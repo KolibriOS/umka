@@ -14,7 +14,7 @@ $Revision: 6462 $
 ; [esi]+[[esp+4]] = name
 ;   out:
 ; eax, ebx = return values for sysfunc 70
-;iglobal
+iglobal
 align 4
 xfs_user_functions:
         dd      xfs_free
@@ -30,7 +30,7 @@ xfs_user_functions:
         dd      0;xfs_Delete
         dd      0;xfs_CreateFolder
 xfs_user_functions_end:
-;endg
+endg
 
 include 'xfs.inc'
 
@@ -263,8 +263,8 @@ endp
 
 ;---------------------------------------------------------------
 ; block number (AG relative)
-; eax -- block_lo
-; edx -- block_hi
+; eax -- inode_lo
+; edx -- inode_hi
 ; ebx -- buffer
 ;---------------------------------------------------------------
 xfs_read_block:
@@ -294,7 +294,7 @@ xfs_read_block:
         add     eax, ecx
         adc     edx, esi
 
-DEBUGF 1,"read block: 0x%x%x\n",edx,eax
+;DEBUGF 1,"read block: 0x%x%x\n",edx,eax
         ; there is no way to read file system block at once, therefore we
         ; 1. calculate the number of sectors first
         ; 2. and then read them in series
@@ -384,7 +384,7 @@ xfs_read_dirblock:
 ; test eax, eax
 ;---------------------------------------------------------------
 xfs_read_inode:
-DEBUGF 1,"reading inode: 0x%x%x\n",[esp+8],[esp+4]
+;DEBUGF 1,"reading inode: 0x%x%x\n",[esp+8],[esp+4]
         push    ebx
         mov     eax, [esp + 8]  ; inode_lo
         mov     edx, [esp + 12] ; inode_hi
@@ -416,25 +416,8 @@ DEBUGF 1,"reading inode: 0x%x%x\n",[esp+8],[esp+4]
         shl     eax, cl
         add     ebx, eax
 
-;DEBUGF 1,"dinode: %x\n", ebx
-;DEBUGF 1,"  %x\n",[ebx+0x00]
-;DEBUGF 1,"  %x\n",[ebx+0x04]
-;DEBUGF 1,"  %x\n",[ebx+0x08]
-;DEBUGF 1,"  %x\n",[ebx+0x0c]
-;DEBUGF 1,"  %x\n",[ebx+0x10]
-;DEBUGF 1,"  %x\n",[ebx+0x14]
-;DEBUGF 1,"  %x\n",[ebx+0x18]
-;DEBUGF 1,"  %x\n",[ebx+0x1c]
-;DEBUGF 1,"  %x\n",[ebx+0x20]
-;DEBUGF 1,"  %x\n",[ebx+0x24]
-;DEBUGF 1,"  %x\n",[ebx+0x28]
-;DEBUGF 1,"  %x\n",[ebx+0x2c]
-;DEBUGF 1,"  %x\n",[ebx+0x30]
-;DEBUGF 1,"  %x\n",[ebx+0x34]
-;DEBUGF 1,"  %x\n",[ebx+0x38]
-;DEBUGF 1,"  %x\n",[ebx+0x3c]
         cmp     word[ebx], XFS_DINODE_MAGIC     ; test signature
-        jnz     .error
+        jne     .error
   .quit:
         xor     eax, eax
         mov     edx, ebx
@@ -1111,7 +1094,7 @@ xfs_get_inode_short:
         ; this function searches for the file in _current_ dir
         ; it is called recursively for all the subdirs /path/to/my/file
 
-DEBUGF 1, "xfs_get_inode_short: %s\n", [esp+4]
+;DEBUGF 1,"xfs_get_inode_short: %s\n",[esp+4]
         mov     esi, [esp + 4]  ; name
         movzx   eax, word[esi]
         cmp     eax, '.'        ; current dir; it is already read, just return
@@ -1135,7 +1118,7 @@ DEBUGF 1, "xfs_get_inode_short: %s\n", [esp+4]
         mov     [ebp + XFS.cur_inode_save], ebx
         cmp     byte[ebx + xfs_inode.di_core.di_format], XFS_DINODE_FMT_LOCAL
         jne     .not_shortdir
-DEBUGF 1, "dir: shortdir\n"
+;DEBUGF 1,"dir: shortdir\n"
         jmp     .shortdir
   .not_shortdir:
         cmp     byte[ebx + xfs_inode.di_core.di_format], XFS_DINODE_FMT_EXTENTS
@@ -1171,9 +1154,9 @@ DEBUGF 1,"NOT IMPLEMENTED: DIR FORMAT\n"
         mov     eax, [esi]
         and     eax, 0x00ffffff
         cmp     eax, '..'
-        jz      .shortdir.parent2
+        je      .shortdir.parent2
         cmp     eax, '../'
-        jz      .shortdir.parent3
+        je      .shortdir.parent3
         jmp     .shortdir.common
   .shortdir.parent3:
         inc     esi
@@ -1181,7 +1164,7 @@ DEBUGF 1,"NOT IMPLEMENTED: DIR FORMAT\n"
         add     esi, 2
         add     ebx, xfs_inode.di_u
         stdcall xfs_get_inode_number_sf, dword[ebx + xfs_dir2_sf_hdr.count], dword[ebx + xfs_dir2_sf_hdr.parent + 4], dword[ebx + xfs_dir2_sf_hdr.parent]
-DEBUGF 1,"found inode: 0x%x%x\n",edx,eax
+;DEBUGF 1,"found inode: 0x%x%x\n",edx,eax
         jmp     .quit
 
         ; not a parent inode?
@@ -1201,8 +1184,8 @@ DEBUGF 1,"found inode: 0x%x%x\n",edx,eax
         movzx   ecx, byte[edi + xfs_dir2_sf_entry.namelen]
         add     edi, xfs_dir2_sf_entry.name
         mov     esi, [esp + 4]
-DEBUGF 1,"esi: %s\n",esi
-DEBUGF 1,"edi: %s\n",edi
+;DEBUGF 1,"esi: %s\n",esi
+;DEBUGF 1,"edi: %s\n",edi
         repe cmpsb
         jne     @f
         cmp     byte[esi], 0            ; HINT: use adc here?
@@ -1596,7 +1579,7 @@ DEBUGF 1,"found inode: 0x%x%x\n",edx,eax
 xfs_get_inode:
         ; call xfs_get_inode_short until file is found / error returned
 
-DEBUGF 1,"getting inode of: %s\n",[esp+4]
+;DEBUGF 1,"getting inode of: %s\n",[esp+4]
         push    ebx esi edi
 
         ; start from the root inode
@@ -1607,7 +1590,7 @@ DEBUGF 1,"getting inode of: %s\n",[esp+4]
 
   .next_dir:
         cmp     byte[esi], 0
-        jz      .found
+        je      .found
 
 ;DEBUGF 1,"next_level: |%s|\n",esi
         stdcall xfs_get_inode_short, esi, eax, edx
@@ -1619,7 +1602,6 @@ DEBUGF 1,"getting inode of: %s\n",[esp+4]
         jmp     .next_dir       ; file name found, go to next directory level
 
   .found:
-DEBUGF 1, "inode found: 0x%x%x\n", edx, eax
 
   .quit:
         pop     edi esi ebx
@@ -1654,14 +1636,13 @@ xfs_ReadFolder:
         ; 2.
         push    ebx esi edi
         add     esi, [esp + 32]         ; directory name
-DEBUGF 1,"xfs_ReadFolder: |%s|\n",esi
+;DEBUGF 1,"xfs_ReadFolder: |%s|\n",esi
         stdcall xfs_get_inode, esi
         pop     edi esi ebx
         mov     ecx, edx
         or      ecx, eax
         jnz     @f
         movi    eax, ERROR_FILE_NOT_FOUND
-        jmp     .error
     @@:
 
         ; 3.

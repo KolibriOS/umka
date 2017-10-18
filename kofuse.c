@@ -1,45 +1,36 @@
-/*
-  FUSE: Filesystem in Userspace
-  Copyright (C) 2001-2007  Miklos Szeredi <miklos@szeredi.hu>
-
-  This program can be distributed under the terms of the GNU GPL.
-  See the file COPYING.
-
-  gcc -Wall hello.c `pkg-config fuse --cflags --libs` -o hello
-*/
-
-#define FUSE_USE_VERSION 26
+#define FUSE_USE_VERSION 31
 
 #include <fuse.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <stdint.h>
 #include <stddef.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <assert.h>
+#include "kocdecl.h"
 
-char *kos_fuse_readdir(const char *path, off_t offset);
-void kos_fuse_init(int fd);
-
-static const char *hello_str = "Hello World!\n";
-static const char *hello_path = "/hello";
-
-static int hello_getattr(const char *path, struct stat *stbuf)
+static void *hello_init(struct fuse_conn_info *conn,
+			struct fuse_config *cfg)
 {
+	(void) conn;
+	cfg->kernel_cache = 1;
+	return NULL;
+}
+
+static int hello_getattr(const char *path, struct stat *stbuf,
+			 struct fuse_file_info *fi)
+{
+	(void) fi;
 	int res = 0;
 
 	memset(stbuf, 0, sizeof(struct stat));
 	if (strcmp(path, "/") == 0) {
 		stbuf->st_mode = S_IFDIR | 0755;
 		stbuf->st_nlink = 2;
-	} else if (strcmp(path, hello_path) == 0) {
+	} else if (strcmp(path+1, "blah") == 0) {
 		stbuf->st_mode = S_IFREG | 0444;
 		stbuf->st_nlink = 1;
-		stbuf->st_size = strlen(hello_str);
+		stbuf->st_size = strlen("blah");
 	} else
 		res = -ENOENT;
 
@@ -47,10 +38,12 @@ static int hello_getattr(const char *path, struct stat *stbuf)
 }
 
 static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-			 off_t offset, struct fuse_file_info *fi)
+			 off_t offset, struct fuse_file_info *fi,
+			 enum fuse_readdir_flags flags)
 {
 	(void) offset;
 	(void) fi;
+	(void) flags;
 
         char *bdfe = kos_fuse_readdir(path, offset);
 
@@ -63,7 +56,7 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 //        close(f);
         bdfe += 0x20;
         for(; i>0; i--) {
-        	filler(buf, bdfe + 0x28, NULL, 0);
+        	filler(buf, bdfe + 0x28, NULL, 0, 0);
                 bdfe += 304;
         }
 
@@ -72,10 +65,10 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
 static int hello_open(const char *path, struct fuse_file_info *fi)
 {
-	if (strcmp(path, hello_path) != 0)
+	if (strcmp(path+1, "blah") != 0)
 		return -ENOENT;
 
-	if ((fi->flags & 3) != O_RDONLY)
+	if ((fi->flags & O_ACCMODE) != O_RDONLY)
 		return -EACCES;
 
 	return 0;
@@ -86,14 +79,14 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
 {
 	size_t len;
 	(void) fi;
-	if(strcmp(path, hello_path) != 0)
+	if(strcmp(path+1, "blah") != 0)
 		return -ENOENT;
 
-	len = strlen(hello_str);
+	len = strlen("blah");
 	if (offset < len) {
 		if (offset + size > len)
 			size = len - offset;
-		memcpy(buf, hello_str + offset, size);
+		memcpy(buf, "blah" + offset, size);
 	} else
 		size = 0;
 
@@ -101,6 +94,7 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
 }
 
 static struct fuse_operations hello_oper = {
+	.init           = hello_init,
 	.getattr	= hello_getattr,
 	.readdir	= hello_readdir,
 	.open		= hello_open,

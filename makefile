@@ -1,25 +1,26 @@
 FASM=fasm
+CC=gcc -m32
+CFLAGS=-Wall -g3 -O0 -D_FILE_OFFSET_BITS=64
 
-all: xfskosfuse
+all: kofu kofuse
 
-#xfskos: xfskos.o
-#	ld *.o -o $@ -m elf_i386 -nostdlib
-#	strip $@
+kofu: kofu.o kocdecl.o
+	$(CC) $^ -o $@
 
-xfskos.o: xfskos.asm xfs.inc xfs.asm
+kofuse: kofuse.o kocdecl.o
+	$(CC) $^ -o $@ `pkg-config fuse3 --libs`
+
+kocdecl.o: kocdecl.asm xfs.inc xfs.asm
 	$(FASM) $< $@
 
-xfskosfuse: xfskosfuse.o xfskos.o
-	gcc -m32 -Wall $^ -o $@ -D_FILE_OFFSET_BITS=64 -lfuse -g3 -O0
+kofu.o: kofu.c
+	$(CC) $(CFLAGS) -c $<
 
-xfskosfuse.o: xfskosfuse.c
-	gcc -m32 -Wall -c $< -D_FILE_OFFSET_BITS=64 -g3 -O0
+kofuse.o: kofuse.c
+	$(CC) $(CFLAGS) `pkg-config fuse3 --cflags` -c $<
 
-.PHONY: all clean check
+.PHONY: all clean
 
 clean:
-	rm -f *.o xfskos
-
-check: xfskos
-	echo ok
+	rm -f *.o kofu kofuse
 

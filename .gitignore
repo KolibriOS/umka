@@ -1,3 +1,5 @@
+*.swp
+.vim
 *.o
-xfskos
-xfskosfuse
+kofu
+kofuse

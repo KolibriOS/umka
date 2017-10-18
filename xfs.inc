@@ -42,7 +42,7 @@ XFS_ABTC_MAGIC          = 'ABTC'
 XFS_IBT_MAGIC           = 'IABT'
 XFS_DINODE_MAGIC        = 'IN'
 XFS_BMAP_MAGIC          = 'BMAP'
-XFS_DA_NODE_MAGIC       = 0xbefe        ; these are little endian here
+XFS_DA_NODE_MAGIC       = 0xbefe        ; those are little endian here
 XFS_ATTR_LEAF_MAGIC     = 0xeefb        ; but big endian in docs
 XFS_DIR2_LEAF1_MAGIC    = 0xf1d2        ; pay attention!
 XFS_DIR2_LEAFN_MAGIC    = 0xffd2        ;
@@ -64,11 +64,11 @@ BMBT_BLOCKCOUNT_BITLEN  = 21
 ; they are magic infile offsets for directories
 XFS_DIR2_DATA_ALIGN_LOG = 3     ; i.e., 8 bytes
 XFS_DIR2_LEAF_SPACE     = 1
-XFS_DIR2_SPACE_SIZE     = 1 SHL (32 + XFS_DIR2_DATA_ALIGN_LOG)
-XFS_DIR2_LEAF_OFFSET    = XFS_DIR2_LEAF_SPACE * XFS_DIR2_SPACE_SIZE
+XFS_DIR2_SPACE_SIZE     = (1 SHL (32 + XFS_DIR2_DATA_ALIGN_LOG))
+XFS_DIR2_LEAF_OFFSET    = (XFS_DIR2_LEAF_SPACE * XFS_DIR2_SPACE_SIZE)
 XFS_DIR2_FREE_SPACE     = 2
-XFS_DIR2_SPACE_SIZE     = 1 SHL (32 + XFS_DIR2_DATA_ALIGN_LOG)
-XFS_DIR2_FREE_OFFSET    = XFS_DIR2_FREE_SPACE * XFS_DIR2_SPACE_SIZE
+XFS_DIR2_SPACE_SIZE     = (1 SHL (32 + XFS_DIR2_DATA_ALIGN_LOG))
+XFS_DIR2_FREE_OFFSET    = (XFS_DIR2_FREE_SPACE * XFS_DIR2_SPACE_SIZE)
 
 
 ; data section magic constants for directories (xfs_dir2_data.h)
@@ -526,4 +526,3 @@ struct XFS PARTITION
         buffer_pos              dd ?
         eof                     dd ?
 ends
-
