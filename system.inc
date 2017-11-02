@@ -15,3 +15,5 @@ O_LARGEFILE = 0x8000
 STDIN       = 0
 STDOUT      = 1
 STDERR      = 2
+
+ENOENT      = 2

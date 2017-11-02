@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -23,13 +24,25 @@ int main(int argc, char **argv) {
 //msg_not_xfs_partition    db 'not xfs partition',0x0a
     while(true) {
         prompt();
-        scanf("%s", cmd_buf);
-        char *bdfe = kos_fuse_readdir("", 0);
-        uint32_t file_cnt = *(uint32_t*)(bdfe + 4);
-        bdfe += 0x20;
-        for (; file_cnt > 0; file_cnt--) {
-            printf("%s\n", bdfe + 0x28);
-            bdfe += 304;
+        fgets(cmd_buf, 4095, stdin);
+        int len = strlen(cmd_buf);
+        cmd_buf[len-1] = '\0';
+//        printf("'%s'\n", cmd_buf);
+        if (!strncmp(cmd_buf, "ls ", 3)) {
+            void *header = kos_fuse_readdir(cmd_buf + 4, 0);
+            uint32_t file_cnt = ((uint32_t*)header)[1];
+            printf("file_cnt: %u\n", file_cnt);
+            struct bdfe *kf = header + 0x20;
+            for (; file_cnt > 0; file_cnt--) {
+                printf("%s\n", kf->name);
+                kf++;
+            }
+        } else if (!strncmp(cmd_buf, "stat ", 5)) {
+            struct bdfe *kf = kos_fuse_getattr(cmd_buf + 5);
+            printf("attr: 0x%2.2x\n", kf->attr);
+            printf("size: %llu\n", kf->size);
+        } else {
+            printf("unknown command: %s\n", cmd_buf);
         }
     }
 

@@ -1,7 +1,7 @@
 format ELF
 
 __DEBUG__ = 1
-__DEBUG_LEVEL__ = 2
+__DEBUG_LEVEL__ = 1
 
 include 'proc32.inc'
 include 'struct.inc'
@@ -25,6 +25,21 @@ ERROR_FS_FAIL        = 9
 ERROR_ACCESS_DENIED  = 10
 ERROR_DEVICE         = 11
 ERROR_OUT_OF_MEMORY  = 12
+
+struct FS_FUNCTIONS
+        Free            dd ?
+        Size            dd ?
+        ReadFile        dd ?
+        ReadFolder      dd ?
+        CreateFile      dd ?
+        WriteFile       dd ?
+        SetFileEnd      dd ?
+        GetFileInfo     dd ?
+        SetFileInfo     dd ?
+        Run             dd ?
+        Delete          dd ?
+        CreateFolder    dd ?
+ends
 
 purge section,mov,add,sub
 section '.text' executable align 16
@@ -81,6 +96,32 @@ kos_fuse_readdir:
         mov     esi, eax
         push    0
         call    xfs_ReadFolder
+        pop     eax
+
+        pop     ebp edi esi ebx
+        mov     eax, sf70_buffer
+        ret
+
+
+public kos_fuse_getattr
+kos_fuse_getattr:
+        push    ebx esi edi ebp
+
+        mov     edx, sf70_params
+        mov     dword[edx + 0x00], 5
+        mov     dword[edx + 0x04], 0
+        mov     dword[edx + 0x08], 0
+        mov     dword[edx + 0x0c], 0
+        mov     dword[edx + 0x10], sf70_buffer
+        mov     eax, [esp + 0x14]       ; path
+        inc     eax     ; skip '/'
+        mov     [edx + 0x14], eax
+
+        mov     ebp, [fs_struct]
+        mov     ebx, sf70_params
+        mov     esi, eax
+        push    0
+        call    xfs_GetFileInfo
         pop     eax
 
         pop     ebp edi esi ebx
@@ -178,6 +219,7 @@ put_board:
 ret
 
 
+;include 'ext.inc'
 include 'xfs.asm'
 
 

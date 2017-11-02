@@ -13,10 +13,10 @@ kofuse: kofuse.o kocdecl.o
 kocdecl.o: kocdecl.asm xfs.inc xfs.asm
 	$(FASM) $< $@
 
-kofu.o: kofu.c
+kofu.o: kofu.c kocdecl.h
 	$(CC) $(CFLAGS) -c $<
 
-kofuse.o: kofuse.c
+kofuse.o: kofuse.c kocdecl.h
 	$(CC) $(CFLAGS) `pkg-config fuse3 --cflags` -c $<
 
 .PHONY: all clean
