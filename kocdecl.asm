@@ -103,6 +103,7 @@ kos_fuse_readdir:
         ret
 
 
+;void *kos_fuse_getattr(const char *path)
 public kos_fuse_getattr
 kos_fuse_getattr:
         push    ebx esi edi ebp
@@ -127,6 +128,38 @@ kos_fuse_getattr:
         pop     ebp edi esi ebx
         mov     eax, sf70_buffer
         ret
+
+
+;long *kos_fuse_read(const char *path, char *buf, size_t size, off_t offset)
+public kos_fuse_read
+kos_fuse_read:
+        push    ebx esi edi ebp
+
+        mov     edx, sf70_params
+        mov     dword[edx + 0x00], 0
+        mov     eax, [esp + 0x20]
+        mov     dword[edx + 0x04], eax
+        mov     dword[edx + 0x08], 0
+        mov     eax, [esp + 0x1c]
+        mov     dword[edx + 0x0c], eax
+        mov     eax, [esp + 0x18]
+        mov     dword[edx + 0x10], eax
+        mov     eax, [esp + 0x14]       ; path
+        inc     eax     ; skip '/'
+        mov     [edx + 0x14], eax
+
+        mov     ebp, [fs_struct]
+        mov     ebx, sf70_params
+        mov     esi, eax
+        push    0
+        call    xfs_ReadFile
+        pop     eax
+
+        pop     ebp edi esi ebx
+        mov     eax, 0
+        ret
+
+
 
 
 ; in: eax = sector, ebx = buffer, ebp = pointer to PARTITION structure

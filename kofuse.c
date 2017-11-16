@@ -15,7 +15,7 @@ static void bdfe_to_stat(struct bdfe *kf, struct stat *st) {
         st->st_mode = S_IFDIR | 0755;
         st->st_nlink = 2;
     } else {
-        st->st_mode = S_IFREG | 0444;
+        st->st_mode = S_IFREG | 0644;
         st->st_nlink = 1;
         st->st_size = kf->size;
     }
@@ -33,26 +33,9 @@ static int hello_getattr(const char *path, struct stat *stbuf,
         (void) fi;
         int res = 0;
 
-//        memset(stbuf, 0, sizeof(struct stat));
-//        if (strcmp(path, "/") == 0) {
-//                stbuf->st_mode = S_IFDIR | 0755;
-//                stbuf->st_nlink = 2;
-//        } else {
-            struct bdfe *kf = kos_fuse_getattr(path);
-            bdfe_to_stat(kf, stbuf);
-//        }
-
-/*
-        if (strcmp(path, "/") == 0) {
-                stbuf->st_mode = S_IFDIR | 0755;
-                stbuf->st_nlink = 2;
-        } else if (strcmp(path+1, "blah") == 0) {
-                stbuf->st_mode = S_IFREG | 0444;
-                stbuf->st_nlink = 1;
-                stbuf->st_size = strlen("blah");
-        } else
-                res = -ENOENT;
-*/
+        struct bdfe *kf = kos_fuse_getattr(path);
+        bdfe_to_stat(kf, stbuf);
+//        res = -ENOENT;
         return res;
 }
 
@@ -65,13 +48,7 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
         void *header = kos_fuse_readdir(path, offset);
 
-//      if (strcmp(path, "/") != 0)
-//              return -ENOENT;
         uint32_t i = *(uint32_t*)(header + 4);
-//        int f = open("/tmp/t", O_RDWR | O_CREAT);
-//        write(f, bdfe, 1000);
-//        write(f, &i, 4);
-//        close(f);
         struct bdfe *kf = header + 0x20;
         for(; i>0; i--) {
                 filler(buf, kf->name, NULL, 0, 0);
@@ -82,8 +59,8 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 }
 
 static int hello_open(const char *path, struct fuse_file_info *fi) {
-        if (strcmp(path+1, "blah") != 0)
-                return -ENOENT;
+//        if (strcmp(path+1, "blah") != 0)
+//                return -ENOENT;
 
         if ((fi->flags & O_ACCMODE) != O_RDONLY)
                 return -EACCES;
@@ -93,19 +70,9 @@ static int hello_open(const char *path, struct fuse_file_info *fi) {
 
 static int hello_read(const char *path, char *buf, size_t size, off_t offset,
                       struct fuse_file_info *fi) {
-        size_t len;
         (void) fi;
-        if(strcmp(path+1, "blah") != 0)
-                return -ENOENT;
 
-        len = strlen("blah");
-        if (offset < len) {
-                if (offset + size > len)
-                        size = len - offset;
-                memcpy(buf, "blah" + offset, size);
-        } else
-                size = 0;
-
+        kos_fuse_read(path, buf, size, offset);
         return size;
 }
 

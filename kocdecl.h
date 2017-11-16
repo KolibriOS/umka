@@ -25,5 +25,6 @@ struct bdfe {
 void kos_fuse_init(int fd);
 uint8_t *kos_fuse_readdir(const char *path, off_t offset);
 void *kos_fuse_getattr(const char *path);
+long *kos_fuse_read(const char *path, char *buf, size_t size, off_t offset);
 
 #endif
