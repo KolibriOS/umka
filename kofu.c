@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
 #include <sys/types.h>
@@ -14,6 +15,11 @@ void prompt() {
 }
 
 int main(int argc, char **argv) {
+    if (argc != 2) {
+        printf("usage: kofu <file.xfs>\n");
+        exit(1);
+    }
+
     char cmd_buf[4096];
     int fd = open(argv[1], O_RDONLY);
     kos_fuse_init(fd);

@@ -3,9 +3,9 @@ format ELF
 __DEBUG__ = 1
 __DEBUG_LEVEL__ = 1
 
+include 'macros.inc'
 include 'proc32.inc'
 include 'struct.inc'
-include 'macros.inc'
 include 'const.inc'
 include 'system.inc'
 include 'debug-fdo.inc'

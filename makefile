@@ -1,17 +1,18 @@
 FASM=fasm
-CC=gcc -m32
-CFLAGS=-Wall -g3 -O0 -D_FILE_OFFSET_BITS=64
+CC=gcc
+CFLAGS=-m32 -Wall -Wextra -g -O0 -D_FILE_OFFSET_BITS=64
+LDFLAGS=-m32
 
 all: kofu kofuse
 
 kofu: kofu.o kocdecl.o
-	$(CC) $^ -o $@
+	$(CC) $(LDFLAGS) $^ -o $@
 
 kofuse: kofuse.o kocdecl.o
-	$(CC) $^ -o $@ `pkg-config fuse3 --libs`
+	$(CC) $(LDFLAGS) $^ -o $@ `pkg-config fuse3 --libs`
 
-kocdecl.o: kocdecl.asm xfs.inc xfs.asm
-	$(FASM) $< $@
+kocdecl.o: kocdecl.asm $(KERNEL_TRUNK)/fs/xfs.inc $(KERNEL_TRUNK)/fs/xfs.asm
+	INCLUDE="$(KERNEL_TRUNK);$(KERNEL_TRUNK)/fs" $(FASM) $< $@
 
 kofu.o: kofu.c kocdecl.h
 	$(CC) $(CFLAGS) -c $<
