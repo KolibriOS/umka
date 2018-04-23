@@ -2,6 +2,7 @@
 #define KOS_H_INCLUDED
 
 #include <stdint.h>
+#include <stdbool.h>
 
 struct bdfe {
     uint32_t attr;
@@ -22,7 +23,7 @@ struct bdfe {
 #define KF_LABEL    0x08
 #define KF_FOLDER   0x10
 
-void kos_fuse_init(int fd);
+bool kos_fuse_init(int fd);
 uint8_t *kos_fuse_readdir(const char *path, off_t offset);
 void *kos_fuse_getattr(const char *path);
 long *kos_fuse_read(const char *path, char *buf, size_t size, off_t offset);

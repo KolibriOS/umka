@@ -22,7 +22,9 @@ int main(int argc, char **argv) {
 
     char cmd_buf[4096];
     int fd = open(argv[1], O_RDONLY);
-    kos_fuse_init(fd);
+    if (!kos_fuse_init(fd)) {
+        exit(1);
+    }
     
 //msg_few_args             db 'usage: xfskos image [offset]',0x0a
 //msg_file_not_found       db 'file not found: '

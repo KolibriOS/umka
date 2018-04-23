@@ -61,6 +61,7 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 static int hello_open(const char *path, struct fuse_file_info *fi) {
 //        if (strcmp(path+1, "blah") != 0)
 //                return -ENOENT;
+        (void) path;
 
         if ((fi->flags & O_ACCMODE) != O_RDONLY)
                 return -EACCES;

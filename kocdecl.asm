@@ -69,6 +69,7 @@ kos_fuse_init:
         mov     ecx, msg_not_xfs_partition
         mov     edx, msg_not_xfs_partition.size
         int     0x80
+        xor     eax, eax
     @@:
         mov     [fs_struct], eax
 
@@ -262,7 +263,7 @@ include_debug_strings
 partition_offset        dd 2048*512
 alloc_pos       dd alloc_base
 sf70_params     rd 6
-msg_not_xfs_partition    db 'not xfs partition',0x0a    ; TODO: return codes, report in C
+msg_not_xfs_partition    db 'not XFS partition',0x0a    ; TODO: return codes, report in C
 msg_not_xfs_partition.size = $ - msg_not_xfs_partition
 IncludeIGlobals
 
