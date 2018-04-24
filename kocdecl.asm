@@ -44,6 +44,21 @@ ends
 purge section,mov,add,sub
 section '.text' executable align 16
 
+
+;uint32_t kos_time_to_epoch(uint8_t *time);
+public kos_time_to_epoch
+kos_time_to_epoch:
+        push    ebx esi edi ebp
+
+        mov     esi, [esp + 0x14]
+        call    fsCalculateTime
+        add     eax, 978307200  ; epoch to 2001.01.01
+
+        pop     ebp edi esi ebx
+        ret
+
+
+;void *kos_fuse_init(int fd);
 public kos_fuse_init
 kos_fuse_init:
         push    ebx esi edi ebp
@@ -75,6 +90,7 @@ kos_fuse_init:
 
         pop     ebp edi esi ebx
         ret
+
 
 ;char *hello_readdir(const char *path, off_t offset)
 public kos_fuse_readdir

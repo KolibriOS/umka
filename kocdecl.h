@@ -23,6 +23,7 @@ struct bdfe {
 #define KF_LABEL    0x08
 #define KF_FOLDER   0x10
 
+uint32_t kos_time_to_epoch(uint32_t *time);
 void *kos_fuse_init(int fd);
 uint8_t *kos_fuse_readdir(const char *path, off_t offset);
 void *kos_fuse_getattr(const char *path);

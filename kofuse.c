@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <time.h>
 #include <assert.h>
 #include "kocdecl.h"
 
@@ -19,6 +20,9 @@ static void bdfe_to_stat(struct bdfe *kf, struct stat *st) {
         st->st_nlink = 1;
         st->st_size = kf->size;
     }
+    st->st_atim = (struct timespec){kos_time_to_epoch(&(kf->atime)), 0};
+    st->st_mtim = (struct timespec){kos_time_to_epoch(&(kf->mtime)), 0};
+    st->st_ctim = (struct timespec){kos_time_to_epoch(&(kf->ctime)), 0};
 }
 
 static void *hello_init(struct fuse_conn_info *conn,
