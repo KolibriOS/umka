@@ -92,7 +92,7 @@ kos_fuse_init:
         ret
 
 
-;char *hello_readdir(const char *path, off_t offset)
+;char *kos_fuse_readdir(const char *path, off_t offset)
 public kos_fuse_readdir
 kos_fuse_readdir:
         push    ebx esi edi ebp

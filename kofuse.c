@@ -25,14 +25,14 @@ static void bdfe_to_stat(struct bdfe *kf, struct stat *st) {
     st->st_ctim = (struct timespec){kos_time_to_epoch(&(kf->ctime)), 0};
 }
 
-static void *hello_init(struct fuse_conn_info *conn,
+static void *kofuse_init(struct fuse_conn_info *conn,
                         struct fuse_config *cfg) {
         (void) conn;
         cfg->kernel_cache = 1;
         return NULL;
 }
 
-static int hello_getattr(const char *path, struct stat *stbuf,
+static int kofuse_getattr(const char *path, struct stat *stbuf,
                          struct fuse_file_info *fi) {
         (void) fi;
         int res = 0;
@@ -43,7 +43,7 @@ static int hello_getattr(const char *path, struct stat *stbuf,
         return res;
 }
 
-static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
+static int kofuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                          off_t offset, struct fuse_file_info *fi,
                          enum fuse_readdir_flags flags) {
         (void) offset;
@@ -62,7 +62,7 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
         return 0;
 }
 
-static int hello_open(const char *path, struct fuse_file_info *fi) {
+static int kofuse_open(const char *path, struct fuse_file_info *fi) {
 //        if (strcmp(path+1, "blah") != 0)
 //                return -ENOENT;
         (void) path;
@@ -73,7 +73,7 @@ static int hello_open(const char *path, struct fuse_file_info *fi) {
         return 0;
 }
 
-static int hello_read(const char *path, char *buf, size_t size, off_t offset,
+static int kofuse_read(const char *path, char *buf, size_t size, off_t offset,
                       struct fuse_file_info *fi) {
         (void) fi;
 
@@ -81,12 +81,12 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
         return size;
 }
 
-static struct fuse_operations hello_oper = {
-        .init           = hello_init,
-        .getattr        = hello_getattr,
-        .readdir        = hello_readdir,
-        .open           = hello_open,
-        .read           = hello_read,
+static struct fuse_operations kofuse_oper = {
+        .init           = kofuse_init,
+        .getattr        = kofuse_getattr,
+        .readdir        = kofuse_readdir,
+        .open           = kofuse_open,
+        .read           = kofuse_read,
 };
 
 int main(int argc, char *argv[]) {
@@ -96,5 +96,5 @@ int main(int argc, char *argv[]) {
         }
         int fd = open(argv[2], O_RDONLY);
         kos_fuse_init(fd);
-        return fuse_main(argc-1, argv, &hello_oper, NULL);
+        return fuse_main(argc-1, argv, &kofuse_oper, NULL);
 }
