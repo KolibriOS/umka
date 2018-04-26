@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -13,14 +14,17 @@
 #define MAX_COMMAND_ARGS 42
 
 char cmd_buf[FGETS_BUF_LEN];
+bool is_tty;
+int cmd_num = 0;
 
 void prompt() {
-    printf("> ");
-    fflush(stdout);
+    fprintf(stderr, "#%d> ", cmd_num);
 }
 
 bool next_line() {
-    prompt();
+    if (is_tty) {
+        prompt();
+    }
     return fgets(cmd_buf, FGETS_BUF_LEN, stdin) != NULL;
 }
 
@@ -67,6 +71,7 @@ int main(int argc, char **argv) {
         printf("usage: kofu <file.xfs>\n");
         exit(1);
     }
+    is_tty = isatty(STDIN_FILENO);
 
     int fd = open(argv[1], O_RDONLY);
     if (!kos_fuse_init(fd)) {
@@ -78,12 +83,20 @@ int main(int argc, char **argv) {
 //msg_unknown_command      db 'unknown command',0x0a
 //msg_not_xfs_partition    db 'not xfs partition',0x0a
     while(next_line()) {
+        if (!is_tty) {
+            prompt();
+            fprintf(stderr, "%s", cmd_buf);
+        }
         char **arg = split_args(cmd_buf);
         bool found = false;
         for (struct func_table *ft = funcs; ft->name != NULL; ft++) {
             if (!strcmp(arg[0], ft->name)) {
-                ft->func(arg);
                 found = true;
+                ft->func(arg);
+                if (!is_tty) {
+                    fprintf(stderr, "\n");
+                }
+                cmd_num++;
                 break;
             }
         }

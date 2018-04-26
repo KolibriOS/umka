@@ -1,6 +1,6 @@
 format ELF
 
-__DEBUG__ = 1
+__DEBUG__ = 0
 __DEBUG_LEVEL__ = 1
 
 include 'macros.inc'
