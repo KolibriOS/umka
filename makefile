@@ -11,8 +11,8 @@ kofu: kofu.o kocdecl.o
 kofuse: kofuse.o kocdecl.o
 	$(CC) $(LDFLAGS) $^ -o $@ `pkg-config fuse3 --libs`
 
-kocdecl.o: kocdecl.asm kocdecl.h $(KERNEL_TRUNK)/fs/xfs.inc $(KERNEL_TRUNK)/fs/xfs.asm
-	INCLUDE="$(KERNEL_TRUNK);$(KERNEL_TRUNK)/fs" $(FASM) $< $@
+kocdecl.o: kocdecl.asm kocdecl.h $(KERNEL_TRUNK)/fs/ext.inc $(KERNEL_TRUNK)/fs/xfs.inc $(KERNEL_TRUNK)/fs/xfs.asm
+	INCLUDE="$(KERNEL_TRUNK);$(KERNEL_TRUNK)/fs;$(KERNEL_TRUNK)/blkdev" $(FASM) $< $@ -m 123456
 
 kofu.o: kofu.c kocdecl.h
 	$(CC) $(CFLAGS) -c $<

@@ -1,6 +1,6 @@
 format ELF
 
-__DEBUG__ = 0
+__DEBUG__ = 1
 __DEBUG_LEVEL__ = 1
 
 include 'macros.inc'
@@ -9,22 +9,10 @@ include 'struct.inc'
 include 'const.inc'
 include 'system.inc'
 include 'debug-fdo.inc'
-include 'disk.inc'
-include 'fs_common.inc'
-
-ERROR_SUCCESS        = 0
-ERROR_DISK_BASE      = 1
-ERROR_UNSUPPORTED_FS = 2
-ERROR_UNKNOWN_FS     = 3
-ERROR_PARTITION      = 4
-ERROR_FILE_NOT_FOUND = 5
-ERROR_END_OF_FILE    = 6
-ERROR_MEMORY_POINTER = 7
-ERROR_DISK_FULL      = 8
-ERROR_FS_FAIL        = 9
-ERROR_ACCESS_DENIED  = 10
-ERROR_DEVICE         = 11
-ERROR_OUT_OF_MEMORY  = 12
+include 'blkdev/disk.inc'
+include 'blkdev/disk_cache.inc'
+include 'fs/fs_lfn.inc'
+include 'crc.inc'
 
 struct FS_FUNCTIONS
         Free            dd ?
@@ -66,26 +54,21 @@ kos_fuse_init:
         mov     eax, [esp + 0x14]
         mov     [fd], eax
 
-        mov     eax, 0
-        mov     ebx, mbr_buffer
-        mov     ebp, partition
-        call    fs_read32_sys
+        mov     [file_disk.Size], 65536
+        stdcall disk_add, disk_functions, disk_name, file_disk, DISK_NO_INSERT_NOTIFICATION
+        mov     [disk], eax
+        stdcall disk_media_changed, [disk], 1
 
-        mov     esi, disk
-        mov     [esi + DISK.MediaInfo.SectorSize], 512
-        mov     ebp, partition
-        mov     [ebp + PARTITION.Disk], esi
-        mov     ebx, mbr_buffer
-        call    xfs_create_partition
-        test    eax, eax
-        jnz     @f
+        mov     eax, [disk]
+        cmp     [eax + DISK.NumPartitions], 0
+        jnz     .done
         mov     eax, SYS_WRITE
         mov     ebx, STDOUT
-        mov     ecx, msg_not_xfs_partition
-        mov     edx, msg_not_xfs_partition.size
+        mov     ecx, msg_no_partition
+        mov     edx, msg_no_partition.size
         int     0x80
         xor     eax, eax
-    @@:
+  .done:
         mov     [fs_struct], eax
 
         pop     ebp edi esi ebx
@@ -169,7 +152,7 @@ kos_fuse_read:
         mov     ebx, sf70_params
         mov     esi, eax
         push    0
-        call    xfs_ReadFile
+        call    xfs_Read
         pop     eax
 
         pop     ebp edi esi ebx
@@ -177,10 +160,36 @@ kos_fuse_read:
         ret
 
 
+proc disk_read stdcall, userdata, buffer, startsector:qword, numsectors
+        pushad
+        mov     eax, dword[startsector + 0]   ; sector lo
+        mov     edx, dword[startsector + 4]   ; sector hi
+        imul    ecx, eax, 512
+        mov     eax, SYS_LSEEK
+        mov     ebx, [fd]
+        mov     edx, SEEK_SET
+        int     0x80
+DEBUGF 1, "lseek: %x\n", eax
+        popad
+
+        pushad
+        mov     eax, SYS_READ
+        mov     ebx, [fd]
+        mov     ecx, [buffer]
+        mov     edx, [numsectors]
+        mov     edx, [edx]
+        imul    edx, 512
+        int     0x80
+DEBUGF 1, "read: %d\n", eax
+        popad
+
+        movi    eax, DISK_STATUS_OK
+        ret
+endp
 
 
-; in: eax = sector, ebx = buffer, ebp = pointer to PARTITION structure
-fs_read32_sys:
+proc disk_write stdcall, userdata, buffer, startsector:qword, numsectors
+ud2
         pushad
         imul    ecx, eax, 512
         add     ecx, 2048*512
@@ -192,49 +201,32 @@ fs_read32_sys:
         popad
 
         pushad
-        mov     eax, SYS_READ
+        mov     eax, SYS_WRITE
         mov     ecx, ebx
         mov     ebx, [fd]
         mov     edx, 512
         int     0x80
-;DEBUGF 1, "read: %d\n", eax
+;DEBUGF 1, "write: %d\n", eax
         popad
 
-        xor     eax, eax
-
+        movi    eax, DISK_STATUS_OK
         ret
+endp
 
 
-fs_read32_app:
+; int querymedia(void* userdata, DISKMEDIAINFO* info);
+proc disk_querymedia stdcall, hd_data, mediainfo
+        mov     ecx, [mediainfo]
+        mov     [ecx + DISKMEDIAINFO.Flags], 0
+        mov     [ecx + DISKMEDIAINFO.SectorSize], 512
+        mov     eax, [hd_data]
+        mov     eax, dword[eax + FILE_DISK.Size + 0]
+        mov     dword [ecx + DISKMEDIAINFO.Capacity], eax
+        mov     dword [ecx + DISKMEDIAINFO.Capacity + 4], 0
+        
+        movi    eax, DISK_STATUS_OK
         ret
-
-
-fs_read64_sys:
-        pushad
-        imul    ecx, eax, 512
-        add     ecx, 2048*512
-        mov     eax, SYS_LSEEK
-        mov     ebx, [fd]
-        mov     edx, SEEK_SET
-        int     0x80
-;DEBUGF 1, "lseek: %x\n", eax
-        popad
-
-        pushad
-        mov     eax, SYS_READ
-        imul    edx, ecx, 512
-        mov     ecx, ebx
-        mov     ebx, [fd]
-        int     0x80
-;DEBUGF 1, "read: %d\n", eax
-        popad
-
-        xor     eax, eax
-        ret
-
-
-fs_read64_app:
-        ret
+endp
 
 
 malloc:
@@ -243,9 +235,30 @@ malloc:
         pop     eax
         ret
 
+proc kernel_alloc _size
+        mov     eax, [_size]
+        call    malloc
+        ret
+endp
+
+
+proc alloc_kernel_space _size
+        mov     eax, [_size]
+        call    malloc
+        ret
+endp
+
+proc alloc_pages _size
+        shl     eax, 12
+        call    malloc
+        ret
+endp
+
+
+
+
 free:
         ret
-
 
 kernel_free:
         ret
@@ -268,27 +281,114 @@ put_board:
         popad
 ret
 
+align 16        ;very often call this subrutine
+memmove:       ; memory move in bytes
+; eax = from
+; ebx = to
+; ecx = no of bytes
+        test    ecx, ecx
+        jle     .ret
 
-;include 'ext.inc'
-include 'xfs.asm'
+        push    esi edi ecx
+
+        mov     edi, ebx
+        mov     esi, eax
+
+        test    ecx, not 11b
+        jz      @f
+
+        push    ecx
+        shr     ecx, 2
+        rep movsd
+        pop     ecx
+        and     ecx, 11b
+        jz      .finish
+;--------------------------------------
+align 4
+@@:
+        rep movsb
+;--------------------------------------
+align 4
+.finish:
+        pop     ecx edi esi
+;--------------------------------------
+align 4
+.ret:
+        ret
+
+
+sys_msg_board_str:
+protect_from_terminate:
+unprotect_from_terminate:
+change_task:
+ReadCDWRetr:
+WaitUnitReady:
+prevent_medium_removal:
+Read_TOC:
+commit_pages:
+release_pages:
+        ret
+
+proc fs_execute
+; edx = flags
+; ecx -> cmdline
+; ebx -> absolute file path
+; eax = string length
+        ret
+endp
 
 
 section '.data' writeable align 16
 include_debug_strings
+disk_functions:
+        dd disk_functions_end - disk_functions
+        dd 0
+        dd 0
+        dd disk_querymedia
+        dd disk_read
+        dd disk_write
+        dd 0
+        dd 0
+disk_functions_end:
 
-partition_offset        dd 2048*512
+struct FILE_DISK
+        Size dd ?
+ends
+
+file_disk FILE_DISK
+
+;partition_offset        dd 2048*512
 alloc_pos       dd alloc_base
 sf70_params     rd 6
-msg_not_xfs_partition    db 'not XFS partition',0x0a    ; TODO: return codes, report in C
-msg_not_xfs_partition.size = $ - msg_not_xfs_partition
+msg_no_partition    db 'no partition detected',0x0a
+msg_no_partition.size = $ - msg_no_partition
+disk_name db 'hd',0
+current_slot dd ?
+pg_data PG_DATA
+ide_channel1_mutex MUTEX
+ide_channel2_mutex MUTEX
+ide_channel3_mutex MUTEX
+ide_channel4_mutex MUTEX
+ide_channel5_mutex MUTEX
+ide_channel6_mutex MUTEX
+ide_channel7_mutex MUTEX
+ide_channel8_mutex MUTEX
 IncludeIGlobals
 
 
 section '.bss' writeable align 16
-mbr_buffer rb 4096*3
+;mbr_buffer rb 4096*3
+DiskNumber db ?
+ChannelNumber db ?
+DevErrorCode dd ?
+CDSectorAddress dd ?
+CDDataBuf_pointer dd ?
+DRIVE_DATA: rb 0x4000
+cdpos dd ?
+cd_appl_data rd 1
 fd      rd 1
-partition PARTITION
-disk DISK
-alloc_base      rb 1024*1024
+disk dd ?
+alloc_base      rb 4*1024*1024
 fs_struct       rd 1
 sf70_buffer     rb 1024*1024
+IncludeUGlobals
