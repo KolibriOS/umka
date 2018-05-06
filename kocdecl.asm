@@ -51,6 +51,8 @@ public kos_fuse_init
 kos_fuse_init:
         push    ebx esi edi ebp
 
+        mov     [pg_data.pages_free], (128*1024*1024)/0x1000
+
         mov     eax, [esp + 0x14]
         mov     [fd], eax
 
@@ -78,26 +80,24 @@ kos_fuse_init:
 ;char *kos_fuse_readdir(const char *path, off_t offset)
 public kos_fuse_readdir
 kos_fuse_readdir:
+;DEBUGF 1, '#kos_fuse_readdir\n'
         push    ebx esi edi ebp
 
         mov     edx, sf70_params
         mov     dword[edx + 0x00], 1
         mov     eax, [esp + 0x18]       ; offset
         mov     [edx + 0x04], eax
-        mov     dword[edx + 0x08], 1
+        mov     dword[edx + 0x08], 1    ; cp866
         mov     dword[edx + 0x0c], 100
         mov     dword[edx + 0x10], sf70_buffer
         mov     eax, [esp + 0x14]       ; path
-        inc     eax     ; skip '/'
-        mov     [edx + 0x14], eax
+        mov     byte[edx + 0x14], 0
+        mov     [edx + 0x15], eax
 
-        mov     ebp, [fs_struct]
         mov     ebx, sf70_params
-        mov     esi, eax
-        push    0
-        call    xfs_ReadFolder
-        pop     eax
-
+        pushad  ; file_system_lfn writes here
+        call    file_system_lfn
+        popad
         pop     ebp edi esi ebx
         mov     eax, sf70_buffer
         ret
@@ -106,6 +106,7 @@ kos_fuse_readdir:
 ;void *kos_fuse_getattr(const char *path)
 public kos_fuse_getattr
 kos_fuse_getattr:
+;DEBUGF 1, '#kos_fuse_getattr\n'
         push    ebx esi edi ebp
 
         mov     edx, sf70_params
@@ -115,16 +116,13 @@ kos_fuse_getattr:
         mov     dword[edx + 0x0c], 0
         mov     dword[edx + 0x10], sf70_buffer
         mov     eax, [esp + 0x14]       ; path
-        inc     eax     ; skip '/'
-        mov     [edx + 0x14], eax
+        mov     byte[edx + 0x14], 0
+        mov     [edx + 0x15], eax
 
-        mov     ebp, [fs_struct]
         mov     ebx, sf70_params
-        mov     esi, eax
-        push    0
-        call    xfs_GetFileInfo
-        pop     eax
-
+        pushad  ; file_system_lfn writes here
+        call    file_system_lfn
+        popad
         pop     ebp edi esi ebx
         mov     eax, sf70_buffer
         ret
@@ -169,7 +167,7 @@ proc disk_read stdcall, userdata, buffer, startsector:qword, numsectors
         mov     ebx, [fd]
         mov     edx, SEEK_SET
         int     0x80
-DEBUGF 1, "lseek: %x\n", eax
+;DEBUGF 1, "lseek: %x\n", eax
         popad
 
         pushad
@@ -180,7 +178,7 @@ DEBUGF 1, "lseek: %x\n", eax
         mov     edx, [edx]
         imul    edx, 512
         int     0x80
-DEBUGF 1, "read: %d\n", eax
+;DEBUGF 1, "read: %d\n", eax
         popad
 
         movi    eax, DISK_STATUS_OK
@@ -248,7 +246,8 @@ proc alloc_kernel_space _size
         ret
 endp
 
-proc alloc_pages _size
+proc alloc_pages _cnt
+        mov     eax, [_cnt]
         shl     eax, 12
         call    malloc
         ret
@@ -260,8 +259,9 @@ endp
 free:
         ret
 
-kernel_free:
+proc kernel_free blah
         ret
+endp
 
 
 mutex_init:
@@ -357,12 +357,11 @@ ends
 
 file_disk FILE_DISK
 
-;partition_offset        dd 2048*512
 alloc_pos       dd alloc_base
 sf70_params     rd 6
 msg_no_partition    db 'no partition detected',0x0a
 msg_no_partition.size = $ - msg_no_partition
-disk_name db 'hd',0
+disk_name db 'hd0',0
 current_slot dd ?
 pg_data PG_DATA
 ide_channel1_mutex MUTEX
@@ -377,7 +376,12 @@ IncludeIGlobals
 
 
 section '.bss' writeable align 16
-;mbr_buffer rb 4096*3
+fd      rd 1
+disk dd ?
+alloc_base      rb 32*1024*1024
+fs_struct       rd 1
+sf70_buffer     rb 16*1024*1024
+IncludeUGlobals
 DiskNumber db ?
 ChannelNumber db ?
 DevErrorCode dd ?
@@ -386,9 +390,3 @@ CDDataBuf_pointer dd ?
 DRIVE_DATA: rb 0x4000
 cdpos dd ?
 cd_appl_data rd 1
-fd      rd 1
-disk dd ?
-alloc_base      rb 4*1024*1024
-fs_struct       rd 1
-sf70_buffer     rb 1024*1024
-IncludeUGlobals
