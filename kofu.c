@@ -55,6 +55,23 @@ void kofu_stat(char **arg) {
     return;
 }
 
+void kofu_read(char **arg) {
+    size_t size;
+    size_t offset;
+    sscanf(arg[2], "%zu", &size);
+    sscanf(arg[3], "%zu", &offset);
+    char *buf = (char*)malloc(size + 4096);
+    kos_fuse_read(arg[1], buf, size, offset);
+    for (size_t i = 0; i < size; i++) {
+        if (i % 32 == 0 && i != 0) {
+            printf("\n");
+        }
+        printf("%2.2x", buf[i]);
+    }
+    printf("\n");
+    return;
+}
+
 struct func_table {
     char *name;
     void (*func) (char **arg);
@@ -63,6 +80,7 @@ struct func_table {
 struct func_table funcs[] = {
                               { "ls",   kofu_ls   },
                               { "stat", kofu_stat },
+                              { "read", kofu_read },
                               { NULL,   NULL      },
                             };
 
@@ -93,9 +111,6 @@ int main(int argc, char **argv) {
             if (!strcmp(arg[0], ft->name)) {
                 found = true;
                 ft->func(arg);
-                if (!is_tty) {
-                    fprintf(stderr, "\n");
-                }
                 cmd_num++;
                 break;
             }

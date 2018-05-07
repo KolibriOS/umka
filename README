@@ -1,1 +1,20 @@
+This is a common project for two related tools, kofuse and kofu. The idea is to
+make UNIX tools that use unchanged KolibriOS dyndisk and fs source to test these
+parts in native environment.
+
+
+Kofuse
+is a short for KolibriOS and FUSE [1]. 
+
+
+Kofu
+is Kolibri Filesystem in Userspace.
+
+
+Architecture
+
+
 Find img files here: https://baravy.by/kofuse/img/
+
+
+[1] https://github.com/libfuse/libfuse
