@@ -8,10 +8,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "kocdecl.h"
+#include "kolibri.h"
 
 #define FGETS_BUF_LEN 4096
 #define MAX_COMMAND_ARGS 42
+#define DIRENTS_TO_READ 100
 
 char cmd_buf[FGETS_BUF_LEN];
 bool is_tty;
@@ -37,31 +38,45 @@ char **split_args(char *s) {
 }
 
 void kofu_ls(char **arg) {
-    void *header = kos_fuse_readdir(arg[1], 0);
-    uint32_t file_cnt = ((uint32_t*)header)[1];
-    printf("file_cnt: %u\n", file_cnt);
-    struct bdfe *kf = header + 0x20;
-    for (; file_cnt > 0; file_cnt--) {
-        printf("%s\n", kf->name);
-        kf++;
+    struct f70s1ret *dir = (struct f70s1ret*)malloc(sizeof(struct f70s1ret) + sizeof(struct bdfe) * DIRENTS_TO_READ);
+    struct f70s1arg f70 = {1, 0, CP866, DIRENTS_TO_READ, dir, 0, arg[1]};
+    while (true) {
+        int status = kos_fuse_lfn(&f70);
+        printf("status = %d\n", status);
+        if (status != 0 && status != 6) {
+            abort();
+        }
+        f70.offset += dir->cnt;
+
+        for (size_t i = 0; i < dir->cnt; i++) {
+            printf("%s\n", dir->bdfes[i].name);
+        }
+
+        if (status == 6) {
+            break;
+        }
     }
+    free(dir);
     return;
 }
 
 void kofu_stat(char **arg) {
-    struct bdfe *kf = kos_fuse_getattr(arg[1]);
-    printf("attr: 0x%2.2x\n", kf->attr);
-    printf("size: %llu\n", kf->size);
+    struct bdfe file;
+    struct f70s5arg f70 = {5, 0, 0, 0, &file, 0, arg[1]};
+    kos_fuse_lfn(&f70);
+    printf("attr: 0x%2.2x\n", file.attr);
+    printf("size: %llu\n", file.size);
     return;
 }
 
 void kofu_read(char **arg) {
     size_t size;
-    size_t offset;
+    off_t offset;
     sscanf(arg[2], "%zu", &size);
-    sscanf(arg[3], "%zu", &offset);
-    char *buf = (char*)malloc(size + 4096);
-    kos_fuse_read(arg[1], buf, size, offset);
+    sscanf(arg[3], "%llu", &offset);
+    uint8_t *buf = (uint8_t*)malloc(size);
+    struct f70s5arg f70 = {0, offset, offset >> 32, size, buf, 0, arg[1]};
+    kos_fuse_lfn(&f70);
     for (size_t i = 0; i < size; i++) {
         if (i % 32 == 0 && i != 0) {
             printf("\n");
@@ -69,6 +84,7 @@ void kofu_read(char **arg) {
         printf("%2.2x", buf[i]);
     }
     printf("\n");
+    free(buf);
     return;
 }
 
@@ -92,14 +108,13 @@ int main(int argc, char **argv) {
     is_tty = isatty(STDIN_FILENO);
 
     int fd = open(argv[1], O_RDONLY);
-    if (!kos_fuse_init(fd)) {
+    struct stat st;
+    fstat(fd, &st);
+    if (!kos_fuse_init(fd, st.st_size / 512)) {
         exit(1);
     }
 
-//msg_few_args             db 'usage: xfskos image [offset]',0x0a
 //msg_file_not_found       db 'file not found: '
-//msg_unknown_command      db 'unknown command',0x0a
-//msg_not_xfs_partition    db 'not xfs partition',0x0a
     while(next_line()) {
         if (!is_tty) {
             prompt();

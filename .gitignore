@@ -3,5 +3,7 @@
 *.o
 kofu
 kofuse
+mkdirrange
 *.img
-*.xz
+*.img.xz
+*.img.info

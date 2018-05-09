@@ -14,21 +14,6 @@ include 'blkdev/disk_cache.inc'
 include 'fs/fs_lfn.inc'
 include 'crc.inc'
 
-struct FS_FUNCTIONS
-        Free            dd ?
-        Size            dd ?
-        ReadFile        dd ?
-        ReadFolder      dd ?
-        CreateFile      dd ?
-        WriteFile       dd ?
-        SetFileEnd      dd ?
-        GetFileInfo     dd ?
-        SetFileInfo     dd ?
-        Run             dd ?
-        Delete          dd ?
-        CreateFolder    dd ?
-ends
-
 purge section,mov,add,sub
 section '.text' executable align 16
 
@@ -46,7 +31,7 @@ kos_time_to_epoch:
         ret
 
 
-;void *kos_fuse_init(int fd);
+;void *kos_fuse_init(int fd, uint32_t sect_cnt);
 public kos_fuse_init
 kos_fuse_init:
         push    ebx esi edi ebp
@@ -54,105 +39,29 @@ kos_fuse_init:
         mov     [pg_data.pages_free], (128*1024*1024)/0x1000
 
         mov     eax, [esp + 0x14]
-        mov     [fd], eax
-
-        mov     [file_disk.Size], 65536
+        mov     [file_disk.fd], eax
+        mov     eax, [esp + 0x18]
+        mov     [file_disk.Sectors], eax
+        mov     [file_disk.Logical], 512
         stdcall disk_add, disk_functions, disk_name, file_disk, DISK_NO_INSERT_NOTIFICATION
         mov     [disk], eax
         stdcall disk_media_changed, [disk], 1
 
         mov     eax, [disk]
-        cmp     [eax + DISK.NumPartitions], 0
-        jnz     .done
-        mov     eax, SYS_WRITE
-        mov     ebx, STDOUT
-        mov     ecx, msg_no_partition
-        mov     edx, msg_no_partition.size
-        int     0x80
-        xor     eax, eax
-  .done:
-        mov     [fs_struct], eax
+        mov     eax, [eax + DISK.NumPartitions]
 
         pop     ebp edi esi ebx
         ret
 
 
-;char *kos_fuse_readdir(const char *path, off_t offset)
-public kos_fuse_readdir
-kos_fuse_readdir:
-;DEBUGF 1, '#kos_fuse_readdir\n'
-        push    ebx esi edi ebp
-
-        mov     edx, sf70_params
-        mov     dword[edx + 0x00], 1
-        mov     eax, [esp + 0x18]       ; offset
-        mov     [edx + 0x04], eax
-        mov     dword[edx + 0x08], 1    ; cp866
-        mov     dword[edx + 0x0c], 100
-        mov     dword[edx + 0x10], sf70_buffer
-        mov     eax, [esp + 0x14]       ; path
-        mov     byte[edx + 0x14], 0
-        mov     [edx + 0x15], eax
-
-        mov     ebx, sf70_params
+public kos_fuse_lfn
+kos_fuse_lfn:
+        push    ebx
+        mov     ebx, [esp + 8]
         pushad  ; file_system_lfn writes here
         call    file_system_lfn
         popad
-        pop     ebp edi esi ebx
-        mov     eax, sf70_buffer
-        ret
-
-
-;void *kos_fuse_getattr(const char *path)
-public kos_fuse_getattr
-kos_fuse_getattr:
-;DEBUGF 1, '#kos_fuse_getattr\n'
-        push    ebx esi edi ebp
-
-        mov     edx, sf70_params
-        mov     dword[edx + 0x00], 5
-        mov     dword[edx + 0x04], 0
-        mov     dword[edx + 0x08], 0
-        mov     dword[edx + 0x0c], 0
-        mov     dword[edx + 0x10], sf70_buffer
-        mov     eax, [esp + 0x14]       ; path
-        mov     byte[edx + 0x14], 0
-        mov     [edx + 0x15], eax
-
-        mov     ebx, sf70_params
-        pushad  ; file_system_lfn writes here
-        call    file_system_lfn
-        popad
-        pop     ebp edi esi ebx
-        mov     eax, sf70_buffer
-        ret
-
-
-;long *kos_fuse_read(const char *path, char *buf, size_t size, off_t offset)
-public kos_fuse_read
-kos_fuse_read:
-        push    ebx esi edi ebp
-
-        mov     edx, sf70_params
-        mov     dword[edx + 0x00], 0
-        mov     eax, [esp + 0x20]       ; offset lo
-        mov     dword[edx + 0x04], eax
-        mov     dword[edx + 0x08], 0    ; offset hi
-        mov     eax, [esp + 0x1c]       ; size
-        mov     dword[edx + 0x0c], eax
-        mov     eax, [esp + 0x18]       ; buf
-        mov     dword[edx + 0x10], eax
-        mov     eax, [esp + 0x14]       ; path
-        mov     byte[edx + 0x14], 0
-        mov     [edx + 0x15], eax
-
-        mov     ebx, sf70_params
-        pushad  ; file_system_lfn writes here
-        call    file_system_lfn
-        popad
-
-        pop     ebp edi esi ebx
-        mov     eax, 0
+        pop     ebx
         ret
 
 
@@ -161,20 +70,22 @@ proc disk_read stdcall, userdata, buffer, startsector:qword, numsectors
         mov     eax, dword[startsector + 0]   ; sector lo
         mov     edx, dword[startsector + 4]   ; sector hi
         imul    ecx, eax, 512
-        mov     eax, SYS_LSEEK
-        mov     ebx, [fd]
+        mov     eax, [userdata]
+        mov     ebx, [eax + FILE_DISK.fd]
         mov     edx, SEEK_SET
+        mov     eax, SYS_LSEEK
         int     0x80
 ;DEBUGF 1, "lseek: %x\n", eax
         popad
 
         pushad
-        mov     eax, SYS_READ
-        mov     ebx, [fd]
+        mov     eax, [userdata]
+        mov     ebx, [eax + FILE_DISK.fd]
         mov     ecx, [buffer]
         mov     edx, [numsectors]
         mov     edx, [edx]
-        imul    edx, 512
+        imul    edx, [eax + FILE_DISK.Logical]
+        mov     eax, SYS_READ
         int     0x80
 ;DEBUGF 1, "read: %d\n", eax
         popad
@@ -185,22 +96,26 @@ endp
 
 
 proc disk_write stdcall, userdata, buffer, startsector:qword, numsectors
-ud2
         pushad
+        mov     eax, dword[startsector + 0]   ; sector lo
+        mov     edx, dword[startsector + 4]   ; sector hi
         imul    ecx, eax, 512
-        add     ecx, 2048*512
-        mov     eax, SYS_LSEEK
-        mov     ebx, [fd]
+        mov     eax, [userdata]
+        mov     ebx, [eax + FILE_DISK.fd]
         mov     edx, SEEK_SET
+        mov     eax, SYS_LSEEK
         int     0x80
 ;DEBUGF 1, "lseek: %x\n", eax
         popad
 
         pushad
+        mov     eax, [userdata]
+        mov     ebx, [eax + FILE_DISK.fd]
+        mov     ecx, [buffer]
+        mov     edx, [numsectors]
+        mov     edx, [edx]
+        imul    edx, [eax + FILE_DISK.Logical]
         mov     eax, SYS_WRITE
-        mov     ecx, ebx
-        mov     ebx, [fd]
-        mov     edx, 512
         int     0x80
 ;DEBUGF 1, "write: %d\n", eax
         popad
@@ -213,10 +128,11 @@ endp
 ; int querymedia(void* userdata, DISKMEDIAINFO* info);
 proc disk_querymedia stdcall, hd_data, mediainfo
         mov     ecx, [mediainfo]
+        mov     edx, [hd_data]
         mov     [ecx + DISKMEDIAINFO.Flags], 0
-        mov     [ecx + DISKMEDIAINFO.SectorSize], 512
-        mov     eax, [hd_data]
-        mov     eax, dword[eax + FILE_DISK.Size + 0]
+        mov     eax, [edx + FILE_DISK.Logical]
+        mov     [ecx + DISKMEDIAINFO.SectorSize], eax
+        mov     eax, [edx + FILE_DISK.Sectors]
         mov     dword [ecx + DISKMEDIAINFO.Capacity], eax
         mov     dword [ecx + DISKMEDIAINFO.Capacity + 4], 0
         
@@ -252,20 +168,14 @@ proc alloc_pages _cnt
 endp
 
 
-
-
 free:
         ret
+
 
 proc kernel_free blah
         ret
 endp
 
-
-mutex_init:
-mutex_lock:
-mutex_unlock:
-        ret
 
 put_board:
         pushad
@@ -325,15 +235,11 @@ prevent_medium_removal:
 Read_TOC:
 commit_pages:
 release_pages:
+fs_execute:
+mutex_init:
+mutex_lock:
+mutex_unlock:
         ret
-
-proc fs_execute
-; edx = flags
-; ecx -> cmdline
-; ebx -> absolute file path
-; eax = string length
-        ret
-endp
 
 
 section '.data' writeable align 16
@@ -350,16 +256,15 @@ disk_functions:
 disk_functions_end:
 
 struct FILE_DISK
-        Size dd ?
+  fd      dd ?
+  Sectors dd ?
+  Logical dd ?  ; sector size
 ends
 
-file_disk FILE_DISK
-
 alloc_pos       dd alloc_base
-sf70_params     rd 6
-msg_no_partition    db 'no partition detected',0x0a
-msg_no_partition.size = $ - msg_no_partition
 disk_name db 'hd0',0
+IncludeIGlobals
+; crap
 current_slot dd ?
 pg_data PG_DATA
 ide_channel1_mutex MUTEX
@@ -370,16 +275,14 @@ ide_channel5_mutex MUTEX
 ide_channel6_mutex MUTEX
 ide_channel7_mutex MUTEX
 ide_channel8_mutex MUTEX
-IncludeIGlobals
 
 
 section '.bss' writeable align 16
-fd      rd 1
+file_disk FILE_DISK
 disk dd ?
-alloc_base      rb 32*1024*1024
-fs_struct       rd 1
-sf70_buffer     rb 16*1024*1024
+alloc_base      rb 8*1024*1024
 IncludeUGlobals
+; crap
 DiskNumber db ?
 ChannelNumber db ?
 DevErrorCode dd ?
@@ -387,4 +290,4 @@ CDSectorAddress dd ?
 CDDataBuf_pointer dd ?
 DRIVE_DATA: rb 0x4000
 cdpos dd ?
-cd_appl_data rd 1
+cd_appl_data dd ?

@@ -1,27 +1,32 @@
 FASM=fasm
 CC=gcc
-CFLAGS=-m32 -Wall -Wextra -g -O0 -D_FILE_OFFSET_BITS=64
-LDFLAGS=-m32
+CFLAGS=-Wall -Wextra -g -O0
+CFLAGS_32=-m32 -D_FILE_OFFSET_BITS=64
+LDFLAGS=
+LDFLAGS_32=-m32
 
-all: kofu kofuse
+all: kofu kofuse tools/mkdirrange
 
-kofu: kofu.o kocdecl.o
-	$(CC) $(LDFLAGS) $^ -o $@
+kofu: kofu.o kolibri.o
+	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@
 
-kofuse: kofuse.o kocdecl.o
-	$(CC) $(LDFLAGS) $^ -o $@ `pkg-config fuse3 --libs`
+kofuse: kofuse.o kolibri.o
+	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
-kocdecl.o: kocdecl.asm kocdecl.h $(KERNEL_TRUNK)/fs/ext.inc $(KERNEL_TRUNK)/fs/xfs.inc $(KERNEL_TRUNK)/fs/xfs.asm
-	INCLUDE="$(KERNEL_TRUNK);$(KERNEL_TRUNK)/fs;$(KERNEL_TRUNK)/blkdev" $(FASM) $< $@ -m 1234567
+kolibri.o: kolibri.asm kolibri.h
+	INCLUDE="$(KOLIBRI_TRUNK)" $(FASM) $< $@ -m 100000
 
-kofu.o: kofu.c kocdecl.h
-	$(CC) $(CFLAGS) -c $<
+kofu.o: kofu.c kolibri.h
+	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<
 
-kofuse.o: kofuse.c kocdecl.h
-	$(CC) $(CFLAGS) `pkg-config fuse3 --cflags` -c $<
+kofuse.o: kofuse.c kolibri.h
+	$(CC) $(CFLAGS) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $<
+
+tools/mkdirrange: tools/mkdirrange.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
 .PHONY: all clean
 
 clean:
-	rm -f *.o kofu kofuse
+	rm -f *.o kofu kofuse tools/mkdirrange
 

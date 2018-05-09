@@ -9,7 +9,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
-#include "kocdecl.h"
+#include "kolibri.h"
+
+#define DIRENTS_TO_READ 100
 
 static void bdfe_to_stat(struct bdfe *kf, struct stat *st) {
     if (kf->attr & KF_FOLDER) {
@@ -20,9 +22,9 @@ static void bdfe_to_stat(struct bdfe *kf, struct stat *st) {
         st->st_nlink = 1;
         st->st_size = kf->size;
     }
-    st->st_atim = (struct timespec){kos_time_to_epoch(&(kf->atime)), 0};
-    st->st_mtim = (struct timespec){kos_time_to_epoch(&(kf->mtime)), 0};
-    st->st_ctim = (struct timespec){kos_time_to_epoch(&(kf->ctime)), 0};
+    st->st_atim = (struct timespec){ .tv_sec = kos_time_to_epoch(&(kf->atime)) };
+    st->st_mtim = (struct timespec){ .tv_sec = kos_time_to_epoch(&(kf->mtime)) };
+    st->st_ctim = (struct timespec){ .tv_sec = kos_time_to_epoch(&(kf->ctime)) };
 }
 
 static void *kofuse_init(struct fuse_conn_info *conn,
@@ -34,32 +36,34 @@ static void *kofuse_init(struct fuse_conn_info *conn,
 
 static int kofuse_getattr(const char *path, struct stat *stbuf,
                          struct fuse_file_info *fi) {
-        (void) fi;
-        int res = 0;
+    (void) fi;
+    int res = 0;
 
-        struct bdfe *kf = kos_fuse_getattr(path);
-        bdfe_to_stat(kf, stbuf);
-//        res = -ENOENT;
-        return res;
+
+    struct bdfe file;
+    struct f70s5arg f70 = {5, 0, 0, 0, &file, 0, path};
+    kos_fuse_lfn(&f70);
+
+    bdfe_to_stat(&file, stbuf);
+//   res = -ENOENT;
+    return res;
 }
 
 static int kofuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                          off_t offset, struct fuse_file_info *fi,
                          enum fuse_readdir_flags flags) {
-        (void) offset;
-        (void) fi;
-        (void) flags;
+    (void) offset;
+    (void) fi;
+    (void) flags;
 
-        void *header = kos_fuse_readdir(path, offset);
-
-        uint32_t i = *(uint32_t*)(header + 4);
-        struct bdfe *kf = header + 0x20;
-        for(; i>0; i--) {
-                filler(buf, kf->name, NULL, 0, 0);
-                kf++;
-        }
-
-        return 0;
+    struct f70s1ret *dir = (struct f70s1ret*)malloc(sizeof(struct f70s1ret) + sizeof(struct bdfe) * DIRENTS_TO_READ);
+    struct f70s1arg f70 = {1, 0, CP866, DIRENTS_TO_READ, dir, 0, path};
+    kos_fuse_lfn(&f70);
+    for (size_t i = 0; i < dir->cnt; i++) {
+        filler(buf, dir->bdfes[i].name, NULL, 0, 0);
+    }
+    free(dir);
+    return 0;
 }
 
 static int kofuse_open(const char *path, struct fuse_file_info *fi) {
@@ -75,10 +79,11 @@ static int kofuse_open(const char *path, struct fuse_file_info *fi) {
 
 static int kofuse_read(const char *path, char *buf, size_t size, off_t offset,
                       struct fuse_file_info *fi) {
-        (void) fi;
+    (void) fi;
 
-        kos_fuse_read(path, buf, size, offset);
-        return size;
+    struct f70s5arg f70 = {0, offset, offset >> 32, size, buf, 0, path};
+    kos_fuse_lfn(&f70);
+    return size;
 }
 
 static struct fuse_operations kofuse_oper = {
@@ -95,6 +100,8 @@ int main(int argc, char *argv[]) {
                 exit(1);
         }
         int fd = open(argv[2], O_RDONLY);
-        kos_fuse_init(fd);
+        struct stat st;
+        fstat(fd, &st);
+        kos_fuse_init(fd, st.st_size / 512);
         return fuse_main(argc-1, argv, &kofuse_oper, NULL);
 }
