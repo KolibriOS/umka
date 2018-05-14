@@ -44,10 +44,9 @@ kos_fuse_init:
         mov     [file_disk.Sectors], eax
         mov     [file_disk.Logical], 512
         stdcall disk_add, disk_functions, disk_name, file_disk, DISK_NO_INSERT_NOTIFICATION
-        mov     [disk], eax
-        stdcall disk_media_changed, [disk], 1
-
-        mov     eax, [disk]
+        push    eax
+        stdcall disk_media_changed, eax, 1
+        pop     eax
         mov     eax, [eax + DISK.NumPartitions]
 
         pop     ebp edi esi ebx
@@ -279,7 +278,6 @@ ide_channel8_mutex MUTEX
 
 section '.bss' writeable align 16
 file_disk FILE_DISK
-disk dd ?
 alloc_base      rb 8*1024*1024
 IncludeUGlobals
 ; crap

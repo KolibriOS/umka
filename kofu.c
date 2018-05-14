@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -37,24 +38,48 @@ char **split_args(char *s) {
     return argv;
 }
 
-void kofu_ls(char **arg) {
-    struct f70s1ret *dir = (struct f70s1ret*)malloc(sizeof(struct f70s1ret) + sizeof(struct bdfe) * DIRENTS_TO_READ);
-    struct f70s1arg f70 = {1, 0, CP866, DIRENTS_TO_READ, dir, 0, arg[1]};
+void ls_range(struct f70s1arg *f70) {
+    int status = kos_fuse_lfn(f70);
+//    printf("status = %d\n", status);
+    if (status == F70_SUCCESS || status == F70_END_OF_FILE) {
+        struct f70s1ret *dir = f70->buf;
+        for (size_t i = 0; i < dir->cnt; i++) {
+            printf("%s\n", dir->bdfes[i].name);
+        }
+    }
+}
+
+void ls_all(struct f70s1arg *f70) {
     while (true) {
-        int status = kos_fuse_lfn(&f70);
-        printf("status = %d\n", status);
-        if (status != 0 && status != 6) {
+        int status = kos_fuse_lfn(f70);
+//        printf("status = %d\n", status);
+        if (status != F70_SUCCESS && status != F70_END_OF_FILE) {
             abort();
         }
-        f70.offset += dir->cnt;
+        struct f70s1ret *dir = f70->buf;
+        f70->offset += dir->cnt;
 
         for (size_t i = 0; i < dir->cnt; i++) {
             printf("%s\n", dir->bdfes[i].name);
         }
 
-        if (status == 6) {
+        if (status == F70_END_OF_FILE) {
             break;
         }
+    }
+}
+
+void kofu_ls(char **arg) {
+    struct f70s1ret *dir = (struct f70s1ret*)malloc(sizeof(struct f70s1ret) + sizeof(struct bdfe) * DIRENTS_TO_READ);
+    struct f70s1arg f70 = {1, 0, CP866, DIRENTS_TO_READ, dir, 0, arg[1]};
+    if (arg[2]) { 
+        sscanf(arg[2], "%"SCNu32, &f70.size);
+        if (arg[3]) {
+            sscanf(arg[3], "%"SCNu32, &f70.offset);
+        }
+        ls_range(&f70);
+    } else {
+        ls_all(&f70);
     }
     free(dir);
     return;

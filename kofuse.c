@@ -52,7 +52,7 @@ static int kofuse_getattr(const char *path, struct stat *stbuf,
 static int kofuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                          off_t offset, struct fuse_file_info *fi,
                          enum fuse_readdir_flags flags) {
-    (void) offset;
+    (void) offset;      // TODO
     (void) fi;
     (void) flags;
 

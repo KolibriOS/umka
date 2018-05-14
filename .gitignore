@@ -1,5 +1,6 @@
 *.swp
 .vim
+.exrc
 *.o
 kofu
 kofuse

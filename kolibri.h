@@ -10,6 +10,22 @@ enum encoding {
     UTF8,
 };
 
+enum f70status {
+    F70_SUCCESS,
+    F70_DISK_BASE,
+    F70_UNSUPPORTED_FS,
+    F70_UNKNOWN_FS,
+    F70_PARTITION,
+    F70_FILE_NOT_FOUND,
+    F70_END_OF_FILE,
+    F70_MEMORY_POINTER,
+    F70_DISK_FULL,
+    F70_FS_FAIL,
+    F70_ACCESS_DENIED,
+    F70_DEVICE,
+    F70_OUT_OF_MEMORY,
+};
+
 struct bdfe {
     uint32_t attr;
     uint32_t enc;
