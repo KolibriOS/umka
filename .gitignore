@@ -7,4 +7,6 @@ kofuse
 mkdirrange
 *.img
 *.img.xz
+*.img.gz
+*.img.lz4
 *.img.info

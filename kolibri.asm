@@ -68,13 +68,18 @@ proc disk_read stdcall, userdata, buffer, startsector:qword, numsectors
         pushad
         mov     eax, dword[startsector + 0]   ; sector lo
         mov     edx, dword[startsector + 4]   ; sector hi
-        imul    ecx, eax, 512
+        xor     ecx, ecx
+        imul    edx, eax, 512
+;DEBUGF 1, "lseek to: %x\n", ecx
         mov     eax, [userdata]
         mov     ebx, [eax + FILE_DISK.fd]
-        mov     edx, SEEK_SET
-        mov     eax, SYS_LSEEK
+        sub     esp, 8
+        mov     esi, esp
+        mov     edi, SEEK_SET
+        mov     eax, SYS_LLSEEK
         int     0x80
-;DEBUGF 1, "lseek: %x\n", eax
+        add     esp, 8
+;DEBUGF 1, "lseek: %x\n",eax
         popad
 
         pushad
@@ -98,13 +103,18 @@ proc disk_write stdcall, userdata, buffer, startsector:qword, numsectors
         pushad
         mov     eax, dword[startsector + 0]   ; sector lo
         mov     edx, dword[startsector + 4]   ; sector hi
-        imul    ecx, eax, 512
+        xor     ecx, ecx
+        imul    edx, eax, 512
+;DEBUGF 1, "lseek to: %x\n", ecx
         mov     eax, [userdata]
         mov     ebx, [eax + FILE_DISK.fd]
-        mov     edx, SEEK_SET
-        mov     eax, SYS_LSEEK
+        sub     esp, 8
+        mov     esi, esp
+        mov     edi, SEEK_SET
+        mov     eax, SYS_LLSEEK
         int     0x80
-;DEBUGF 1, "lseek: %x\n", eax
+        add     esp, 8
+;DEBUGF 1, "lseek: %x\n",eax
         popad
 
         pushad
