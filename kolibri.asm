@@ -70,7 +70,7 @@ proc disk_read stdcall, userdata, buffer, startsector:qword, numsectors
         mov     edx, dword[startsector + 4]   ; sector hi
         xor     ecx, ecx
         imul    edx, eax, 512
-;DEBUGF 1, "lseek to: %x\n", ecx
+;DEBUGF 1, "lseek to: %x\n", edx
         mov     eax, [userdata]
         mov     ebx, [eax + FILE_DISK.fd]
         sub     esp, 8
