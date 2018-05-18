@@ -14,7 +14,7 @@ kofuse: kofuse.o kolibri.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
 kolibri.o: kolibri.asm kolibri.h
-	INCLUDE="$(KOLIBRI_TRUNK)" $(FASM) $< $@ -m 100000
+	INCLUDE="$(KOLIBRI_TRUNK)" $(FASM) $< $@
 
 kofu.o: kofu.c kolibri.h
 	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<

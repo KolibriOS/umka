@@ -14,9 +14,16 @@ include 'blkdev/disk_cache.inc'
 include 'fs/fs_lfn.inc'
 include 'crc.inc'
 
+struct FILE_DISK
+  fd      dd ?
+  Sectors dd ?
+  Logical dd ?  ; sector size
+ends
+
+extrn calloc
+
 purge section,mov,add,sub
 section '.text' executable align 16
-
 
 ;uint32_t kos_time_to_epoch(uint8_t *time);
 public kos_time_to_epoch
@@ -151,9 +158,9 @@ endp
 
 
 malloc:
-        push    [alloc_pos]
-        add     [alloc_pos], eax
-        pop     eax
+        push    ecx edx
+        ccall   calloc, 1, eax
+        pop     edx ecx
         ret
 
 proc kernel_alloc _size
@@ -264,31 +271,12 @@ disk_functions:
         dd 0
 disk_functions_end:
 
-struct FILE_DISK
-  fd      dd ?
-  Sectors dd ?
-  Logical dd ?  ; sector size
-ends
-
-alloc_pos       dd alloc_base
 disk_name db 'hd0',0
 IncludeIGlobals
-; crap
-current_slot dd ?
-pg_data PG_DATA
-ide_channel1_mutex MUTEX
-ide_channel2_mutex MUTEX
-ide_channel3_mutex MUTEX
-ide_channel4_mutex MUTEX
-ide_channel5_mutex MUTEX
-ide_channel6_mutex MUTEX
-ide_channel7_mutex MUTEX
-ide_channel8_mutex MUTEX
 
 
 section '.bss' writeable align 16
 file_disk FILE_DISK
-alloc_base      rb 8*1024*1024
 IncludeUGlobals
 ; crap
 DiskNumber db ?
@@ -299,3 +287,13 @@ CDDataBuf_pointer dd ?
 DRIVE_DATA: rb 0x4000
 cdpos dd ?
 cd_appl_data dd ?
+current_slot dd ?
+pg_data PG_DATA
+ide_channel1_mutex MUTEX
+ide_channel2_mutex MUTEX
+ide_channel3_mutex MUTEX
+ide_channel4_mutex MUTEX
+ide_channel5_mutex MUTEX
+ide_channel6_mutex MUTEX
+ide_channel7_mutex MUTEX
+ide_channel8_mutex MUTEX
