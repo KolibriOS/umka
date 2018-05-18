@@ -3,6 +3,9 @@ format ELF
 __DEBUG__ = 1
 __DEBUG_LEVEL__ = 1
 
+extrn malloc
+malloc fix __malloc
+_malloc fix malloc
 include 'macros.inc'
 include 'proc32.inc'
 include 'struct.inc'
@@ -19,8 +22,6 @@ struct FILE_DISK
   Sectors dd ?
   Logical dd ?  ; sector size
 ends
-
-extrn calloc
 
 purge section,mov,add,sub
 section '.text' executable align 16
@@ -162,11 +163,12 @@ proc disk_querymedia stdcall, hd_data, mediainfo
 endp
 
 
-malloc:
+__malloc:
         push    ecx edx
-        ccall   calloc, 1, eax
+        ccall   _malloc, eax
         pop     edx ecx
         ret
+
 
 proc kernel_alloc _size
         mov     eax, [_size]
