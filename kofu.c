@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
     int fd = open(argv[1], O_RDONLY);
     struct stat st;
     fstat(fd, &st);
-    if (!kos_fuse_init(fd, st.st_size / 512)) {
+    if (!kos_fuse_init(fd, st.st_size / 512, 512)) {
         exit(1);
     }
 

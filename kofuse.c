@@ -102,6 +102,6 @@ int main(int argc, char *argv[]) {
         int fd = open(argv[2], O_RDONLY);
         struct stat st;
         fstat(fd, &st);
-        kos_fuse_init(fd, st.st_size / 512);
+        kos_fuse_init(fd, st.st_size / 512, 512);
         return fuse_main(argc-1, argv, &kofuse_oper, NULL);
 }

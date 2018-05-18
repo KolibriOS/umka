@@ -38,7 +38,7 @@ kos_time_to_epoch:
         ret
 
 
-;void *kos_fuse_init(int fd, uint32_t sect_cnt);
+;void *kos_fuse_init(int fd, uint32_t sect_cnt, uint32_t sect_sz);
 public kos_fuse_init
 kos_fuse_init:
         push    ebx esi edi ebp
@@ -49,7 +49,8 @@ kos_fuse_init:
         mov     [file_disk.fd], eax
         mov     eax, [esp + 0x18]
         mov     [file_disk.Sectors], eax
-        mov     [file_disk.Logical], 512
+        mov     eax, [esp + 0x1c]
+        mov     [file_disk.Logical], eax
         stdcall disk_add, disk_functions, disk_name, file_disk, DISK_NO_INSERT_NOTIFICATION
         push    eax
         stdcall disk_media_changed, eax, 1
@@ -75,8 +76,10 @@ proc disk_read stdcall, userdata, buffer, startsector:qword, numsectors
         pushad
         mov     eax, dword[startsector + 0]   ; sector lo
         mov     edx, dword[startsector + 4]   ; sector hi
-        xor     ecx, ecx
-        imul    edx, eax, 512
+        mov     edx, [userdata]
+        mul     [edx + FILE_DISK.Logical]
+        mov     ecx, edx
+        mov     edx, eax
 ;DEBUGF 1, "lseek to: %x\n", edx
         mov     eax, [userdata]
         mov     ebx, [eax + FILE_DISK.fd]
@@ -110,8 +113,10 @@ proc disk_write stdcall, userdata, buffer, startsector:qword, numsectors
         pushad
         mov     eax, dword[startsector + 0]   ; sector lo
         mov     edx, dword[startsector + 4]   ; sector hi
-        xor     ecx, ecx
-        imul    edx, eax, 512
+        mov     edx, [userdata]
+        mul     [edx + FILE_DISK.Logical]
+        mov     ecx, edx
+        mov     edx, eax
 ;DEBUGF 1, "lseek to: %x\n", ecx
         mov     eax, [userdata]
         mov     ebx, [eax + FILE_DISK.fd]

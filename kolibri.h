@@ -84,7 +84,7 @@ struct f70s5arg {
 #define KF_FOLDER   0x10
 
 uint32_t kos_time_to_epoch(uint32_t *time);
-void *kos_fuse_init(int fd, uint32_t sect_cnt);
+void *kos_fuse_init(int fd, uint32_t sect_cnt, uint32_t sect_sz);
 int kos_fuse_lfn(void *f70arg);
 
 #endif
