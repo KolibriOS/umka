@@ -20,7 +20,8 @@ bool is_tty;
 int cmd_num = 0;
 
 void prompt() {
-    fprintf(stderr, "#%d> ", cmd_num);
+    printf("#%d> ", cmd_num);
+    fflush(stdout);
 }
 
 bool next_line() {
@@ -143,7 +144,7 @@ int main(int argc, char **argv) {
     while(next_line()) {
         if (!is_tty) {
             prompt();
-            fprintf(stderr, "%s", cmd_buf);
+            printf("%s", cmd_buf);
         }
         char **arg = split_args(cmd_buf);
         bool found = false;

@@ -10,3 +10,4 @@ mkdirrange
 *.img.gz
 *.img.lz4
 *.img.info
+t_*.out
