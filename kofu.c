@@ -40,12 +40,22 @@ char **split_args(char *s) {
 }
 
 void ls_range(struct f70s1arg *f70) {
-    int status = kos_fuse_lfn(f70);
-//    printf("status = %d\n", status);
-    if (status == F70_SUCCESS || status == F70_END_OF_FILE) {
-        struct f70s1ret *dir = f70->buf;
-        for (size_t i = 0; i < dir->cnt; i++) {
-            printf("%s\n", dir->bdfes[i].name);
+    uint32_t requested = f70->size;
+    f70->size = DIRENTS_TO_READ;
+    for (; requested; requested -= f70->size) {
+        if (f70->size > requested) {
+            f70->size = requested;
+        }
+        int status = kos_fuse_lfn(f70);
+        f70->offset += f70->size;
+        printf("status = %d\n", status);
+        if (status != F70_SUCCESS && status != F70_END_OF_FILE) {
+            abort();
+        } else {
+            struct f70s1ret *dir = f70->buf;
+            for (size_t i = 0; i < dir->cnt; i++) {
+                printf("%s\n", dir->bdfes[i].name);
+            }
         }
     }
 }
@@ -53,7 +63,7 @@ void ls_range(struct f70s1arg *f70) {
 void ls_all(struct f70s1arg *f70) {
     while (true) {
         int status = kos_fuse_lfn(f70);
-//        printf("status = %d\n", status);
+        printf("status = %d\n", status);
         if (status != F70_SUCCESS && status != F70_END_OF_FILE) {
             abort();
         }

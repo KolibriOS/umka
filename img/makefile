@@ -67,8 +67,8 @@ s512_xfs_v4_ftype1_btree_dirs.img:
 	sudo mount $(LOOP_DEV)p1 $(TEMP_DIR)
 	sudo chown $(shell whoami) $(TEMP_DIR) -R
 #
-	mkdir $(TEMP_DIR)/btree1
-	$(MKDIRRANGE) $(TEMP_DIR)/btree1 293181
+	mkdir $(TEMP_DIR)/btree
+	$(MKDIRRANGE) $(TEMP_DIR)/btree 293181
 
 	sudo umount $(TEMP_DIR)
 	sudo losetup -d $(LOOP_DEV)

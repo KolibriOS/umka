@@ -6,6 +6,9 @@ __DEBUG_LEVEL__ = 1
 extrn malloc
 malloc fix __malloc
 _malloc fix malloc
+extrn free
+free fix __free
+_free fix free
 include 'macros.inc'
 include 'proc32.inc'
 include 'struct.inc'
@@ -191,11 +194,15 @@ proc alloc_pages _cnt
 endp
 
 
-free:
+__free:
+        ccall   _free, eax
         ret
 
 
-proc kernel_free blah
+proc kernel_free base
+        mov     eax, [base]
+        call    free
+        xor     eax, eax
         ret
 endp
 
