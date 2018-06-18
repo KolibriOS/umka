@@ -5,7 +5,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
-#include <errno.h>
 
 int main(int argc, char *argv[])
 {

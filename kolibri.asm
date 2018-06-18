@@ -72,6 +72,9 @@ kos_fuse_lfn:
         pushad  ; file_system_lfn writes here
         call    file_system_lfn
         popad
+        mov     ecx, [esp + 12]
+        mov     [ecx + 0], eax
+        mov     [ecx + 4], ebx
         pop     ebx
         ret
 

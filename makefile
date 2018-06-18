@@ -1,11 +1,11 @@
 FASM=fasm
 CC=gcc
-CFLAGS=-Wall -Wextra -g -O0
+CFLAGS=-Wall -Wextra -g -O0 -D_LARGEFILE64_SOURCE
 CFLAGS_32=-m32 -D_FILE_OFFSET_BITS=64
 LDFLAGS=
 LDFLAGS_32=-m32
 
-all: kofu kofuse tools/mkdirrange
+all: kofu kofuse tools/mkdirrange tools/mkfilepattern
 
 kofu: kofu.o kolibri.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@
@@ -25,8 +25,11 @@ kofuse.o: kofuse.c kolibri.h
 tools/mkdirrange: tools/mkdirrange.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
+tools/mkfilepattern: tools/mkfilepattern.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+
 .PHONY: all clean
 
 clean:
-	rm -f *.o kofu kofuse tools/mkdirrange
+	rm -f *.o kofu kofuse tools/mkdirrange tools/mkfilepattern
 

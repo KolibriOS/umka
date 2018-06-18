@@ -26,6 +26,11 @@ enum f70status {
     F70_OUT_OF_MEMORY,
 };
 
+typedef struct {
+    uint32_t status;
+    uint32_t count;
+} f70ret;
+
 struct bdfe {
     uint32_t attr;
     uint32_t enc;
@@ -85,6 +90,6 @@ struct f70s5arg {
 
 uint32_t kos_time_to_epoch(uint32_t *time);
 void *kos_fuse_init(int fd, uint32_t sect_cnt, uint32_t sect_sz);
-int kos_fuse_lfn(void *f70arg);
+void kos_fuse_lfn(void *f70arg, f70ret *r);
 
 #endif

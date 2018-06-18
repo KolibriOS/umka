@@ -1,8 +1,9 @@
 MKDIRRANGE=../tools/mkdirrange
+MKFILEPATTERN=../tools/mkfilepattern
 LOOP_DEV=/dev/loop8
 TEMP_DIR:=$(shell mktemp -d)
 
-all: s512_xfs_v4_ftype0.img s512_xfs_v4_ftype1.img s512_xfs_v4_ftype1_btree_dirs.img
+all: s512_xfs_v4_ftype0.img s512_xfs_v4_ftype1.img s512_xfs_v4_ftype0_xattr.img s512_xfs_v4_files.img s512_xfs_v4_ftype1_btree_dirs.img
 
 s512_xfs_v4_ftype0.img:
 	dd if=/dev/zero of=$@ bs=1M count=64
@@ -55,6 +56,53 @@ s512_xfs_v4_ftype1.img:
 	mkdir $(TEMP_DIR)/btree
 	$(MKDIRRANGE) $(TEMP_DIR)/btree 600
 
+	sudo umount $(TEMP_DIR)
+	sudo losetup -d $(LOOP_DEV)
+
+s512_xfs_v4_ftype0_xattr.img:
+	dd if=/dev/zero of=$@ bs=1M count=64
+	parted --script $@ mktable gpt
+	parted --script --align optimal $@ mkpart primary 1MiB 100%
+	sudo losetup $(LOOP_DEV) --partscan $@
+	sudo mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n ftype=0 $(LOOP_DEV)p1
+	sudo mount $(LOOP_DEV)p1 $(TEMP_DIR) -o attr2
+	sudo chown $(shell whoami) $(TEMP_DIR) -R
+#
+	mkdir $(TEMP_DIR)/sf
+	$(MKDIRRANGE) $(TEMP_DIR)/sf 900
+#
+	mkdir $(TEMP_DIR)/leaf
+	$(MKDIRRANGE) $(TEMP_DIR)/leaf 600
+#
+	mkdir $(TEMP_DIR)/node
+	$(MKDIRRANGE) $(TEMP_DIR)/node 600
+#
+	mkdir $(TEMP_DIR)/btree
+	$(MKDIRRANGE) $(TEMP_DIR)/btree 600
+
+	sudo umount $(TEMP_DIR)
+	sudo losetup -d $(LOOP_DEV)
+
+s512_xfs_v4_files.img:
+	dd if=/dev/zero of=$@ bs=1M count=64
+	parted --script $@ mktable gpt
+	parted --script --align optimal $@ mkpart primary 1MiB 100%
+	sudo losetup $(LOOP_DEV) --partscan $@
+	sudo mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n ftype=0 $(LOOP_DEV)p1
+	sudo mount $(LOOP_DEV)p1 $(TEMP_DIR)
+	sudo chown $(shell whoami) $(TEMP_DIR) -R
+#
+	$(MKFILEPATTERN) $(TEMP_DIR)/no_hole 65536
+#
+	$(MKFILEPATTERN) $(TEMP_DIR)/hole_begin 65536
+	fallocate -p -o 0 -l 16384 $(TEMP_DIR)/hole_begin
+#
+	$(MKFILEPATTERN) $(TEMP_DIR)/hole_middle 65536
+	fallocate -p -o 32768 -l 16384 $(TEMP_DIR)/hole_middle
+#
+	$(MKFILEPATTERN) $(TEMP_DIR)/hole_end 65536
+	fallocate -p -o 49152 -l 16384 $(TEMP_DIR)/hole_end
+#
 	sudo umount $(TEMP_DIR)
 	sudo losetup -d $(LOOP_DEV)
 

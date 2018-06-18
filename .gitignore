@@ -5,6 +5,7 @@
 kofu
 kofuse
 mkdirrange
+mkfilepattern
 *.img
 *.img.xz
 *.img.gz
