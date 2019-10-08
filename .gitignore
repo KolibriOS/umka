@@ -12,3 +12,4 @@ mkfilepattern
 *.img.lz4
 *.img.info
 t_*.out
+.gdb_history

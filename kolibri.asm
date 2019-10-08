@@ -9,6 +9,19 @@ _malloc fix malloc
 extrn free
 free fix __free
 _free fix free
+
+macro coverage_magic_instruction {
+        nop
+        int3
+}
+
+purge section,mov,add,sub
+purge section,mov,add,sub
+section '.text' executable align 16
+
+coverage_begin:
+public coverage_begin
+
 include 'macros.inc'
 include 'proc32.inc'
 include 'struct.inc'
@@ -26,8 +39,35 @@ struct FILE_DISK
   Logical dd ?  ; sector size
 ends
 
-purge section,mov,add,sub
-section '.text' executable align 16
+public set_eflags_tf
+set_eflags_tf:
+        pushfd
+        pop     eax
+        mov     ecx, [esp + 4]
+        and     ecx, 1
+        shl     ecx, 8  ; TF
+        and     eax, NOT (1 SHL 8)
+        or      eax, ecx
+        push    eax
+        popfd
+        ret
+
+public get_lwp_event_size
+get_lwp_event_size:
+        mov     eax, 0x80000001
+        cpuid
+        bt      ecx, 15
+        jnc     .no_lwp
+        mov     eax, 0x8000001c
+        cpuid
+        and     eax, 1001b
+        cmp     eax, 1001b
+        jnz     .no_lwp
+        movzx   eax, bh
+        ret
+  .no_lwp:
+        xor     eax, eax
+        ret
 
 ;uint32_t kos_time_to_epoch(uint8_t *time);
 public kos_time_to_epoch
@@ -47,7 +87,14 @@ public kos_fuse_init
 kos_fuse_init:
         push    ebx esi edi ebp
 
-        mov     [pg_data.pages_free], (128*1024*1024)/0x1000
+;DEBUGF 1, "coverage begin: 0x%x\n", coverage_begin
+;DEBUGF 1, "xfs_create_partition: 0x%x\n", xfs_create_partition
+;DEBUGF 1, "coverage end: 0x%x\n", coverage_end
+
+        MEMORY_BYTES = 128 SHL 20
+        mov     [pg_data.mem_amount], MEMORY_BYTES
+        mov     [pg_data.pages_count], MEMORY_BYTES / PAGE_SIZE
+        mov     [pg_data.pages_free], MEMORY_BYTES / PAGE_SIZE
 
         mov     eax, [esp + 0x14]
         mov     [file_disk.fd], eax
@@ -66,6 +113,7 @@ kos_fuse_init:
 
 
 public kos_fuse_lfn
+;proc kos_fuse_lfn c, _blah1, _blah2
 kos_fuse_lfn:
         push    ebx
         mov     ebx, [esp + 8]
@@ -77,6 +125,7 @@ kos_fuse_lfn:
         mov     [ecx + 4], ebx
         pop     ebx
         ret
+;endp
 
 
 proc disk_read stdcall, userdata, buffer, startsector:qword, numsectors
@@ -273,6 +322,9 @@ mutex_init:
 mutex_lock:
 mutex_unlock:
         ret
+
+coverage_end:
+public coverage_end
 
 
 section '.data' writeable align 16

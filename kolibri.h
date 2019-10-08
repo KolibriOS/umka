@@ -92,4 +92,9 @@ uint32_t kos_time_to_epoch(uint32_t *time);
 void *kos_fuse_init(int fd, uint32_t sect_cnt, uint32_t sect_sz);
 void kos_fuse_lfn(void *f70arg, f70ret *r);
 
+void set_eflags_tf(int x);
+void coverage_begin(void);
+void coverage_end(void);
+uint32_t get_lwp_event_size(void);
+
 #endif

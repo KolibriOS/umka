@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -13,14 +15,14 @@
 int main(int argc, char *argv[])
 {
     uint8_t buf[BUF_LEN + 7];
-    unsigned len;
+    int64_t len;
     char *path;
     if (argc != 3) {
         fprintf(stderr, "mkfilepattern filename size\n");
         exit(1);
     } else {
         path = argv[1];
-        sscanf(argv[2], "%u", &len);
+        sscanf(argv[2], "%" SCNi64, &len);
     }
 
     int fd = open(path, O_CREAT | O_LARGEFILE | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
@@ -29,7 +31,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    for (unsigned pos = 0, count = BUF_LEN; pos < len; pos += count) {
+    for (int64_t pos = 0, count = BUF_LEN; pos < len; pos += count) {
         if (count > len - pos) {
             count = len - pos;
         }

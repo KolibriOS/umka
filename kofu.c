@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -11,6 +12,7 @@
 #include <fcntl.h>
 #include <assert.h>
 #include "kolibri.h"
+#include "trace.h"
 
 #define FGETS_BUF_LEN 4096
 #define MAX_COMMAND_ARGS 42
@@ -213,6 +215,7 @@ int main(int argc, char **argv) {
     int fd = open(argv[1], O_RDONLY);
     struct stat st;
     fstat(fd, &st);
+    trace_begin();
     if (!kos_fuse_init(fd, st.st_size / 512, 512)) {
         exit(1);
     }
@@ -237,5 +240,7 @@ int main(int argc, char **argv) {
             printf("unknown command: %s\n", arg[0]);
         }
     }
+
+    trace_end();
     return 0;
 }
