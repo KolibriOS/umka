@@ -10,7 +10,7 @@ enum encoding {
     UTF8,
 };
 
-enum f70status {
+typedef enum {
     F70_SUCCESS,
     F70_DISK_BASE,
     F70_UNSUPPORTED_FS,
@@ -24,7 +24,7 @@ enum f70status {
     F70_ACCESS_DENIED,
     F70_DEVICE,
     F70_OUT_OF_MEMORY,
-};
+} f70status;
 
 typedef struct {
     uint32_t status;
@@ -91,6 +91,10 @@ struct f70s5arg {
 uint32_t kos_time_to_epoch(uint32_t *time);
 void *kos_fuse_init(int fd, uint32_t sect_cnt, uint32_t sect_sz);
 void kos_fuse_lfn(void *f70arg, f70ret *r);
+
+void kos_init(void);
+void *kos_disk_add(const char *file_name, const char *disk_name);
+int kos_disk_del(const char *name);
 
 void set_eflags_tf(int x);
 void coverage_begin(void);

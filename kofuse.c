@@ -1,6 +1,6 @@
 /*
     Kofuse: KolibriOS kernel FS code as FUSE in Linux
-    Copyright (C) 2018  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2018--2019  Ivan Baravy <dunkaist@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,6 +27,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include "kolibri.h"
 
 #define DIRENTS_TO_READ 100
@@ -40,9 +44,9 @@ static void bdfe_to_stat(struct bdfe *kf, struct stat *st) {
         st->st_nlink = 1;
         st->st_size = kf->size;
     }
-    st->st_atim = (struct timespec){ .tv_sec = kos_time_to_epoch(&(kf->atime)) };
-    st->st_mtim = (struct timespec){ .tv_sec = kos_time_to_epoch(&(kf->mtime)) };
-    st->st_ctim = (struct timespec){ .tv_sec = kos_time_to_epoch(&(kf->ctime)) };
+    st->st_atime = kos_time_to_epoch(&(kf->atime));
+    st->st_mtime = kos_time_to_epoch(&(kf->mtime));
+    st->st_ctime = kos_time_to_epoch(&(kf->ctime));
 }
 
 static void *kofuse_init(struct fuse_conn_info *conn,
@@ -120,9 +124,7 @@ int main(int argc, char *argv[]) {
                 printf("usage: kofuse dir img\n");
                 exit(1);
         }
-        int fd = open(argv[2], O_RDONLY);
-        struct stat st;
-        fstat(fd, &st);
-        kos_fuse_init(fd, st.st_size / 512, 512);
+        kos_init();
+        kos_disk_add(argv[2], "hd0");
         return fuse_main(argc-1, argv, &kofuse_oper, NULL);
 }

@@ -1,11 +1,13 @@
-#0> ls /hd0/1/sf
+#0> disk_add ../img/s512_xfs_v4_ftype1.img hd0
+/hd0/1: xfs
+#1> ls /hd0/1/sf
 status = 6, count = 5
 .
 ..
 d0000000000_
 d0000000001_x
 d0000000002_xx
-#1> ls /hd0/1/block
+#2> ls /hd0/1/block
 status = 6, count = 22
 .
 ..
@@ -29,7 +31,7 @@ d0000000016_xxxxxxxxxxxxxxxx
 d0000000017_xxxxxxxxxxxxxxxxx
 d0000000018_xxxxxxxxxxxxxxxxxx
 d0000000019_xxxxxxxxxxxxxxxxxxx
-#2> ls /hd0/1/leaf
+#3> ls /hd0/1/leaf
 status = 6, count = 72
 .
 ..
@@ -103,7 +105,7 @@ d0000000066_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 d0000000067_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 d0000000068_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 d0000000069_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-#3> ls /hd0/1/node
+#4> ls /hd0/1/node
 status = 0, count = 100
 .
 ..
@@ -632,7 +634,7 @@ d0000000516_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 d0000000517_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 d0000000518_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 d0000000519_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-#4> ls /hd0/1/btree
+#5> ls /hd0/1/btree
 status = 0, count = 100
 .
 ..
@@ -1242,3 +1244,4 @@ d0000000597_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 status = 6, count = 2
 d0000000598_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 d0000000599_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#6> disk_del hd0

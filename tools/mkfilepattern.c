@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
         sscanf(argv[2], "%" SCNi64, &len);
     }
 
-    int fd = open(path, O_CREAT | O_LARGEFILE | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    int fd = open(path, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (fd == -1) {
         fprintf(stderr, "Can't open %s: %s\n", path, strerror(errno));
         exit(1);
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
             count = len - pos;
         }
 
-        off64_t off = 0;
+        off_t off = 0;
         while (off < count) {
             if (pos + off < 0x100) {
                 *(uint8_t*)(buf + off) = (uint8_t)(pos + off);

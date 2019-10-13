@@ -10,10 +10,7 @@ extrn free
 free fix __free
 _free fix free
 
-macro coverage_magic_instruction {
-        nop
-        int3
-}
+sys_msg_board equ _sys_msg_board
 
 purge section,mov,add,sub
 purge section,mov,add,sub
@@ -27,18 +24,19 @@ include 'proc32.inc'
 include 'struct.inc'
 include 'const.inc'
 include 'system.inc'
-include 'debug-fdo.inc'
+include 'fdo.inc'
 include 'blkdev/disk.inc'
 include 'blkdev/disk_cache.inc'
 include 'fs/fs_lfn.inc'
 include 'crc.inc'
 
-struct FILE_DISK
-  fd      dd ?
-  Sectors dd ?
-  Logical dd ?  ; sector size
+struct VDISK
+  File     dd ?
+  SectCnt  dd ?  ; FIXME: dq
+  SectSize dd ?  ; sector size
 ends
 
+; TODO: move to trace_lbr
 public set_eflags_tf
 set_eflags_tf:
         pushfd
@@ -52,6 +50,7 @@ set_eflags_tf:
         popfd
         ret
 
+; TODO: move to trace_lwp
 public get_lwp_event_size
 get_lwp_event_size:
         mov     eax, 0x80000001
@@ -69,148 +68,146 @@ get_lwp_event_size:
         xor     eax, eax
         ret
 
-;uint32_t kos_time_to_epoch(uint8_t *time);
-public kos_time_to_epoch
-kos_time_to_epoch:
-        push    ebx esi edi ebp
 
-        mov     esi, [esp + 0x14]
+public kos_time_to_epoch
+proc kos_time_to_epoch c uses ebx esi edi ebp, _time
+        mov     esi, [_time]
         call    fsCalculateTime
         add     eax, 978307200  ; epoch to 2001.01.01
-
-        pop     ebp edi esi ebx
         ret
+endp
 
 
-;void *kos_fuse_init(int fd, uint32_t sect_cnt, uint32_t sect_sz);
-public kos_fuse_init
-kos_fuse_init:
-        push    ebx esi edi ebp
-
-;DEBUGF 1, "coverage begin: 0x%x\n", coverage_begin
-;DEBUGF 1, "xfs_create_partition: 0x%x\n", xfs_create_partition
-;DEBUGF 1, "coverage end: 0x%x\n", coverage_end
-
+public kos_init
+proc kos_init c
         MEMORY_BYTES = 128 SHL 20
         mov     [pg_data.mem_amount], MEMORY_BYTES
         mov     [pg_data.pages_count], MEMORY_BYTES / PAGE_SIZE
         mov     [pg_data.pages_free], MEMORY_BYTES / PAGE_SIZE
+        ret
+endp
 
-        mov     eax, [esp + 0x14]
-        mov     [file_disk.fd], eax
-        mov     eax, [esp + 0x18]
-        mov     [file_disk.Sectors], eax
-        mov     eax, [esp + 0x1c]
-        mov     [file_disk.Logical], eax
-        stdcall disk_add, disk_functions, disk_name, file_disk, DISK_NO_INSERT_NOTIFICATION
+
+public kos_disk_add
+proc kos_disk_add c uses ebx esi edi ebp, _file_name, _disk_name
+        extrn cio_disk_init
+        ccall   cio_disk_init, [_file_name]
+        stdcall disk_add, vdisk_functions, [_disk_name], eax, DISK_NO_INSERT_NOTIFICATION
         push    eax
         stdcall disk_media_changed, eax, 1
-        pop     eax
-        mov     eax, [eax + DISK.NumPartitions]
-
-        pop     ebp edi esi ebx
+        pop     edx
+        movi    ecx, 1
+        mov     esi, [edx+DISK.Partitions]
+.next_part:
+        cmp     ecx, [edx+DISK.NumPartitions]
+        ja      .part_done
+        DEBUGF 1, "/%s/%d: ", [edx+DISK.Name], ecx
+        lodsd
+        inc     ecx
+        cmp     [eax+PARTITION.FSUserFunctions], xfs._.user_functions
+        jnz     @f
+        DEBUGF 1, "xfs\n"
+        jmp     .next_part
+@@:
+        cmp     [eax+PARTITION.FSUserFunctions], ext_user_functions
+        jnz     @f
+        DEBUGF 1, "ext\n"
+        jmp     .next_part
+@@:
+        cmp     [eax+PARTITION.FSUserFunctions], fat_user_functions
+        jnz     @f
+        DEBUGF 1, "fat\n"
+        jmp     .next_part
+@@:
+        cmp     [eax+PARTITION.FSUserFunctions], ntfs_user_functions
+        jnz     @f
+        DEBUGF 1, "ntfs\n"
+        jmp     .next_part
+@@:
+        DEBUGF 1, "???\n"
+        jmp     .next_part
+.part_done:
+        xor     eax, eax
         ret
+.error:
+        movi    eax, 1
+        ret
+endp
+
+
+public kos_disk_del
+proc kos_disk_del c uses ebx esi edi ebp, _name
+        mov     eax, [disk_list+LHEAD.next]
+.next_disk:
+        cmp     eax, disk_list
+        jz      .not_found
+        mov     esi, [eax+DISK.Name]
+        mov     edi, [_name]
+@@:
+        movzx   ecx, byte[esi]
+        cmpsb
+        jnz     .skip
+        jecxz   .found
+        jmp     @b
+.skip:
+        mov     eax, [eax+LHEAD.next]
+        jmp     .next_disk
+.found:
+        stdcall disk_del, eax
+        xor     eax, eax
+        ret
+.not_found:
+        movi    eax, 1
+        ret
+endp
 
 
 public kos_fuse_lfn
-;proc kos_fuse_lfn c, _blah1, _blah2
-kos_fuse_lfn:
+proc kos_fuse_lfn c uses ebx edx esi edi ebp, _f70arg, _f70ret
         push    ebx
-        mov     ebx, [esp + 8]
+        mov     ebx, [_f70arg]
         pushad  ; file_system_lfn writes here
         call    file_system_lfn
         popad
-        mov     ecx, [esp + 12]
-        mov     [ecx + 0], eax
-        mov     [ecx + 4], ebx
+        mov     ecx, [_f70ret]
+        mov     [ecx+0], eax    ; status
+        mov     [ecx+4], ebx    ; count
         pop     ebx
         ret
-;endp
+endp
 
 
-proc disk_read stdcall, userdata, buffer, startsector:qword, numsectors
-        pushad
-        mov     eax, dword[startsector + 0]   ; sector lo
-        mov     edx, dword[startsector + 4]   ; sector hi
-        mov     edx, [userdata]
-        mul     [edx + FILE_DISK.Logical]
-        mov     ecx, edx
-        mov     edx, eax
-;DEBUGF 1, "lseek to: %x\n", edx
-        mov     eax, [userdata]
-        mov     ebx, [eax + FILE_DISK.fd]
-        sub     esp, 8
-        mov     esi, esp
-        mov     edi, SEEK_SET
-        mov     eax, SYS_LLSEEK
-        int     0x80
-        add     esp, 8
-;DEBUGF 1, "lseek: %x\n",eax
-        popad
+proc vdisk_close stdcall uses ebx esi edi ebp, _userdata
+        extrn cio_disk_free
+        ccall   cio_disk_free, [_userdata]
+        ret
+endp
 
-        pushad
-        mov     eax, [userdata]
-        mov     ebx, [eax + FILE_DISK.fd]
-        mov     ecx, [buffer]
-        mov     edx, [numsectors]
-        mov     edx, [edx]
-        imul    edx, [eax + FILE_DISK.Logical]
-        mov     eax, SYS_READ
-        int     0x80
-;DEBUGF 1, "read: %d\n", eax
-        popad
 
+proc vdisk_read stdcall uses ebx esi edi ebp, _userdata, _buffer, _startsector:qword, _numsectors
+        extrn cio_disk_read
+        ccall   cio_disk_read, [_userdata], [_buffer], dword[_startsector+0], dword[_startsector+4], [_numsectors]
         movi    eax, DISK_STATUS_OK
         ret
 endp
 
 
-proc disk_write stdcall, userdata, buffer, startsector:qword, numsectors
-        pushad
-        mov     eax, dword[startsector + 0]   ; sector lo
-        mov     edx, dword[startsector + 4]   ; sector hi
-        mov     edx, [userdata]
-        mul     [edx + FILE_DISK.Logical]
-        mov     ecx, edx
-        mov     edx, eax
-;DEBUGF 1, "lseek to: %x\n", ecx
-        mov     eax, [userdata]
-        mov     ebx, [eax + FILE_DISK.fd]
-        sub     esp, 8
-        mov     esi, esp
-        mov     edi, SEEK_SET
-        mov     eax, SYS_LLSEEK
-        int     0x80
-        add     esp, 8
-;DEBUGF 1, "lseek: %x\n",eax
-        popad
-
-        pushad
-        mov     eax, [userdata]
-        mov     ebx, [eax + FILE_DISK.fd]
-        mov     ecx, [buffer]
-        mov     edx, [numsectors]
-        mov     edx, [edx]
-        imul    edx, [eax + FILE_DISK.Logical]
-        mov     eax, SYS_WRITE
-        int     0x80
-;DEBUGF 1, "write: %d\n", eax
-        popad
-
+proc vdisk_write stdcall uses ebx esi edi ebp, userdata, buffer, startsector:qword, numsectors
+        extrn cio_disk_write
+        ccall   cio_disk_write, [userdata], [buffer], dword[startsector+0], dword[startsector+4], [numsectors]
         movi    eax, DISK_STATUS_OK
         ret
 endp
 
 
-; int querymedia(void* userdata, DISKMEDIAINFO* info);
-proc disk_querymedia stdcall, hd_data, mediainfo
+proc vdisk_querymedia stdcall uses ebx esi edi ebp, vdisk, mediainfo
         mov     ecx, [mediainfo]
-        mov     edx, [hd_data]
+        mov     edx, [vdisk]
         mov     [ecx + DISKMEDIAINFO.Flags], 0
-        mov     eax, [edx + FILE_DISK.Logical]
+        mov     eax, [edx + VDISK.SectSize]
         mov     [ecx + DISKMEDIAINFO.SectorSize], eax
-        mov     eax, [edx + FILE_DISK.Sectors]
-        mov     dword [ecx + DISKMEDIAINFO.Capacity], eax
+        mov     eax, [edx + VDISK.SectCnt]
+        mov     dword [ecx + DISKMEDIAINFO.Capacity + 0], eax
         mov     dword [ecx + DISKMEDIAINFO.Capacity + 4], 0
         
         movi    eax, DISK_STATUS_OK
@@ -218,11 +215,12 @@ proc disk_querymedia stdcall, hd_data, mediainfo
 endp
 
 
-__malloc:
+proc __malloc
         push    ecx edx
         ccall   _malloc, eax
         pop     edx ecx
         ret
+endp
 
 
 proc kernel_alloc _size
@@ -238,6 +236,7 @@ proc alloc_kernel_space _size
         ret
 endp
 
+
 proc alloc_pages _cnt
         mov     eax, [_cnt]
         shl     eax, 12
@@ -246,9 +245,10 @@ proc alloc_pages _cnt
 endp
 
 
-__free:
+proc __free
         ccall   _free, eax
         ret
+endp
 
 
 proc kernel_free base
@@ -259,7 +259,9 @@ proc kernel_free base
 endp
 
 
-put_board:
+proc _sys_msg_board
+        cmp     cl, 0x0d
+        jz      @f
         pushad
         mov     eax, SYS_WRITE
         mov     ebx, STDOUT
@@ -269,7 +271,10 @@ put_board:
         int     0x80
         pop     ecx
         popad
-ret
+@@:
+        ret
+endp
+
 
 align 16        ;very often call this subrutine
 memmove:       ; memory move in bytes
@@ -329,23 +334,22 @@ public coverage_end
 
 section '.data' writeable align 16
 include_debug_strings
-disk_functions:
-        dd disk_functions_end - disk_functions
-        dd 0
-        dd 0
-        dd disk_querymedia
-        dd disk_read
-        dd disk_write
-        dd 0
-        dd 0
-disk_functions_end:
+vdisk_functions:
+        dd vdisk_functions_end - vdisk_functions
+        dd 0;vdisk_close    ; close
+        dd 0    ; closemedia
+        dd vdisk_querymedia
+        dd vdisk_read
+        dd vdisk_write
+        dd 0    ; flush
+        dd 0    ; adjust_cache_size
+vdisk_functions_end:
 
 disk_name db 'hd0',0
 IncludeIGlobals
 
 
 section '.bss' writeable align 16
-file_disk FILE_DISK
 IncludeUGlobals
 ; crap
 DiskNumber db ?
