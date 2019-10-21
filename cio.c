@@ -6,7 +6,7 @@
 
 typedef struct {
     FILE *file;
-    uint32_t sect_cnt;
+    uint64_t sect_cnt;
     uint32_t sect_size;
 } vdisk_t;
 

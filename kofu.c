@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -12,37 +13,64 @@
 #include "kolibri.h"
 #include "trace.h"
 
-// http://home.thep.lu.se/~bjorn/crc/
-/* Simple public domain implementation of the standard CRC32 checksum.
- * Outputs the checksum for each file given as a command line argument.
- * Invalid file names and files that cause errors are silently skipped.
- * The program reads from stdin if it is called with no arguments. */
-
-uint32_t crc32_for_byte(uint32_t r) {
-  for(int j = 0; j < 8; ++j)
-    r = (r & 1? 0: (uint32_t)0xEDB88320L) ^ r >> 1;
-  return r ^ (uint32_t)0xFF000000L;
-}
-
-void crc32(const void *data, size_t n_bytes, uint32_t* crc) {
-  static uint32_t table[0x100];
-  if(!*table)
-    for(size_t i = 0; i < 0x100; ++i)
-      table[i] = crc32_for_byte(i);
-  for(size_t i = 0; i < n_bytes; ++i)
-    *crc = table[(uint8_t)*crc ^ ((uint8_t*)data)[i]] ^ *crc >> 8;
-}
-
 #define FGETS_BUF_LEN 4096
 #define MAX_COMMAND_ARGS 42
 #define PRINT_BYTES_PER_LINE 32
 #define MAX_DIRENTS_TO_READ 100
-#define MAX_BYTES_TO_READ 1024
+#define MAX_BYTES_TO_READ (16*1024)
 
 char cmd_buf[FGETS_BUF_LEN];
 bool is_tty;
 int cmd_num = 0;
 bool trace = false;
+
+bool parse_uintmax(const char *str, uintmax_t *res) {
+    char *endptr;
+    *res = strtoumax(str, &endptr, 0);
+    bool ok = (str != endptr) && (*endptr == '\0');
+    return ok;
+}
+
+bool parse_uint32(const char *str, uint32_t *res) {
+    uintmax_t x;
+    if (parse_uintmax(str, &x) && x <= UINT32_MAX) {
+        *res = x;
+        return true;
+    } else {
+        perror("invalid number");
+        return false;
+    }
+}
+
+bool parse_uint64(const char *str, uint64_t *res) {
+    uintmax_t x;
+    if (parse_uintmax(str, &x) && x <= UINT64_MAX) {
+        *res = x;
+        return true;
+    } else {
+        perror("invalid number");
+        return false;
+    }
+}
+
+void print_bytes(uint8_t *x, size_t len) {
+    for (size_t i = 0; i < len; i++) {
+        if (i % PRINT_BYTES_PER_LINE == 0 && i != 0) {
+            printf("\n");
+        }
+        printf("%2.2x", x[i]);
+    }
+    putchar('\n');
+}
+
+void print_hash(uint8_t *x, size_t len) {
+    hash_context ctx;
+    hash_oneshot(&ctx, x, len);
+    for (size_t i = 0; i < HASH_SIZE; i++) {
+        printf("%2.2x", ctx.hash[i]);
+    }
+    putchar('\n');
+}
 
 void prompt() {
     printf("#%d> ", cmd_num);
@@ -81,8 +109,8 @@ void kofu_disk_del(int argc, const char **argv) {
     return;
 }
 
-void ls_range(struct f70s1arg *f70) {
-    f70ret r;
+void ls_range(f70s1arg_t *f70) {
+    f70ret_t r;
     uint32_t requested = f70->size;
     if (f70->size > MAX_DIRENTS_TO_READ) {
         f70->size = MAX_DIRENTS_TO_READ;
@@ -94,7 +122,7 @@ void ls_range(struct f70s1arg *f70) {
         kos_fuse_lfn(f70, &r);
         f70->offset += f70->size;
         printf("status = %d, count = %d\n", r.status, r.count);
-        struct f70s1ret *dir = f70->buf;
+        f70s1info_t *dir = f70->buf;
         assert((r.status == F70_SUCCESS && r.count == f70->size) ||
                (r.status == F70_END_OF_FILE && r.count < f70->size)
               );
@@ -114,15 +142,15 @@ void ls_range(struct f70s1arg *f70) {
     }
 }
 
-void ls_all(struct f70s1arg *f70) {
-    f70ret r;
+void ls_all(f70s1arg_t *f70) {
+    f70ret_t r;
     while (true) {
         kos_fuse_lfn(f70, &r);
         printf("status = %d, count = %d\n", r.status, r.count);
         if (r.status != F70_SUCCESS && r.status != F70_END_OF_FILE) {
             abort();
         }
-        struct f70s1ret *dir = f70->buf;
+        f70s1info_t *dir = f70->buf;
         f70->offset += dir->cnt;
         assert((r.status == F70_SUCCESS && r.count == f70->size) ||
                (r.status == F70_END_OF_FILE && r.count < f70->size)
@@ -139,8 +167,8 @@ void ls_all(struct f70s1arg *f70) {
 
 void kofu_ls(int argc, const char **argv) {
     (void)argc;
-    struct f70s1ret *dir = (struct f70s1ret*)malloc(sizeof(struct f70s1ret) + sizeof(struct bdfe) * MAX_DIRENTS_TO_READ);
-    struct f70s1arg f70 = {1, 0, CP866, MAX_DIRENTS_TO_READ, dir, 0, argv[1]};
+    f70s1info_t *dir = (f70s1info_t*)malloc(sizeof(f70s1info_t) + sizeof(bdfe_t) * MAX_DIRENTS_TO_READ);
+    f70s1arg_t f70 = {1, 0, CP866, MAX_DIRENTS_TO_READ, dir, 0, argv[1]};
     if (argv[2]) {
         sscanf(argv[2], "%"SCNu32, &f70.size);
         if (argv[3]) {
@@ -156,17 +184,21 @@ void kofu_ls(int argc, const char **argv) {
 
 void kofu_stat(int argc, const char **argv) {
     (void)argc;
-    f70ret r;
-    struct bdfe file;
-    struct f70s5arg f70 = {5, 0, 0, 0, &file, 0, argv[1]};
+    f70s5arg_t f70 = {.sf = 5, .flags = 0, .zero = 0};
+    f70ret_t r;
+    bdfe_t file;
+    f70.buf = &file;
+    f70.path = argv[1];
     kos_fuse_lfn(&f70, &r);
     printf("attr: 0x%2.2x\n", file.attr);
     printf("size: %llu\n", file.size);
     return;
 }
 
+/*
 void read_range(struct f70s0arg *f70) {
     f70ret r;
+    hash_context ctx;
     uint32_t requested = f70->size;
     if (f70->size > MAX_BYTES_TO_READ) {
         f70->size = MAX_BYTES_TO_READ;
@@ -181,13 +213,9 @@ void read_range(struct f70s0arg *f70) {
         assert((r.status == F70_SUCCESS && r.count == f70->size) ||
                (r.status == F70_END_OF_FILE && r.count < f70->size)
               );
-        for (size_t i = 0; i < r.count; i++) {
-            if (i % PRINT_BYTES_PER_LINE == 0 && i != 0) {
-                printf("\n");
-            }
-            printf("%2.2x", ((uint8_t*)f70->buf)[i]);
-        }
-        printf("\n");
+        print_bytes(f70->buf, r.count);
+        hash_oneshot(&ctx, f70->buf, r.count);
+        print_hash(ctx.hash, HASH_SIZE);
         if (r.status == F70_END_OF_FILE) {
             break;
         }
@@ -203,37 +231,58 @@ void read_all(struct f70s0arg *f70) {
         assert((r.status == F70_SUCCESS && r.count == f70->size) ||
                (r.status == F70_END_OF_FILE && r.count < f70->size)
               );
-        for (size_t i = 0; i < r.count; i++) {
-            if (i % PRINT_BYTES_PER_LINE == 0 && i != 0) {
-                printf("\n");
-            }
-            printf("%2.2x", ((uint8_t*)f70->buf)[i]);
+        if () {
+            print_bytes(f70->buf, r.count);
         }
-        printf("\n");
+        if () {
+            hash_context ctx;
+            hash_oneshot(&ctx, f70->buf, r.count);
+            print_hash(ctx.hash, HASH_SIZE);
+        }
         if (r.status == F70_END_OF_FILE) {
             break;
         }
     }
 }
+*/
 
 void kofu_read(int argc, const char **argv) {
     (void)argc;
-    uint8_t *buf = (uint8_t*)malloc(MAX_BYTES_TO_READ);
-    struct f70s0arg f70 = {0, 0, 0, MAX_BYTES_TO_READ, buf, 0, argv[1]};
-//    optind = 1;
-//    while ((opt = getopt(argc, argv, "fcshd:")) != -1) {
-//        switch (opt) {
-//        case
-    if (argv[2]) {
-        sscanf(argv[2], "%"SCNu32, &f70.size);
-        if (argv[3]) {
-            sscanf(argv[3], "%"SCNu32, &f70.offset_lo);
-        }
-        read_range(&f70);
-    } else {
-        read_all(&f70);
+    f70s0arg_t f70 = {.sf = 0, .zero = 0};
+    f70ret_t r;
+    bool dump_bytes = false, dump_hash = false;
+    if (argc < 4) {
+        printf("usage: %s <offset> <length> [-b] [-h]\n", argv[0]);
+        return;
     }
-    free(buf);
+    int opt = 1;
+    f70.path = argv[opt++];
+    if ((opt >= argc) || !parse_uint64(argv[opt++], &f70.offset))
+        return;
+    if ((opt >= argc) || !parse_uint32(argv[opt++], &f70.count))
+        return;
+    for (; opt < argc; opt++) {
+        if (!strcmp(argv[opt], "-b")) {
+            dump_bytes = true;
+        } else if (!strcmp(argv[opt], "-h")) {
+            dump_hash = true;
+        } else {
+            printf("invalid option: '%s'\n", argv[opt]);
+            return;
+        }
+    }
+    f70.buf = (uint8_t*)malloc(f70.count);
+
+    kos_fuse_lfn(&f70, &r);
+    assert((r.status == F70_SUCCESS && r.count == f70.count) ||
+           (r.status == F70_END_OF_FILE && r.count < f70.count));
+
+    if (dump_bytes)
+        print_bytes(f70.buf, r.count);
+    if (dump_hash)
+        print_hash(f70.buf, r.count);
+
+    free(f70.buf);
     return;
 }
 
@@ -250,13 +299,6 @@ struct func_table funcs[] = {
                               { "read", kofu_read },
                               { NULL,   NULL      },
                             };
-
-void crc() {
-    uint8_t data[] = {1,2,3,4};
-    uint32_t x = 0;
-    crc32(data, 4, &x);
-    printf("crc=%"PRIx32"\n", x);
-}
 
 int main(int argc, char **argv) {
     (void)argc;

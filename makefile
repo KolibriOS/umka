@@ -1,6 +1,6 @@
 FASM=fasm
 CC=gcc
-CFLAGS=-Wall -Wextra -g -O0 -D_FILE_OFFSET_BITS=64
+CFLAGS=-Wall -Wextra -g -O0 -D_FILE_OFFSET_BITS=64 -Wno-address-of-packed-member
 CFLAGS_32=-m32
 LDFLAGS=
 LDFLAGS_32=-m32
@@ -14,7 +14,7 @@ kofuse: kofuse.o kolibri.o cio.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
 kolibri.o kolibri.fas: kolibri.asm kolibri.h
-	INCLUDE="$(KOLIBRI_TRUNK)" $(FASM) $< $@ -s kolibri.fas
+	INCLUDE="$(KOLIBRI_TRUNK);$(LIBCRASH_X86)" $(FASM) $< $@ -s kolibri.fas
 
 kolibri.sym: kolibri.fas
 	symbols kolibri.fas kolibri.sym

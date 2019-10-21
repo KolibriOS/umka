@@ -30,11 +30,19 @@ include 'blkdev/disk_cache.inc'
 include 'fs/fs_lfn.inc'
 include 'crc.inc'
 
+include 'sha3.asm'
+
 struct VDISK
   File     dd ?
-  SectCnt  dd ?  ; FIXME: dq
+  SectCnt  DQ ?
   SectSize dd ?  ; sector size
 ends
+
+public sha3_256_oneshot as 'hash_oneshot'
+proc sha3_256_oneshot c uses ebx esi edi ebp, _ctx, _data, _len
+        stdcall sha3_256.oneshot, [_ctx], [_data], [_len]
+        ret
+endp
 
 ; TODO: move to trace_lbr
 public set_eflags_tf
@@ -206,9 +214,10 @@ proc vdisk_querymedia stdcall uses ebx esi edi ebp, vdisk, mediainfo
         mov     [ecx + DISKMEDIAINFO.Flags], 0
         mov     eax, [edx + VDISK.SectSize]
         mov     [ecx + DISKMEDIAINFO.SectorSize], eax
-        mov     eax, [edx + VDISK.SectCnt]
+        mov     eax, [edx + VDISK.SectCnt.lo]
         mov     dword [ecx + DISKMEDIAINFO.Capacity + 0], eax
-        mov     dword [ecx + DISKMEDIAINFO.Capacity + 4], 0
+        mov     eax, [edx + VDISK.SectCnt.hi]
+        mov     dword [ecx + DISKMEDIAINFO.Capacity + 4], eax
         
         movi    eax, DISK_STATUS_OK
         ret

@@ -13,3 +13,7 @@ mkfilepattern
 *.img.info
 t_*.out
 .gdb_history
+kolibri.fas
+kolibri.sym
+kolibri.lst
+kolibri.prp

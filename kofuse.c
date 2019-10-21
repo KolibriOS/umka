@@ -35,7 +35,7 @@
 
 #define DIRENTS_TO_READ 100
 
-static void bdfe_to_stat(struct bdfe *kf, struct stat *st) {
+static void bdfe_to_stat(bdfe_t *kf, struct stat *st) {
     if (kf->attr & KF_FOLDER) {
         st->st_mode = S_IFDIR | 0755;
         st->st_nlink = 2;
@@ -62,9 +62,9 @@ static int kofuse_getattr(const char *path, struct stat *stbuf,
     int res = 0;
 
 
-    struct bdfe file;
-    struct f70s5arg f70 = {5, 0, 0, 0, &file, 0, path};
-    f70ret r;
+    bdfe_t file;
+    f70s5arg_t f70 = {.sf = 5, .flags = 0, .buf = &file, .zero = 0, .path = path};
+    f70ret_t r;
     kos_fuse_lfn(&f70, &r);
 
     bdfe_to_stat(&file, stbuf);
@@ -79,9 +79,9 @@ static int kofuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     (void) fi;
     (void) flags;
 
-    struct f70s1ret *dir = (struct f70s1ret*)malloc(sizeof(struct f70s1ret) + sizeof(struct bdfe) * DIRENTS_TO_READ);
-    struct f70s1arg f70 = {1, 0, CP866, DIRENTS_TO_READ, dir, 0, path};
-    f70ret r;
+    f70s1info_t *dir = (f70s1info_t*)malloc(sizeof(f70s1info_t) + sizeof(bdfe_t) * DIRENTS_TO_READ);
+    f70s1arg_t f70 = {1, 0, CP866, DIRENTS_TO_READ, dir, 0, path};
+    f70ret_t r;
     kos_fuse_lfn(&f70, &r);
     for (size_t i = 0; i < dir->cnt; i++) {
         filler(buf, dir->bdfes[i].name, NULL, 0, 0);
@@ -105,8 +105,8 @@ static int kofuse_read(const char *path, char *buf, size_t size, off_t offset,
                       struct fuse_file_info *fi) {
     (void) fi;
 
-    struct f70s5arg f70 = {0, offset, offset >> 32, size, buf, 0, path};
-    f70ret r;
+    f70s0arg_t f70 = {.sf = 0, .offset = offset, .count = size, .buf = buf, .zero = 0, .path = path};
+    f70ret_t r;
     kos_fuse_lfn(&f70, &r);
     return size;
 }
