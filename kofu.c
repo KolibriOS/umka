@@ -119,7 +119,7 @@ void ls_range(f70s1arg_t *f70) {
         if (f70->size > requested) {
             f70->size = requested;
         }
-        kos_fuse_lfn(f70, &r);
+        kos_lfn(f70, &r);
         f70->offset += f70->size;
         printf("status = %d, count = %d\n", r.status, r.count);
         f70s1info_t *dir = f70->buf;
@@ -145,7 +145,7 @@ void ls_range(f70s1arg_t *f70) {
 void ls_all(f70s1arg_t *f70) {
     f70ret_t r;
     while (true) {
-        kos_fuse_lfn(f70, &r);
+        kos_lfn(f70, &r);
         printf("status = %d, count = %d\n", r.status, r.count);
         if (r.status != F70_SUCCESS && r.status != F70_END_OF_FILE) {
             abort();
@@ -189,7 +189,7 @@ void kofu_stat(int argc, const char **argv) {
     bdfe_t file;
     f70.buf = &file;
     f70.path = argv[1];
-    kos_fuse_lfn(&f70, &r);
+    kos_lfn(&f70, &r);
     printf("attr: 0x%2.2x\n", file.attr);
     printf("size: %llu\n", file.size);
     return;
@@ -207,7 +207,7 @@ void read_range(struct f70s0arg *f70) {
         if (f70->size > requested) {
             f70->size = requested;
         }
-        kos_fuse_lfn(f70, &r);
+        kos_lfn(f70, &r);
         f70->offset_lo += f70->size;
         printf("status = %d, count = %d\n", r.status, r.count);
         assert((r.status == F70_SUCCESS && r.count == f70->size) ||
@@ -225,7 +225,7 @@ void read_range(struct f70s0arg *f70) {
 void read_all(struct f70s0arg *f70) {
     f70ret r;
     while (true) {
-        kos_fuse_lfn(f70, &r);
+        kos_lfn(f70, &r);
         f70->offset_lo += f70->size;
         printf("status = %d, count = %d\n", r.status, r.count);
         assert((r.status == F70_SUCCESS && r.count == f70->size) ||
@@ -273,7 +273,7 @@ void kofu_read(int argc, const char **argv) {
     }
     f70.buf = (uint8_t*)malloc(f70.count);
 
-    kos_fuse_lfn(&f70, &r);
+    kos_lfn(&f70, &r);
     assert((r.status == F70_SUCCESS && r.count == f70.count) ||
            (r.status == F70_END_OF_FILE && r.count < f70.count));
 

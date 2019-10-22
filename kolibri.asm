@@ -170,8 +170,8 @@ proc kos_disk_del c uses ebx esi edi ebp, _name
 endp
 
 
-public kos_fuse_lfn
-proc kos_fuse_lfn c uses ebx edx esi edi ebp, _f70arg, _f70ret
+public kos_lfn
+proc kos_lfn c uses ebx edx esi edi ebp, _f70arg, _f70ret
         push    ebx
         mov     ebx, [_f70arg]
         pushad  ; file_system_lfn writes here

@@ -65,7 +65,7 @@ static int kofuse_getattr(const char *path, struct stat *stbuf,
     bdfe_t file;
     f70s5arg_t f70 = {.sf = 5, .flags = 0, .buf = &file, .zero = 0, .path = path};
     f70ret_t r;
-    kos_fuse_lfn(&f70, &r);
+    kos_lfn(&f70, &r);
 
     bdfe_to_stat(&file, stbuf);
 //   res = -ENOENT;
@@ -82,7 +82,7 @@ static int kofuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     f70s1info_t *dir = (f70s1info_t*)malloc(sizeof(f70s1info_t) + sizeof(bdfe_t) * DIRENTS_TO_READ);
     f70s1arg_t f70 = {1, 0, CP866, DIRENTS_TO_READ, dir, 0, path};
     f70ret_t r;
-    kos_fuse_lfn(&f70, &r);
+    kos_lfn(&f70, &r);
     for (size_t i = 0; i < dir->cnt; i++) {
         filler(buf, dir->bdfes[i].name, NULL, 0, 0);
     }
@@ -107,7 +107,7 @@ static int kofuse_read(const char *path, char *buf, size_t size, off_t offset,
 
     f70s0arg_t f70 = {.sf = 0, .offset = offset, .count = size, .buf = buf, .zero = 0, .path = path};
     f70ret_t r;
-    kos_fuse_lfn(&f70, &r);
+    kos_lfn(&f70, &r);
     return size;
 }
 

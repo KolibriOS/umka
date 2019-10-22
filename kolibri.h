@@ -95,10 +95,8 @@ typedef struct {
 } hash_context;
 
 uint32_t kos_time_to_epoch(uint32_t *time);
-void *kos_fuse_init(int fd, uint32_t sect_cnt, uint32_t sect_sz);
-void kos_fuse_lfn(void *f70sXarg, f70ret_t *r);
-
 void kos_init(void);
+void kos_lfn(void *f70sXarg, f70ret_t *r);
 void *kos_disk_add(const char *file_name, const char *disk_name);
 int kos_disk_del(const char *name);
 
