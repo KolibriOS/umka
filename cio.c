@@ -20,7 +20,7 @@ void *cio_disk_init(const char *fname) {
         sect_size = 4096;
     }
     vdisk_t *vdisk = (vdisk_t*)malloc(sizeof(vdisk_t));
-    *vdisk = (vdisk_t){f, fsize / sect_size, sect_size};
+    *vdisk = (vdisk_t){f, (uint64_t)fsize / sect_size, sect_size};
     return vdisk;
 }
 

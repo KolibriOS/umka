@@ -6,7 +6,6 @@ TEMP_DIR:=$(shell mktemp -d)
 all: s512_xfs_v4_ftype0.img s512_xfs_v4_ftype0_b4k_n2b.img s512_xfs_v4_ftype1.img s512_xfs_v4_ftype0_xattr.img s512_xfs_v4_files.img s512_xfs_v4_files_b4k_n2b.img s512_xfs_v4_ftype1_btree_dirs.img
 
 s512_xfs_v4_ftype0.img:
-#	dd if=/dev/zero of=$@ bs=1M count=64
 	fallocate -l 64MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
@@ -34,7 +33,6 @@ s512_xfs_v4_ftype0.img:
 	sudo losetup -d $(LOOP_DEV)
 
 s512_xfs_v4_ftype0_b4k_n2b.img:
-#	dd if=/dev/zero of=$@ bs=1M count=64
 	fallocate -l 64MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
@@ -62,7 +60,6 @@ s512_xfs_v4_ftype0_b4k_n2b.img:
 	sudo losetup -d $(LOOP_DEV)
 
 s512_xfs_v4_ftype1.img:
-#	dd if=/dev/zero of=$@ bs=1M count=64
 	fallocate -l 64MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
@@ -90,7 +87,6 @@ s512_xfs_v4_ftype1.img:
 	sudo losetup -d $(LOOP_DEV)
 
 s512_xfs_v4_ftype0_xattr.img:
-#	dd if=/dev/zero of=$@ bs=1M count=64
 	fallocate -l 64MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
@@ -115,7 +111,6 @@ s512_xfs_v4_ftype0_xattr.img:
 	sudo losetup -d $(LOOP_DEV)
 
 s512_xfs_v4_ftype1_btree_dirs.img:
-#	dd if=/dev/zero of=$@ bs=1M count=128
 	fallocate -l 128MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
@@ -131,7 +126,6 @@ s512_xfs_v4_ftype1_btree_dirs.img:
 	sudo losetup -d $(LOOP_DEV)
 
 s512_xfs_v4_files.img:
-#	dd if=/dev/zero of=$@ bs=1M count=128000
 	fallocate -l 128MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
@@ -166,7 +160,6 @@ s512_xfs_v4_files.img:
 	sudo losetup -d $(LOOP_DEV)
 
 s512_xfs_v4_files_b4k_n2b.img:
-#	dd if=/dev/zero of=$@ bs=1M count=128000
 	fallocate -l 128MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%

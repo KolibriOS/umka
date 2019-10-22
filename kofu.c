@@ -34,7 +34,7 @@ bool parse_uintmax(const char *str, uintmax_t *res) {
 bool parse_uint32(const char *str, uint32_t *res) {
     uintmax_t x;
     if (parse_uintmax(str, &x) && x <= UINT32_MAX) {
-        *res = x;
+        *res = (uint32_t)x;
         return true;
     } else {
         perror("invalid number");

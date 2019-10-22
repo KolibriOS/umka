@@ -1,0 +1,4 @@
+#0> disk_add ../img/s512_xfs_v4_files.img hd0
+/hd0/1: xfs
+#1> read /hd0/1/no_hole 0 2 -b
+0001
