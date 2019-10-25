@@ -12,8 +12,8 @@ _free fix free
 
 sys_msg_board equ _sys_msg_board
 
-purge section,mov,add,sub
-purge section,mov,add,sub
+purge mov,add,sub
+purge mov,add,sub
 section '.text' executable align 16
 
 coverage_begin:
@@ -31,6 +31,8 @@ include 'fs/fs_lfn.inc'
 include 'crc.inc'
 
 include 'sha3.asm'
+
+SLOT_BASE    = os_base + 0x00080000
 
 struct VDISK
   File     dd ?
@@ -77,6 +79,25 @@ get_lwp_event_size:
         ret
 
 
+public kos_getcwd
+proc kos_getcwd c uses ebx esi edi ebp, _buf, _len
+        mov     eax, 30
+        mov     ebx, 2
+        mov     ecx, [_buf]
+        mov     edx, [_len]
+        call    sys_current_directory
+        ret
+endp
+
+public kos_cd
+proc kos_cd c uses ebx esi edi ebp, _path
+        mov     eax, 30
+        mov     ebx, 1
+        mov     ecx, [_path]
+        call    sys_current_directory
+        ret
+endp
+
 public kos_time_to_epoch
 proc kos_time_to_epoch c uses ebx esi edi ebp, _time
         mov     esi, [_time]
@@ -92,6 +113,15 @@ proc kos_init c
         mov     [pg_data.mem_amount], MEMORY_BYTES
         mov     [pg_data.pages_count], MEMORY_BYTES / PAGE_SIZE
         mov     [pg_data.pages_free], MEMORY_BYTES / PAGE_SIZE
+
+        mov     dword[sysdir_name], 'sys'
+        mov     dword[sysdir_path], 'HD0/'
+        mov     word[sysdir_path+4], '1'
+
+        mov     eax, SLOT_BASE
+        mov     dword[current_slot], eax
+        mov     word[cur_dir.path], '/'
+        mov     [eax+APPDATA.cur_dir], cur_dir
         ret
 endp
 
@@ -379,3 +409,7 @@ ide_channel5_mutex MUTEX
 ide_channel6_mutex MUTEX
 ide_channel7_mutex MUTEX
 ide_channel8_mutex MUTEX
+os_base rb 0x100000
+cur_dir:
+.encoding rb 1
+.path     rb maxPathLength

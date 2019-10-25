@@ -32,11 +32,11 @@ void cio_disk_free(vdisk_t *vdisk) {
 f70status cio_disk_read(vdisk_t *vdisk, uint8_t *buffer, off_t startsector, uint32_t *numsectors) {
     fseeko(vdisk->file, startsector * vdisk->sect_size, SEEK_SET);
     fread(buffer, *numsectors * vdisk->sect_size, 1, vdisk->file);
-    return F70_SUCCESS;
+    return F70_ERROR_SUCCESS;
 }
 
 f70status cio_disk_write(vdisk_t *vdisk, uint8_t *buffer, off_t startsector, uint32_t *numsectors) {
     fseeko(vdisk->file, startsector * vdisk->sect_size, SEEK_SET);
     fwrite(buffer, *numsectors * vdisk->sect_size, 1, vdisk->file);
-    return F70_SUCCESS;
+    return F70_ERROR_SUCCESS;
 }

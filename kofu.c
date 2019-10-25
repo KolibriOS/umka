@@ -13,16 +13,67 @@
 #include "kolibri.h"
 #include "trace.h"
 
+#define PATH_MAX 4096
 #define FGETS_BUF_LEN 4096
 #define MAX_COMMAND_ARGS 42
 #define PRINT_BYTES_PER_LINE 32
 #define MAX_DIRENTS_TO_READ 100
 #define MAX_BYTES_TO_READ (16*1024)
 
+char cur_dir[PATH_MAX] = "/";
+const char *last_dir = cur_dir;
+bool cur_dir_changed = true;
+
 char cmd_buf[FGETS_BUF_LEN];
 bool is_tty;
-int cmd_num = 0;
 bool trace = false;
+
+const char *f70_status_name[] = {
+                                 "success",
+                                 "disk_base",
+                                 "unsupported_fs",
+                                 "unknown_fs",
+                                 "partition",
+                                 "file_not_found",
+                                 "end_of_file",
+                                 "memory_pointer",
+                                 "disk_full",
+                                 "fs_fail",
+                                 "access_denied",
+                                 "device",
+                                 "out_of_memory"
+                                };
+
+const char *get_f70_status_name(f70status s) {
+    switch (s) {
+    case F70_ERROR_SUCCESS:
+        return "";
+    case F70_ERROR_DISK_BASE:
+    case F70_ERROR_UNSUPPORTED_FS:
+    case F70_ERROR_UNKNOWN_FS:
+    case F70_ERROR_PARTITION:
+    case F70_ERROR_FILE_NOT_FOUND:
+    case F70_ERROR_END_OF_FILE:
+    case F70_ERROR_MEMORY_POINTER:
+    case F70_ERROR_DISK_FULL:
+    case F70_ERROR_FS_FAIL:
+    case F70_ERROR_ACCESS_DENIED:
+    case F70_ERROR_DEVICE:
+    case F70_ERROR_OUT_OF_MEMORY:
+        return f70_status_name[s];
+    default:
+        return "unknown";
+    }
+}
+
+void print_f70_status(f70ret_t *r, int use_ebx) {
+    printf("status = %d", r->status);
+    if (r->status != F70_ERROR_SUCCESS)
+        printf(" %s", get_f70_status_name(r->status));
+    if (use_ebx)
+        printf(", count = %d", r->count);
+    putchar('\n');
+}
 
 bool parse_uintmax(const char *str, uintmax_t *res) {
     char *endptr;
@@ -72,8 +123,23 @@ void print_hash(uint8_t *x, size_t len) {
     putchar('\n');
 }
 
+const char *get_last_dir(const char *path) {
+    const char *last = strrchr(path, '/');
+    if (!last) {
+        last = path;
+    } else if (last != path || last[1] != '\0') {
+        last++;
+    }
+    return last;
+}
+
 void prompt() {
-    printf("#%d> ", cmd_num);
+    if (cur_dir_changed) {
+        kos_getcwd(cur_dir, PATH_MAX);
+        last_dir = get_last_dir(cur_dir);
+        cur_dir_changed = false;
+    }
+    printf("%s> ", last_dir);
     fflush(stdout);
 }
 
@@ -109,6 +175,21 @@ void kofu_disk_del(int argc, const char **argv) {
     return;
 }
 
+void kofu_pwd(int argc, const char **argv) {
+    (void)argc;
+    (void)argv;
+    bool quoted = false;
+    const char *quote = quoted ? "'" : "";
+    kos_getcwd(cur_dir, PATH_MAX);
+    printf("%s%s%s\n", quote, cur_dir, quote);
+}
+
+void kofu_cd(int argc, const char **argv) {
+    (void)argc;
+    kos_cd(argv[1]);
+    cur_dir_changed = true;
+}
+
 void ls_range(f70s1arg_t *f70) {
     f70ret_t r;
     uint32_t requested = f70->size;
@@ -121,22 +202,17 @@ void ls_range(f70s1arg_t *f70) {
         }
         kos_lfn(f70, &r);
         f70->offset += f70->size;
-        printf("status = %d, count = %d\n", r.status, r.count);
+        print_f70_status(&r, 1);
         f70s1info_t *dir = f70->buf;
-        assert((r.status == F70_SUCCESS && r.count == f70->size) ||
-               (r.status == F70_END_OF_FILE && r.count < f70->size)
-              );
+        assert(r.count <= f70->size);
         assert(dir->cnt == r.count);
-        if (dir->cnt != r.count ||
-            (r.status == F70_SUCCESS && r.count != f70->size) ||
-            (r.status == F70_END_OF_FILE && r.count >= f70->size)
-           ) {
-            abort();
-        }
+        assert((r.status == F70_ERROR_SUCCESS && r.count == f70->size) ||
+               (r.status == F70_ERROR_END_OF_FILE && r.count < f70->size)
+              );
         for (size_t i = 0; i < dir->cnt; i++) {
             printf("%s\n", dir->bdfes[i].name);
         }
-        if (r.status == F70_END_OF_FILE) {
+        if (r.status == F70_ERROR_END_OF_FILE) {
             break;
         }
     }
@@ -146,20 +222,21 @@ void ls_all(f70s1arg_t *f70) {
     f70ret_t r;
     while (true) {
         kos_lfn(f70, &r);
-        printf("status = %d, count = %d\n", r.status, r.count);
-        if (r.status != F70_SUCCESS && r.status != F70_END_OF_FILE) {
+        print_f70_status(&r, 1);
+        if (r.status != F70_ERROR_SUCCESS && r.status != F70_ERROR_END_OF_FILE) {
             abort();
         }
         f70s1info_t *dir = f70->buf;
         f70->offset += dir->cnt;
-        assert((r.status == F70_SUCCESS && r.count == f70->size) ||
-               (r.status == F70_END_OF_FILE && r.count < f70->size)
-              );
+        assert(r.count <= f70->size);
         assert(dir->cnt == r.count);
+        assert((r.status == F70_ERROR_SUCCESS && r.count == f70->size) ||
+               (r.status == F70_ERROR_END_OF_FILE && r.count < f70->size)
+              );
         for (size_t i = 0; i < dir->cnt; i++) {
             printf("%s\n", dir->bdfes[i].name);
         }
-        if (r.status == F70_END_OF_FILE) {
+        if (r.status == F70_ERROR_END_OF_FILE) {
             break;
         }
     }
@@ -190,61 +267,11 @@ void kofu_stat(int argc, const char **argv) {
     f70.buf = &file;
     f70.path = argv[1];
     kos_lfn(&f70, &r);
+    print_f70_status(&r, 0);
     printf("attr: 0x%2.2x\n", file.attr);
     printf("size: %llu\n", file.size);
     return;
 }
-
-/*
-void read_range(struct f70s0arg *f70) {
-    f70ret r;
-    hash_context ctx;
-    uint32_t requested = f70->size;
-    if (f70->size > MAX_BYTES_TO_READ) {
-        f70->size = MAX_BYTES_TO_READ;
-    }
-    for (; requested; requested -= f70->size) {
-        if (f70->size > requested) {
-            f70->size = requested;
-        }
-        kos_lfn(f70, &r);
-        f70->offset_lo += f70->size;
-        printf("status = %d, count = %d\n", r.status, r.count);
-        assert((r.status == F70_SUCCESS && r.count == f70->size) ||
-               (r.status == F70_END_OF_FILE && r.count < f70->size)
-              );
-        print_bytes(f70->buf, r.count);
-        hash_oneshot(&ctx, f70->buf, r.count);
-        print_hash(ctx.hash, HASH_SIZE);
-        if (r.status == F70_END_OF_FILE) {
-            break;
-        }
-    }
-}
-
-void read_all(struct f70s0arg *f70) {
-    f70ret r;
-    while (true) {
-        kos_lfn(f70, &r);
-        f70->offset_lo += f70->size;
-        printf("status = %d, count = %d\n", r.status, r.count);
-        assert((r.status == F70_SUCCESS && r.count == f70->size) ||
-               (r.status == F70_END_OF_FILE && r.count < f70->size)
-              );
-        if () {
-            print_bytes(f70->buf, r.count);
-        }
-        if () {
-            hash_context ctx;
-            hash_oneshot(&ctx, f70->buf, r.count);
-            print_hash(ctx.hash, HASH_SIZE);
-        }
-        if (r.status == F70_END_OF_FILE) {
-            break;
-        }
-    }
-}
-*/
 
 void kofu_read(int argc, const char **argv) {
     (void)argc;
@@ -274,9 +301,13 @@ void kofu_read(int argc, const char **argv) {
     f70.buf = (uint8_t*)malloc(f70.count);
 
     kos_lfn(&f70, &r);
-    assert((r.status == F70_SUCCESS && r.count == f70.count) ||
-           (r.status == F70_END_OF_FILE && r.count < f70.count));
 
+    assert(r.count <= f70.count);
+    assert((r.count == f70.count && r.status == F70_ERROR_SUCCESS) ||
+           (r.count < f70.count && r.status == F70_ERROR_END_OF_FILE)
+          );
+
+    print_f70_status(&r, 1);
     if (dump_bytes)
         print_bytes(f70.buf, r.count);
     if (dump_hash)
@@ -286,17 +317,19 @@ void kofu_read(int argc, const char **argv) {
     return;
 }
 
-struct func_table {
+typedef struct {
     char *name;
     void (*func) (int, const char **);
-};
+} func_table_t;
 
-struct func_table funcs[] = {
+func_table_t funcs[] = {
                               { "disk_add", kofu_disk_add },
                               { "disk_del", kofu_disk_del },
                               { "ls",   kofu_ls   },
                               { "stat", kofu_stat },
                               { "read", kofu_read },
+                              { "pwd",  kofu_pwd },
+                              { "cd",   kofu_cd },
                               { NULL,   NULL      },
                             };
 
@@ -315,33 +348,31 @@ int main(int argc, char **argv) {
         trace_begin();
     }
     kos_init();
-//    kos_disk_add(argv[1], "hd0");
-//    if (cio_init(argv[1])) {
-//        exit(1);
-//    }
 
 //msg_file_not_found       db 'file not found: '
+    const char **cargv = (const char**)malloc(sizeof(const char*) * (MAX_COMMAND_ARGS + 1));
     while(next_line()) {
+        if (cmd_buf[0] == '#' || cmd_buf[0] == '\n') continue;
+        if (cmd_buf[0] == 'X') break;
         if (!is_tty) {
             prompt();
             printf("%s", cmd_buf);
             fflush(stdout);
         }
-        const char **cargv = (const char**)malloc(sizeof(char*) * (MAX_COMMAND_ARGS + 1));
         int cargc = split_args(cmd_buf, cargv);
-        bool found = false;
-        for (struct func_table *ft = funcs; ft->name != NULL; ft++) {
+        func_table_t *ft;
+        for (ft = funcs; ft->name != NULL; ft++) {
             if (!strcmp(cargv[0], ft->name)) {
-                found = true;
-                ft->func(cargc, cargv);
-                cmd_num++;
                 break;
             }
         }
-        if (!found) {
+        if (ft->name) {
+            ft->func(cargc, cargv);
+        } else {
             printf("unknown command: %s\n", cargv[0]);
         }
     }
+    free(cargv);
 
     if (trace) {
         trace_end();

@@ -1,5 +1,0 @@
-#0> disk_add ../img/s512_xfs_v4_files.img hd0
-/hd0/1: xfs
-#1> stat /hd0/1/no_hole
-attr: 0x00
-size: 65536

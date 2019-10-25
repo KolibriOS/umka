@@ -12,19 +12,19 @@ enum {
 };
 
 typedef enum {
-    F70_SUCCESS,
-    F70_DISK_BASE,
-    F70_UNSUPPORTED_FS,
-    F70_UNKNOWN_FS,
-    F70_PARTITION,
-    F70_FILE_NOT_FOUND,
-    F70_END_OF_FILE,
-    F70_MEMORY_POINTER,
-    F70_DISK_FULL,
-    F70_FS_FAIL,
-    F70_ACCESS_DENIED,
-    F70_DEVICE,
-    F70_OUT_OF_MEMORY,
+    F70_ERROR_SUCCESS,
+    F70_ERROR_DISK_BASE,
+    F70_ERROR_UNSUPPORTED_FS,
+    F70_ERROR_UNKNOWN_FS,
+    F70_ERROR_PARTITION,
+    F70_ERROR_FILE_NOT_FOUND,
+    F70_ERROR_END_OF_FILE,
+    F70_ERROR_MEMORY_POINTER,
+    F70_ERROR_DISK_FULL,
+    F70_ERROR_FS_FAIL,
+    F70_ERROR_ACCESS_DENIED,
+    F70_ERROR_DEVICE,
+    F70_ERROR_OUT_OF_MEMORY,
 } f70status;
 
 typedef struct {
@@ -99,6 +99,8 @@ void kos_init(void);
 void kos_lfn(void *f70sXarg, f70ret_t *r);
 void *kos_disk_add(const char *file_name, const char *disk_name);
 int kos_disk_del(const char *name);
+uint32_t kos_getcwd(char *buf, uint32_t len);
+void kos_cd(const char *buf);
 
 //void hash_init(void *ctx);
 //void hash_update(void *ctx, void *data, size_t len);
