@@ -118,7 +118,7 @@ proc kos_init c
         mov     dword[sysdir_path], 'HD0/'
         mov     word[sysdir_path+4], '1'
 
-        mov     eax, SLOT_BASE
+        mov     eax, SLOT_BASE + 2*256
         mov     dword[current_slot], eax
         mov     word[cur_dir.path], '/'
         mov     [eax+APPDATA.cur_dir], cur_dir

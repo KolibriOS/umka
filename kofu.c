@@ -47,7 +47,7 @@ const char *f70_status_name[] = {
 const char *get_f70_status_name(f70status s) {
     switch (s) {
     case F70_ERROR_SUCCESS:
-        return "";
+//        return "";
     case F70_ERROR_DISK_BASE:
     case F70_ERROR_UNSUPPORTED_FS:
     case F70_ERROR_UNKNOWN_FS:
@@ -67,10 +67,8 @@ const char *get_f70_status_name(f70status s) {
 }
 
 void print_f70_status(f70ret_t *r, int use_ebx) {
-    printf("status = %d", r->status);
-    if (r->status != F70_ERROR_SUCCESS)
-        printf(" %s", get_f70_status_name(r->status));
-    if (use_ebx)
+    printf("status = %d %s", r->status, get_f70_status_name(r->status));
+    if (use_ebx && (r->status == F70_ERROR_SUCCESS || r->status == F70_ERROR_END_OF_FILE))
         printf(", count = %d", r->count);
     putchar('\n');
 }

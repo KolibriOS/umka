@@ -1,6 +1,6 @@
 /> disk_add ../img/s512_xfs_v4_files.img hd0
 /hd0/1: xfs
 /> stat /hd0/1/no_hole
-status = 0
+status = 0 success
 attr: 0x00
 size: 65536

@@ -7,7 +7,7 @@ sf701_tests := $(addsuffix .out, $(basename $(wildcard ???_sf701_*.t)))
 sf705_tests := $(addsuffix .out, $(basename $(wildcard ???_sf705_*.t)))
 
 all: f30 f70
-	@echo all test passed
+	@echo all tests passed
 
 f30: $(f30_tests)
 
