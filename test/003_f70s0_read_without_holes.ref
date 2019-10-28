@@ -1,5 +1,6 @@
 /> disk_add ../img/s512_xfs_v4_files_b4k_n2b.img hd0
 /hd0/1: xfs
+# zero length
 /> read /hd0/1/no_hole 0 0 -b
 status = 0 success, count = 0
 
@@ -72,6 +73,7 @@ status = 0 success, count = 0
 /> read /hd0/1/no_hole 0xffffffffffffffff 0 -b
 status = 0 success, count = 0
 
+# one-byte length
 /> read /hd0/1/no_hole 0 1 -b
 status = 0 success, count = 1
 00
@@ -144,6 +146,7 @@ status = 6 end_of_file, count = 0
 /> read /hd0/1/no_hole 0xffffffffffffffff 1 -b
 status = 6 end_of_file, count = 0
 
+# fixed-size block, different begin/end positions
 /> read /hd0/1/no_hole 0 11 -b
 status = 0 success, count = 11
 000102030405060708090a

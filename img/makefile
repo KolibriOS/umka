@@ -137,19 +137,15 @@ s512_xfs_v4_files.img:
 	$(MKFILEPATTERN) $(TEMP_DIR)/no_hole 65536
 #
 	$(MKFILEPATTERN) $(TEMP_DIR)/hole_begin 65536
-	fallocate -p -o 0 -l 16384 $(TEMP_DIR)/hole_begin
+	fallocate -p -o 0 -l 16KiB $(TEMP_DIR)/hole_begin
 #
 	$(MKFILEPATTERN) $(TEMP_DIR)/hole_middle 65536
-	fallocate -p -o 32768 -l 16384 $(TEMP_DIR)/hole_middle
+	fallocate -p -o 32KiB -l 16KiB $(TEMP_DIR)/hole_middle
 #
 	$(MKFILEPATTERN) $(TEMP_DIR)/hole_end 65536
-	fallocate -p -o 49152 -l 16384 $(TEMP_DIR)/hole_end
+	fallocate -p -o 48KiB -l 16KiB $(TEMP_DIR)/hole_end
 #
-#	fallocate -l 120GiB $(TEMP_DIR)/btree_l1_no_hole
 	fallocate -l 4KiB $(TEMP_DIR)/btree_l1_no_hole
-#	$(MKFILEPATTERN) $(TEMP_DIR)/btree_l1_no_hole 2097152
-#		fallocate -c -l 64KiB -o  $$((64*$$n))KiB $(TEMP_DIR)/btree_l1_no_hole ; \
-#	dd if=/dev/zero of=$(TEMP_DIR)/btree_l1_no_hole bs=1M count=128
 	for n in $$(seq 1 2000); do \
 		fallocate -i -l 4KiB -o 0KiB $(TEMP_DIR)/btree_l1_no_hole ; \
 		fallocate -z -l 4KiB -o 0KiB $(TEMP_DIR)/btree_l1_no_hole ; \
@@ -171,13 +167,13 @@ s512_xfs_v4_files_b4k_n2b.img:
 	$(MKFILEPATTERN) $(TEMP_DIR)/no_hole 65536
 #
 	$(MKFILEPATTERN) $(TEMP_DIR)/hole_begin 65536
-	fallocate -p -o 0 -l 16384 $(TEMP_DIR)/hole_begin
+	fallocate -p -o 0 -l 16KiB $(TEMP_DIR)/hole_begin
 #
 	$(MKFILEPATTERN) $(TEMP_DIR)/hole_middle 65536
-	fallocate -p -o 32768 -l 16384 $(TEMP_DIR)/hole_middle
+	fallocate -p -o 32KiB -l 16KiB $(TEMP_DIR)/hole_middle
 #
 	$(MKFILEPATTERN) $(TEMP_DIR)/hole_end 65536
-	fallocate -p -o 49152 -l 16384 $(TEMP_DIR)/hole_end
+	fallocate -p -o 48KiB -l 16KiB $(TEMP_DIR)/hole_end
 #
 #	fallocate -l 120GiB $(TEMP_DIR)/btree_l1_no_hole
 	fallocate -l 4KiB $(TEMP_DIR)/btree_l1_no_hole

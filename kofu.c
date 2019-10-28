@@ -350,7 +350,10 @@ int main(int argc, char **argv) {
 //msg_file_not_found       db 'file not found: '
     const char **cargv = (const char**)malloc(sizeof(const char*) * (MAX_COMMAND_ARGS + 1));
     while(next_line()) {
-        if (cmd_buf[0] == '#' || cmd_buf[0] == '\n') continue;
+        if (cmd_buf[0] == '#' || cmd_buf[0] == '\n') {
+            printf("%s", cmd_buf);
+            continue;
+        }
         if (cmd_buf[0] == 'X') break;
         if (!is_tty) {
             prompt();

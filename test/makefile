@@ -2,19 +2,19 @@ KOFU=../kofu
 
 f30_tests := $(addsuffix .out, $(basename $(wildcard ???_f30_*.t)))
 
-sf700_tests := $(addsuffix .out, $(basename $(wildcard ???_sf700_*.t)))
-sf701_tests := $(addsuffix .out, $(basename $(wildcard ???_sf701_*.t)))
-sf705_tests := $(addsuffix .out, $(basename $(wildcard ???_sf705_*.t)))
+f70s0_tests := $(addsuffix .out, $(basename $(wildcard ???_f70s0_*.t)))
+f70s1_tests := $(addsuffix .out, $(basename $(wildcard ???_f70s1_*.t)))
+f70s5_tests := $(addsuffix .out, $(basename $(wildcard ???_f70s5_*.t)))
 
 all: f30 f70
 	@echo all tests passed
 
 f30: $(f30_tests)
 
-f70: sf700 sf701 sf705
-sf700: $(sf700_tests)
-sf701: $(sf701_tests)
-sf705: $(sf705_tests)
+f70: f70s0 f70s1 f70s5
+f70s0: $(f70s0_tests)
+f70s1: $(f70s1_tests)
+f70s5: $(f70s5_tests)
 
 %.out: %.ref %.t
 	$(KOFU) < $(word 2, $^) > $@
