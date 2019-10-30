@@ -69,3 +69,6 @@ read /hd0/1/no_hole 0x100000001 11 -b
 read /hd0/1/no_hole 0x1ffffffff 11 -b
 read /hd0/1/no_hole 0xffffffff00000000 11 -b
 read /hd0/1/no_hole 0xffffffffffffffff 11 -b
+
+# btree
+read /hd0/1/btree_l1_no_hole 0x80000 11 -b

@@ -184,7 +184,7 @@ s512_xfs_v4_files_b4k_n2b.img:
 		fallocate -i -l 4KiB -o 0KiB $(TEMP_DIR)/btree_l1_no_hole ; \
 		fallocate -z -l 4KiB -o 0KiB $(TEMP_DIR)/btree_l1_no_hole ; \
 	done
-#	$(MKFILEPATTERN) $(TEMP_DIR)/btree_l1_no_hole 134217728
+	$(MKFILEPATTERN) $(TEMP_DIR)/btree_l1_no_hole 8196096
 #
 	sudo umount $(TEMP_DIR)
 	sudo losetup -d $(LOOP_DEV)

@@ -6,16 +6,19 @@ CFLAGS_32=-m32
 LDFLAGS=
 LDFLAGS_32=-m32
 
-all: kofu kofuse kolibri.sym kolibri.lst tools/mkdirrange tools/mkfilepattern
+all: kofu kofuse kolibri.sym kolibri.prp kolibri.lst tools/mkdirrange tools/mkfilepattern
 
 kofu: kofu.o kolibri.o trace.o trace_lbr.o trace_lwp.o cio.o
-	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ -static
+	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@
 
 kofuse: kofuse.o kolibri.o cio.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
 kolibri.o kolibri.fas: kolibri.asm kolibri.h
 	INCLUDE="$(KOLIBRI_TRUNK);$(LIBCRASH_X86)" $(FASM) $< $@ -s kolibri.fas
+
+kolibri.prp: kolibri.fas
+	prepsrc kolibri.fas kolibri.prp
 
 kolibri.sym: kolibri.fas
 	symbols kolibri.fas kolibri.sym
@@ -36,7 +39,7 @@ cio.o: cio.c
 	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<
 
 kofu.o: kofu.c kolibri.h trace.h
-	$(CC) $(CFLAGS) $(CFLAGS_32) -c $< -std=c99
+	$(CC) $(CFLAGS) $(CFLAGS_32) -c $< -std=c99 -D_POSIX_C_SOURCE
 
 kofuse.o: kofuse.c kolibri.h
 	$(CC) $(CFLAGS) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $< -std=gnu99

@@ -19,4 +19,4 @@ f70s5: $(f70s5_tests)
 %.out: %.ref %.t
 	$(KOFU) < $(word 2, $^) > $@
 	cmp $@ $<
-	
+

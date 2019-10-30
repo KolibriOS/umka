@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <inttypes.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -25,8 +26,7 @@ const char *last_dir = cur_dir;
 bool cur_dir_changed = true;
 
 char cmd_buf[FGETS_BUF_LEN];
-bool is_tty;
-bool trace = false;
+int trace = false;
 
 const char *f70_status_name[] = {
                                  "success",
@@ -141,16 +141,16 @@ void prompt() {
     fflush(stdout);
 }
 
-bool next_line() {
+int next_line(FILE *file, int is_tty) {
     if (is_tty) {
         prompt();
     }
-    return fgets(cmd_buf, FGETS_BUF_LEN, stdin) != NULL;
+    return fgets(cmd_buf, FGETS_BUF_LEN, file) != NULL;
 }
 
 int split_args(char *s, const char **argv) {
     int argc = -1;
-    for ( ; (argv[++argc] = strtok(s, " \t\n")) != NULL; s = NULL );
+    for (; (argv[++argc] = strtok(s, " \t\n")) != NULL; s = NULL);
     return argc;
 }
 
@@ -331,25 +331,37 @@ func_table_t funcs[] = {
                               { NULL,   NULL      },
                             };
 
-int main(int argc, char **argv) {
-    (void)argc;
-    (void)argv;
-/*
-    if (argc != 2) {
-        printf("usage: kofu <file.xfs>\n");
-        exit(1);
-    }
-*/
-    is_tty = isatty(STDIN_FILENO);
+void usage() {
+    printf("usage: kofu [test_file.t]\n");
+}
 
-    if (trace) {
-        trace_begin();
-    }
-    kos_init();
+void *run_test(const char *infile_name) {
+    FILE *infile, *outfile;
 
-//msg_file_not_found       db 'file not found: '
+    if (!infile_name) {
+        infile = stdin;
+        outfile = stdout;
+    } else {
+        char outfile_name[PATH_MAX];
+        strncpy(outfile_name, infile_name, PATH_MAX-2);    // ".t" is shorter that ".out"
+        char *last_dot = strrchr(outfile_name, '.');
+        if (!last_dot) {
+            printf("test file must have '.t' suffix\n");
+            usage();
+            return NULL;
+        }
+        strcpy(last_dot, ".out");
+        infile = fopen(infile_name, "r");
+        outfile = fopen(outfile_name, "w");
+        if (!infile || !outfile) {
+            printf("can't open in/out files\n");
+            return NULL;
+        }
+    }
+
+    int is_tty = isatty(fileno(infile));
     const char **cargv = (const char**)malloc(sizeof(const char*) * (MAX_COMMAND_ARGS + 1));
-    while(next_line()) {
+    while(next_line(infile, is_tty)) {
         if (cmd_buf[0] == '#' || cmd_buf[0] == '\n') {
             printf("%s", cmd_buf);
             continue;
@@ -358,7 +370,7 @@ int main(int argc, char **argv) {
         if (!is_tty) {
             prompt();
             printf("%s", cmd_buf);
-            fflush(stdout);
+            fflush(outfile);
         }
         int cargc = split_args(cmd_buf, cargv);
         func_table_t *ft;
@@ -375,8 +387,28 @@ int main(int argc, char **argv) {
     }
     free(cargv);
 
-    if (trace) {
-        trace_end();
+    return NULL;
+}
+
+int main(int argc, char **argv) {
+    if (trace)
+        trace_begin();
+    kos_init();
+
+    switch (argc) {
+    case 1:
+        run_test(NULL);
+        break;
+    case 2: {
+        run_test(argv[1]);
+        break;
     }
+    default:
+        usage();
+    }
+
+    if (trace)
+        trace_end();
+
     return 0;
 }

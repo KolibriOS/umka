@@ -204,3 +204,8 @@ status = 6 end_of_file, count = 0
 /> read /hd0/1/no_hole 0xffffffffffffffff 11 -b
 status = 6 end_of_file, count = 0
 
+
+# btree
+/> read /hd0/1/btree_l1_no_hole 0x80000 11 -b
+status = 0 success, count = 11
+0000080004000800080008
