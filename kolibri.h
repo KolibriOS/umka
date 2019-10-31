@@ -68,7 +68,7 @@ typedef struct {
     uint32_t version;
     uint32_t cnt;
     uint32_t total_cnt;
-    uint32_t reserved[5];
+    uint32_t zeroed[5];
     bdfe_t bdfes[0];
 } f70s1info_t;
 

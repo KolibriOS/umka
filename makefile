@@ -6,7 +6,7 @@ CFLAGS_32=-m32
 LDFLAGS=
 LDFLAGS_32=-m32
 
-all: kofu kofuse kolibri.sym kolibri.prp kolibri.lst tools/mkdirrange tools/mkfilepattern
+all: kofu kofuse kolibri.sym kolibri.prp kolibri.lst tags tools/mkdirrange tools/mkfilepattern
 
 kofu: kofu.o kolibri.o trace.o trace_lbr.o trace_lwp.o cio.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@
@@ -25,6 +25,9 @@ kolibri.sym: kolibri.fas
 
 kolibri.lst: kolibri.fas
 	listing kolibri.fas kolibri.lst
+
+tags: kolibri.sym
+	fasmtags.py $<
 
 trace.o: trace.c trace.h trace_lbr.h
 	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<

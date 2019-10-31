@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <time.h>
 #include "kolibri.h"
 #include "trace.h"
 
@@ -266,8 +267,32 @@ void kofu_stat(int argc, const char **argv) {
     f70.path = argv[1];
     kos_lfn(&f70, &r);
     print_f70_status(&r, 0);
+    if (r.status != F70_ERROR_SUCCESS)
+        return;
     printf("attr: 0x%2.2x\n", file.attr);
-    printf("size: %llu\n", file.size);
+    if (!file.attr) {   // don't show size for dirs
+        printf("size: %llu\n", file.size);
+    }
+
+#if PRINT_DATE_TIME == 1
+    time_t time;
+    struct tm *t;
+    time = kos_time_to_epoch(&file.ctime);
+    t = localtime(&time);
+    printf("ctime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
+           t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+           t->tm_hour, t->tm_min, t->tm_sec);
+    time = kos_time_to_epoch(&file.atime);
+    t = localtime(&time);
+    printf("atime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
+           t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+           t->tm_hour, t->tm_min, t->tm_sec);
+    time = kos_time_to_epoch(&file.mtime);
+    t = localtime(&time);
+    printf("mtime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
+           t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+           t->tm_hour, t->tm_min, t->tm_sec);
+#endif
     return;
 }
 
