@@ -67,6 +67,15 @@ const char *get_f70_status_name(f70status s) {
     }
 }
 
+void convert_f70_file_attr(uint32_t attr, char s[KF_ATTR_CNT+1]) {
+    s[0] = (attr & KF_READONLY) ? 'r' : '-';
+    s[1] = (attr & KF_HIDDEN)   ? 'h' : '-';
+    s[2] = (attr & KF_SYSTEM)   ? 's' : '-';
+    s[3] = (attr & KF_LABEL)    ? 'l' : '-';
+    s[4] = (attr & KF_FOLDER)   ? 'f' : '-';
+    s[5] = '\0';
+}
+
 void print_f70_status(f70ret_t *r, int use_ebx) {
     printf("status = %d %s", r->status, get_f70_status_name(r->status));
     if (use_ebx && (r->status == F70_ERROR_SUCCESS || r->status == F70_ERROR_END_OF_FILE))
@@ -203,13 +212,17 @@ void ls_range(f70s1arg_t *f70) {
         f70->offset += f70->size;
         print_f70_status(&r, 1);
         f70s1info_t *dir = f70->buf;
-        assert(r.count <= f70->size);
-        assert(dir->cnt == r.count);
-        assert((r.status == F70_ERROR_SUCCESS && r.count == f70->size) ||
-               (r.status == F70_ERROR_END_OF_FILE && r.count < f70->size)
-              );
+        int ok = (r.count <= f70->size);
+        ok &= (dir->cnt == r.count);
+        ok &= (r.status == F70_ERROR_SUCCESS && r.count == f70->size)
+              || (r.status == F70_ERROR_END_OF_FILE && r.count < f70->size);
+        assert(ok);
+        if (!ok)
+            break;
         for (size_t i = 0; i < dir->cnt; i++) {
-            printf("%s\n", dir->bdfes[i].name);
+            char fattr[KF_ATTR_CNT+1];
+            convert_f70_file_attr(dir->bdfes[i].attr, fattr);
+            printf("%s %s\n", fattr, dir->bdfes[i].name);
         }
         if (r.status == F70_ERROR_END_OF_FILE) {
             break;
@@ -222,18 +235,21 @@ void ls_all(f70s1arg_t *f70) {
     while (true) {
         kos_lfn(f70, &r);
         print_f70_status(&r, 1);
-        if (r.status != F70_ERROR_SUCCESS && r.status != F70_ERROR_END_OF_FILE) {
-            abort();
-        }
+        assert((r.status == F70_ERROR_SUCCESS && r.count == f70->size)
+              || (r.status == F70_ERROR_END_OF_FILE && r.count < f70->size));
         f70s1info_t *dir = f70->buf;
         f70->offset += dir->cnt;
-        assert(r.count <= f70->size);
-        assert(dir->cnt == r.count);
-        assert((r.status == F70_ERROR_SUCCESS && r.count == f70->size) ||
-               (r.status == F70_ERROR_END_OF_FILE && r.count < f70->size)
-              );
+        int ok = (r.count <= f70->size);
+        ok &= (dir->cnt == r.count);
+        ok &= (r.status == F70_ERROR_SUCCESS && r.count == f70->size)
+              || (r.status == F70_ERROR_END_OF_FILE && r.count < f70->size);
+        assert(ok);
+        if (!ok)
+            break;
         for (size_t i = 0; i < dir->cnt; i++) {
-            printf("%s\n", dir->bdfes[i].name);
+            char fattr[KF_ATTR_CNT+1];
+            convert_f70_file_attr(dir->bdfes[i].attr, fattr);
+            printf("%s %s\n", fattr, dir->bdfes[i].name);
         }
         if (r.status == F70_ERROR_END_OF_FILE) {
             break;
@@ -269,8 +285,10 @@ void kofu_stat(int argc, const char **argv) {
     print_f70_status(&r, 0);
     if (r.status != F70_ERROR_SUCCESS)
         return;
-    printf("attr: 0x%2.2x\n", file.attr);
-    if (!file.attr) {   // don't show size for dirs
+    char fattr[KF_ATTR_CNT+1];
+    convert_f70_file_attr(file.attr, fattr);
+    printf("attr: %s\n", fattr);
+    if ((file.attr & KF_FOLDER) == 0) {   // don't show size for dirs
         printf("size: %llu\n", file.size);
     }
 

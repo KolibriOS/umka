@@ -87,6 +87,7 @@ typedef struct {
 #define KF_SYSTEM   0x04
 #define KF_LABEL    0x08
 #define KF_FOLDER   0x10
+#define KF_ATTR_CNT 5
 
 #define HASH_SIZE 32
 typedef struct {

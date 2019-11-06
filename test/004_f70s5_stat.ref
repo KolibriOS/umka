@@ -1,24 +1,44 @@
 /> disk_add ../img/s512_xfs_v4_ftype0_b4k_n2b.img hd0
 /hd0/1: xfs
-#stat /hd0/1/sf/.
+/> stat /hd0/1/sf/.
+status = 0 success
+attr: ----f
 /> stat /hd0/1/sf/..
 status = 0 success
-attr: 0x10
+attr: ----f
+/> stat /hd0/1/sf///
+status = 0 success
+attr: ----f
+/> stat /hd0/1/sf///.
+status = 0 success
+attr: ----f
+/> stat /hd0/1/sf///..
+status = 0 success
+attr: ----f
+/> stat /hd0/1/sf/../sf
+status = 0 success
+attr: ----f
+/> stat /hd0/1/sf/../sf/
+status = 0 success
+attr: ----f
+#stat /hd0/1/sf///..//sf
+#stat /hd0/1/sf///..//sf/
+
 /> stat /hd0/1/sf/d0000000000_
 status = 0 success
-attr: 0x10
+attr: ----f
 /> stat /hd0/1/sf/d0000000001_x
 status = 0 success
-attr: 0x10
+attr: ----f
 /> stat /hd0/1/sf/d0000000002_xx
 status = 0 success
-attr: 0x10
+attr: ----f
 /> stat /hd0/1/sf/d0000000003_xxx
 status = 5 file_not_found
 
 /> cd /hd0/1/sf
 sf> stat d0000000001_x
 status = 0 success
-attr: 0x10
+attr: ----f
 sf> stat d0000000003_xxx
 status = 5 file_not_found
