@@ -1,44 +1,10 @@
-/> disk_add ../img/xfs_v4_ftype0_s05k_b2k_n8k.img hd0
+/> disk_add ../img/xfs_v4_files_s05k_b4k_n8k.img hd0
 /hd0/1: xfs
-/> stat /hd0/1/sf/.
+/> stat /hd0/1/
 status = 0 success
 attr: ----f
-/> stat /hd0/1/sf/..
+/> stat /hd0/1/hole_begin
 status = 0 success
-attr: ----f
-/> stat /hd0/1/sf///
-status = 0 success
-attr: ----f
-/> stat /hd0/1/sf///.
-status = 0 success
-attr: ----f
-/> stat /hd0/1/sf///..
-status = 0 success
-attr: ----f
-/> stat /hd0/1/sf/../sf
-status = 0 success
-attr: ----f
-/> stat /hd0/1/sf/../sf/
-status = 0 success
-attr: ----f
-#stat /hd0/1/sf///..//sf
-#stat /hd0/1/sf///..//sf/
-
-/> stat /hd0/1/sf/d0000000000_
-status = 0 success
-attr: ----f
-/> stat /hd0/1/sf/d0000000001_x
-status = 0 success
-attr: ----f
-/> stat /hd0/1/sf/d0000000002_xx
-status = 0 success
-attr: ----f
-/> stat /hd0/1/sf/d0000000003_xxx
-status = 5 file_not_found
-
-/> cd /hd0/1/sf
-sf> stat d0000000001_x
-status = 0 success
-attr: ----f
-sf> stat d0000000003_xxx
-status = 5 file_not_found
+attr: -----
+size: 65536
+/> disk_del hd0

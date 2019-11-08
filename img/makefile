@@ -1,6 +1,6 @@
 MKDIRRANGE=../tools/mkdirrange
 MKFILEPATTERN=../tools/mkfilepattern
-MOUNT_OPT=
+MOUNT_OPT=-t xfs
 TEMP_DIR:=$(shell mktemp -d)
 
 all: xfs_v4_ftype0_s05k_b2k_n8k.img xfs_v4_ftype1_s05k_b2k_n8k.img xfs_v4_xattr.img xfs_v4_files_s05k_b4k_n8k.img xfs_v4_deep_btree_dirs.img

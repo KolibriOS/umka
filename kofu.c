@@ -366,12 +366,12 @@ typedef struct {
 func_table_t funcs[] = {
                               { "disk_add", kofu_disk_add },
                               { "disk_del", kofu_disk_del },
-                              { "ls",   kofu_ls   },
-                              { "stat", kofu_stat },
-                              { "read", kofu_read },
-                              { "pwd",  kofu_pwd },
-                              { "cd",   kofu_cd },
-                              { NULL,   NULL      },
+                              { "ls",       kofu_ls },
+                              { "stat",     kofu_stat },
+                              { "read",     kofu_read },
+                              { "pwd",      kofu_pwd },
+                              { "cd",       kofu_cd },
+                              { NULL,       NULL },
                             };
 
 void usage() {
