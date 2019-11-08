@@ -1,4 +1,4 @@
-disk_add ../img/s512_xfs_v4_ftype0_b4k_n2b.img hd0
+disk_add ../img/xfs_v4_ftype0_s05k_b2k_n8k.img hd0
 stat /hd0/1/sf/.
 stat /hd0/1/sf/..
 stat /hd0/1/sf///

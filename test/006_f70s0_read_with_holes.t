@@ -1,4 +1,4 @@
-disk_add ../img/s512_xfs_v4_files_b4k_n2b.img hd0
+disk_add ../img/xfs_v4_files_s05k_b4k_n8k.img hd0
 # hole begin
 # zero length
 read /hd0/1/hole_begin 0 0 -b

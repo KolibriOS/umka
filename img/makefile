@@ -1,138 +1,111 @@
 MKDIRRANGE=../tools/mkdirrange
 MKFILEPATTERN=../tools/mkfilepattern
-LOOP_DEV=/dev/loop8
+MOUNT_OPT=
 TEMP_DIR:=$(shell mktemp -d)
 
-all: s512_xfs_v4_ftype0.img s512_xfs_v4_ftype0_b4k_n2b.img s512_xfs_v4_ftype1.img s512_xfs_v4_ftype0_xattr.img s512_xfs_v4_files.img s512_xfs_v4_files_b4k_n2b.img s512_xfs_v4_ftype1_btree_dirs.img
+all: xfs_v4_ftype0_s05k_b2k_n8k.img xfs_v4_ftype1_s05k_b2k_n8k.img xfs_v4_xattr.img xfs_v4_files_s05k_b4k_n8k.img xfs_v4_deep_btree_dirs.img
+	rmdir $(TEMP_DIR)
 
-s512_xfs_v4_ftype0.img:
-	fallocate -l 64MiB $@
-	parted --script $@ mktable gpt
-	parted --script --align optimal $@ mkpart primary 1MiB 100%
-	sudo losetup $(LOOP_DEV) --partscan $@
-	sudo mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n ftype=0 $(LOOP_DEV)p1
-	sudo mount $(LOOP_DEV)p1 $(TEMP_DIR)
-	sudo chown $(shell whoami) $(TEMP_DIR) -R
+xfs_v4_ftype0_s05k_b2k_n8k.img:
+	fallocate -l 63MiB $@
+	sudo mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=0 $@
+	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/sf
-	$(MKDIRRANGE) $(TEMP_DIR)/sf 3
+	$(MKDIRRANGE) $(TEMP_DIR)/sf 0 3  0 244
 #
 	mkdir $(TEMP_DIR)/block
-	$(MKDIRRANGE) $(TEMP_DIR)/block 20
+	$(MKDIRRANGE) $(TEMP_DIR)/block 0 5  234 10
 #
 	mkdir $(TEMP_DIR)/leaf
-	$(MKDIRRANGE) $(TEMP_DIR)/leaf 70
+	$(MKDIRRANGE) $(TEMP_DIR)/leaf 0 40  214 30
 #
 	mkdir $(TEMP_DIR)/node
-	$(MKDIRRANGE) $(TEMP_DIR)/node 520
+	$(MKDIRRANGE) $(TEMP_DIR)/node 0 1100  0 23
 #
-	mkdir $(TEMP_DIR)/btree
-	$(MKDIRRANGE) $(TEMP_DIR)/btree 600
-
+	mkdir $(TEMP_DIR)/btree_leaf
+	$(MKDIRRANGE) $(TEMP_DIR)/btree_leaf 0 1000  201 43
+#
+	mkdir $(TEMP_DIR)/btree_leaf_free
+	$(MKDIRRANGE) $(TEMP_DIR)/btree_leaf_free 0 1200  201 43
+#
 	sudo umount $(TEMP_DIR)
-	sudo losetup -d $(LOOP_DEV)
-
-s512_xfs_v4_ftype0_b4k_n2b.img:
-	fallocate -l 64MiB $@
+	fallocate -i -o 0 -l 1MiB $@ 
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
-	sudo losetup $(LOOP_DEV) --partscan $@
-	sudo mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=2b,ftype=0 $(LOOP_DEV)p1
-	sudo mount $(LOOP_DEV)p1 $(TEMP_DIR)
-	sudo chown $(shell whoami) $(TEMP_DIR) -R
+
+xfs_v4_ftype1_s05k_b2k_n8k.img:
+	fallocate -l 63MiB $@
+	sudo mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=1 $@
+	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/sf
-	$(MKDIRRANGE) $(TEMP_DIR)/sf 3
+	$(MKDIRRANGE) $(TEMP_DIR)/sf 0 3  0 244
 #
 	mkdir $(TEMP_DIR)/block
-	$(MKDIRRANGE) $(TEMP_DIR)/block 20
+	$(MKDIRRANGE) $(TEMP_DIR)/block 0 5  234 10
 #
 	mkdir $(TEMP_DIR)/leaf
-	$(MKDIRRANGE) $(TEMP_DIR)/leaf 70
+	$(MKDIRRANGE) $(TEMP_DIR)/leaf 0 40  214 30
 #
 	mkdir $(TEMP_DIR)/node
-	$(MKDIRRANGE) $(TEMP_DIR)/node 520
+	$(MKDIRRANGE) $(TEMP_DIR)/node 0 1100  0 23
 #
-	mkdir $(TEMP_DIR)/btree
-	$(MKDIRRANGE) $(TEMP_DIR)/btree 600
-
+	mkdir $(TEMP_DIR)/btree_leaf
+	$(MKDIRRANGE) $(TEMP_DIR)/btree_leaf 0 1000  201 43
+#
+	mkdir $(TEMP_DIR)/btree_leaf_free
+	$(MKDIRRANGE) $(TEMP_DIR)/btree_leaf_free 0 1200  201 43
+#
 	sudo umount $(TEMP_DIR)
-	sudo losetup -d $(LOOP_DEV)
-
-s512_xfs_v4_ftype1.img:
-	fallocate -l 64MiB $@
+	fallocate -i -o 0 -l 1MiB $@ 
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
-	sudo losetup $(LOOP_DEV) --partscan $@
-	sudo mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n ftype=1 $(LOOP_DEV)p1
-	sudo mount $(LOOP_DEV)p1 $(TEMP_DIR)
-	sudo chown $(shell whoami) $(TEMP_DIR) -R
+
+xfs_v4_xattr.img:
+	fallocate -l 63MiB $@
+	sudo mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n ftype=0 $@
+	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR) -o attr2
+	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/sf
-	$(MKDIRRANGE) $(TEMP_DIR)/sf 3
-#
-	mkdir $(TEMP_DIR)/block
-	$(MKDIRRANGE) $(TEMP_DIR)/block 20
+	$(MKDIRRANGE) $(TEMP_DIR)/sf 0 900  0 244
 #
 	mkdir $(TEMP_DIR)/leaf
-	$(MKDIRRANGE) $(TEMP_DIR)/leaf 70
+	$(MKDIRRANGE) $(TEMP_DIR)/leaf 0 600  0 244
 #
 	mkdir $(TEMP_DIR)/node
-	$(MKDIRRANGE) $(TEMP_DIR)/node 520
+	$(MKDIRRANGE) $(TEMP_DIR)/node 0 600  0 244
 #
 	mkdir $(TEMP_DIR)/btree
-	$(MKDIRRANGE) $(TEMP_DIR)/btree 600
-
+	$(MKDIRRANGE) $(TEMP_DIR)/btree 0 600  0 244
+#
 	sudo umount $(TEMP_DIR)
-	sudo losetup -d $(LOOP_DEV)
-
-s512_xfs_v4_ftype0_xattr.img:
-	fallocate -l 64MiB $@
+	fallocate -i -o 0 -l 1MiB $@ 
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
-	sudo losetup $(LOOP_DEV) --partscan $@
-	sudo mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n ftype=0 $(LOOP_DEV)p1
-	sudo mount $(LOOP_DEV)p1 $(TEMP_DIR) -o attr2
-	sudo chown $(shell whoami) $(TEMP_DIR) -R
-#
-	mkdir $(TEMP_DIR)/sf
-	$(MKDIRRANGE) $(TEMP_DIR)/sf 900
-#
-	mkdir $(TEMP_DIR)/leaf
-	$(MKDIRRANGE) $(TEMP_DIR)/leaf 600
-#
-	mkdir $(TEMP_DIR)/node
-	$(MKDIRRANGE) $(TEMP_DIR)/node 600
+
+xfs_v4_deep_btree_dirs.img:
+	fallocate -l 127MiB $@
+	sudo mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=4k,ftype=1 $@
+	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/btree
-	$(MKDIRRANGE) $(TEMP_DIR)/btree 600
-
-	sudo umount $(TEMP_DIR)
-	sudo losetup -d $(LOOP_DEV)
-
-s512_xfs_v4_ftype1_btree_dirs.img:
-	fallocate -l 128MiB $@
-	parted --script $@ mktable gpt
-	parted --script --align optimal $@ mkpart primary 1MiB 100%
-	sudo losetup $(LOOP_DEV) --partscan $@
-	sudo mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n ftype=1 $(LOOP_DEV)p1
-	sudo mount $(LOOP_DEV)p1 $(TEMP_DIR)
-	sudo chown $(shell whoami) $(TEMP_DIR) -R
+	$(MKDIRRANGE) $(TEMP_DIR)/btree 0 293181  0 244
 #
-	mkdir $(TEMP_DIR)/btree
-	$(MKDIRRANGE) $(TEMP_DIR)/btree 293181
-
 	sudo umount $(TEMP_DIR)
-	sudo losetup -d $(LOOP_DEV)
-
-s512_xfs_v4_files.img:
-	fallocate -l 128MiB $@
+	fallocate -i -o 0 -l 1MiB $@ 
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
-	sudo losetup $(LOOP_DEV) --partscan $@
-	sudo mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n ftype=0 $(LOOP_DEV)p1
-	sudo mount $(LOOP_DEV)p1 $(TEMP_DIR)
-	sudo chown $(shell whoami) $(TEMP_DIR) -R
+
+xfs_v4_files_s05k_b4k_n8k.img:
+	fallocate -l 127MiB $@
+	sudo mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=0 $@
+	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo chown $$USER $(TEMP_DIR) -R
 #
 	$(MKFILEPATTERN) $(TEMP_DIR)/no_hole 65536
 #
@@ -146,40 +119,6 @@ s512_xfs_v4_files.img:
 	fallocate -p -o 48KiB -l 16KiB $(TEMP_DIR)/hole_end
 #
 	fallocate -l 4KiB $(TEMP_DIR)/btree_l1_no_hole
-	for n in $$(seq 1 2000); do \
-		fallocate -i -l 4KiB -o 0KiB $(TEMP_DIR)/btree_l1_no_hole ; \
-		fallocate -z -l 4KiB -o 0KiB $(TEMP_DIR)/btree_l1_no_hole ; \
-	done
-#	$(MKFILEPATTERN) $(TEMP_DIR)/btree_l1_no_hole 134217728
-#
-	sudo umount $(TEMP_DIR)
-	sudo losetup -d $(LOOP_DEV)
-
-s512_xfs_v4_files_b4k_n2b.img:
-	fallocate -l 128MiB $@
-	parted --script $@ mktable gpt
-	parted --script --align optimal $@ mkpart primary 1MiB 100%
-	sudo losetup $(LOOP_DEV) --partscan $@
-	sudo mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=2b,ftype=0 $(LOOP_DEV)p1
-	sudo mount $(LOOP_DEV)p1 $(TEMP_DIR)
-	sudo chown $(shell whoami) $(TEMP_DIR) -R
-#
-	$(MKFILEPATTERN) $(TEMP_DIR)/no_hole 65536
-#
-	$(MKFILEPATTERN) $(TEMP_DIR)/hole_begin 65536
-	fallocate -p -o 0 -l 16KiB $(TEMP_DIR)/hole_begin
-#
-	$(MKFILEPATTERN) $(TEMP_DIR)/hole_middle 65536
-	fallocate -p -o 32KiB -l 16KiB $(TEMP_DIR)/hole_middle
-#
-	$(MKFILEPATTERN) $(TEMP_DIR)/hole_end 65536
-	fallocate -p -o 48KiB -l 16KiB $(TEMP_DIR)/hole_end
-#
-#	fallocate -l 120GiB $(TEMP_DIR)/btree_l1_no_hole
-	fallocate -l 4KiB $(TEMP_DIR)/btree_l1_no_hole
-#	$(MKFILEPATTERN) $(TEMP_DIR)/btree_l1_no_hole 2097152
-#		fallocate -c -l 64KiB -o  $$((64*$$n))KiB $(TEMP_DIR)/btree_l1_no_hole ; \
-#	dd if=/dev/zero of=$(TEMP_DIR)/btree_l1_no_hole bs=1M count=128
 	for n in $$(seq 1 2000); do \
 		fallocate -i -l 4KiB -o 0KiB $(TEMP_DIR)/btree_l1_no_hole ; \
 		fallocate -z -l 4KiB -o 0KiB $(TEMP_DIR)/btree_l1_no_hole ; \
@@ -187,5 +126,7 @@ s512_xfs_v4_files_b4k_n2b.img:
 	$(MKFILEPATTERN) $(TEMP_DIR)/btree_l1_no_hole 8196096
 #
 	sudo umount $(TEMP_DIR)
-	sudo losetup -d $(LOOP_DEV)
+	fallocate -i -o 0 -l 1MiB $@ 
+	parted --script $@ mktable gpt
+	parted --script --align optimal $@ mkpart primary 1MiB 100%
 

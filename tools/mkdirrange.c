@@ -8,17 +8,18 @@
 
 int main(int argc, char *argv[])
 {
-    unsigned begin = 0, end;
+    unsigned begin, end;
+    int pat_min, pat_max;
     char *path;
-    if (argc == 3) {
-        path = argv[1];
-        sscanf(argv[2], "%u", &end);
-    } else if (argc == 4) {
+    if (argc == 6) {
         path = argv[1];
         sscanf(argv[2], "%u", &begin);
         sscanf(argv[3], "%u", &end);
+        sscanf(argv[4], "%i", &pat_min);
+        sscanf(argv[5], "%i", &pat_max);
     } else {
-        fprintf(stderr, "mkdirrange directory num_begin num_end\n");
+        fprintf(stderr, "mkdirrange <directory> <num_begin> <num_end> <pat_min> <pat_max>\n"
+                        "pat_min + pat_max <= 244\n");
         exit(1);
     }
 
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
     for(unsigned current = begin; current < end; current++) {
         int length = sprintf(dirname, "d%10.10u_", current);
         dirname[length] = 'x';
-        length += current % 244;
+        length += pat_min + (current % pat_max);
         dirname[length] = '\0';
         if(mkdirat(dirfd, dirname, 0755)) {
             fprintf(stderr, "Can't mkdir %s: %s\n", dirname, strerror(errno));
