@@ -246,6 +246,7 @@ void ls_all(f70s1arg_t *f70) {
         assert(ok);
         if (!ok)
             break;
+        printf("total = %"PRIi32"\n", dir->total_cnt);
         for (size_t i = 0; i < dir->cnt; i++) {
             char fattr[KF_ATTR_CNT+1];
             convert_f70_file_attr(dir->bdfes[i].attr, fattr);

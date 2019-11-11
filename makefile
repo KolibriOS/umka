@@ -15,7 +15,7 @@ kofuse: kofuse.o kolibri.o cio.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
 kolibri.o kolibri.fas: kolibri.asm kolibri.h
-	INCLUDE="$(KOLIBRI_TRUNK);$(LIBCRASH_X86)" $(FASM) $< $@ -s kolibri.fas
+	INCLUDE="$(KOLIBRI_TRUNK);$(LIBCRASH_X86)" $(FASM) $< kolibri.o -s kolibri.fas
 
 kolibri.prp: kolibri.fas
 	prepsrc kolibri.fas kolibri.prp
