@@ -1,5 +1,17 @@
 /> disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.img hd0
 /hd0/1: xfs
+/> stat /hd0/1/sf_empty
+status = 0 success
+attr: ----f
+/> stat /hd0/1/sf_empty/.
+status = 0 success
+attr: ----f
+/> stat /hd0/1/sf_empty/..
+status = 0 success
+attr: ----f
+/> stat /hd0/1/sf_empty/deadbeef
+status = 5 file_not_found
+
 /> stat /hd0/1/sf/.
 status = 0 success
 attr: ----f

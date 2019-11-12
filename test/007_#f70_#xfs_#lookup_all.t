@@ -1,4 +1,9 @@
 disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.img hd0
+stat /hd0/1/sf_empty
+stat /hd0/1/sf_empty/.
+stat /hd0/1/sf_empty/..
+stat /hd0/1/sf_empty/deadbeef
+
 stat /hd0/1/sf/.
 stat /hd0/1/sf/..
 stat /hd0/1/sf///

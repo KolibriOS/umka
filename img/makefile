@@ -16,6 +16,8 @@ xfs_v4_ftype0_s05k_b2k_n8k.img:
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
+	mkdir $(TEMP_DIR)/sf_empty
+#
 	mkdir $(TEMP_DIR)/sf
 	$(MKDIRRANGE) $(TEMP_DIR)/sf 0 3  0 244
 #
@@ -44,6 +46,8 @@ xfs_v4_ftype1_s05k_b2k_n8k.img:
 	sudo mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=1 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
+#
+	mkdir $(TEMP_DIR)/sf_empty
 #
 	mkdir $(TEMP_DIR)/sf
 	$(MKDIRRANGE) $(TEMP_DIR)/sf 0 3  0 244
@@ -139,6 +143,8 @@ xfs_v4_ftype0_s4k_b4k_n8k.img:
 	sudo mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=4k -i maxpct=100 -n size=8k,ftype=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
+#
+	mkdir $(TEMP_DIR)/sf_empty
 #
 	mkdir $(TEMP_DIR)/sf
 	$(MKDIRRANGE) $(TEMP_DIR)/sf 0 3  0 244

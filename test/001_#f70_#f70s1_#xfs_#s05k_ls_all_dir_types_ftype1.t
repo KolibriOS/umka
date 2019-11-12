@@ -1,4 +1,5 @@
 disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.img hd0
+ls /hd0/1/sf_empty
 ls /hd0/1/sf
 ls /hd0/1/block
 ls /hd0/1/leaf
