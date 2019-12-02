@@ -1,23 +1,39 @@
-This is a common project for two related tools, kofuse and kofu. The idea is to
-make UNIX tools that use unchanged KolibriOS dyndisk and fs source to test these
-parts in native environment.
+KOFU & KOFUSE
+=============
 
-
-Kofuse
-is a short for KolibriOS and FUSE [1]. 
+This is a common project for two related tools, kofu and kofuse. The idea is to
+make userspace UNIX tools that use unchanged KolibriOS block and FS source to
+test these kernel parts in your favorite developer environment.
 
 
 Kofu
+----
+
 is Kolibri Filesystem in Userspace.
+It is an interactive shell with commands that are wrappers around KolibriOS
+kernel block and FS functions.
+
+
+Kofuse
+------
+
+is a short for KolibriOS and FUSE [1]. Like kofu above but commands are
+translated from FUSE calls, not entered manually.
 
 
 BUILD
-KOLIBRI_TRUNK
+-----
+
+$ KOLIBRIOS=/path/to/kolibrios make
+
+/path/to/kolibrios is where you did `svn co svn://kolibrios.org`.
+
 
 Architecture
+------------
 
-
-Find img files here: https://baravy.by/kofuse/img/
+Kernel services are replaced with stubs or libc calls. Block devices are
+emulated with wrappers around regular files. Shell and FUSE FS are written in C.
 
 
 [1] https://github.com/libfuse/libfuse
