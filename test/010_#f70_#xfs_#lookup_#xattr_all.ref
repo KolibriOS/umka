@@ -1,4 +1,4 @@
-/> disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.img hd0
+/> disk_add ../img/xfs_v4_ftype0_s05k_b2k_n8k_xattr.img hd0
 /hd0/1: xfs
 /> stat70 /hd0/1/sf_empty
 status = 0 success
@@ -124,19 +124,19 @@ attr: ----f
 node> stat70 d0000000004_xxxx
 status = 0 success
 attr: ----f
-node> stat70 d0000001095_xxxxxxxxxxxxxx
+node> stat70 d0000001015_xxx
 status = 0 success
 attr: ----f
-node> stat70 d0000001096_xxxxxxxxxxxxxxx
+node> stat70 d0000001016_xxxx
 status = 0 success
 attr: ----f
-node> stat70 d0000001097_xxxxxxxxxxxxxxxx
+node> stat70 d0000001017_xxxxx
 status = 0 success
 attr: ----f
-node> stat70 d0000001098_xxxxxxxxxxxxxxxxx
+node> stat70 d0000001018_xxxxxx
 status = 0 success
 attr: ----f
-node> stat70 d0000001099_xxxxxxxxxxxxxxxxxx
+node> stat70 d0000001019_xxxxxxx
 status = 0 success
 attr: ----f
 

@@ -1,0 +1,77 @@
+/> disk_add ../img/xfs_v4_unicode.img hd0
+/hd0/1: xfs
+
+/> stat80 /hd0/1/dir0
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/dir0/
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/дир❦
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/дир❦/
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/дир❦/дир11
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/дир❦/дир11/
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/❦❦❦
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/❦❦❦/
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/❦❦❦/д❦р22
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/дир3
+status = 0 success
+attr: ----f
+
+/> stat80 /hd0/1/dir0/file00
+status = 0 success
+attr: -----
+size: 12
+/> stat80 /hd0/1/dir0/file00/
+status = 0 success
+attr: -----
+size: 12
+/> stat80 /hd0/1/❦❦❦/д❦р22/❦❦
+status = 0 success
+attr: -----
+size: 22
+/> stat80 /hd0/1/❦❦❦/д❦р22/❦❦/
+status = 0 success
+attr: -----
+size: 22
+/> stat80 /hd0/1/❦❦❦/д❦р22/💗💗
+status = 0 success
+attr: -----
+size: 23
+/> stat80 /hd0/1/дир3/файл33
+status = 0 success
+attr: -----
+size: 26
+/> stat80 /hd0/1/дир3/файл33/
+status = 0 success
+attr: -----
+size: 26
+
+/> read80 /hd0/1/dir0/file00 0 100 -b
+status = 6 end_of_file, count = 12
+68656c6c6f5f776f726c640a
+/> read80 /hd0/1/dir0/file00/ 0 100 -b
+status = 6 end_of_file, count = 12
+68656c6c6f5f776f726c640a
+/> read80 /hd0/1/❦❦❦/д❦р22/❦❦ 0 100 -b
+status = 6 end_of_file, count = 22
+d0bfd180d0b8d0b2d0b5d182e29da6d0bcd0b8d1800a
+/> read80 /hd0/1/дир3/файл33 0 100 -b
+status = 6 end_of_file, count = 26
+d0bfd180d0b8d0b2d0b5d182e29da6f09f9297d0bcd0b8d1800a
+
+/> disk_del hd0

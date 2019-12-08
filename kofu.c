@@ -22,6 +22,8 @@
 #define MAX_DIRENTS_TO_READ 100
 #define MAX_BYTES_TO_READ (16*1024)
 
+#define DEFAULT_PATH_ENCODING UTF8
+
 char cur_dir[PATH_MAX] = "/";
 const char *last_dir = cur_dir;
 bool cur_dir_changed = true;
@@ -45,22 +47,22 @@ const char *f70_status_name[] = {
                                  "out_of_memory"
                                 };
 
-const char *get_f70_status_name(f70status s) {
+const char *get_f70_status_name(f70status_t s) {
     switch (s) {
-    case F70_ERROR_SUCCESS:
+    case ERROR_SUCCESS:
 //        return "";
-    case F70_ERROR_DISK_BASE:
-    case F70_ERROR_UNSUPPORTED_FS:
-    case F70_ERROR_UNKNOWN_FS:
-    case F70_ERROR_PARTITION:
-    case F70_ERROR_FILE_NOT_FOUND:
-    case F70_ERROR_END_OF_FILE:
-    case F70_ERROR_MEMORY_POINTER:
-    case F70_ERROR_DISK_FULL:
-    case F70_ERROR_FS_FAIL:
-    case F70_ERROR_ACCESS_DENIED:
-    case F70_ERROR_DEVICE:
-    case F70_ERROR_OUT_OF_MEMORY:
+    case ERROR_DISK_BASE:
+    case ERROR_UNSUPPORTED_FS:
+    case ERROR_UNKNOWN_FS:
+    case ERROR_PARTITION:
+    case ERROR_FILE_NOT_FOUND:
+    case ERROR_END_OF_FILE:
+    case ERROR_MEMORY_POINTER:
+    case ERROR_DISK_FULL:
+    case ERROR_FS_FAIL:
+    case ERROR_ACCESS_DENIED:
+    case ERROR_DEVICE:
+    case ERROR_OUT_OF_MEMORY:
         return f70_status_name[s];
     default:
         return "unknown";
@@ -76,9 +78,9 @@ void convert_f70_file_attr(uint32_t attr, char s[KF_ATTR_CNT+1]) {
     s[5] = '\0';
 }
 
-void print_f70_status(f70ret_t *r, int use_ebx) {
+void print_f70_status(f7080ret_t *r, int use_ebx) {
     printf("status = %d %s", r->status, get_f70_status_name(r->status));
-    if (use_ebx && (r->status == F70_ERROR_SUCCESS || r->status == F70_ERROR_END_OF_FILE))
+    if (use_ebx && (r->status == ERROR_SUCCESS || r->status == ERROR_END_OF_FILE))
         printf(", count = %d", r->count);
     putchar('\n');
 }
@@ -198,93 +200,122 @@ void kofu_cd(int argc, const char **argv) {
     cur_dir_changed = true;
 }
 
-void ls_range(f70s1arg_t *f70) {
-    f70ret_t r;
-    uint32_t requested = f70->size;
-    if (f70->size > MAX_DIRENTS_TO_READ) {
-        f70->size = MAX_DIRENTS_TO_READ;
+void ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
+    f7080ret_t r;
+    size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 : BDFE_LEN_UNICODE;
+    uint32_t requested = fX0->size;
+    if (fX0->size > MAX_DIRENTS_TO_READ) {
+        fX0->size = MAX_DIRENTS_TO_READ;
     }
-    for (; requested; requested -= f70->size) {
-        if (f70->size > requested) {
-            f70->size = requested;
+    for (; requested; requested -= fX0->size) {
+        if (fX0->size > requested) {
+            fX0->size = requested;
         }
-        kos_lfn(f70, &r);
-        f70->offset += f70->size;
+        kos_lfn(fX0, &r, f70or80);
+        fX0->offset += fX0->size;
         print_f70_status(&r, 1);
-        f70s1info_t *dir = f70->buf;
-        int ok = (r.count <= f70->size);
+        f7080s1info_t *dir = fX0->buf;
+        int ok = (r.count <= fX0->size);
         ok &= (dir->cnt == r.count);
-        ok &= (r.status == F70_ERROR_SUCCESS && r.count == f70->size)
-              || (r.status == F70_ERROR_END_OF_FILE && r.count < f70->size);
+        ok &= (r.status == ERROR_SUCCESS && r.count == fX0->size)
+              || (r.status == ERROR_END_OF_FILE && r.count < fX0->size);
         assert(ok);
         if (!ok)
             break;
+        bdfe_t *bdfe = dir->bdfes;
         for (size_t i = 0; i < dir->cnt; i++) {
             char fattr[KF_ATTR_CNT+1];
-            convert_f70_file_attr(dir->bdfes[i].attr, fattr);
-            printf("%s %s\n", fattr, dir->bdfes[i].name);
+            convert_f70_file_attr(bdfe->attr, fattr);
+            printf("%s %s\n", fattr, bdfe->name);
+            bdfe = (bdfe_t*)((uintptr_t)bdfe + bdfe_len);
         }
-        if (r.status == F70_ERROR_END_OF_FILE) {
+        if (r.status == ERROR_END_OF_FILE) {
             break;
         }
     }
 }
 
-void ls_all(f70s1arg_t *f70) {
-    f70ret_t r;
+void ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
+    f7080ret_t r;
+    size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 : BDFE_LEN_UNICODE;
     while (true) {
-        kos_lfn(f70, &r);
+        kos_lfn(fX0, &r, f70or80);
         print_f70_status(&r, 1);
-        assert((r.status == F70_ERROR_SUCCESS && r.count == f70->size)
-              || (r.status == F70_ERROR_END_OF_FILE && r.count < f70->size));
-        f70s1info_t *dir = f70->buf;
-        f70->offset += dir->cnt;
-        int ok = (r.count <= f70->size);
+        assert((r.status == ERROR_SUCCESS && r.count == fX0->size)
+              || (r.status == ERROR_END_OF_FILE && r.count < fX0->size));
+        f7080s1info_t *dir = fX0->buf;
+        fX0->offset += dir->cnt;
+        int ok = (r.count <= fX0->size);
         ok &= (dir->cnt == r.count);
-        ok &= (r.status == F70_ERROR_SUCCESS && r.count == f70->size)
-              || (r.status == F70_ERROR_END_OF_FILE && r.count < f70->size);
+        ok &= (r.status == ERROR_SUCCESS && r.count == fX0->size)
+              || (r.status == ERROR_END_OF_FILE && r.count < fX0->size);
         assert(ok);
         if (!ok)
             break;
         printf("total = %"PRIi32"\n", dir->total_cnt);
+        bdfe_t *bdfe = dir->bdfes;
         for (size_t i = 0; i < dir->cnt; i++) {
             char fattr[KF_ATTR_CNT+1];
-            convert_f70_file_attr(dir->bdfes[i].attr, fattr);
-            printf("%s %s\n", fattr, dir->bdfes[i].name);
+            convert_f70_file_attr(bdfe->attr, fattr);
+            printf("%s %s\n", fattr, bdfe->name);
+            bdfe = (bdfe_t*)((uintptr_t)bdfe + bdfe_len);
         }
-        if (r.status == F70_ERROR_END_OF_FILE) {
+        if (r.status == ERROR_END_OF_FILE) {
             break;
         }
     }
 }
 
-void kofu_ls(int argc, const char **argv) {
+void kofu_ls(int argc, const char **argv, f70or80_t f70or80) {
     (void)argc;
-    f70s1info_t *dir = (f70s1info_t*)malloc(sizeof(f70s1info_t) + sizeof(bdfe_t) * MAX_DIRENTS_TO_READ);
-    f70s1arg_t f70 = {1, 0, CP866, MAX_DIRENTS_TO_READ, dir, 0, argv[1]};
-    if (argv[2]) {
-        sscanf(argv[2], "%"SCNu32, &f70.size);
-        if (argv[3]) {
-            sscanf(argv[3], "%"SCNu32, &f70.offset);
-        }
-        ls_range(&f70);
+    uint32_t encoding = UTF8;
+    size_t bdfe_len = (encoding == CP866) ? BDFE_LEN_CP866 : BDFE_LEN_UNICODE;
+    f7080s1info_t *dir = (f7080s1info_t*)malloc(sizeof(f7080s1info_t) + bdfe_len * MAX_DIRENTS_TO_READ);
+    f7080s1arg_t fX0 = {.sf = 1, .offset = 0, .encoding = encoding, .size = MAX_DIRENTS_TO_READ, .buf = dir};
+    if (f70or80 == F70) {
+        fX0.u.f70.zero = 0;
+        fX0.u.f70.path = argv[1];
     } else {
-        ls_all(&f70);
+        fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
+        fX0.u.f80.path = argv[1];
+    }
+    if (argv[2]) {
+        sscanf(argv[2], "%"SCNu32, &fX0.size);
+        if (argv[3]) {
+            sscanf(argv[3], "%"SCNu32, &fX0.offset);
+        }
+        ls_range(&fX0, f70or80);
+    } else {
+        ls_all(&fX0, f70or80);
     }
     free(dir);
     return;
 }
 
-void kofu_stat(int argc, const char **argv) {
+void kofu_ls70(int argc, const char **argv) {
+    kofu_ls(argc, argv, F70);
+}
+
+void kofu_ls80(int argc, const char **argv) {
+    kofu_ls(argc, argv, F80);
+}
+
+void kofu_stat(int argc, const char **argv, f70or80_t f70or80) {
     (void)argc;
-    f70s5arg_t f70 = {.sf = 5, .flags = 0, .zero = 0};
-    f70ret_t r;
+    f7080s5arg_t fX0 = {.sf = 5, .flags = 0};
+    f7080ret_t r;
     bdfe_t file;
-    f70.buf = &file;
-    f70.path = argv[1];
-    kos_lfn(&f70, &r);
+    fX0.buf = &file;
+    if (f70or80 == F70) {
+        fX0.u.f70.zero = 0;
+        fX0.u.f70.path = argv[1];
+    } else {
+        fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
+        fX0.u.f80.path = argv[1];
+    }
+    kos_lfn(&fX0, &r, f70or80);
     print_f70_status(&r, 0);
-    if (r.status != F70_ERROR_SUCCESS)
+    if (r.status != ERROR_SUCCESS)
         return;
     char fattr[KF_ATTR_CNT+1];
     convert_f70_file_attr(file.attr, fattr);
@@ -315,48 +346,72 @@ void kofu_stat(int argc, const char **argv) {
     return;
 }
 
-void kofu_read(int argc, const char **argv) {
+void kofu_stat70(int argc, const char **argv) {
+    kofu_stat(argc, argv, F70);
+}
+
+void kofu_stat80(int argc, const char **argv) {
+    kofu_stat(argc, argv, F80);
+}
+
+void kofu_read(int argc, const char **argv, f70or80_t f70or80) {
     (void)argc;
-    f70s0arg_t f70 = {.sf = 0, .zero = 0};
-    f70ret_t r;
+    f7080s0arg_t fX0 = {.sf = 0};
+    f7080ret_t r;
     bool dump_bytes = false, dump_hash = false;
     if (argc < 4) {
-        printf("usage: %s <offset> <length> [-b] [-h]\n", argv[0]);
+        printf("usage: %s <offset> <length> [-b] [-h] [-e cp866|utf8|utf16]\n", argv[0]);
         return;
     }
     int opt = 1;
-    f70.path = argv[opt++];
-    if ((opt >= argc) || !parse_uint64(argv[opt++], &f70.offset))
+    if (f70or80 == F70) {
+        fX0.u.f70.zero = 0;
+        fX0.u.f70.path = argv[opt++];
+    } else {
+        fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
+        fX0.u.f80.path = argv[opt++];
+    }
+    if ((opt >= argc) || !parse_uint64(argv[opt++], &fX0.offset))
         return;
-    if ((opt >= argc) || !parse_uint32(argv[opt++], &f70.count))
+    if ((opt >= argc) || !parse_uint32(argv[opt++], &fX0.count))
         return;
     for (; opt < argc; opt++) {
         if (!strcmp(argv[opt], "-b")) {
             dump_bytes = true;
         } else if (!strcmp(argv[opt], "-h")) {
             dump_hash = true;
+        } else if (!strcmp(argv[opt], "-e")) {
+            if (f70or80 == F70) {
+                printf("f70 doesn't accept encoding parameter, use f80\n");
+                return;
+            }
         } else {
             printf("invalid option: '%s'\n", argv[opt]);
             return;
         }
     }
-    f70.buf = (uint8_t*)malloc(f70.count);
+    fX0.buf = (uint8_t*)malloc(fX0.count);
 
-    kos_lfn(&f70, &r);
-
-    assert(r.count <= f70.count);
-    assert((r.count == f70.count && r.status == F70_ERROR_SUCCESS) ||
-           (r.count < f70.count && r.status == F70_ERROR_END_OF_FILE)
-          );
+    kos_lfn(&fX0, &r, f70or80);
 
     print_f70_status(&r, 1);
-    if (dump_bytes)
-        print_bytes(f70.buf, r.count);
-    if (dump_hash)
-        print_hash(f70.buf, r.count);
+    if (r.status == ERROR_SUCCESS || r.status == ERROR_END_OF_FILE) {
+        if (dump_bytes)
+            print_bytes(fX0.buf, r.count);
+        if (dump_hash)
+            print_hash(fX0.buf, r.count);
+    }
 
-    free(f70.buf);
+    free(fX0.buf);
     return;
+}
+
+void kofu_read70(int argc, const char **argv) {
+    kofu_read(argc, argv, F70);
+}
+
+void kofu_read80(int argc, const char **argv) {
+    kofu_read(argc, argv, F80);
 }
 
 typedef struct {
@@ -367,9 +422,12 @@ typedef struct {
 func_table_t funcs[] = {
                               { "disk_add", kofu_disk_add },
                               { "disk_del", kofu_disk_del },
-                              { "ls",       kofu_ls },
-                              { "stat",     kofu_stat },
-                              { "read",     kofu_read },
+                              { "ls70",     kofu_ls70 },
+                              { "ls80",     kofu_ls80 },
+                              { "stat70",   kofu_stat70 },
+                              { "stat80",   kofu_stat80 },
+                              { "read70",   kofu_read70 },
+                              { "read80",   kofu_read80 },
                               { "pwd",      kofu_pwd },
                               { "cd",       kofu_cd },
                               { NULL,       NULL },

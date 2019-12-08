@@ -201,13 +201,20 @@ endp
 
 
 public kos_lfn
-proc kos_lfn c uses ebx edx esi edi ebp, _f70arg, _f70ret
+proc kos_lfn c uses ebx edx esi edi ebp, _f7080arg, _f7080ret, _f70or80
         push    ebx
-        mov     ebx, [_f70arg]
+        mov     ebx, [_f7080arg]
         pushad  ; file_system_lfn writes here
+        cmp     [_f70or80], 80
+        jz      .f80
+.f70:
         call    file_system_lfn
+        jmp     .done
+.f80:
+        call    fileSystemUnicode
+.done:
         popad
-        mov     ecx, [_f70ret]
+        mov     ecx, [_f7080ret]
         mov     [ecx+0], eax    ; status
         mov     [ecx+4], ebx    ; count
         pop     ebx

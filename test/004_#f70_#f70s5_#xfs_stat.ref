@@ -1,9 +1,9 @@
 /> disk_add ../img/xfs_v4_files_s05k_b4k_n8k.img hd0
 /hd0/1: xfs
-/> stat /hd0/1/
+/> stat70 /hd0/1/
 status = 0 success
 attr: ----f
-/> stat /hd0/1/hole_begin
+/> stat70 /hd0/1/hole_begin
 status = 0 success
 attr: -----
 size: 65536

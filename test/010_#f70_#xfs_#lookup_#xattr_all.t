@@ -1,4 +1,4 @@
-disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.img hd0
+disk_add ../img/xfs_v4_ftype0_s05k_b2k_n8k_xattr.img hd0
 stat70 /hd0/1/sf_empty
 stat70 /hd0/1/sf_empty/.
 stat70 /hd0/1/sf_empty/..
@@ -50,11 +50,11 @@ stat70 d0000000001_x
 stat70 d0000000002_xx
 stat70 d0000000003_xxx
 stat70 d0000000004_xxxx
-stat70 d0000001095_xxxxxxxxxxxxxx
-stat70 d0000001096_xxxxxxxxxxxxxxx
-stat70 d0000001097_xxxxxxxxxxxxxxxx
-stat70 d0000001098_xxxxxxxxxxxxxxxxx
-stat70 d0000001099_xxxxxxxxxxxxxxxxxx
+stat70 d0000001015_xxx
+stat70 d0000001016_xxxx
+stat70 d0000001017_xxxxx
+stat70 d0000001018_xxxxxx
+stat70 d0000001019_xxxxxxx
 
 cd /hd0/1/btree_leaf
 stat70 d0000000000_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
