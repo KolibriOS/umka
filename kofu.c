@@ -1,3 +1,21 @@
+/*
+    kofu: KolibriOS kernel FS code as userspace interactive shell in Linux
+    Copyright (C) 2018--2020  Ivan Baravy <dunkaist@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -268,7 +286,7 @@ void ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
 
 void kofu_ls(int argc, const char **argv, f70or80_t f70or80) {
     (void)argc;
-    uint32_t encoding = UTF8;
+    uint32_t encoding = DEFAULT_PATH_ENCODING;
     size_t bdfe_len = (encoding == CP866) ? BDFE_LEN_CP866 : BDFE_LEN_UNICODE;
     f7080s1info_t *dir = (f7080s1info_t*)malloc(sizeof(f7080s1info_t) + bdfe_len * MAX_DIRENTS_TO_READ);
     f7080s1arg_t fX0 = {.sf = 1, .offset = 0, .encoding = encoding, .size = MAX_DIRENTS_TO_READ, .buf = dir};

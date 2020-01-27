@@ -1,6 +1,6 @@
 /*
-    Kofuse: KolibriOS kernel FS code as FUSE in Linux
-    Copyright (C) 2018--2019  Ivan Baravy <dunkaist@gmail.com>
+    kofuse: KolibriOS kernel FS code as FUSE in Linux
+    Copyright (C) 2018--2020  Ivan Baravy <dunkaist@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
