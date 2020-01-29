@@ -47,7 +47,7 @@ const char *last_dir = cur_dir;
 bool cur_dir_changed = true;
 
 char cmd_buf[FGETS_BUF_LEN];
-int trace = false;
+int trace = true;
 
 const char *f70_status_name[] = {
                                  "success",

@@ -48,8 +48,8 @@ void handle_sigtrap() {
 
     if ((from >= (uintptr_t)coverage_begin && from < (uintptr_t)coverage_end) ||
         (to >= (uintptr_t)coverage_begin && to < (uintptr_t)coverage_end)) {
-        write(covfd, &from, 8);
-        write(covfd, &to, 8);
+        write(covfd, &from, 4);
+        write(covfd, &to, 4);
     }
 
     wrmsr(0x1d9, 3);
@@ -72,7 +72,9 @@ void trace_lbr_begin() {
         perror("rdmsr: open");
         exit(1);
     }
-    covfd = open("coverage", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+    char coverage_filename[32];
+    sprintf(coverage_filename, "coverage.%i", getpid());
+    covfd = open(coverage_filename, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
     set_eflags_tf(1);
 }
 

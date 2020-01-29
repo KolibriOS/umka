@@ -19,3 +19,5 @@ kolibri.lst
 kolibri.prp
 tags
 *.out
+coverage.*
+covpreproc
