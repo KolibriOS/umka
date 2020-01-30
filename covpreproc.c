@@ -14,7 +14,7 @@ branch branches[MAX_COVERED_CODE_SIZE];
 uint32_t coverage_offset, coverage_begin, coverage_end;
 
 void read_coverage_file(const char *fname) {
-    FILE *f = fopen(fname, "r+");
+    FILE *f = fopen(fname, "r");
     fseeko(f, 0, SEEK_END);
     off_t fsize = ftello(f);
     fseeko(f, 0, SEEK_SET);
@@ -56,6 +56,43 @@ size_t count_block_bytes(FILE *f) {
     return cnt;
 }
 
+int is_cond_jump(const char *s) {
+    s += strspn(s, " \t");
+    int found = !strncasecmp(s, "jo", 2)
+                || !strncasecmp(s, "jno", 3)
+                || !strncasecmp(s, "js", 2)
+                || !strncasecmp(s, "jns", 3)
+                || !strncasecmp(s, "je", 2)
+                || !strncasecmp(s, "jne", 3)
+                || !strncasecmp(s, "jz", 2)
+                || !strncasecmp(s, "jnz", 3)
+                || !strncasecmp(s, "jb", 2)
+                || !strncasecmp(s, "jnb", 3)
+                || !strncasecmp(s, "jc", 2)
+                || !strncasecmp(s, "jnc", 3)
+                || !strncasecmp(s, "jae", 3)
+                || !strncasecmp(s, "jnae", 4)
+                || !strncasecmp(s, "jbe", 3)
+                || !strncasecmp(s, "jna", 3)
+                || !strncasecmp(s, "ja", 2)
+                || !strncasecmp(s, "jnbe", 4)
+                || !strncasecmp(s, "jl", 2)
+                || !strncasecmp(s, "jnge", 4)
+                || !strncasecmp(s, "jge", 3)
+                || !strncasecmp(s, "jnl", 3)
+                || !strncasecmp(s, "jle", 3)
+                || !strncasecmp(s, "jng", 3)
+                || !strncasecmp(s, "jg",2)
+                || !strncasecmp(s, "jnle", 4)
+                || !strncasecmp(s, "jp", 2)
+                || !strncasecmp(s, "jpe", 3)
+                || !strncasecmp(s, "jnp", 3)
+                || !strncasecmp(s, "jpo", 3)
+                || !strncasecmp(s, "jcxz", 4)
+                || !strncasecmp(s, "jecxz", 5);
+    return found;
+}
+
 int main(int argc, char **argv) {
     if (argc < 6) {
         fprintf(stderr, "usage: covpreproc <listing file> <coverage_begin offset> <coverage_begin address> <coverage_end address> <coverage files ...>\n");
@@ -71,7 +108,7 @@ int main(int argc, char **argv) {
 
     FILE *f = fopen(argv[1], "r");
     char tmp[1024];
-    uint64_t cur = 0;
+    uint64_t cur = 0, taken, not_taken;
     while (1) {
         off_t fpos_before = ftello(f);
         if (!fgets(tmp, 1024, f)) {
@@ -79,6 +116,7 @@ int main(int argc, char **argv) {
         }
         off_t fpos_after = ftello(f);
         if (strspn(tmp, "0123456789ABCDEF") == 8) {
+            int is_cond = is_cond_jump(tmp + 64);
             fseeko(f, fpos_before, SEEK_SET);
             size_t inst_len = count_block_bytes(f);
             fseeko(f, fpos_after, SEEK_SET);
@@ -89,19 +127,33 @@ int main(int argc, char **argv) {
                 total_from += branches[pos + i].from_cnt;
             }
             cur += total_to;
+            if (is_cond) {
+                taken = total_from;
+                not_taken = cur - taken;
+                if (taken && not_taken) {
+                    putchar(' ');
+                } else {
+                    putchar('-');
+                }
+            } else {
+                putchar(' ');
+            }
             if (cur) {
                 putchar(' ');
             } else {
                 putchar('-');
             }
-            if (total_from || total_to || cur) {
-                printf("%8" PRIu64 " %8" PRIu64 " %8" PRIu64, total_from, total_to, cur);
+            if (is_cond) {
+                int spaces = 19 - printf("%10" PRIu64 "/%" PRIu64, taken, not_taken);
+                while (spaces-- > 0)
+                    putchar(' ');
             } else {
-                printf("       -        -        -");
+                printf("                   ");
             }
+            printf(" %10" PRIu64, cur);
             cur -= total_from;
         } else {
-            printf("                           ");
+            printf("                                ");
         }
         printf(" : %s", tmp + 64);
     }
