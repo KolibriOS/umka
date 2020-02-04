@@ -47,7 +47,7 @@ const char *last_dir = cur_dir;
 bool cur_dir_changed = true;
 
 char cmd_buf[FGETS_BUF_LEN];
-int trace = true;
+int trace;
 
 const char *f70_status_name[] = {
                                  "success",
@@ -210,6 +210,24 @@ void kofu_pwd(int argc, const char **argv) {
     const char *quote = quoted ? "'" : "";
     kos_getcwd(cur_dir, PATH_MAX);
     printf("%s%s%s\n", quote, cur_dir, quote);
+}
+
+void kofu_scrot(int argc, const char **argv) {
+    (void)argc;
+    (void)argv;
+//    printf("%"PRIx32 " %"PRIx32 "\n", kos_lfb_base[0], kos_lfb_base[1]);
+    FILE *img = fopen("umka.rgba", "w");
+//    const char *header = "P6\n1024 768\n255\n";
+//    fwrite(header, strlen(header), 1, img);
+    uint32_t *lfb = kos_lfb_base;
+    for (int y = 0; y < 300; y++) {
+        for (int x = 0; x < 400; x++) {
+            uint32_t p = *lfb++;
+            p |= 0xff000000;
+            fwrite(&p, 4, 1, img);
+        }
+    }
+    fclose(img);
 }
 
 void kofu_cd(int argc, const char **argv) {
@@ -448,6 +466,7 @@ func_table_t funcs[] = {
                               { "read80",   kofu_read80 },
                               { "pwd",      kofu_pwd },
                               { "cd",       kofu_cd },
+                              { "scrot",    kofu_scrot },
                               { NULL,       NULL },
                             };
 

@@ -17,8 +17,11 @@ kofu: kofu.o kolibri.o trace.o trace_lbr.o trace_lwp.o cio.o
 kofuse: kofuse.o kolibri.o cio.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
-kolibri.o kolibri.fas: kolibri.asm kolibri.h
-	INCLUDE="$(KOLIBRI)/kernel/trunk;$(KOLIBRI)/programs/develop/libraries/libcrash/trunk" $(FASM) $< kolibri.o -s kolibri.fas
+kolibri.o kolibri.fas: kolibri.asm kolibri.h skin.skn
+	INCLUDE="$(KOLIBRI)/kernel/trunk;$(KOLIBRI)/programs/develop/libraries/libcrash/trunk" $(FASM) $< kolibri.o -s kolibri.fas -m 1234567
+
+skin.skn: $(KOLIBRI)/skins/Leency/Octo_flat/default.asm
+	$(FASM) $< $@
 
 kolibri.prp: kolibri.fas
 	prepsrc kolibri.fas kolibri.prp

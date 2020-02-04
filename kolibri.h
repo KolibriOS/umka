@@ -142,4 +142,5 @@ void coverage_begin(void);
 void coverage_end(void);
 uint32_t get_lwp_event_size(void);
 
+extern uint32_t *kos_lfb_base;
 #endif

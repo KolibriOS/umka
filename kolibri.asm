@@ -11,6 +11,12 @@ free fix __free
 _free fix free
 
 sys_msg_board equ _sys_msg_board
+cli equ nop
+
+lang fix en
+preboot_blogesc = 0       ; start immediately after bootlog
+pci_code_sel = 0
+VESA_1_2_VIDEO  = 0      ; enable vesa 1.2 bank switch functions
 
 purge mov,add,sub
 purge mov,add,sub
@@ -20,19 +26,50 @@ coverage_begin:
 public coverage_begin
 
 include 'macros.inc'
+macro diff16 blah1,blah2,blah3 {
+}
 include 'proc32.inc'
 include 'struct.inc'
 include 'const.inc'
+;OS_BASE      = os_base
+LFB_BASE     = lfb_base
+SLOT_BASE    = os_base + 0x00080000
+window_data  = os_base + 0x00001000
+WIN_STACK    = os_base + 0x0000C000
+WIN_POS      = os_base + 0x0000C400
+KEY_COUNT    = os_base + 0x0000F400
+KEY_BUFF     = os_base + 0x0000F401 ; 120*2 + 2*2 = 244 bytes, actually 255 bytes
+BTN_COUNT    = os_base + 0x0000F500
+BTN_BUFF     = os_base + 0x0000F501
+BTN_ADDR     = os_base + 0x0000FE88
+TASK_BASE    = os_base + 0x00003010
+CURRENT_TASK = os_base + 0x00003000
+TASK_COUNT   = os_base + 0x00003004
+TASK_BASE    = os_base + 0x00003010
+
 include 'system.inc'
 include 'fdo.inc'
+; block and fs
 include 'blkdev/disk.inc'
 include 'blkdev/disk_cache.inc'
 include 'fs/fs_lfn.inc'
 include 'crc.inc'
-
+; video
+include 'core/dll.inc'
+include 'video/framebuffer.inc'
+include 'video/vesa20.inc'
+include 'video/vga.inc'
+include 'video/cursors.inc'
+include 'unpacker.inc'
+include 'gui/window.inc'
+include 'gui/button.inc'
+load_file equ __load_file
+include 'gui/skincode.inc'
+restore load_file
+include 'gui/draw.inc'
+include 'gui/font.inc'
+ 
 include 'sha3.asm'
-
-SLOT_BASE    = os_base + 0x00080000
 
 struct VDISK
   File     dd ?
@@ -46,6 +83,49 @@ proc sha3_256_oneshot c uses ebx esi edi ebp, _ctx, _data, _len
         ret
 endp
 
+align 4
+syscall_getpixel:                       ; GetPixel
+        mov     ecx, [_display.width]
+        xor     edx, edx
+        mov     eax, ebx
+        div     ecx
+        mov     ebx, edx
+        xchg    eax, ebx
+        and     ecx, 0xFBFFFFFF  ;negate 0x04000000 use mouseunder area
+        call    dword [GETPIXEL]; eax - x, ebx - y
+        mov     [esp + 32], ecx
+        ret
+
+align 4
+calculate_fast_getting_offset_for_WinMapAddress:
+; calculate data area for fast getting offset to _WinMapAddress
+        xor     eax, eax
+        mov     ecx, [_display.height]
+        mov     edi, d_width_calc_area
+        cld
+@@:
+        stosd
+        add     eax, [_display.width]
+        dec     ecx
+        jnz     @r
+        ret
+;------------------------------------------------------------------------------
+align 4
+calculate_fast_getting_offset_for_LFB:
+; calculate data area for fast getting offset to LFB
+        xor     eax, eax
+        mov     ecx, [_display.height]
+        mov     edi, BPSLine_calc_area
+        cld
+@@:
+        stosd
+        add     eax, [_display.lfb_pitch]
+        dec     ecx
+        jnz     @r
+redrawscreen:
+force_redraw_background:
+        ret
+ 
 ; TODO: move to trace_lbr
 public set_eflags_tf
 set_eflags_tf:
@@ -108,8 +188,10 @@ endp
 
 
 public kos_init
-proc kos_init c
+proc kos_init c uses ebx esi edi ebp
         MEMORY_BYTES = 128 SHL 20
+        DISPLAY_WIDTH = 400
+        DISPLAY_HEIGHT = 300
         mov     [pg_data.mem_amount], MEMORY_BYTES
         mov     [pg_data.pages_count], MEMORY_BYTES / PAGE_SIZE
         mov     [pg_data.pages_free], MEMORY_BYTES / PAGE_SIZE
@@ -119,12 +201,138 @@ proc kos_init c
         mov     word[sysdir_path+4], '1'
 
         mov     eax, SLOT_BASE + 2*256
-        mov     dword[current_slot], eax
+        mov     [current_slot], eax
         mov     word[cur_dir.path], '/'
         mov     [eax+APPDATA.cur_dir], cur_dir
+        mov     [eax+APPDATA.wnd_clientbox.left], 0
+        mov     [eax+APPDATA.wnd_clientbox.top], 0
+        mov     dword[CURRENT_TASK], 2
+        mov     dword[TASK_COUNT], 2
+        mov     dword[TASK_BASE], CURRENT_TASK + 2*sizeof.TASKDATA
+
+        mov     [_display.x], 0
+        mov     [_display.y], 0
+        mov     [_display.width], DISPLAY_WIDTH
+        mov     [_display.lfb_pitch], DISPLAY_WIDTH*4
+        mov     [_display.height], DISPLAY_HEIGHT
+        mov     [PUTPIXEL], Vesa20_putpixel32
+        mov     [GETPIXEL], Vesa20_getpixel32
+        mov     [_display.bytes_per_pixel], 4
+        mov     [_display.bits_per_pixel], 32
+        mov     [MOUSE_PICTURE], dword mousepointer
+        call    calculate_fast_getting_offset_for_WinMapAddress
+        call    calculate_fast_getting_offset_for_LFB
+        mov     [X_UNDER], 500
+        mov     [Y_UNDER], 500
+        mov     word[MOUSE_X], 40
+        mov     word[MOUSE_Y], 30
+
+        mov     eax, [_display.width]
+        mul     [_display.height]
+        mov     [_display.win_map_size], eax
+
+        mov     [_display.check_mouse], check_mouse_area_for_putpixel_new
+        mov     [_display.check_m_pixel], check_mouse_area_for_getpixel_new
+
+        stdcall kernel_alloc, eax
+        mov     [_display.win_map], eax
+
+        mov     [BgrDrawMode], eax
+        mov     [BgrDataWidth], eax
+        mov     [BgrDataHeight], eax
+        mov     [mem_BACKGROUND], 4
+        mov     [img_background], static_background_data
+
+        ; from set_variables
+        xor     eax, eax
+        mov     [BTN_ADDR], dword BUTTON_INFO ; address of button list
+        mov     byte [KEY_COUNT], al              ; keyboard buffer
+        mov     byte [BTN_COUNT], al              ; button buffer
+
+        call    set_window_defaults
+        mov     [skin_data], 0
+        call    load_default_skin
+
+        mov     eax, 0
+        mov     ebx, (0 SHL 16)+300
+        mov     ecx, (0 SHL 16)+200
+        mov     edx, 0x34000088
+        mov     esi, 0x00008800
+        mov     edi, window_title
+        call    syscall_draw_window
+
+        mov     eax, 1
+        mov     ebx, 0
+        mov     ecx, 0
+        mov     edx, 0x000000ff
+        call    syscall_setpixel
+
+        mov     eax, 1
+        mov     ebx, 1
+        mov     ecx, 1
+        mov     edx, 0x00ff0000
+        call    syscall_setpixel
+
+        mov     eax, 1
+        mov     ebx, 2
+        mov     ecx, 2
+        mov     edx, 0x0000ff00
+        call    syscall_setpixel
+
+        mov     eax, 38
+        mov     ebx, (10 SHL 16) + 510
+        mov     ecx, (10 SHL 16) + 510
+        mov     edx, 0x00ff0000
+        call    syscall_drawline
+
+        mov     eax, 13
+        mov     ebx, (60 SHL 16) + 20
+        mov     ecx, (30 SHL 16) + 20
+        mov     edx, 0x0000ff00
+        call    syscall_drawrect
+
+        mov     eax, 7
+        mov     ebx, chess_image
+        mov     ecx, (8 SHL 16) + 8
+        mov     edx, (5 SHL 16) + 15
+        call    syscall_putimage
+
+        mov     eax, 65
+        mov     ebx, chess_image
+        mov     ecx, (12 SHL 16) + 12
+        mov     edx, (5 SHL 16) + 30
+        mov     esi, 9
+        mov     edi, 0
+        mov     ebp, 0
+        call    sys_putimage_palette
+
+        mov     eax, 4
+        mov     ebx, (10 SHL 16) + 70
+        mov     ecx, 0xffff00
+        mov     edx, window_title
+        mov     esi, 5
+        mov     edi, 0
+        call    syscall_writetext
+ 
+        mov     eax, 8
+        mov     ebx, (55 SHL 16) + 40
+        mov     ecx, (5 SHL 16) + 20
+        mov     edx, 0x20c0ffee
+        mov     esi, 0x00dddddd
+        call    syscall_button
+
+        mov     eax, 47
+        mov     ebx, 0x80040000
+        mov     ecx, 1234
+        mov     edx, (5 SHL 16) + 45
+        mov     esi, 0x50ffff00
+        mov     edi, 0x000000ff
+        call    display_number
+
         ret
 endp
 
+window_title db 'hello',0
 
 public kos_disk_add
 proc kos_disk_add c uses ebx esi edi ebp, _file_name, _disk_name
@@ -357,6 +565,10 @@ align 4
 .ret:
         ret
 
+proc my_putpixel
+        DEBUGF 1,"hello from my putpixel!\n"
+        ret
+endp
 
 sys_msg_board_str:
 protect_from_terminate:
@@ -372,13 +584,34 @@ fs_execute:
 mutex_init:
 mutex_lock:
 mutex_unlock:
+alloc_page:
+map_page:
+free_kernel_space:
+cache_ide0:
+cache_ide1:
+wakeup_osloop:
+read_process_memory:
+.forced:
         ret
+
+proc __load_file _filename
+        push    ebx ecx edx esi edi
+        stdcall kernel_alloc, skin_size
+        push    eax
+        mov     esi, skin
+        mov     edi, eax
+        mov     ecx, skin_size
+        rep movsb
+        pop     eax
+        pop     edi esi edx ecx ebx
+        ret
+endp
 
 coverage_end:
 public coverage_end
 
 
-section '.data' writeable align 16
+section '.data' writeable align 64
 include_debug_strings
 vdisk_functions:
         dd vdisk_functions_end - vdisk_functions
@@ -392,22 +625,57 @@ vdisk_functions:
 vdisk_functions_end:
 
 disk_name db 'hd0',0
-IncludeIGlobals
+;IncludeIGlobals
+skin file 'skin.skn'
+skin_size = $ - skin
+include 'hid/mousedrv.inc'
+include 'gui/mousepointer.inc'
+
+screen_workarea RECT
+display_width_standard dd 0
+display_height_standard dd 0
+do_not_touch_winmap db 0
+window_minimize db 0
+sound_flag      db 0
+
+chess_image db \
+        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
+        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
+        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
+        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
+        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
+        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
+        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
+        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
+        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
+        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
+        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
+        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
+        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
+        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
+        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
+        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff
+
+fl_moving db 0
+rb 3
+
+;section '.bss' writeable align 16
+;IncludeUGlobals
 
 
-section '.bss' writeable align 16
-IncludeUGlobals
+;section '.bss' writeable align 16
+;IncludeUGlobals
 ; crap
 DiskNumber db ?
 ChannelNumber db ?
 DevErrorCode dd ?
 CDSectorAddress dd ?
 CDDataBuf_pointer dd ?
-DRIVE_DATA: rb 0x4000
-cdpos dd ?
-cd_appl_data dd ?
-current_slot dd ?
-pg_data PG_DATA
+;DRIVE_DATA: rb 0x4000
+;cdpos dd ?
+;cd_appl_data dd ?
+;current_slot dd ?
+;pg_data PG_DATA
 ide_channel1_mutex MUTEX
 ide_channel2_mutex MUTEX
 ide_channel3_mutex MUTEX
@@ -416,7 +684,19 @@ ide_channel5_mutex MUTEX
 ide_channel6_mutex MUTEX
 ide_channel7_mutex MUTEX
 ide_channel8_mutex MUTEX
-os_base rb 0x100000
+os_base rb 0x400000
+public lfb_base_addr as 'kos_lfb_base'
+lfb_base_addr dd lfb_base
+lfb_base rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
 cur_dir:
 .encoding rb 1
 .path     rb maxPathLength
+
+BgrAuxTable     rb  32768
+BgrAuxTable     equ
+SB16Buffer      rb  65536
+SB16Buffer      equ
+BUTTON_INFO     rb  64*1024
+BUTTON_INFO     equ
+
+include 'data32.inc'
