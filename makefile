@@ -11,7 +11,7 @@ all: kofu kofuse kolibri.sym kolibri.prp kolibri.lst tags tools/mkdirrange tools
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
-kofu: kofu.o kolibri.o trace.o trace_lbr.o trace_lwp.o cio.o
+kofu: kofu.o kolibri.o trace.o trace_lbr.o cio.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ -static
 
 kofuse: kofuse.o kolibri.o cio.o
@@ -39,9 +39,6 @@ trace.o: trace.c trace.h trace_lbr.h
 	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<
 
 trace_lbr.o: trace_lbr.c trace_lbr.h kolibri.h
-	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<
-
-trace_lwp.o: trace_lwp.c trace_lwp.h kolibri.h
 	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<
 
 cio.o: cio.c

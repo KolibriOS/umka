@@ -144,25 +144,6 @@ set_eflags_tf:
         popfd
         ret
 
-; TODO: move to trace_lwp
-public get_lwp_event_size
-get_lwp_event_size:
-        mov     eax, 0x80000001
-        cpuid
-        bt      ecx, 15
-        jnc     .no_lwp
-        mov     eax, 0x8000001c
-        cpuid
-        and     eax, 1001b
-        cmp     eax, 1001b
-        jnz     .no_lwp
-        movzx   eax, bh
-        ret
-  .no_lwp:
-        xor     eax, eax
-        ret
-
-
 public kos_getcwd
 proc kos_getcwd c uses ebx esi edi ebp, _buf, _len
         mov     eax, 30
