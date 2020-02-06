@@ -129,7 +129,7 @@ typedef struct {
 
 uint32_t kos_time_to_epoch(uint32_t *time);
 void kos_init(void);
-void kos_lfn(void *f7080sXarg, f7080ret_t *r, f70or80_t f70or80);
+void i40(void);
 void *kos_disk_add(const char *file_name, const char *disk_name);
 int kos_disk_del(const char *name);
 uint32_t kos_getcwd(char *buf, uint32_t len);

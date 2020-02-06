@@ -31,6 +31,7 @@
 #include <assert.h>
 #include <time.h>
 #include "kolibri.h"
+#include "syscalls.h"
 #include "trace.h"
 
 #define PATH_MAX 4096
@@ -212,6 +213,129 @@ void kofu_pwd(int argc, const char **argv) {
     printf("%s%s%s\n", quote, cur_dir, quote);
 }
 
+void kofu_set_pixel(int argc, const char **argv) {
+    size_t x = strtoul(argv[1], NULL, 0);
+    size_t y = strtoul(argv[2], NULL, 0);
+    uint32_t color = strtoul(argv[3], NULL, 16);
+    int invert = (argc == 5) && !strcmp(argv[4], "-i");
+    umka_sys_set_pixel(x, y, color, invert);
+}
+
+void kofu_write_text(int argc, const char **argv) {
+    (void)argc;
+    size_t x = strtoul(argv[1], NULL, 0);
+    size_t y = strtoul(argv[2], NULL, 0);
+    uint32_t color = strtoul(argv[3], NULL, 16);
+    const char *string = argv[4];
+    int asciiz = strtoul(argv[5], NULL, 0);
+    int fill_background = strtoul(argv[6], NULL, 0);
+    int font_and_encoding = strtoul(argv[7], NULL, 0);
+    int draw_to_buffer = strtoul(argv[8], NULL, 0);
+    int scale_factor = strtoul(argv[9], NULL, 0);
+    int length = strtoul(argv[10], NULL, 0);
+    int background_color_or_buffer = strtoul(argv[11], NULL, 0);
+    umka_sys_write_text(x, y, color, asciiz, fill_background, font_and_encoding, draw_to_buffer, scale_factor, string, length, background_color_or_buffer);
+}
+
+void kofu_display_number(int argc, const char **argv) {
+    (void)argc;
+    int is_pointer = strtoul(argv[1], NULL, 0);
+    int base = strtoul(argv[2], NULL, 0);
+    if (base == 10) base = 0;
+    else if (base == 16) base = 1;
+    else if (base == 2) base = 2;
+    else base = 0;
+    size_t digits_to_display = strtoul(argv[3], NULL, 0);
+    int is_qword = strtoul(argv[4], NULL, 0);
+    int show_leading_zeros = strtoul(argv[5], NULL, 0);
+    uintptr_t number_or_pointer = strtoul(argv[6], NULL, 0);
+    size_t x = strtoul(argv[7], NULL, 0);
+    size_t y = strtoul(argv[8], NULL, 0);
+    uint32_t color = strtoul(argv[9], NULL, 16);
+    int fill_background = strtoul(argv[10], NULL, 0);
+    int font = strtoul(argv[11], NULL, 0);
+    int draw_to_buffer = strtoul(argv[12], NULL, 0);
+    int scale_factor = strtoul(argv[13], NULL, 0);
+    uintptr_t background_color_or_buffer = strtoul(argv[14], NULL, 16);
+    umka_sys_display_number(is_pointer, base, digits_to_display, is_qword, show_leading_zeros, number_or_pointer, x, y, color, fill_background, font, draw_to_buffer, scale_factor, background_color_or_buffer);
+}
+
+void kofu_button(int argc, const char **argv) {
+    (void)argc;
+    size_t x     = strtoul(argv[1], NULL, 0);
+    size_t xsize = strtoul(argv[2], NULL, 0);
+    size_t y     = strtoul(argv[3], NULL, 0);
+    size_t ysize = strtoul(argv[4], NULL, 0);
+    uint32_t button_id = strtoul(argv[5], NULL, 0);
+    uint32_t color = strtoul(argv[6], NULL, 16);
+    int draw_button = strtoul(argv[7], NULL, 0);
+    int draw_frame = strtoul(argv[8], NULL, 0);
+    umka_sys_button(x, xsize, y, ysize, button_id, draw_button, draw_frame, color);
+}
+
+void kofu_put_image(int argc, const char **argv) {
+    (void)argc;
+    FILE *f = fopen(argv[1], "r");
+    fseek(f, 0, SEEK_END);
+    size_t fsize = ftell(f);
+    rewind(f);
+    uint8_t *image = (uint8_t*)malloc(fsize);
+    fread(image, fsize, 1, f);
+    fclose(f);
+    size_t xsize = strtoul(argv[2], NULL, 0);
+    size_t ysize = strtoul(argv[3], NULL, 0);
+    size_t x = strtoul(argv[4], NULL, 0);
+    size_t y = strtoul(argv[5], NULL, 0);
+    umka_sys_put_image(image, xsize, ysize, x, y);
+    free(image);
+}
+
+void kofu_put_image_palette(int argc, const char **argv) {
+    (void)argc;
+    FILE *f = fopen(argv[1], "r");
+    fseek(f, 0, SEEK_END);
+    size_t fsize = ftell(f);
+    rewind(f);
+    uint8_t *image = (uint8_t*)malloc(fsize);
+    fread(image, fsize, 1, f);
+    fclose(f);
+    size_t xsize = strtoul(argv[2], NULL, 0);
+    size_t ysize = strtoul(argv[3], NULL, 0);
+    size_t x = strtoul(argv[4], NULL, 0);
+    size_t y = strtoul(argv[5], NULL, 0);
+    size_t bpp = strtoul(argv[6], NULL, 0);
+    void *palette = NULL;
+    size_t row_offset = strtoul(argv[7], NULL, 0);
+    umka_sys_put_image_palette(image, xsize, ysize, x, y, bpp, palette, row_offset);
+    free(image);
+}
+
+void kofu_draw_rect(int argc, const char **argv) {
+    size_t x     = strtoul(argv[1], NULL, 0);
+    size_t xsize = strtoul(argv[2], NULL, 0);
+    size_t y     = strtoul(argv[3], NULL, 0);
+    size_t ysize = strtoul(argv[4], NULL, 0);
+    uint32_t color = strtoul(argv[5], NULL, 16);
+    int gradient = (argc == 7) && !strcmp(argv[6], "-g");
+    umka_sys_draw_rect(x, xsize, y, ysize, color, gradient);
+}
+
+void kofu_draw_line(int argc, const char **argv) {
+    size_t x    = strtoul(argv[1], NULL, 0);
+    size_t xend = strtoul(argv[2], NULL, 0);
+    size_t y    = strtoul(argv[3], NULL, 0);
+    size_t yend = strtoul(argv[4], NULL, 0);
+    uint32_t color = strtoul(argv[5], NULL, 16);
+    int invert = (argc == 7) && !strcmp(argv[6], "-i");
+    umka_sys_draw_line(x, xend, y, yend, color, invert);
+}
+
+void kofu_draw_window(int argc, const char **argv) {
+    (void)argc;
+    (void)argv;
+    umka_sys_draw_window(0, 300, 0, 200, 0x00000088, 1, 1, 1, 0, 1, 4, "hello");
+}
+
 void kofu_scrot(int argc, const char **argv) {
     (void)argc;
     (void)argv;
@@ -247,7 +371,7 @@ void ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
         if (fX0->size > requested) {
             fX0->size = requested;
         }
-        kos_lfn(fX0, &r, f70or80);
+        umka_sys_lfn(fX0, &r, f70or80);
         fX0->offset += fX0->size;
         print_f70_status(&r, 1);
         f7080s1info_t *dir = fX0->buf;
@@ -275,7 +399,7 @@ void ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
     f7080ret_t r;
     size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 : BDFE_LEN_UNICODE;
     while (true) {
-        kos_lfn(fX0, &r, f70or80);
+        umka_sys_lfn(fX0, &r, f70or80);
         print_f70_status(&r, 1);
         assert((r.status == ERROR_SUCCESS && r.count == fX0->size)
               || (r.status == ERROR_END_OF_FILE && r.count < fX0->size));
@@ -349,7 +473,7 @@ void kofu_stat(int argc, const char **argv, f70or80_t f70or80) {
         fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
         fX0.u.f80.path = argv[1];
     }
-    kos_lfn(&fX0, &r, f70or80);
+    umka_sys_lfn(&fX0, &r, f70or80);
     print_f70_status(&r, 0);
     if (r.status != ERROR_SUCCESS)
         return;
@@ -428,7 +552,7 @@ void kofu_read(int argc, const char **argv, f70or80_t f70or80) {
     }
     fX0.buf = (uint8_t*)malloc(fX0.count);
 
-    kos_lfn(&fX0, &r, f70or80);
+    umka_sys_lfn(&fX0, &r, f70or80);
 
     print_f70_status(&r, 1);
     if (r.status == ERROR_SUCCESS || r.status == ERROR_END_OF_FILE) {
@@ -456,18 +580,27 @@ typedef struct {
 } func_table_t;
 
 func_table_t funcs[] = {
-                              { "disk_add", kofu_disk_add },
-                              { "disk_del", kofu_disk_del },
-                              { "ls70",     kofu_ls70 },
-                              { "ls80",     kofu_ls80 },
-                              { "stat70",   kofu_stat70 },
-                              { "stat80",   kofu_stat80 },
-                              { "read70",   kofu_read70 },
-                              { "read80",   kofu_read80 },
-                              { "pwd",      kofu_pwd },
-                              { "cd",       kofu_cd },
-                              { "scrot",    kofu_scrot },
-                              { NULL,       NULL },
+                              { "disk_add",          kofu_disk_add },
+                              { "disk_del",          kofu_disk_del },
+                              { "ls70",              kofu_ls70 },
+                              { "ls80",              kofu_ls80 },
+                              { "stat70",            kofu_stat70 },
+                              { "stat80",            kofu_stat80 },
+                              { "read70",            kofu_read70 },
+                              { "read80",            kofu_read80 },
+                              { "pwd",               kofu_pwd },
+                              { "cd",                kofu_cd },
+                              { "draw_window",       kofu_draw_window },
+                              { "set_pixel",         kofu_set_pixel },
+                              { "write_text",        kofu_write_text },
+                              { "put_image",         kofu_put_image },
+                              { "button",            kofu_button },
+                              { "draw_rect",         kofu_draw_rect },
+                              { "draw_line",         kofu_draw_line },
+                              { "display_number",    kofu_display_number },
+                              { "put_image_palette", kofu_put_image_palette },
+                              { "scrot",             kofu_scrot },
+                              { NULL,                NULL },
                             };
 
 void usage() {

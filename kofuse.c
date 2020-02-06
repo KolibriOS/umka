@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "kolibri.h"
+#include "syscalls.h"
 
 #define DIRENTS_TO_READ 100
 
@@ -65,7 +66,7 @@ static int kofuse_getattr(const char *path, struct stat *stbuf,
     bdfe_t file;
     f7080s5arg_t fX0 = {.sf = 5, .flags = 0, .buf = &file, .u = {.f80 = {.path_encoding = UTF8, .path = path}}};
     f7080ret_t r;
-    kos_lfn(&fX0, &r, F80);
+    umka_sys_lfn(&fX0, &r, F80);
 
     bdfe_to_stat(&file, stbuf);
 //   res = -ENOENT;
@@ -82,7 +83,7 @@ static int kofuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     f7080s1info_t *dir = (f7080s1info_t*)malloc(sizeof(f7080s1info_t) + BDFE_LEN_UNICODE * DIRENTS_TO_READ);
     f7080s1arg_t fX0 = {.sf = 1, .offset = 0, .encoding = UTF8, .size = DIRENTS_TO_READ, .buf = dir, .u = {.f80 = {.path_encoding = UTF8, .path = path}}};
     f7080ret_t r;
-    kos_lfn(&fX0, &r, F80);
+    umka_sys_lfn(&fX0, &r, F80);
     bdfe_t *bdfe = dir->bdfes;
     for (size_t i = 0; i < dir->cnt; i++) {
         filler(buf, bdfe->name, NULL, 0, 0);
@@ -109,7 +110,7 @@ static int kofuse_read(const char *path, char *buf, size_t size, off_t offset,
 
     f7080s0arg_t fX0 = {.sf = 0, .offset = offset, .count = size, .buf = buf, .u = {.f80 = {.path_encoding = UTF8, .path = path}}};
     f7080ret_t r;
-    kos_lfn(&fX0, &r, F80);
+    umka_sys_lfn(&fX0, &r, F80);
     return size;
 }
 

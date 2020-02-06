@@ -22,5 +22,6 @@ tags
 coverage.*
 covpreproc
 *.rgba
+*.rgb
 *.png
 *.skn

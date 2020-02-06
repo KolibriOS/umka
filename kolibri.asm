@@ -12,6 +12,7 @@ _free fix free
 
 sys_msg_board equ _sys_msg_board
 cli equ nop
+iretd equ retd
 
 lang fix en
 preboot_blogesc = 0       ; start immediately after bootlog
@@ -20,7 +21,9 @@ VESA_1_2_VIDEO  = 0      ; enable vesa 1.2 bank switch functions
 
 purge mov,add,sub
 purge mov,add,sub
-section '.text' executable align 16
+section '.text' executable align 32
+
+public i40
 
 coverage_begin:
 public coverage_begin
@@ -68,6 +71,7 @@ include 'gui/skincode.inc'
 restore load_file
 include 'gui/draw.inc'
 include 'gui/font.inc'
+include 'core/syscall.inc'
  
 include 'sha3.asm'
 
@@ -253,82 +257,6 @@ proc kos_init c uses ebx esi edi ebp
         mov     [skin_data], 0
         call    load_default_skin
 
-        mov     eax, 0
-        mov     ebx, (0 SHL 16)+300
-        mov     ecx, (0 SHL 16)+200
-        mov     edx, 0x34000088
-        mov     esi, 0x00008800
-        mov     edi, window_title
-        call    syscall_draw_window
-
-        mov     eax, 1
-        mov     ebx, 0
-        mov     ecx, 0
-        mov     edx, 0x000000ff
-        call    syscall_setpixel
-
-        mov     eax, 1
-        mov     ebx, 1
-        mov     ecx, 1
-        mov     edx, 0x00ff0000
-        call    syscall_setpixel
-
-        mov     eax, 1
-        mov     ebx, 2
-        mov     ecx, 2
-        mov     edx, 0x0000ff00
-        call    syscall_setpixel
-
-        mov     eax, 38
-        mov     ebx, (10 SHL 16) + 510
-        mov     ecx, (10 SHL 16) + 510
-        mov     edx, 0x00ff0000
-        call    syscall_drawline
-
-        mov     eax, 13
-        mov     ebx, (60 SHL 16) + 20
-        mov     ecx, (30 SHL 16) + 20
-        mov     edx, 0x0000ff00
-        call    syscall_drawrect
-
-        mov     eax, 7
-        mov     ebx, chess_image
-        mov     ecx, (8 SHL 16) + 8
-        mov     edx, (5 SHL 16) + 15
-        call    syscall_putimage
-
-        mov     eax, 65
-        mov     ebx, chess_image
-        mov     ecx, (12 SHL 16) + 12
-        mov     edx, (5 SHL 16) + 30
-        mov     esi, 9
-        mov     edi, 0
-        mov     ebp, 0
-        call    sys_putimage_palette
-
-        mov     eax, 4
-        mov     ebx, (10 SHL 16) + 70
-        mov     ecx, 0xffff00
-        mov     edx, window_title
-        mov     esi, 5
-        mov     edi, 0
-        call    syscall_writetext
- 
-        mov     eax, 8
-        mov     ebx, (55 SHL 16) + 40
-        mov     ecx, (5 SHL 16) + 20
-        mov     edx, 0x20c0ffee
-        mov     esi, 0x00dddddd
-        call    syscall_button
-
-        mov     eax, 47
-        mov     ebx, 0x80040000
-        mov     ecx, 1234
-        mov     edx, (5 SHL 16) + 45
-        mov     esi, 0x50ffff00
-        mov     edi, 0x000000ff
-        call    display_number
-
         ret
 endp
 
@@ -404,28 +332,6 @@ proc kos_disk_del c uses ebx esi edi ebp, _name
         ret
 .not_found:
         movi    eax, 1
-        ret
-endp
-
-
-public kos_lfn
-proc kos_lfn c uses ebx edx esi edi ebp, _f7080arg, _f7080ret, _f70or80
-        push    ebx
-        mov     ebx, [_f7080arg]
-        pushad  ; file_system_lfn writes here
-        cmp     [_f70or80], 80
-        jz      .f80
-.f70:
-        call    file_system_lfn
-        jmp     .done
-.f80:
-        call    fileSystemUnicode
-.done:
-        popad
-        mov     ecx, [_f7080ret]
-        mov     [ecx+0], eax    ; status
-        mov     [ecx+4], ebx    ; count
-        pop     ebx
         ret
 endp
 
@@ -593,6 +499,55 @@ wakeup_osloop:
 read_process_memory:
 .forced:
         ret
+sys_getkey:
+sys_clock:
+delay_hs_unprotected:
+undefined_syscall:
+sys_cpuusage:
+sys_waitforevent:
+sys_getevent:
+sys_redrawstat:
+syscall_getscreensize:
+sys_background:
+sys_cachetodiskette:
+sys_getbutton:
+sys_system:
+paleholder:
+sys_midi:
+sys_setup:
+sys_settime:
+sys_wait_event_timeout:
+syscall_cdaudio:
+syscall_putarea_backgr:
+sys_getsetup:
+sys_date:
+syscall_getpixel_WinMap:
+syscall_getarea:
+readmousepos:
+sys_getbackground:
+set_app_param:
+sys_outport:
+syscall_reserveportarea:
+sys_apm:
+syscall_threads:
+sys_clipboard:
+sound_interface:
+sys_pcibios:
+sys_IPC:
+sys_gs:
+pci_api:
+sys_resize_app_memory:
+sys_process_def:
+f68:
+sys_debug_services:
+sys_sendwindowmsg:
+blit_32:
+sys_network:
+sys_socket:
+sys_protocols:
+sys_posix:
+sys_end:
+        ret
 
 proc __load_file _filename
         push    ebx ecx edx esi edi
@@ -638,30 +593,8 @@ do_not_touch_winmap db 0
 window_minimize db 0
 sound_flag      db 0
 
-chess_image db \
-        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
-        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
-        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
-        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
-        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
-        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
-        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
-        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
-        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
-        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
-        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
-        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
-        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
-        0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, \
-        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff, \
-        0x00,0x00,0x00, 0xff,0xff,0xff, 0x00,0x00,0x00, 0xff,0xff,0xff
-
 fl_moving db 0
 rb 3
-
-;section '.bss' writeable align 16
-;IncludeUGlobals
-
 
 ;section '.bss' writeable align 16
 ;IncludeUGlobals

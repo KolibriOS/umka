@@ -47,8 +47,8 @@ trace_lwp.o: trace_lwp.c trace_lwp.h kolibri.h
 cio.o: cio.c
 	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<
 
-kofu.o: kofu.c kolibri.h trace.h
-	$(CC) $(CFLAGS) $(CFLAGS_32) -c $< -std=c99 -D_POSIX_C_SOURCE
+kofu.o: kofu.c kolibri.h trace.h syscalls.h
+	$(CC) $(CFLAGS) $(CFLAGS_32) -c $< -std=c99 -D_POSIX_C_SOURCE -masm=intel
 
 kofuse.o: kofuse.c kolibri.h
 	$(CC) $(CFLAGS) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $< -std=gnu99
