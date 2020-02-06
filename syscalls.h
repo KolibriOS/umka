@@ -153,7 +153,7 @@ static inline void umka_sys_put_image_palette(void *image,
           "d"((x << 16) + y),
           "S"(bpp),
           "D"(palette),
-          [row_offset] "rm"(row_offset)
+          [row_offset] "Rm"(row_offset)
         : "memory");
 }
 

@@ -1,7 +1,7 @@
 FASM=fasm
 CC=gcc
 WARNINGS=-Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict -Wnull-dereference -Wjump-misses-init -Wshadow -Wformat=2 -Wswitch -Wswitch-enum #-Wconversion -Wsign-conversion
-CFLAGS=$(WARNINGS) -g -O0 -D_FILE_OFFSET_BITS=64 -Wno-address-of-packed-member -DNDEBUG
+CFLAGS=$(WARNINGS) -g -O0 -D_FILE_OFFSET_BITS=64 -Wno-address-of-packed-member -DNDEBUG -masm=intel
 CFLAGS_32=-m32
 LDFLAGS=
 LDFLAGS_32=-m32
@@ -48,7 +48,7 @@ cio.o: cio.c
 	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<
 
 kofu.o: kofu.c kolibri.h trace.h syscalls.h
-	$(CC) $(CFLAGS) $(CFLAGS_32) -c $< -std=c99 -D_POSIX_C_SOURCE -masm=intel
+	$(CC) $(CFLAGS) $(CFLAGS_32) -c $< -std=c99 -D_POSIX_C_SOURCE
 
 kofuse.o: kofuse.c kolibri.h
 	$(CC) $(CFLAGS) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $< -std=gnu99
