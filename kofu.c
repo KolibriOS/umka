@@ -260,6 +260,20 @@ void kofu_display_number(int argc, const char **argv) {
     umka_sys_display_number(is_pointer, base, digits_to_display, is_qword, show_leading_zeros, number_or_pointer, x, y, color, fill_background, font, draw_to_buffer, scale_factor, background_color_or_buffer);
 }
 
+void kofu_get_font_smoothing(int argc, const char **argv) {
+    (void)argc;
+    (void)argv;
+    const char *names[] = {"off", "anti-aliasing", "subpixel"};
+    int type = umka_sys_get_smoothing();
+    printf("font smoothing: %i - %s\n", type, names[type]);
+}
+
+void kofu_set_font_smoothing(int argc, const char **argv) {
+    (void)argc;
+    int type = strtol(argv[1], NULL, 0);
+    umka_sys_set_smoothing(type);
+}
+
 void kofu_button(int argc, const char **argv) {
     (void)argc;
     size_t x     = strtoul(argv[1], NULL, 0);
@@ -330,17 +344,76 @@ void kofu_draw_line(int argc, const char **argv) {
     umka_sys_draw_line(x, xend, y, yend, color, invert);
 }
 
+void kofu_set_window_caption(int argc, const char **argv) {
+    (void)argc;
+    const char *caption = argv[1];
+    int encoding = strtoul(argv[2], NULL, 0);
+    umka_sys_set_window_caption(caption, encoding);
+}
+
+
 void kofu_draw_window(int argc, const char **argv) {
     (void)argc;
-    (void)argv;
-    umka_sys_draw_window(0, 300, 0, 200, 0x00000088, 1, 1, 1, 0, 1, 4, "hello");
+    size_t x     = strtoul(argv[1], NULL, 0);
+    size_t xsize = strtoul(argv[2], NULL, 0);
+    size_t y     = strtoul(argv[3], NULL, 0);
+    size_t ysize = strtoul(argv[4], NULL, 0);
+    uint32_t color = strtoul(argv[5], NULL, 16);
+    int has_caption = strtoul(argv[6], NULL, 0);
+    int client_relative = strtoul(argv[7], NULL, 0);
+    int fill_workarea = strtoul(argv[8], NULL, 0);
+    int gradient_fill = strtoul(argv[9], NULL, 0);
+    int movable = strtoul(argv[10], NULL, 0);
+    int style = strtoul(argv[11], NULL, 0);
+    const char *caption = argv[12];
+    umka_sys_draw_window(x, xsize, y, ysize, color, has_caption, client_relative, fill_workarea, gradient_fill, movable, style, caption);
+}
+
+void kofu_window_redraw(int argc, const char **argv) {
+    (void)argc;
+    int begin_end = strtoul(argv[1], NULL, 0);
+    umka_sys_window_redraw(begin_end);
+}
+
+void kofu_move_window(int argc, const char **argv) {
+    (void)argc;
+    size_t x      = strtoul(argv[1], NULL, 0);
+    size_t y      = strtoul(argv[2], NULL, 0);
+    ssize_t xsize = strtol(argv[3], NULL, 0);
+    ssize_t ysize = strtol(argv[4], NULL, 0);
+    umka_sys_move_window(x, y, xsize, ysize);
+}
+
+void kofu_blit_bitmap(int argc, const char **argv) {
+    (void)argc;
+    FILE *f = fopen(argv[1], "r");
+    fseek(f, 0, SEEK_END);
+    size_t fsize = ftell(f);
+    rewind(f);
+    uint8_t *image = (uint8_t*)malloc(fsize);
+    fread(image, fsize, 1, f);
+    fclose(f);
+    size_t dstx     = strtoul(argv[2], NULL, 0);
+    size_t dsty     = strtoul(argv[3], NULL, 0);
+    size_t dstxsize = strtoul(argv[4], NULL, 0);
+    size_t dstysize = strtoul(argv[5], NULL, 0);
+    size_t srcx     = strtoul(argv[6], NULL, 0);
+    size_t srcy     = strtoul(argv[7], NULL, 0);
+    size_t srcxsize = strtoul(argv[8], NULL, 0);
+    size_t srcysize = strtoul(argv[9], NULL, 0);
+    int operation   = strtoul(argv[10], NULL, 0);
+    int background  = strtoul(argv[11], NULL, 0);
+    int transparent = strtoul(argv[12], NULL, 0);
+    int client_relative = strtoul(argv[13], NULL, 0);
+    int row_length = strtoul(argv[14], NULL, 0);
+    uint32_t params[] = {dstx, dsty, dstxsize, dstysize, srcx, srcy, srcxsize, srcysize, (uintptr_t)image, row_length};
+    umka_sys_blit_bitmap(operation, background, transparent, client_relative, params);
+    free(image);
 }
 
 void kofu_scrot(int argc, const char **argv) {
     (void)argc;
-    (void)argv;
-//    printf("%"PRIx32 " %"PRIx32 "\n", kos_lfb_base[0], kos_lfb_base[1]);
-    FILE *img = fopen("umka.rgba", "w");
+    FILE *img = fopen(argv[1], "w");
 //    const char *header = "P6\n1024 768\n255\n";
 //    fwrite(header, strlen(header), 1, img);
     uint32_t *lfb = kos_lfb_base;
@@ -580,28 +653,34 @@ typedef struct {
 } func_table_t;
 
 func_table_t funcs[] = {
-                              { "disk_add",          kofu_disk_add },
-                              { "disk_del",          kofu_disk_del },
-                              { "ls70",              kofu_ls70 },
-                              { "ls80",              kofu_ls80 },
-                              { "stat70",            kofu_stat70 },
-                              { "stat80",            kofu_stat80 },
-                              { "read70",            kofu_read70 },
-                              { "read80",            kofu_read80 },
-                              { "pwd",               kofu_pwd },
-                              { "cd",                kofu_cd },
-                              { "draw_window",       kofu_draw_window },
-                              { "set_pixel",         kofu_set_pixel },
-                              { "write_text",        kofu_write_text },
-                              { "put_image",         kofu_put_image },
-                              { "button",            kofu_button },
-                              { "draw_rect",         kofu_draw_rect },
-                              { "draw_line",         kofu_draw_line },
-                              { "display_number",    kofu_display_number },
-                              { "put_image_palette", kofu_put_image_palette },
-                              { "scrot",             kofu_scrot },
-                              { NULL,                NULL },
-                            };
+                        { "disk_add",           kofu_disk_add },
+                        { "disk_del",           kofu_disk_del },
+                        { "ls70",               kofu_ls70 },
+                        { "ls80",               kofu_ls80 },
+                        { "stat70",             kofu_stat70 },
+                        { "stat80",             kofu_stat80 },
+                        { "read70",             kofu_read70 },
+                        { "read80",             kofu_read80 },
+                        { "pwd",                kofu_pwd },
+                        { "cd",                 kofu_cd },
+                        { "draw_window",        kofu_draw_window },
+                        { "set_pixel",          kofu_set_pixel },
+                        { "write_text",         kofu_write_text },
+                        { "put_image",          kofu_put_image },
+                        { "button",             kofu_button },
+                        { "window_redraw",      kofu_window_redraw },
+                        { "draw_rect",          kofu_draw_rect },
+                        { "draw_line",          kofu_draw_line },
+                        { "display_number",     kofu_display_number },
+                        { "get_font_smoothing", kofu_get_font_smoothing },
+                        { "set_font_smoothing", kofu_set_font_smoothing },
+                        { "put_image_palette",  kofu_put_image_palette },
+                        { "move_window",        kofu_move_window },
+                        { "set_window_caption", kofu_set_window_caption },
+                        { "blit_bitmap",        kofu_blit_bitmap },
+                        { "scrot",              kofu_scrot },
+                        { NULL,                 NULL },
+                       };
 
 void usage() {
     printf("usage: kofu [test_file.t]\n");

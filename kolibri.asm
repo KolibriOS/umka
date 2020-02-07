@@ -57,11 +57,12 @@ include 'blkdev/disk.inc'
 include 'blkdev/disk_cache.inc'
 include 'fs/fs_lfn.inc'
 include 'crc.inc'
-; video
 include 'core/dll.inc'
+include 'core/syscall.inc'
 include 'video/framebuffer.inc'
 include 'video/vesa20.inc'
 include 'video/vga.inc'
+include 'video/blitter.inc'
 include 'video/cursors.inc'
 include 'unpacker.inc'
 include 'gui/window.inc'
@@ -71,7 +72,9 @@ include 'gui/skincode.inc'
 restore load_file
 include 'gui/draw.inc'
 include 'gui/font.inc'
-include 'core/syscall.inc'
+include 'gui/event.inc'
+include 'gui/mouse.inc'
+include 'hid/keyboard.inc'
  
 include 'sha3.asm'
 
@@ -174,6 +177,11 @@ endp
 
 public kos_init
 proc kos_init c uses ebx esi edi ebp
+        mov     edi, endofcode
+        mov     ecx, uglobals_size
+        xor     eax, eax
+        rep stosb
+
         MEMORY_BYTES = 128 SHL 20
         DISPLAY_WIDTH = 400
         DISPLAY_HEIGHT = 300
@@ -240,8 +248,6 @@ proc kos_init c uses ebx esi edi ebp
 
         ret
 endp
-
-window_title db 'hello',0
 
 public kos_disk_add
 proc kos_disk_add c uses ebx esi edi ebp, _file_name, _disk_name
@@ -452,11 +458,52 @@ align 4
 .ret:
         ret
 
-proc my_putpixel
-        DEBUGF 1,"hello from my putpixel!\n"
+pid_to_slot:
+;Input:
+;  eax - pid of process
+;Output:
+;  eax - slot of process or 0 if process don't exists
+;Search process by PID.
+        push    ebx
+        push    ecx
+        mov     ebx, [TASK_COUNT]
+        shl     ebx, 5
+        mov     ecx, 2*32
+
+.loop:
+;ecx=offset of current process info entry
+;ebx=maximum permitted offset
+        cmp     byte [CURRENT_TASK+ecx+0xa], 9
+        jz      .endloop ;skip empty slots
+        cmp     [CURRENT_TASK+ecx+0x4], eax;check PID
+        jz      .pid_found
+.endloop:
+        add     ecx, 32
+        cmp     ecx, ebx
+        jle     .loop
+
+        pop     ecx
+        pop     ebx
+        xor     eax, eax
+        ret
+
+.pid_found:
+        shr     ecx, 5
+        mov     eax, ecx ;convert offset to index of slot
+        pop     ecx
+        pop     ebx
+        ret
+
+
+proc disable_irq _irq
         ret
 endp
 
+proc enable_irq _irq
+        ret
+endp
+
+kb_write_wait_ack:
 sys_msg_board_str:
 protect_from_terminate:
 unprotect_from_terminate:
@@ -485,8 +532,6 @@ sys_clock:
 delay_hs_unprotected:
 undefined_syscall:
 sys_cpuusage:
-sys_waitforevent:
-sys_getevent:
 sys_redrawstat:
 syscall_getscreensize:
 sys_background:
@@ -497,7 +542,6 @@ paleholder:
 sys_midi:
 sys_setup:
 sys_settime:
-sys_wait_event_timeout:
 syscall_cdaudio:
 syscall_putarea_backgr:
 sys_getsetup:
@@ -521,8 +565,6 @@ sys_resize_app_memory:
 sys_process_def:
 f68:
 sys_debug_services:
-sys_sendwindowmsg:
-blit_32:
 sys_network:
 sys_socket:
 sys_protocols:
@@ -565,7 +607,6 @@ disk_name db 'hd0',0
 skin file 'skin.skn'
 skin_size = $ - skin
 include 'hid/mousedrv.inc'
-include 'gui/mousepointer.inc'
 
 screen_workarea RECT
 display_width_standard dd 0
@@ -573,9 +614,9 @@ display_height_standard dd 0
 do_not_touch_winmap db 0
 window_minimize db 0
 sound_flag      db 0
-
-fl_moving db 0
-rb 3
+timer_ticks dd 0
+;hotkey_buffer           rd      120*2   ; buffer for 120 hotkeys
+PID_lock_input dd 0x0
 
 ;section '.bss' writeable align 16
 ;IncludeUGlobals

@@ -87,6 +87,15 @@ static inline void umka_sys_button(size_t x, size_t xsize,
         : "memory");
 }
 
+static inline void umka_sys_window_redraw(int begin_end) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(12),
+          "b"(begin_end)
+        : "memory");
+}
+
 static inline void umka_sys_draw_rect(size_t x, size_t xsize,
                                       size_t y, size_t ysize,
                                       uint32_t color, int gradient) {
@@ -136,6 +145,27 @@ static inline void umka_sys_display_number(int is_pointer, int base,
         : "memory");
 }
 
+static inline int umka_sys_get_smoothing() {
+    int type;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a" (type)
+        : "a"(48),
+          "b"(9)
+        : "memory");
+    return type;
+}
+
+static inline void umka_sys_set_smoothing(int type) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(48),
+          "b"(10),
+          "c"(type)
+        : "memory");
+}
+
 static inline void umka_sys_put_image_palette(void *image,
                                               size_t xsize, size_t ysize,
                                               size_t x, size_t y,
@@ -157,6 +187,19 @@ static inline void umka_sys_put_image_palette(void *image,
         : "memory");
 }
 
+static inline void umka_sys_move_window(size_t x, size_t y,
+                                        ssize_t xsize, ssize_t ysize) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(67),
+          "b"(x),
+          "c"(y),
+          "d"(xsize),
+          "S"(ysize)
+        : "memory");
+}
+
 static inline void umka_sys_lfn(void *f7080sXarg, f7080ret_t *r,
                                 f70or80_t f70or80) {
     __asm__ __inline__ __volatile__ (
@@ -165,6 +208,31 @@ static inline void umka_sys_lfn(void *f7080sXarg, f7080ret_t *r,
           "=b" (r->count)
         : "a"(f70or80),
           "b"(f7080sXarg)
+        : "memory");
+}
+
+static inline void umka_sys_set_window_caption(const char *caption,
+                                               int encoding) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(71),
+          "b"(encoding ? 2 : 1),
+          "c"(caption),
+          "d"(encoding)
+        : "memory");
+}
+
+static inline void umka_sys_blit_bitmap(int operation, int background,
+                                        int transparent, int client_relative,
+                                        void *params) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(73),
+          "b"((client_relative << 29) + (transparent << 5) + (background << 4)
+              + operation),
+          "c"(params)
         : "memory");
 }
 
