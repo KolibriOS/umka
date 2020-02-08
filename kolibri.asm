@@ -3,12 +3,8 @@ format ELF
 __DEBUG__ = 1
 __DEBUG_LEVEL__ = 1
 
-extrn malloc
-malloc fix __malloc
-_malloc fix malloc
-extrn free
-free fix __free
-_free fix free
+extrn 'malloc' as libc_malloc
+extrn 'free' as libc_free
 
 sys_msg_board equ _sys_msg_board
 cli equ nop
@@ -34,7 +30,6 @@ macro diff16 blah1,blah2,blah3 {
 include 'proc32.inc'
 include 'struct.inc'
 include 'const.inc'
-;OS_BASE      = os_base
 LFB_BASE     = lfb_base
 SLOT_BASE    = os_base + 0x00080000
 window_data  = os_base + 0x00001000
@@ -51,6 +46,7 @@ TASK_COUNT   = os_base + 0x00003004
 TASK_BASE    = os_base + 0x00003010
 WIN_STACK    = os_base + 0x0000C000
 WIN_POS      = os_base + 0x0000C400
+HEAP_BASE    = os_base + 0x00800000
 
 include 'system.inc'
 include 'fdo.inc'
@@ -59,7 +55,11 @@ include 'blkdev/disk.inc'
 include 'blkdev/disk_cache.inc'
 include 'fs/fs_lfn.inc'
 include 'crc.inc'
+include 'core/string.inc'
+include 'core/malloc.inc'
+include 'core/heap.inc'
 include 'core/dll.inc'
+include 'core/taskman.inc'
 include 'core/syscall.inc'
 include 'video/framebuffer.inc'
 include 'video/vesa20.inc'
@@ -191,6 +191,12 @@ proc kos_init c uses ebx esi edi ebp
         mov     [pg_data.mem_amount], MEMORY_BYTES
         mov     [pg_data.pages_count], MEMORY_BYTES / PAGE_SIZE
         mov     [pg_data.pages_free], MEMORY_BYTES / PAGE_SIZE
+        mov     eax, MEMORY_BYTES SHR 12
+        mov     [pg_data.kernel_pages], eax
+        shr     eax, 10
+        mov     [pg_data.kernel_tables], eax
+        call    init_kernel_heap
+        call    init_malloc
 
         mov     dword[sysdir_name], 'sys'
         mov     dword[sysdir_path], 'HD0/'
@@ -366,50 +372,14 @@ proc vdisk_querymedia stdcall uses ebx esi edi ebp, vdisk, mediainfo
         ret
 endp
 
-
-proc __malloc
+proc alloc_pages _cnt
         push    ecx edx
-        ccall   _malloc, eax
+        mov     eax, [_cnt]
+        shl     eax, 12
+        ccall   libc_malloc
         pop     edx ecx
         ret
 endp
-
-
-proc kernel_alloc _size
-        mov     eax, [_size]
-        call    malloc
-        ret
-endp
-
-
-proc alloc_kernel_space _size
-        mov     eax, [_size]
-        call    malloc
-        ret
-endp
-
-
-proc alloc_pages _cnt
-        mov     eax, [_cnt]
-        shl     eax, 12
-        call    malloc
-        ret
-endp
-
-
-proc __free
-        ccall   _free, eax
-        ret
-endp
-
-
-proc kernel_free base
-        mov     eax, [base]
-        call    free
-        xor     eax, eax
-        ret
-endp
-
 
 proc _sys_msg_board
         cmp     cl, 0x0d
@@ -463,43 +433,6 @@ align 4
 .ret:
         ret
 
-pid_to_slot:
-;Input:
-;  eax - pid of process
-;Output:
-;  eax - slot of process or 0 if process don't exists
-;Search process by PID.
-        push    ebx
-        push    ecx
-        mov     ebx, [TASK_COUNT]
-        shl     ebx, 5
-        mov     ecx, 2*32
-
-.loop:
-;ecx=offset of current process info entry
-;ebx=maximum permitted offset
-        cmp     byte [CURRENT_TASK+ecx+0xa], 9
-        jz      .endloop ;skip empty slots
-        cmp     [CURRENT_TASK+ecx+0x4], eax;check PID
-        jz      .pid_found
-.endloop:
-        add     ecx, 32
-        cmp     ecx, ebx
-        jle     .loop
-
-        pop     ecx
-        pop     ebx
-        xor     eax, eax
-        ret
-
-.pid_found:
-        shr     ecx, 5
-        mov     eax, ecx ;convert offset to index of slot
-        pop     ecx
-        pop     ebx
-        ret
-
-
 proc disable_irq _irq
         ret
 endp
@@ -508,6 +441,19 @@ proc enable_irq _irq
         ret
 endp
 
+proc map_page _one, _two, _three
+        ret
+endp
+
+app_tls = 0
+app_code = 0
+app_data = 0
+os_code = 0
+USER_PRIORITY = 0
+MAX_PRIORITY = 1
+
+sysfn_terminate:
+scheduler_add_thread:
 kb_write_wait_ack:
 sys_msg_board_str:
 protect_from_terminate:
@@ -519,18 +465,18 @@ prevent_medium_removal:
 Read_TOC:
 commit_pages:
 release_pages:
-fs_execute:
 mutex_init:
 mutex_lock:
 mutex_unlock:
 alloc_page:
-map_page:
-free_kernel_space:
 cache_ide0:
 cache_ide1:
 wakeup_osloop:
-read_process_memory:
-.forced:
+lock_application_table:
+unlock_application_table:
+get_pg_addr:
+free_page:
+map_memEx:
         ret
 sys_getkey:
 sys_clock:
@@ -568,7 +514,6 @@ pci_api:
 sys_resize_app_memory:
 sys_process_def:
 f68:
-sys_debug_services:
 sys_network:
 sys_socket:
 sys_protocols:
@@ -621,6 +566,8 @@ sound_flag      db 0
 timer_ticks dd 0
 ;hotkey_buffer           rd      120*2   ; buffer for 120 hotkeys
 PID_lock_input dd 0x0
+process_number dd 0
+fpu_owner dd ?
 
 ;section '.bss' writeable align 16
 ;IncludeUGlobals
