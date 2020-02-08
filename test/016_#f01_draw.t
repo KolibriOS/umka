@@ -28,4 +28,9 @@ window_redraw 2
 
 set_window_caption hi_2there 0
 
+dump_win_stack 5
+dump_win_pos 5
+
+process_info -1
+
 scrot umka.rgba

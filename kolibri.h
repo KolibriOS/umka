@@ -7,6 +7,31 @@
 #define BDFE_LEN_CP866 304
 #define BDFE_LEN_UNICODE 560
 
+typedef struct {
+    uint32_t left, top, right, bottom;
+} rect_t;
+
+typedef struct {
+    uint32_t left, top, width, height;
+} box_t;
+
+typedef struct {
+    uint32_t cpu_usage;             //  +0
+    uint16_t window_stack_position; //  +4
+    uint16_t window_stack_value;    //  +6
+    uint16_t pad;                   //  +8
+    char process_name[12];          // +10
+    uint32_t memory_start;          // +22
+    uint32_t used_memory;           // +26
+    uint32_t pid;                   // +30
+    box_t box;                      // +34
+    uint16_t slot_state;            // +50
+    uint16_t pad2;                  // +52
+    box_t client_box;               // +54
+    uint8_t wnd_state;              // +70
+    uint8_t pad3[1024-71];
+} __attribute__((packed)) process_information_t;
+
 enum {
     DEFAULT,
     CP866,
@@ -142,4 +167,6 @@ void coverage_begin(void);
 void coverage_end(void);
 
 extern uint32_t *kos_lfb_base;
+extern uint16_t *kos_win_stack;
+extern uint16_t *kos_win_pos;
 #endif

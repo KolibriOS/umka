@@ -36,4 +36,13 @@ Kernel services are replaced with stubs or libc calls. Block devices are
 emulated with wrappers around regular files. Shell and FUSE FS are written in C.
 
 
+Troubleshooting
+---------------
+
+gm convert -size 400x300 -depth 8 umka.rgba umka.png
+
+
+Links
+-----
+
 [1] https://github.com/libfuse/libfuse

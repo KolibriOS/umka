@@ -49,6 +49,8 @@ TASK_BASE    = os_base + 0x00003010
 CURRENT_TASK = os_base + 0x00003000
 TASK_COUNT   = os_base + 0x00003004
 TASK_BASE    = os_base + 0x00003010
+WIN_STACK    = os_base + 0x0000C000
+WIN_POS      = os_base + 0x0000C400
 
 include 'system.inc'
 include 'fdo.inc'
@@ -70,6 +72,7 @@ include 'gui/button.inc'
 load_file equ __load_file
 include 'gui/skincode.inc'
 restore load_file
+include 'sysother.inc'
 include 'gui/draw.inc'
 include 'gui/font.inc'
 include 'gui/event.inc'
@@ -193,12 +196,14 @@ proc kos_init c uses ebx esi edi ebp
         mov     dword[sysdir_path], 'HD0/'
         mov     word[sysdir_path+4], '1'
 
-        mov     eax, SLOT_BASE + 2*256
-        mov     [current_slot], eax
+        mov     ebx, SLOT_BASE + 2*256
+        mov     [current_slot], ebx
+        stdcall kernel_alloc, 0x2000
+        mov     [ebx+APPDATA.process], eax
         mov     word[cur_dir.path], '/'
-        mov     [eax+APPDATA.cur_dir], cur_dir
-        mov     [eax+APPDATA.wnd_clientbox.left], 0
-        mov     [eax+APPDATA.wnd_clientbox.top], 0
+        mov     [ebx+APPDATA.cur_dir], cur_dir
+        mov     [ebx+APPDATA.wnd_clientbox.left], 0
+        mov     [ebx+APPDATA.wnd_clientbox.top], 0
         mov     dword[CURRENT_TASK], 2
         mov     dword[TASK_COUNT], 2
         mov     dword[TASK_BASE], CURRENT_TASK + 2*sizeof.TASKDATA
@@ -531,7 +536,6 @@ sys_getkey:
 sys_clock:
 delay_hs_unprotected:
 undefined_syscall:
-sys_cpuusage:
 sys_redrawstat:
 syscall_getscreensize:
 sys_background:
@@ -640,6 +644,10 @@ ide_channel6_mutex MUTEX
 ide_channel7_mutex MUTEX
 ide_channel8_mutex MUTEX
 os_base rb 0x400000
+public win_stack_addr as 'kos_win_stack'
+win_stack_addr dd WIN_STACK
+public win_pos_addr as 'kos_win_pos'
+win_pos_addr dd WIN_POS
 public lfb_base_addr as 'kos_lfb_base'
 lfb_base_addr dd lfb_base
 lfb_base rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT

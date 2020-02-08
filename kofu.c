@@ -237,6 +237,44 @@ void kofu_write_text(int argc, const char **argv) {
     umka_sys_write_text(x, y, color, asciiz, fill_background, font_and_encoding, draw_to_buffer, scale_factor, string, length, background_color_or_buffer);
 }
 
+void kofu_dump_win_stack(int argc, const char **argv) {
+    int depth = 5;
+    if (argc > 1) {
+        depth = strtol(argv[1], NULL, 0);
+    }
+    for (int i = 0; i < depth; i++) {
+        printf("%3i: %3u\n", i, kos_win_stack[i]);
+    }
+}
+
+void kofu_dump_win_pos(int argc, const char **argv) {
+    int depth = 5;
+    if (argc > 1) {
+        depth = strtol(argv[1], NULL, 0);
+    }
+    for (int i = 0; i < depth; i++) {
+        printf("%3i: %3u\n", i, kos_win_pos[i]);
+    }
+}
+
+void kofu_process_info(int argc, const char **argv) {
+    (void)argc;
+    process_information_t info;
+    int32_t pid = strtol(argv[1], NULL, 0);
+    umka_sys_process_info(pid, &info);
+    printf("cpu_usage: %u\n", info.cpu_usage);
+    printf("window_stack_position: %u\n", info.window_stack_position);
+    printf("window_stack_value: %u\n", info.window_stack_value);
+    printf("process_name: %s\n", info.process_name);
+    printf("memory_start: 0x%.8" PRIx32 "\n", info.memory_start);
+    printf("used_memory: %u (0x%x)\n", info.used_memory, info.used_memory);
+    printf("pid: %u\n", info.pid);
+    printf("box: %u %u %u %u\n", info.box.left, info.box.top, info.box.width, info.box.height);
+    printf("slot_state: %u\n", info.slot_state);
+    printf("client_box: %u %u %u %u\n", info.client_box.left, info.client_box.top, info.client_box.width, info.client_box.height);
+    printf("wnd_state: 0x%.2" PRIx8 "\n", info.wnd_state);
+}
+
 void kofu_display_number(int argc, const char **argv) {
     (void)argc;
     int is_pointer = strtoul(argv[1], NULL, 0);
@@ -668,6 +706,7 @@ func_table_t funcs[] = {
                         { "write_text",         kofu_write_text },
                         { "put_image",          kofu_put_image },
                         { "button",             kofu_button },
+                        { "process_info",       kofu_process_info },
                         { "window_redraw",      kofu_window_redraw },
                         { "draw_rect",          kofu_draw_rect },
                         { "draw_line",          kofu_draw_line },
@@ -679,6 +718,8 @@ func_table_t funcs[] = {
                         { "set_window_caption", kofu_set_window_caption },
                         { "blit_bitmap",        kofu_blit_bitmap },
                         { "scrot",              kofu_scrot },
+                        { "dump_win_stack",     kofu_dump_win_stack },
+                        { "dump_win_pos",       kofu_dump_win_pos },
                         { NULL,                 NULL },
                        };
 

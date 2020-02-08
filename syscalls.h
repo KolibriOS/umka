@@ -87,6 +87,16 @@ static inline void umka_sys_button(size_t x, size_t xsize,
         : "memory");
 }
 
+static inline void umka_sys_process_info(int32_t pid, void *param) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(9),
+          "b"(param),
+          "c"(pid)
+        : "memory");
+}
+
 static inline void umka_sys_window_redraw(int begin_end) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
