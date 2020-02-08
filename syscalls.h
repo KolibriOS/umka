@@ -155,6 +155,18 @@ static inline void umka_sys_display_number(int is_pointer, int base,
         : "memory");
 }
 
+static inline int32_t umka_sys_set_skin(const char *path) {
+    int32_t status;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a" (status)
+        : "a"(48),
+          "b"(8),
+          "c"(path)
+        : "memory");
+    return status;
+}
+
 static inline int umka_sys_get_smoothing() {
     int type;
     __asm__ __inline__ __volatile__ (

@@ -155,6 +155,7 @@ typedef struct {
 uint32_t kos_time_to_epoch(uint32_t *time);
 void kos_init(void);
 void i40(void);
+int32_t set_skin(const char *path);
 void *kos_disk_add(const char *file_name, const char *disk_name);
 int kos_disk_del(const char *name);
 uint32_t kos_getcwd(char *buf, uint32_t len);

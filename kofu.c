@@ -298,6 +298,13 @@ void kofu_display_number(int argc, const char **argv) {
     umka_sys_display_number(is_pointer, base, digits_to_display, is_qword, show_leading_zeros, number_or_pointer, x, y, color, fill_background, font, draw_to_buffer, scale_factor, background_color_or_buffer);
 }
 
+void kofu_set_skin(int argc, const char **argv) {
+    (void)argc;
+    const char *path = argv[1];
+    int32_t status = umka_sys_set_skin(path);
+    printf("status: %" PRIi32 "\n", status);
+}
+
 void kofu_get_font_smoothing(int argc, const char **argv) {
     (void)argc;
     (void)argv;
@@ -711,6 +718,7 @@ func_table_t funcs[] = {
                         { "draw_rect",          kofu_draw_rect },
                         { "draw_line",          kofu_draw_line },
                         { "display_number",     kofu_display_number },
+                        { "set_skin",           kofu_set_skin },
                         { "get_font_smoothing", kofu_get_font_smoothing },
                         { "set_font_smoothing", kofu_set_font_smoothing },
                         { "put_image_palette",  kofu_put_image_palette },

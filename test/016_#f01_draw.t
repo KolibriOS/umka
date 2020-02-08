@@ -1,3 +1,5 @@
+disk_add ../img/kolibri.img rd
+set_skin /sys/DEFAULT.SKN
 window_redraw 1
 draw_window 0 300 0 200 0x000088 1 1 1 0 1 4 hello
 set_pixel 0 0 0x0000ff
@@ -34,3 +36,5 @@ dump_win_pos 5
 process_info -1
 
 scrot umka.rgba
+
+disk_del rd

@@ -14,6 +14,13 @@ lang fix en
 preboot_blogesc = 0       ; start immediately after bootlog
 pci_code_sel = 0
 VESA_1_2_VIDEO  = 0      ; enable vesa 1.2 bank switch functions
+macro int n {
+  if n eq 0x40
+    call i40
+  else
+    int n
+  end if
+}
 
 purge mov,add,sub
 purge mov,add,sub
@@ -69,9 +76,7 @@ include 'video/cursors.inc'
 include 'unpacker.inc'
 include 'gui/window.inc'
 include 'gui/button.inc'
-load_file equ __load_file
 include 'gui/skincode.inc'
-restore load_file
 include 'sysother.inc'
 include 'gui/draw.inc'
 include 'gui/font.inc'
@@ -198,9 +203,13 @@ proc kos_init c uses ebx esi edi ebp
         call    init_kernel_heap
         call    init_malloc
 
+        stdcall kernel_alloc, (unpack.LZMA_BASE_SIZE+(unpack.LZMA_LIT_SIZE shl \
+                (unpack.lc+unpack.lp)))*4
+        mov     [unpack.p], eax
+
         mov     dword[sysdir_name], 'sys'
-        mov     dword[sysdir_path], 'HD0/'
-        mov     word[sysdir_path+4], '1'
+        mov     dword[sysdir_path], 'RD/1'
+        mov     word[sysdir_path+4], 0
 
         mov     ebx, SLOT_BASE + 2*256
         mov     [current_slot], ebx
@@ -255,7 +264,7 @@ proc kos_init c uses ebx esi edi ebp
 
         call    set_window_defaults
         mov     [skin_data], 0
-        call    load_default_skin
+;        call    load_default_skin
 
         ret
 endp
@@ -521,19 +530,6 @@ sys_posix:
 sys_end:
         ret
 
-proc __load_file _filename
-        push    ebx ecx edx esi edi
-        stdcall kernel_alloc, skin_size
-        push    eax
-        mov     esi, skin
-        mov     edi, eax
-        mov     ecx, skin_size
-        rep movsb
-        pop     eax
-        pop     edi esi edx ecx ebx
-        ret
-endp
-
 coverage_end:
 public coverage_end
 
@@ -551,10 +547,7 @@ vdisk_functions:
         dd 0    ; adjust_cache_size
 vdisk_functions_end:
 
-disk_name db 'hd0',0
 ;IncludeIGlobals
-skin file 'skin.skn'
-skin_size = $ - skin
 include 'hid/mousedrv.inc'
 
 screen_workarea RECT
