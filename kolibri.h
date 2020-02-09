@@ -16,21 +16,26 @@ typedef struct {
 } box_t;
 
 typedef struct {
-    uint32_t cpu_usage;             //  +0
-    uint16_t window_stack_position; //  +4
-    uint16_t window_stack_value;    //  +6
-    uint16_t pad;                   //  +8
-    char process_name[12];          // +10
-    uint32_t memory_start;          // +22
-    uint32_t used_memory;           // +26
-    uint32_t pid;                   // +30
-    box_t box;                      // +34
-    uint16_t slot_state;            // +50
-    uint16_t pad2;                  // +52
-    box_t client_box;               // +54
-    uint8_t wnd_state;              // +70
+    uint32_t cpu_usage;
+    uint16_t window_stack_position;
+    uint16_t window_stack_value;
+    uint16_t pad;
+    char process_name[12];
+    uint32_t memory_start;
+    uint32_t used_memory;
+    uint32_t pid;
+    box_t box;
+    uint16_t slot_state;
+    uint16_t pad2;
+    box_t client_box;
+    uint8_t wnd_state;
     uint8_t pad3[1024-71];
 } __attribute__((packed)) process_information_t;
+
+typedef struct {
+    uint32_t frame, grab, work_3d_dark, work_3d_light, grab_text, work,
+             work_button, work_button_text, work_text, work_graph;
+} system_colors_t;
 
 enum {
     DEFAULT,

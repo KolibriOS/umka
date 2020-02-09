@@ -155,6 +155,93 @@ static inline void umka_sys_display_number(int is_pointer, int base,
         : "memory");
 }
 
+static inline void umka_sys_set_button_style(int style) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(48),
+          "b"(1),
+          "c"(style)
+        : "memory");
+}
+
+static inline void umka_sys_set_window_colors(void *colors) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(48),
+          "b"(2),
+          "c"(colors),
+          "d"(40)
+        : "memory");
+}
+
+static inline void umka_sys_get_window_colors(void *colors) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(48),
+          "b"(3),
+          "c"(colors),
+          "d"(40)
+        : "memory");
+}
+
+static inline uint32_t umka_sys_get_skin_height() {
+    uint32_t skin_height;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(skin_height)
+        : "a"(48),
+          "b"(4)
+        : "memory");
+    return skin_height;
+}
+
+static inline void umka_sys_get_screen_area(rect_t *wa) {
+    uint32_t eax, ebx;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(eax),
+          "=b"(ebx)
+        : "a"(48),
+          "b"(5)
+        : "memory");
+    wa->left   = eax >> 16;
+    wa->right  = eax & 0xffffu;
+    wa->top    = ebx >> 16;
+    wa->bottom = ebx & 0xffffu;
+}
+
+static inline void umka_sys_set_screen_area(rect_t *wa) {
+    uint32_t ecx, edx;
+    ecx = (wa->left << 16) + wa->right;
+    edx = (wa->top << 16) + wa->bottom;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(48),
+          "b"(6),
+          "c"(ecx),
+          "d"(edx)
+        : "memory");
+}
+
+static inline void umka_sys_get_skin_margins(rect_t *wa) {
+    uint32_t eax, ebx;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(eax),
+          "=b"(ebx)
+        : "a"(48),
+          "b"(7)
+        : "memory");
+    wa->left   = eax >> 16;
+    wa->right  = eax & 0xffffu;
+    wa->top    = ebx >> 16;
+    wa->bottom = ebx & 0xffffu;
+}
+
 static inline int32_t umka_sys_set_skin(const char *path) {
     int32_t status;
     __asm__ __inline__ __volatile__ (
@@ -167,7 +254,7 @@ static inline int32_t umka_sys_set_skin(const char *path) {
     return status;
 }
 
-static inline int umka_sys_get_smoothing() {
+static inline int umka_sys_get_font_smoothing() {
     int type;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -178,13 +265,34 @@ static inline int umka_sys_get_smoothing() {
     return type;
 }
 
-static inline void umka_sys_set_smoothing(int type) {
+static inline void umka_sys_set_font_smoothing(int type) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
         : "a"(48),
           "b"(10),
           "c"(type)
+        : "memory");
+}
+
+static inline int umka_sys_get_font_size() {
+    uint32_t size;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a" (size)
+        : "a"(48),
+          "b"(11)
+        : "memory");
+    return size;
+}
+
+static inline void umka_sys_set_font_size(uint32_t size) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(48),
+          "b"(12),
+          "c"(size)
         : "memory");
 }
 

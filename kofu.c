@@ -298,6 +298,90 @@ void kofu_display_number(int argc, const char **argv) {
     umka_sys_display_number(is_pointer, base, digits_to_display, is_qword, show_leading_zeros, number_or_pointer, x, y, color, fill_background, font, draw_to_buffer, scale_factor, background_color_or_buffer);
 }
 
+void kofu_set_window_colors(int argc, const char **argv) {
+    if (argc != (1 + sizeof(system_colors_t)/4)) {
+        printf("10 colors required\n");
+        return;
+    }
+    system_colors_t colors;
+    colors.frame            = strtoul(argv[1], NULL, 16);
+    colors.grab             = strtoul(argv[2], NULL, 16);
+    colors.work_3d_dark     = strtoul(argv[3], NULL, 16);
+    colors.work_3d_light    = strtoul(argv[4], NULL, 16);
+    colors.grab_text        = strtoul(argv[5], NULL, 16);
+    colors.work             = strtoul(argv[6], NULL, 16);
+    colors.work_button      = strtoul(argv[7], NULL, 16);
+    colors.work_button_text = strtoul(argv[8], NULL, 16);
+    colors.work_text        = strtoul(argv[9], NULL, 16);
+    colors.work_graph       = strtoul(argv[10], NULL, 16);
+    umka_sys_set_window_colors(&colors);
+}
+
+void kofu_get_window_colors(int argc, const char **argv) {
+    (void)argc;
+    (void)argv;
+    system_colors_t colors;
+    umka_sys_get_window_colors(&colors);
+    printf("0x%.8" PRIx32 " frame\n", colors.frame);
+    printf("0x%.8" PRIx32 " grab\n", colors.grab);
+    printf("0x%.8" PRIx32 " work_3d_dark\n", colors.work_3d_dark);
+    printf("0x%.8" PRIx32 " work_3d_light\n", colors.work_3d_light);
+    printf("0x%.8" PRIx32 " grab_text\n", colors.grab_text);
+    printf("0x%.8" PRIx32 " work\n", colors.work);
+    printf("0x%.8" PRIx32 " work_button\n", colors.work_button);
+    printf("0x%.8" PRIx32 " work_button_text\n", colors.work_button_text);
+    printf("0x%.8" PRIx32 " work_text\n", colors.work_text);
+    printf("0x%.8" PRIx32 " work_graph\n", colors.work_graph);
+}
+
+void kofu_get_skin_height(int argc, const char **argv) {
+    (void)argc;
+    (void)argv;
+    uint32_t skin_height = umka_sys_get_skin_height();
+    printf("%" PRIu32 "\n", skin_height);
+}
+
+void kofu_get_screen_area(int argc, const char **argv) {
+    (void)argc;
+    (void)argv;
+    rect_t wa;
+    umka_sys_get_screen_area(&wa);
+    printf("%" PRIu32 " left\n", wa.left);
+    printf("%" PRIu32 " top\n", wa.top);
+    printf("%" PRIu32 " right\n", wa.right);
+    printf("%" PRIu32 " bottom\n", wa.bottom);
+}
+
+void kofu_set_screen_area(int argc, const char **argv) {
+    if (argc != 5) {
+        printf("left top right bottom\n");
+        return;
+    }
+    rect_t wa;
+    wa.left   = strtoul(argv[1], NULL, 0);
+    wa.top    = strtoul(argv[2], NULL, 0);
+    wa.right  = strtoul(argv[3], NULL, 0);
+    wa.bottom = strtoul(argv[4], NULL, 0);
+    umka_sys_set_screen_area(&wa);
+}
+
+void kofu_get_skin_margins(int argc, const char **argv) {
+    (void)argc;
+    (void)argv;
+    rect_t wa;
+    umka_sys_get_skin_margins(&wa);
+    printf("%" PRIu32 " left\n", wa.left);
+    printf("%" PRIu32 " top\n", wa.top);
+    printf("%" PRIu32 " right\n", wa.right);
+    printf("%" PRIu32 " bottom\n", wa.bottom);
+}
+
+void kofu_set_button_style(int argc, const char **argv) {
+    (void)argc;
+    uint32_t style = strtoul(argv[1], NULL, 0);
+    umka_sys_set_button_style(style);
+}
+
 void kofu_set_skin(int argc, const char **argv) {
     (void)argc;
     const char *path = argv[1];
@@ -309,14 +393,27 @@ void kofu_get_font_smoothing(int argc, const char **argv) {
     (void)argc;
     (void)argv;
     const char *names[] = {"off", "anti-aliasing", "subpixel"};
-    int type = umka_sys_get_smoothing();
+    int type = umka_sys_get_font_smoothing();
     printf("font smoothing: %i - %s\n", type, names[type]);
 }
 
 void kofu_set_font_smoothing(int argc, const char **argv) {
     (void)argc;
     int type = strtol(argv[1], NULL, 0);
-    umka_sys_set_smoothing(type);
+    umka_sys_set_font_smoothing(type);
+}
+
+void kofu_get_font_size(int argc, const char **argv) {
+    (void)argc;
+    (void)argv;
+    size_t size = umka_sys_get_font_size();
+    printf("%upx\n", size);
+}
+
+void kofu_set_font_size(int argc, const char **argv) {
+    (void)argc;
+    uint32_t size = strtoul(argv[1], NULL, 0);
+    umka_sys_set_font_size(size);
 }
 
 void kofu_button(int argc, const char **argv) {
@@ -718,9 +815,18 @@ func_table_t funcs[] = {
                         { "draw_rect",          kofu_draw_rect },
                         { "draw_line",          kofu_draw_line },
                         { "display_number",     kofu_display_number },
+                        { "set_button_style",   kofu_set_button_style },
+                        { "set_window_colors",  kofu_set_window_colors },
+                        { "get_window_colors",  kofu_get_window_colors },
+                        { "get_skin_height",    kofu_get_skin_height },
+                        { "get_screen_area",    kofu_get_screen_area },
+                        { "set_screen_area",    kofu_set_screen_area },
+                        { "get_skin_margins",   kofu_get_skin_margins },
                         { "set_skin",           kofu_set_skin },
                         { "get_font_smoothing", kofu_get_font_smoothing },
                         { "set_font_smoothing", kofu_set_font_smoothing },
+                        { "get_font_size",      kofu_get_font_size },
+                        { "set_font_size",      kofu_set_font_size },
                         { "put_image_palette",  kofu_put_image_palette },
                         { "move_window",        kofu_move_window },
                         { "set_window_caption", kofu_set_window_caption },

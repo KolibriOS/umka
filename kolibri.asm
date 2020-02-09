@@ -22,6 +22,17 @@ macro int n {
   end if
 }
 
+app_tls = 0
+app_code = 0
+app_data = 0
+graph_data = 0
+os_code = 0
+
+MAX_PRIORITY      = 0   ; highest, used for kernel tasks
+USER_PRIORITY     = 1   ; default
+IDLE_PRIORITY     = 2   ; lowest, only IDLE thread goes here
+NR_SCHED_QUEUES   = 3   ; MUST equal IDLE_PRIORYTY + 1
+
 purge mov,add,sub
 purge mov,add,sub
 section '.text' executable align 32
@@ -32,32 +43,48 @@ coverage_begin:
 public coverage_begin
 
 include 'macros.inc'
-macro diff16 blah1,blah2,blah3 {
+macro diff16 msg,blah2,blah3 {
+  if msg eq "end of .data segment"
+    section '.bss' writeable align 64
+  end if
 }
 include 'proc32.inc'
 include 'struct.inc'
+macro BOOT_LO a {}
+macro BOOT a {}
 include 'const.inc'
-LFB_BASE     = lfb_base
-SLOT_BASE    = os_base + 0x00080000
-window_data  = os_base + 0x00001000
-WIN_STACK    = os_base + 0x0000C000
-WIN_POS      = os_base + 0x0000C400
-KEY_COUNT    = os_base + 0x0000F400
-KEY_BUFF     = os_base + 0x0000F401 ; 120*2 + 2*2 = 244 bytes, actually 255 bytes
-BTN_COUNT    = os_base + 0x0000F500
-BTN_BUFF     = os_base + 0x0000F501
-BTN_ADDR     = os_base + 0x0000FE88
-TASK_BASE    = os_base + 0x00003010
-CURRENT_TASK = os_base + 0x00003000
-TASK_COUNT   = os_base + 0x00003004
-TASK_BASE    = os_base + 0x00003010
-WIN_STACK    = os_base + 0x0000C000
-WIN_POS      = os_base + 0x0000C400
-HEAP_BASE    = os_base + 0x00800000
+purge BOOT_LO,BOOT
+
+LFB_BASE = lfb_base
+
+window_data        = os_base + 0x00001000
+CURRENT_TASK       = os_base + 0x00003000
+TASK_COUNT         = os_base + 0x00003004
+TASK_BASE          = os_base + 0x00003010
+TASK_DATA          = os_base + 0x00003020
+TASK_EVENT         = os_base + 0x00003020
+CDDataBuf          = os_base + 0x00005000
+idts               = os_base + 0x0000B100
+WIN_STACK          = os_base + 0x0000C000
+WIN_POS            = os_base + 0x0000C400
+FDD_BUFF           = os_base + 0x0000D000
+WIN_TEMP_XY        = os_base + 0x0000F300
+KEY_COUNT          = os_base + 0x0000F400
+KEY_BUFF           = os_base + 0x0000F401 ; 120*2 + 2*2 = 244 bytes, actually 255 bytes
+BTN_COUNT          = os_base + 0x0000F500
+BTN_BUFF           = os_base + 0x0000F501
+BTN_ADDR           = os_base + 0x0000FE88
+MEM_AMOUNT         = os_base + 0x0000FE8C
+SYS_SHUTDOWN       = os_base + 0x0000FF00
+TASK_ACTIVATE      = os_base + 0x0000FF01
+sys_proc           = os_base + 0x0006F000
+SLOT_BASE          = os_base + 0x00080000
+VGABasePtr         = os_base + 0x000A0000
+UPPER_KERNEL_PAGES = os_base + 0x00400000
+HEAP_BASE          = os_base + 0x00800000
 
 include 'system.inc'
 include 'fdo.inc'
-; block and fs
 include 'blkdev/disk.inc'
 include 'blkdev/disk_cache.inc'
 include 'fs/fs_lfn.inc'
@@ -67,12 +94,14 @@ include 'core/malloc.inc'
 include 'core/heap.inc'
 include 'core/dll.inc'
 include 'core/taskman.inc'
+include 'core/clipboard.inc'
 include 'core/syscall.inc'
 include 'video/framebuffer.inc'
 include 'video/vesa20.inc'
 include 'video/vga.inc'
 include 'video/blitter.inc'
 include 'video/cursors.inc'
+include 'sound/playnote.inc'
 include 'unpacker.inc'
 include 'gui/window.inc'
 include 'gui/button.inc'
@@ -182,7 +211,6 @@ proc kos_time_to_epoch c uses ebx esi edi ebp, _time
         ret
 endp
 
-
 public kos_init
 proc kos_init c uses ebx esi edi ebp
         mov     edi, endofcode
@@ -203,58 +231,77 @@ proc kos_init c uses ebx esi edi ebp
         call    init_kernel_heap
         call    init_malloc
 
+        mov     [BOOT.bpp], 32
+        mov     [BOOT.x_res], 400
+        mov     [BOOT.y_res], 300
+        mov     [BOOT.pitch], 400*4
+        mov     [BOOT.lfb], LFB_BASE
+        call    init_video
+
         stdcall kernel_alloc, (unpack.LZMA_BASE_SIZE+(unpack.LZMA_LIT_SIZE shl \
                 (unpack.lc+unpack.lp)))*4
         mov     [unpack.p], eax
+
+        call    init_events
+        mov     eax, srv.fd-SRV.fd
+        mov     [srv.fd], eax
+        mov     [srv.bk], eax
 
         mov     dword[sysdir_name], 'sys'
         mov     dword[sysdir_path], 'RD/1'
         mov     word[sysdir_path+4], 0
 
+        mov     dword[CURRENT_TASK], 2
+        mov     dword[TASK_COUNT], 2
+        mov     dword[TASK_BASE], CURRENT_TASK + 2*sizeof.TASKDATA
+        mov     [current_slot], SLOT_BASE + 256*2
+
+        ;call    ramdisk_init
+
         mov     ebx, SLOT_BASE + 2*256
-        mov     [current_slot], ebx
         stdcall kernel_alloc, 0x2000
         mov     [ebx+APPDATA.process], eax
         mov     word[cur_dir.path], '/'
         mov     [ebx+APPDATA.cur_dir], cur_dir
         mov     [ebx+APPDATA.wnd_clientbox.left], 0
         mov     [ebx+APPDATA.wnd_clientbox.top], 0
-        mov     dword[CURRENT_TASK], 2
-        mov     dword[TASK_COUNT], 2
-        mov     dword[TASK_BASE], CURRENT_TASK + 2*sizeof.TASKDATA
 
-        mov     [_display.x], 0
-        mov     [_display.y], 0
-        mov     [_display.width], DISPLAY_WIDTH
-        mov     [_display.lfb_pitch], DISPLAY_WIDTH*4
-        mov     [_display.height], DISPLAY_HEIGHT
-        mov     [PUTPIXEL], Vesa20_putpixel32
-        mov     [GETPIXEL], Vesa20_getpixel32
-        mov     [_display.bytes_per_pixel], 4
-        mov     [_display.bits_per_pixel], 32
-        mov     [MOUSE_PICTURE], dword mousepointer
-        call    calculate_fast_getting_offset_for_WinMapAddress
-        call    calculate_fast_getting_offset_for_LFB
         mov     [X_UNDER], 500
         mov     [Y_UNDER], 500
         mov     word[MOUSE_X], 40
         mov     word[MOUSE_Y], 30
 
-        mov     eax, [_display.width]
-        mul     [_display.height]
-        mov     [_display.win_map_size], eax
-
-        mov     [_display.check_mouse], check_mouse_area_for_putpixel_new
-        mov     [_display.check_m_pixel], check_mouse_area_for_getpixel_new
-
-        stdcall kernel_alloc, eax
+        stdcall kernel_alloc, [_display.win_map_size]
         mov     [_display.win_map], eax
 
+; set background
+        movi    eax, 1
         mov     [BgrDrawMode], eax
         mov     [BgrDataWidth], eax
         mov     [BgrDataHeight], eax
         mov     [mem_BACKGROUND], 4
         mov     [img_background], static_background_data
+
+; set clipboard
+        xor     eax, eax
+        mov     [clipboard_slots], eax
+        mov     [clipboard_write_lock], eax
+        stdcall kernel_alloc, 4096
+        test    eax, eax
+        jnz     @f
+
+        dec     eax
+@@:
+        mov     [clipboard_main_list], eax
+
+
+        call    set_window_defaults
+        call    init_background
+        call    calculatebackground
+        call    init_display
+        mov     eax, [def_cursor]
+        mov     [SLOT_BASE+APPDATA.cursor+256], eax
+        mov     [SLOT_BASE+APPDATA.cursor+256*2], eax
 
         ; from set_variables
         xor     eax, eax
@@ -262,9 +309,8 @@ proc kos_init c uses ebx esi edi ebp
         mov     byte [KEY_COUNT], al              ; keyboard buffer
         mov     byte [BTN_COUNT], al              ; button buffer
 
-        call    set_window_defaults
-        mov     [skin_data], 0
-;        call    load_default_skin
+        ;call    load_default_skin
+;        call    stack_init
 
         ret
 endp
@@ -454,20 +500,12 @@ proc map_page _one, _two, _three
         ret
 endp
 
-app_tls = 0
-app_code = 0
-app_data = 0
-os_code = 0
-USER_PRIORITY = 0
-MAX_PRIORITY = 1
 
 sysfn_terminate:
-scheduler_add_thread:
 kb_write_wait_ack:
 sys_msg_board_str:
 protect_from_terminate:
 unprotect_from_terminate:
-change_task:
 ReadCDWRetr:
 WaitUnitReady:
 prevent_medium_removal:
@@ -486,6 +524,11 @@ unlock_application_table:
 get_pg_addr:
 free_page:
 map_memEx:
+setup_os_slot:
+idle_thread:
+irq_eoi:
+change_task:
+scheduler_add_thread:
         ret
 sys_getkey:
 sys_clock:
@@ -514,8 +557,6 @@ sys_outport:
 syscall_reserveportarea:
 sys_apm:
 syscall_threads:
-sys_clipboard:
-sound_interface:
 sys_pcibios:
 sys_IPC:
 sys_gs:
@@ -556,25 +597,26 @@ display_height_standard dd 0
 do_not_touch_winmap db 0
 window_minimize db 0
 sound_flag      db 0
-timer_ticks dd 0
-;hotkey_buffer           rd      120*2   ; buffer for 120 hotkeys
 PID_lock_input dd 0x0
 process_number dd 0
+timer_ticks dd 0
 fpu_owner dd ?
 
+public win_stack_addr as 'kos_win_stack'
+win_stack_addr dd WIN_STACK
+public win_pos_addr as 'kos_win_pos'
+win_pos_addr dd WIN_POS
+public lfb_base_addr as 'kos_lfb_base'
+lfb_base_addr dd lfb_base
+
+uglobal
 ;section '.bss' writeable align 16
 ;IncludeUGlobals
-; crap
 DiskNumber db ?
 ChannelNumber db ?
 DevErrorCode dd ?
 CDSectorAddress dd ?
 CDDataBuf_pointer dd ?
-;DRIVE_DATA: rb 0x4000
-;cdpos dd ?
-;cd_appl_data dd ?
-;current_slot dd ?
-;pg_data PG_DATA
 ide_channel1_mutex MUTEX
 ide_channel2_mutex MUTEX
 ide_channel3_mutex MUTEX
@@ -584,12 +626,7 @@ ide_channel6_mutex MUTEX
 ide_channel7_mutex MUTEX
 ide_channel8_mutex MUTEX
 os_base rb 0x400000
-public win_stack_addr as 'kos_win_stack'
-win_stack_addr dd WIN_STACK
-public win_pos_addr as 'kos_win_pos'
-win_pos_addr dd WIN_POS
-public lfb_base_addr as 'kos_lfb_base'
-lfb_base_addr dd lfb_base
+BOOT boot_data
 lfb_base rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
 cur_dir:
 .encoding rb 1
@@ -601,5 +638,6 @@ SB16Buffer      rb  65536
 SB16Buffer      equ
 BUTTON_INFO     rb  64*1024
 BUTTON_INFO     equ
+endg
 
 include 'data32.inc'
