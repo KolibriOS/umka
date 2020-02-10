@@ -6,14 +6,11 @@ __DEBUG_LEVEL__ = 1
 extrn 'malloc' as libc_malloc
 extrn 'free' as libc_free
 
-sys_msg_board equ _sys_msg_board
 cli equ nop
 iretd equ retd
 
 lang fix en
-preboot_blogesc = 0       ; start immediately after bootlog
-pci_code_sel = 0
-VESA_1_2_VIDEO  = 0      ; enable vesa 1.2 bank switch functions
+
 macro int n {
   if n eq 0x40
     call i40
@@ -22,16 +19,11 @@ macro int n {
   end if
 }
 
-app_tls = 0
-app_code = 0
-app_data = 0
-graph_data = 0
-os_code = 0
+UEFI = 1
 
 MAX_PRIORITY      = 0   ; highest, used for kernel tasks
 USER_PRIORITY     = 1   ; default
 IDLE_PRIORITY     = 2   ; lowest, only IDLE thread goes here
-NR_SCHED_QUEUES   = 3   ; MUST equal IDLE_PRIORYTY + 1
 
 purge mov,add,sub
 purge mov,add,sub
@@ -52,14 +44,22 @@ include 'proc32.inc'
 include 'struct.inc'
 macro BOOT_LO a {}
 macro BOOT a {}
+window_data equ twer
+CURRENT_TASK equ twer2
+TASK_COUNT equ gyads
+SLOT_BASE equ gfdskh
 include 'const.inc'
+restore window_data
+restore CURRENT_TASK
+restore TASK_COUNT
+restore SLOT_BASE
 purge BOOT_LO,BOOT
 
 LFB_BASE = lfb_base
 
-window_data        = os_base + 0x00001000
-CURRENT_TASK       = os_base + 0x00003000
-TASK_COUNT         = os_base + 0x00003004
+;window_data        = os_base + 0x00001000
+;CURRENT_TASK       = os_base + 0x00003000
+;TASK_COUNT         = os_base + 0x00003004
 TASK_BASE          = os_base + 0x00003010
 TASK_DATA          = os_base + 0x00003020
 TASK_EVENT         = os_base + 0x00003020
@@ -94,6 +94,7 @@ include 'core/malloc.inc'
 include 'core/heap.inc'
 include 'core/dll.inc'
 include 'core/taskman.inc'
+include 'core/timers.inc'
 include 'core/clipboard.inc'
 include 'core/syscall.inc'
 include 'video/framebuffer.inc'
@@ -106,12 +107,12 @@ include 'unpacker.inc'
 include 'gui/window.inc'
 include 'gui/button.inc'
 include 'gui/skincode.inc'
-include 'sysother.inc'
-include 'gui/draw.inc'
 include 'gui/font.inc'
 include 'gui/event.inc'
 include 'gui/mouse.inc'
 include 'hid/keyboard.inc'
+include 'hid/mousedrv.inc'
+include 'network/stack.inc'
  
 include 'sha3.asm'
 
@@ -127,49 +128,6 @@ proc sha3_256_oneshot c uses ebx esi edi ebp, _ctx, _data, _len
         ret
 endp
 
-align 4
-syscall_getpixel:                       ; GetPixel
-        mov     ecx, [_display.width]
-        xor     edx, edx
-        mov     eax, ebx
-        div     ecx
-        mov     ebx, edx
-        xchg    eax, ebx
-        and     ecx, 0xFBFFFFFF  ;negate 0x04000000 use mouseunder area
-        call    dword [GETPIXEL]; eax - x, ebx - y
-        mov     [esp + 32], ecx
-        ret
-
-align 4
-calculate_fast_getting_offset_for_WinMapAddress:
-; calculate data area for fast getting offset to _WinMapAddress
-        xor     eax, eax
-        mov     ecx, [_display.height]
-        mov     edi, d_width_calc_area
-        cld
-@@:
-        stosd
-        add     eax, [_display.width]
-        dec     ecx
-        jnz     @r
-        ret
-;------------------------------------------------------------------------------
-align 4
-calculate_fast_getting_offset_for_LFB:
-; calculate data area for fast getting offset to LFB
-        xor     eax, eax
-        mov     ecx, [_display.height]
-        mov     edi, BPSLine_calc_area
-        cld
-@@:
-        stosd
-        add     eax, [_display.lfb_pitch]
-        dec     ecx
-        jnz     @r
-redrawscreen:
-force_redraw_background:
-        ret
- 
 ; TODO: move to trace_lbr
 public set_eflags_tf
 set_eflags_tf:
@@ -310,7 +268,7 @@ proc kos_init c uses ebx esi edi ebp
         mov     byte [BTN_COUNT], al              ; button buffer
 
         ;call    load_default_skin
-;        call    stack_init
+        ;call    stack_init
 
         ret
 endp
@@ -427,7 +385,17 @@ proc vdisk_querymedia stdcall uses ebx esi edi ebp, vdisk, mediainfo
         ret
 endp
 
+proc alloc_page
+        ret
+        push    ecx edx
+        mov     eax, 0x1000
+        ccall   libc_malloc
+        pop     edx ecx
+        ret
+endp
+
 proc alloc_pages _cnt
+        ret
         push    ecx edx
         mov     eax, [_cnt]
         shl     eax, 12
@@ -436,7 +404,7 @@ proc alloc_pages _cnt
         ret
 endp
 
-proc _sys_msg_board
+proc sys_msg_board
         cmp     cl, 0x0d
         jz      @f
         pushad
@@ -453,41 +421,6 @@ proc _sys_msg_board
 endp
 
 
-align 16        ;very often call this subrutine
-memmove:       ; memory move in bytes
-; eax = from
-; ebx = to
-; ecx = no of bytes
-        test    ecx, ecx
-        jle     .ret
-
-        push    esi edi ecx
-
-        mov     edi, ebx
-        mov     esi, eax
-
-        test    ecx, not 11b
-        jz      @f
-
-        push    ecx
-        shr     ecx, 2
-        rep movsd
-        pop     ecx
-        and     ecx, 11b
-        jz      .finish
-;--------------------------------------
-align 4
-@@:
-        rep movsb
-;--------------------------------------
-align 4
-.finish:
-        pop     ecx edi esi
-;--------------------------------------
-align 4
-.ret:
-        ret
-
 proc disable_irq _irq
         ret
 endp
@@ -500,10 +433,47 @@ proc map_page _one, _two, _three
         ret
 endp
 
+proc create_ring_buffer stdcall, size:dword, flags:dword
+        ret
+endp
 
-sysfn_terminate:
-kb_write_wait_ack:
-sys_msg_board_str:
+proc map_memEx stdcall, lin_addr:dword,slot:dword,\
+                        ofs:dword,buf_size:dword,req_access:dword
+        ret
+endp
+
+change_task:
+        mov     [REDRAW_BACKGROUND], 0
+        ret
+
+sysfn_saveramdisk:
+sysfn_meminfo:
+check_fdd_motor_status:
+check_ATAPI_device_event:
+check_fdd_motor_status_has_work?:
+check_ATAPI_device_event_has_work?:
+get_clock_ns:
+request_terminate:
+system_shutdown:
+terminate:
+LoadMedium:
+clear_CD_cache:
+allow_medium_removal:
+EjectMedium:
+save_image:
+init_irqs:
+PIC_init:
+init_sys_v86:
+PIT_init:
+ramdisk_init:
+APIC_init:
+unmask_timer:
+pci_enum:
+load_pe_driver:
+usb_init:
+fdc_init:
+attach_int_handler:
+mtrr_validate:
 protect_from_terminate:
 unprotect_from_terminate:
 ReadCDWRetr:
@@ -515,68 +485,59 @@ release_pages:
 mutex_init:
 mutex_lock:
 mutex_unlock:
-alloc_page:
-cache_ide0:
-cache_ide1:
-wakeup_osloop:
 lock_application_table:
 unlock_application_table:
 get_pg_addr:
 free_page:
-map_memEx:
-setup_os_slot:
-idle_thread:
-irq_eoi:
-change_task:
 scheduler_add_thread:
+build_interrupt_table:
+init_fpu:
+init_mtrr:
+map_io_mem:
+create_trampoline_pgmap:
         ret
-sys_getkey:
-sys_clock:
-delay_hs_unprotected:
-undefined_syscall:
-sys_redrawstat:
-syscall_getscreensize:
-sys_background:
-sys_cachetodiskette:
-sys_getbutton:
-sys_system:
-paleholder:
-sys_midi:
-sys_setup:
 sys_settime:
-syscall_cdaudio:
-syscall_putarea_backgr:
-sys_getsetup:
-sys_date:
-syscall_getpixel_WinMap:
-syscall_getarea:
-readmousepos:
-sys_getbackground:
-set_app_param:
-sys_outport:
-syscall_reserveportarea:
-sys_apm:
-syscall_threads:
 sys_pcibios:
 sys_IPC:
-sys_gs:
 pci_api:
 sys_resize_app_memory:
-sys_process_def:
 f68:
-sys_network:
-sys_socket:
-sys_protocols:
 sys_posix:
-sys_end:
         ret
+
+
+macro format a,b,c,d {
+macro pew x \{
+\}
+}
+
+pewpew:
+
+macro pew x, y {
+  if y eq 1
+    include `x
+  end if
+}
+
+1FFFFFFFh fix 0
+include fix pew
+HEAP_BASE equ
+macro org x {}
+include 'init.inc', 1
+sys_msg_board equ tyu
+include 'kernel.asm', 1
+purge sys_msg_board
+restore org
+purge org
+purge HEAP_BASE
+restore pew
 
 coverage_end:
 public coverage_end
 
 
 section '.data' writeable align 64
-include_debug_strings
+;include_debug_strings
 vdisk_functions:
         dd vdisk_functions_end - vdisk_functions
         dd 0;vdisk_close    ; close
@@ -588,17 +549,6 @@ vdisk_functions:
         dd 0    ; adjust_cache_size
 vdisk_functions_end:
 
-;IncludeIGlobals
-include 'hid/mousedrv.inc'
-
-screen_workarea RECT
-display_width_standard dd 0
-display_height_standard dd 0
-do_not_touch_winmap db 0
-window_minimize db 0
-sound_flag      db 0
-PID_lock_input dd 0x0
-process_number dd 0
 timer_ticks dd 0
 fpu_owner dd ?
 
@@ -610,13 +560,18 @@ public lfb_base_addr as 'kos_lfb_base'
 lfb_base_addr dd lfb_base
 
 uglobal
-;section '.bss' writeable align 16
-;IncludeUGlobals
+context_counter dd ?
+LAPIC_BASE dd ?
+irq_mode dd ?
+cache_ide0  IDE_CACHE
+cache_ide1  IDE_CACHE
 DiskNumber db ?
 ChannelNumber db ?
 DevErrorCode dd ?
 CDSectorAddress dd ?
 CDDataBuf_pointer dd ?
+allow_dma_access db ?
+ide_mutex MUTEX
 ide_channel1_mutex MUTEX
 ide_channel2_mutex MUTEX
 ide_channel3_mutex MUTEX
@@ -625,7 +580,13 @@ ide_channel5_mutex MUTEX
 ide_channel6_mutex MUTEX
 ide_channel7_mutex MUTEX
 ide_channel8_mutex MUTEX
-os_base rb 0x400000
+os_base:        rb 0x1000
+window_data:    rb 0x2000
+CURRENT_TASK:   rb 4
+TASK_COUNT:     rb 12
+                rb 0x1000000
+;os_base rb 0x1000000
+BOOT_LO boot_data
 BOOT boot_data
 lfb_base rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
 cur_dir:
@@ -640,4 +601,7 @@ BUTTON_INFO     rb  64*1024
 BUTTON_INFO     equ
 endg
 
-include 'data32.inc'
+macro iii {
+inclu#de 'data32.inc'
+}
+iii
