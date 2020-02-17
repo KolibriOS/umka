@@ -6,33 +6,33 @@ CFLAGS_32=-m32
 LDFLAGS=
 LDFLAGS_32=-m32
 
-all: kofu kofuse kolibri.sym kolibri.prp kolibri.lst tags tools/mkdirrange tools/mkfilepattern covpreproc
+all: umka_shell umka_fuse umka.sym umka.prp umka.lst tags tools/mkdirrange tools/mkfilepattern covpreproc
 
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
-kofu: kofu.o kolibri.o trace.o trace_lbr.o cio.o
+umka_shell: umka_shell.o umka.o trace.o trace_lbr.o cio.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ -static
 
-kofuse: kofuse.o kolibri.o cio.o
+umka_fuse: umka_fuse.o umka.o cio.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
-kolibri.o kolibri.fas: kolibri.asm kolibri.h skin.skn
-	INCLUDE="$(KOLIBRI)/kernel/trunk;$(KOLIBRI)/programs/develop/libraries/libcrash/trunk" $(FASM) $< kolibri.o -s kolibri.fas -m 1234567
+umka.o umka.fas: umka.asm skin.skn
+	INCLUDE="$(KOLIBRI)/kernel/trunk;$(KOLIBRI)/programs/develop/libraries/libcrash/trunk" $(FASM) $< umka.o -s umka.fas -m 1234567
 
 skin.skn: $(KOLIBRI)/skins/Leency/Octo_flat/default.asm
 	$(FASM) $< $@
 
-kolibri.prp: kolibri.fas
-	prepsrc kolibri.fas kolibri.prp
+umka.prp: umka.fas
+	prepsrc $< $@
 
-kolibri.sym: kolibri.fas
-	symbols kolibri.fas kolibri.sym
+umka.sym: umka.fas
+	symbols $< $@
 
-kolibri.lst: kolibri.fas
-	listing kolibri.fas kolibri.lst
+umka.lst: umka.fas
+	listing $< $@
 
-tags: kolibri.sym
+tags: umka.sym
 	fasmtags.py $<
 
 trace.o: trace.c trace.h trace_lbr.h
@@ -44,10 +44,10 @@ trace_lbr.o: trace_lbr.c trace_lbr.h kolibri.h
 cio.o: cio.c
 	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<
 
-kofu.o: kofu.c kolibri.h trace.h syscalls.h
+umka_shell.o: umka_shell.c kolibri.h trace.h syscalls.h
 	$(CC) $(CFLAGS) $(CFLAGS_32) -c $< -std=c99 -D_POSIX_C_SOURCE
 
-kofuse.o: kofuse.c kolibri.h
+umka_fuse.o: umka_fuse.c kolibri.h
 	$(CC) $(CFLAGS) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $< -std=gnu99
 
 tools/mkdirrange: tools/mkdirrange.c
@@ -59,5 +59,5 @@ tools/mkfilepattern: tools/mkfilepattern.c
 .PHONY: all clean
 
 clean:
-	rm -f *.o kofu kofuse kolibri.fas kolibri.sym kolibri.lst kolibri.prp coverage tools/mkdirrange tools/mkfilepattern
+	rm -f *.o umka_shell umka_fuse umka.fas umka.sym umka.lst umka.prp coverage tools/mkdirrange tools/mkfilepattern
 

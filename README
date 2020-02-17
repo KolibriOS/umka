@@ -1,39 +1,43 @@
-KOFU & KOFUSE
-=============
+UMKa -- User-Mode KolibriOS developer tools
+===========================================
 
-This is a common project for two related tools, kofu and kofuse. The idea is to
-make userspace UNIX tools that use unchanged KolibriOS block and FS source to
-test these kernel parts in your favorite developer environment.
-
-
-Kofu
-----
-
-is Kolibri Filesystem in Userspace.
-It is an interactive shell with commands that are wrappers around KolibriOS
-kernel block and FS functions.
+This is a common project for a set of KolibriOS developer tools which are based
+on original KolibriOS code wrapped and hacked as to run in the UNIX programming
+environment. The idea is to make userspace UNIX tools that use as much unchanged
+KolibriOS source as possible to test architecture-independent parts of the
+kernelin your favorite developer environment.
 
 
-Kofuse
-------
+umka_shell
+----------
 
-is a short for KolibriOS and FUSE [1]. Like kofu above but commands are
-translated from FUSE calls, not entered manually.
+is an interactive shell with commands that are wrappers around KolibriOS kernel
+block, FS, UI and other functions. Can read input from the keyboard, stdin and a
+file, i.e. can be used for automated testing.
+
+
+umka_fuse
+---------
+
+is like kofu above but commands are translated from FUSE calls, not entered
+manually. Can *potentially* be used to run xfstests (cross-fs-tests) and
+automated tests against reference FS implementations.
 
 
 BUILD
 -----
 
-$ KOLIBRIOS=/path/to/kolibrios make
+$ KOLIBRI=/path/to/kolibrios make
 
-/path/to/kolibrios is where you did `svn co svn://kolibrios.org`.
+/path/to/kolibrios is where you checked out `svn co svn://kolibrios.org`.
 
 
 Architecture
 ------------
 
-Kernel services are replaced with stubs or libc calls. Block devices are
-emulated with wrappers around regular files. Shell and FUSE FS are written in C.
+Kernel services are replaced with stubs, wrappers around userspace
+implementation or libc calls. Block devices are emulated with regular files.
+Framebuffer can be dumped to disk as image file.
 
 
 Troubleshooting

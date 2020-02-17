@@ -1,4 +1,4 @@
-KOFU=../kofu
+UMKA_SHELL=../umka_shell
 
 xfs_tests     := $(addsuffix .out, $(basename $(wildcard *\#xfs_*.t)))
 s05k_tests    := $(addsuffix .out, $(basename $(wildcard *\#s05k_*.t)))
@@ -32,6 +32,6 @@ unicode: $(unicode_tests)
 v5: $(v5_tests)
 
 %.out: %.ref %.t
-	$(KOFU) < $(word 2, $^) > $@
+	$(UMKA_SHELL) < $(word 2, $^) > $@
 	cmp $@ $<
 
