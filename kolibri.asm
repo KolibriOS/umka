@@ -525,7 +525,28 @@ HEAP_BASE equ
 macro org x {}
 include 'init.inc', 1
 sys_msg_board equ tyu
+
+macro lea r, v {
+  if v eq [(ecx-(CURRENT_TASK and 1FFFFFFFh)-TASKDATA.state)*8+SLOT_BASE]
+        int3
+  else if v eq [(edx-(CURRENT_TASK and 1FFFFFFFh))*8+SLOT_BASE]
+        int3
+  else
+        lea     r, v
+  end if
+}
+macro add r, v {
+  if v eq CURRENT_TASK - (SLOT_BASE shr 3)
+        int3
+  else
+        add     r, v
+  end if
+}
 include 'kernel.asm', 1
+purge lea
+restore lea
+purge add
+restore add
 purge sys_msg_board
 restore org
 purge org
