@@ -41,7 +41,16 @@
 #define MAX_DIRENTS_TO_READ 100
 #define MAX_BYTES_TO_READ (16*1024)
 
+#define DEFAULT_READDIR_ENCODING UTF8
 #define DEFAULT_PATH_ENCODING UTF8
+
+#define CHECK_OPTION_ARG    \
+    do {                        \
+        if (!argv[++optind]) {  \
+            puts(usage);        \
+            return;             \
+        }                       \
+    } while (0)
 
 char cur_dir[PATH_MAX] = "/";
 const char *last_dir = cur_dir;
@@ -179,13 +188,13 @@ int next_line(FILE *file, int is_tty) {
     return fgets(cmd_buf, FGETS_BUF_LEN, file) != NULL;
 }
 
-int split_args(char *s, const char **argv) {
+int split_args(char *s, char **argv) {
     int argc = -1;
     for (; (argv[++argc] = strtok(s, " \t\n")) != NULL; s = NULL);
     return argc;
 }
 
-void kofu_disk_add(int argc, const char **argv) {
+void kofu_disk_add(int argc, char **argv) {
     (void)argc;
     const char *file_name = argv[1];
     const char *disk_name = argv[2];
@@ -195,7 +204,7 @@ void kofu_disk_add(int argc, const char **argv) {
     return;
 }
 
-void kofu_disk_del(int argc, const char **argv) {
+void kofu_disk_del(int argc, char **argv) {
     (void)argc;
     const char *name = argv[1];
     if (kos_disk_del(name)) {
@@ -204,7 +213,7 @@ void kofu_disk_del(int argc, const char **argv) {
     return;
 }
 
-void kofu_pwd(int argc, const char **argv) {
+void kofu_pwd(int argc, char **argv) {
     (void)argc;
     (void)argv;
     bool quoted = false;
@@ -213,7 +222,7 @@ void kofu_pwd(int argc, const char **argv) {
     printf("%s%s%s\n", quote, cur_dir, quote);
 }
 
-void kofu_set_pixel(int argc, const char **argv) {
+void kofu_set_pixel(int argc, char **argv) {
     size_t x = strtoul(argv[1], NULL, 0);
     size_t y = strtoul(argv[2], NULL, 0);
     uint32_t color = strtoul(argv[3], NULL, 16);
@@ -221,7 +230,7 @@ void kofu_set_pixel(int argc, const char **argv) {
     umka_sys_set_pixel(x, y, color, invert);
 }
 
-void kofu_write_text(int argc, const char **argv) {
+void kofu_write_text(int argc, char **argv) {
     (void)argc;
     size_t x = strtoul(argv[1], NULL, 0);
     size_t y = strtoul(argv[2], NULL, 0);
@@ -237,7 +246,7 @@ void kofu_write_text(int argc, const char **argv) {
     umka_sys_write_text(x, y, color, asciiz, fill_background, font_and_encoding, draw_to_buffer, scale_factor, string, length, background_color_or_buffer);
 }
 
-void kofu_dump_win_stack(int argc, const char **argv) {
+void kofu_dump_win_stack(int argc, char **argv) {
     int depth = 5;
     if (argc > 1) {
         depth = strtol(argv[1], NULL, 0);
@@ -247,7 +256,7 @@ void kofu_dump_win_stack(int argc, const char **argv) {
     }
 }
 
-void kofu_dump_win_pos(int argc, const char **argv) {
+void kofu_dump_win_pos(int argc, char **argv) {
     int depth = 5;
     if (argc > 1) {
         depth = strtol(argv[1], NULL, 0);
@@ -257,7 +266,7 @@ void kofu_dump_win_pos(int argc, const char **argv) {
     }
 }
 
-void kofu_process_info(int argc, const char **argv) {
+void kofu_process_info(int argc, char **argv) {
     (void)argc;
     process_information_t info;
     int32_t pid = strtol(argv[1], NULL, 0);
@@ -275,7 +284,7 @@ void kofu_process_info(int argc, const char **argv) {
     printf("wnd_state: 0x%.2" PRIx8 "\n", info.wnd_state);
 }
 
-void kofu_display_number(int argc, const char **argv) {
+void kofu_display_number(int argc, char **argv) {
     (void)argc;
     int is_pointer = strtoul(argv[1], NULL, 0);
     int base = strtoul(argv[2], NULL, 0);
@@ -298,7 +307,7 @@ void kofu_display_number(int argc, const char **argv) {
     umka_sys_display_number(is_pointer, base, digits_to_display, is_qword, show_leading_zeros, number_or_pointer, x, y, color, fill_background, font, draw_to_buffer, scale_factor, background_color_or_buffer);
 }
 
-void kofu_set_window_colors(int argc, const char **argv) {
+void kofu_set_window_colors(int argc, char **argv) {
     if (argc != (1 + sizeof(system_colors_t)/4)) {
         printf("10 colors required\n");
         return;
@@ -317,7 +326,7 @@ void kofu_set_window_colors(int argc, const char **argv) {
     umka_sys_set_window_colors(&colors);
 }
 
-void kofu_get_window_colors(int argc, const char **argv) {
+void kofu_get_window_colors(int argc, char **argv) {
     (void)argc;
     (void)argv;
     system_colors_t colors;
@@ -334,14 +343,14 @@ void kofu_get_window_colors(int argc, const char **argv) {
     printf("0x%.8" PRIx32 " work_graph\n", colors.work_graph);
 }
 
-void kofu_get_skin_height(int argc, const char **argv) {
+void kofu_get_skin_height(int argc, char **argv) {
     (void)argc;
     (void)argv;
     uint32_t skin_height = umka_sys_get_skin_height();
     printf("%" PRIu32 "\n", skin_height);
 }
 
-void kofu_get_screen_area(int argc, const char **argv) {
+void kofu_get_screen_area(int argc, char **argv) {
     (void)argc;
     (void)argv;
     rect_t wa;
@@ -352,7 +361,7 @@ void kofu_get_screen_area(int argc, const char **argv) {
     printf("%" PRIu32 " bottom\n", wa.bottom);
 }
 
-void kofu_set_screen_area(int argc, const char **argv) {
+void kofu_set_screen_area(int argc, char **argv) {
     if (argc != 5) {
         printf("left top right bottom\n");
         return;
@@ -365,7 +374,7 @@ void kofu_set_screen_area(int argc, const char **argv) {
     umka_sys_set_screen_area(&wa);
 }
 
-void kofu_get_skin_margins(int argc, const char **argv) {
+void kofu_get_skin_margins(int argc, char **argv) {
     (void)argc;
     (void)argv;
     rect_t wa;
@@ -376,20 +385,20 @@ void kofu_get_skin_margins(int argc, const char **argv) {
     printf("%" PRIu32 " bottom\n", wa.bottom);
 }
 
-void kofu_set_button_style(int argc, const char **argv) {
+void kofu_set_button_style(int argc, char **argv) {
     (void)argc;
     uint32_t style = strtoul(argv[1], NULL, 0);
     umka_sys_set_button_style(style);
 }
 
-void kofu_set_skin(int argc, const char **argv) {
+void kofu_set_skin(int argc, char **argv) {
     (void)argc;
     const char *path = argv[1];
     int32_t status = umka_sys_set_skin(path);
     printf("status: %" PRIi32 "\n", status);
 }
 
-void kofu_get_font_smoothing(int argc, const char **argv) {
+void kofu_get_font_smoothing(int argc, char **argv) {
     (void)argc;
     (void)argv;
     const char *names[] = {"off", "anti-aliasing", "subpixel"};
@@ -397,26 +406,26 @@ void kofu_get_font_smoothing(int argc, const char **argv) {
     printf("font smoothing: %i - %s\n", type, names[type]);
 }
 
-void kofu_set_font_smoothing(int argc, const char **argv) {
+void kofu_set_font_smoothing(int argc, char **argv) {
     (void)argc;
     int type = strtol(argv[1], NULL, 0);
     umka_sys_set_font_smoothing(type);
 }
 
-void kofu_get_font_size(int argc, const char **argv) {
+void kofu_get_font_size(int argc, char **argv) {
     (void)argc;
     (void)argv;
     size_t size = umka_sys_get_font_size();
     printf("%upx\n", size);
 }
 
-void kofu_set_font_size(int argc, const char **argv) {
+void kofu_set_font_size(int argc, char **argv) {
     (void)argc;
     uint32_t size = strtoul(argv[1], NULL, 0);
     umka_sys_set_font_size(size);
 }
 
-void kofu_button(int argc, const char **argv) {
+void kofu_button(int argc, char **argv) {
     (void)argc;
     size_t x     = strtoul(argv[1], NULL, 0);
     size_t xsize = strtoul(argv[2], NULL, 0);
@@ -429,7 +438,7 @@ void kofu_button(int argc, const char **argv) {
     umka_sys_button(x, xsize, y, ysize, button_id, draw_button, draw_frame, color);
 }
 
-void kofu_put_image(int argc, const char **argv) {
+void kofu_put_image(int argc, char **argv) {
     (void)argc;
     FILE *f = fopen(argv[1], "r");
     fseek(f, 0, SEEK_END);
@@ -446,7 +455,7 @@ void kofu_put_image(int argc, const char **argv) {
     free(image);
 }
 
-void kofu_put_image_palette(int argc, const char **argv) {
+void kofu_put_image_palette(int argc, char **argv) {
     (void)argc;
     FILE *f = fopen(argv[1], "r");
     fseek(f, 0, SEEK_END);
@@ -466,7 +475,7 @@ void kofu_put_image_palette(int argc, const char **argv) {
     free(image);
 }
 
-void kofu_draw_rect(int argc, const char **argv) {
+void kofu_draw_rect(int argc, char **argv) {
     size_t x     = strtoul(argv[1], NULL, 0);
     size_t xsize = strtoul(argv[2], NULL, 0);
     size_t y     = strtoul(argv[3], NULL, 0);
@@ -476,7 +485,7 @@ void kofu_draw_rect(int argc, const char **argv) {
     umka_sys_draw_rect(x, xsize, y, ysize, color, gradient);
 }
 
-void kofu_draw_line(int argc, const char **argv) {
+void kofu_draw_line(int argc, char **argv) {
     size_t x    = strtoul(argv[1], NULL, 0);
     size_t xend = strtoul(argv[2], NULL, 0);
     size_t y    = strtoul(argv[3], NULL, 0);
@@ -486,7 +495,7 @@ void kofu_draw_line(int argc, const char **argv) {
     umka_sys_draw_line(x, xend, y, yend, color, invert);
 }
 
-void kofu_set_window_caption(int argc, const char **argv) {
+void kofu_set_window_caption(int argc, char **argv) {
     (void)argc;
     const char *caption = argv[1];
     int encoding = strtoul(argv[2], NULL, 0);
@@ -494,7 +503,7 @@ void kofu_set_window_caption(int argc, const char **argv) {
 }
 
 
-void kofu_draw_window(int argc, const char **argv) {
+void kofu_draw_window(int argc, char **argv) {
     (void)argc;
     size_t x     = strtoul(argv[1], NULL, 0);
     size_t xsize = strtoul(argv[2], NULL, 0);
@@ -511,13 +520,13 @@ void kofu_draw_window(int argc, const char **argv) {
     umka_sys_draw_window(x, xsize, y, ysize, color, has_caption, client_relative, fill_workarea, gradient_fill, movable, style, caption);
 }
 
-void kofu_window_redraw(int argc, const char **argv) {
+void kofu_window_redraw(int argc, char **argv) {
     (void)argc;
     int begin_end = strtoul(argv[1], NULL, 0);
     umka_sys_window_redraw(begin_end);
 }
 
-void kofu_move_window(int argc, const char **argv) {
+void kofu_move_window(int argc, char **argv) {
     (void)argc;
     size_t x      = strtoul(argv[1], NULL, 0);
     size_t y      = strtoul(argv[2], NULL, 0);
@@ -526,7 +535,7 @@ void kofu_move_window(int argc, const char **argv) {
     umka_sys_move_window(x, y, xsize, ysize);
 }
 
-void kofu_blit_bitmap(int argc, const char **argv) {
+void kofu_blit_bitmap(int argc, char **argv) {
     (void)argc;
     FILE *f = fopen(argv[1], "r");
     fseek(f, 0, SEEK_END);
@@ -553,7 +562,7 @@ void kofu_blit_bitmap(int argc, const char **argv) {
     free(image);
 }
 
-void kofu_scrot(int argc, const char **argv) {
+void kofu_scrot(int argc, char **argv) {
     (void)argc;
     FILE *img = fopen(argv[1], "w");
 //    const char *header = "P6\n1024 768\n255\n";
@@ -569,7 +578,7 @@ void kofu_scrot(int argc, const char **argv) {
     fclose(img);
 }
 
-void kofu_cd(int argc, const char **argv) {
+void kofu_cd(int argc, char **argv) {
     (void)argc;
     kos_cd(argv[1]);
     cur_dir_changed = true;
@@ -641,24 +650,64 @@ void ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
     }
 }
 
-void kofu_ls(int argc, const char **argv, f70or80_t f70or80) {
-    (void)argc;
-    uint32_t encoding = DEFAULT_PATH_ENCODING;
-    size_t bdfe_len = (encoding == CP866) ? BDFE_LEN_CP866 : BDFE_LEN_UNICODE;
+fs_enc_t parse_encoding(const char *str) {
+    fs_enc_t enc;
+    if (!strcmp(str, "default")) {
+        enc = DEFAULT_ENCODING;
+    } else if (!strcmp(str, "cp866")) {
+        enc = CP866;
+    } else if (!strcmp(str, "utf16")) {
+        enc = UTF16;
+    } else if (!strcmp(str, "utf8")) {
+        enc = UTF8;
+    } else {
+        enc = INVALID_ENCODING;
+    }
+    return enc;
+}
+
+void kofu_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
+    int opt;
+    optind = 1;
+    const char *optstring = (f70or80 == F70) ? "f:c:e:" : "f:c:e:p:";
+    const char *path = ".";
+    uint32_t readdir_enc = DEFAULT_READDIR_ENCODING;
+    uint32_t path_enc = DEFAULT_PATH_ENCODING;
+    uint32_t from_idx = 0, count = MAX_DIRENTS_TO_READ;
+    if (argc > 1 && *argv[1] != '-') {
+        path = argv[optind++];
+    }
+    while ((opt = getopt(argc, argv, optstring)) != -1) {
+        switch (opt) {
+        case 'f':
+            from_idx = strtoul(argv[optind++], NULL, 0);
+            break;
+        case 'c':
+            count = strtoul(argv[optind++], NULL, 0);
+            break;
+        case 'e':
+            readdir_enc = parse_encoding(argv[optind++]);
+            break;
+        case 'p':
+            path_enc = parse_encoding(argv[optind++]);
+            break;
+        default:
+            puts(usage);
+            return;
+        }
+    }
+
+    size_t bdfe_len = (readdir_enc <= CP866) ? BDFE_LEN_CP866 : BDFE_LEN_UNICODE;
     f7080s1info_t *dir = (f7080s1info_t*)malloc(sizeof(f7080s1info_t) + bdfe_len * MAX_DIRENTS_TO_READ);
-    f7080s1arg_t fX0 = {.sf = 1, .offset = 0, .encoding = encoding, .size = MAX_DIRENTS_TO_READ, .buf = dir};
+    f7080s1arg_t fX0 = {.sf = 1, .offset = from_idx, .encoding = readdir_enc, .size = count, .buf = dir};
     if (f70or80 == F70) {
         fX0.u.f70.zero = 0;
-        fX0.u.f70.path = argv[1];
+        fX0.u.f70.path = path;
     } else {
-        fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
-        fX0.u.f80.path = argv[1];
+        fX0.u.f80.path_encoding = path_enc;
+        fX0.u.f80.path = path;
     }
-    if (argv[2]) {
-        sscanf(argv[2], "%"SCNu32, &fX0.size);
-        if (argv[3]) {
-            sscanf(argv[3], "%"SCNu32, &fX0.offset);
-        }
+    if (count != MAX_DIRENTS_TO_READ) {
         ls_range(&fX0, f70or80);
     } else {
         ls_all(&fX0, f70or80);
@@ -667,15 +716,29 @@ void kofu_ls(int argc, const char **argv, f70or80_t f70or80) {
     return;
 }
 
-void kofu_ls70(int argc, const char **argv) {
-    kofu_ls(argc, argv, F70);
+void kofu_ls70(int argc, char **argv) {
+    const char *usage = \
+        "usage: ls70 [dir] [option]...\n"
+        "  -f number        index of the first dir entry to read\n"
+        "  -c number        number of dir entries to read\n"
+        "  -e encoding      cp866|utf16|utf8\n"
+        "                   return directory listing in this encoding";
+    kofu_ls(argc, argv, usage, F70);
 }
 
-void kofu_ls80(int argc, const char **argv) {
-    kofu_ls(argc, argv, F80);
+void kofu_ls80(int argc, char **argv) {
+    const char *usage = \
+        "usage: ls80 [dir] [option]...\n"
+        "  -f number        index of the first dir entry to read\n"
+        "  -c number        number of dir entries to read\n"
+        "  -e encoding      cp866|utf16|utf8\n"
+        "                   return directory listing in this encoding\n"
+        "  -p encoding      cp866|utf16|utf8\n"
+        "                   path to dir is specified in this encoding";
+    kofu_ls(argc, argv, usage, F80);
 }
 
-void kofu_stat(int argc, const char **argv, f70or80_t f70or80) {
+void kofu_stat(int argc, char **argv, f70or80_t f70or80) {
     (void)argc;
     f7080s5arg_t fX0 = {.sf = 5, .flags = 0};
     f7080ret_t r;
@@ -721,15 +784,15 @@ void kofu_stat(int argc, const char **argv, f70or80_t f70or80) {
     return;
 }
 
-void kofu_stat70(int argc, const char **argv) {
+void kofu_stat70(int argc, char **argv) {
     kofu_stat(argc, argv, F70);
 }
 
-void kofu_stat80(int argc, const char **argv) {
+void kofu_stat80(int argc, char **argv) {
     kofu_stat(argc, argv, F80);
 }
 
-void kofu_read(int argc, const char **argv, f70or80_t f70or80) {
+void kofu_read(int argc, char **argv, f70or80_t f70or80) {
     (void)argc;
     f7080s0arg_t fX0 = {.sf = 0};
     f7080ret_t r;
@@ -781,17 +844,17 @@ void kofu_read(int argc, const char **argv, f70or80_t f70or80) {
     return;
 }
 
-void kofu_read70(int argc, const char **argv) {
+void kofu_read70(int argc, char **argv) {
     kofu_read(argc, argv, F70);
 }
 
-void kofu_read80(int argc, const char **argv) {
+void kofu_read80(int argc, char **argv) {
     kofu_read(argc, argv, F80);
 }
 
 typedef struct {
     char *name;
-    void (*func) (int, const char **);
+    void (*func) (int, char **);
 } func_table_t;
 
 func_table_t funcs[] = {
@@ -866,7 +929,7 @@ void *run_test(const char *infile_name) {
     }
 
     int is_tty = isatty(fileno(infile));
-    const char **cargv = (const char**)malloc(sizeof(const char*) * (MAX_COMMAND_ARGS + 1));
+    char **cargv = (char**)malloc(sizeof(char*) * (MAX_COMMAND_ARGS + 1));
     while(next_line(infile, is_tty)) {
         if (cmd_buf[0] == '#' || cmd_buf[0] == '\n') {
             printf("%s", cmd_buf);

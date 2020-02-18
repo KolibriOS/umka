@@ -45,7 +45,7 @@ cio.o: cio.c
 	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<
 
 umka_shell.o: umka_shell.c kolibri.h trace.h syscalls.h
-	$(CC) $(CFLAGS) $(CFLAGS_32) -c $< -std=c99 -D_POSIX_C_SOURCE
+	$(CC) $(CFLAGS) $(CFLAGS_32) -c $< -std=c99 -D_POSIX_C_SOURCE=2
 
 umka_fuse.o: umka_fuse.c kolibri.h
 	$(CC) $(CFLAGS) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $< -std=gnu99

@@ -37,12 +37,13 @@ typedef struct {
              work_button, work_button_text, work_text, work_graph;
 } system_colors_t;
 
-enum {
-    DEFAULT,
+typedef enum {
+    DEFAULT_ENCODING,
     CP866,
     UTF16,
     UTF8,
-};
+    INVALID_ENCODING,
+} fs_enc_t;
 
 typedef enum {
     F70 = 70,

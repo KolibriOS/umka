@@ -2,8 +2,8 @@
 .vim
 .exrc
 *.o
-kofu
-kofuse
+umka_shell
+umka_fuse
 mkdirrange
 mkfilepattern
 *.img
@@ -13,10 +13,10 @@ mkfilepattern
 *.img.info
 t_*.out
 .gdb_history
-kolibri.fas
-kolibri.sym
-kolibri.lst
-kolibri.prp
+umka.fas
+umka.sym
+umka.lst
+umka.prp
 tags
 *.out
 coverage.*
