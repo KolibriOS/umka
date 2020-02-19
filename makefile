@@ -1,6 +1,6 @@
 FASM=fasm
 CC=gcc
-WARNINGS=-Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict -Wnull-dereference -Wjump-misses-init -Wshadow -Wformat=2 -Wswitch #-Wswitch-enum #-Wconversion -Wsign-conversion
+WARNINGS=-Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict -Wnull-dereference -Wjump-misses-init -Wshadow -Wformat=2 -Wswitch -Wswitch-enum #-Wconversion -Wsign-conversion
 CFLAGS=$(WARNINGS) -g -O0 -D_FILE_OFFSET_BITS=64 -Wno-address-of-packed-member -DNDEBUG -masm=intel
 CFLAGS_32=$(CFLAGS) -m32
 LDFLAGS=
