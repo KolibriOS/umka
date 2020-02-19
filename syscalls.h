@@ -130,6 +130,27 @@ static inline void umka_sys_get_screen_size(uint32_t *xsize, uint32_t *ysize) {
     *ysize = (xysize & 0xffffu) + 1;
 }
 
+static inline void umka_sys_set_cwd(const char *dir) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(30),
+          "b"(1),
+          "c"(dir)
+        : "memory");
+}
+
+static inline void umka_sys_get_cwd(const char *buf, size_t len) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(30),
+          "b"(2),
+          "c"(buf),
+          "d"(len)
+        : "memory");
+}
+
 static inline void umka_sys_draw_line(size_t x, size_t xend,
                                       size_t y, size_t yend,
                                       uint32_t color, int invert) {

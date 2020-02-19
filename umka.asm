@@ -142,25 +142,6 @@ set_eflags_tf:
         popfd
         ret
 
-public kos_getcwd
-proc kos_getcwd c uses ebx esi edi ebp, _buf, _len
-        mov     eax, 30
-        mov     ebx, 2
-        mov     ecx, [_buf]
-        mov     edx, [_len]
-        call    sys_current_directory
-        ret
-endp
-
-public kos_cd
-proc kos_cd c uses ebx esi edi ebp, _path
-        mov     eax, 30
-        mov     ebx, 1
-        mov     ecx, [_path]
-        call    sys_current_directory
-        ret
-endp
-
 public kos_time_to_epoch
 proc kos_time_to_epoch c uses ebx esi edi ebp, _time
         mov     esi, [_time]

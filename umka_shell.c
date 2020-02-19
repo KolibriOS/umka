@@ -174,7 +174,7 @@ const char *get_last_dir(const char *path) {
 
 void prompt() {
     if (cur_dir_changed) {
-        kos_getcwd(cur_dir, PATH_MAX);
+        umka_sys_get_cwd(cur_dir, PATH_MAX);
         last_dir = get_last_dir(cur_dir);
         cur_dir_changed = false;
     }
@@ -219,7 +219,7 @@ void umka_pwd(int argc, char **argv) {
     (void)argv;
     bool quoted = false;
     const char *quote = quoted ? "'" : "";
-    kos_getcwd(cur_dir, PATH_MAX);
+    umka_sys_get_cwd(cur_dir, PATH_MAX);
     printf("%s%s%s\n", quote, cur_dir, quote);
 }
 
@@ -587,9 +587,9 @@ void umka_scrot(int argc, char **argv) {
     if(error) printf("error %u: %s\n", error, lodepng_error_text(error));
 }
 
-void umka_cd(int argc, char **argv) {
+void shell_cd(int argc, char **argv) {
     (void)argc;
-    kos_cd(argv[1]);
+    umka_sys_set_cwd(argv[1]);
     cur_dir_changed = true;
 }
 
@@ -876,7 +876,8 @@ func_table_t funcs[] = {
                         { "read70",             umka_read70 },
                         { "read80",             umka_read80 },
                         { "pwd",                umka_pwd },
-                        { "cd",                 umka_cd },
+                        { "cd",                 shell_cd },
+                        { "set_cwd",            shell_cd },
                         { "draw_window",        umka_draw_window },
                         { "set_pixel",          umka_set_pixel },
                         { "write_text",         umka_write_text },
@@ -911,7 +912,7 @@ func_table_t funcs[] = {
                        };
 
 void usage() {
-    printf("usage: umka [test_file.t]\n");
+    printf("usage: umka_shell [test_file.t]\n");
 }
 
 void *run_test(const char *infile_name) {
