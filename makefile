@@ -1,8 +1,8 @@
 FASM=fasm
 CC=gcc
-WARNINGS=-Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict -Wnull-dereference -Wjump-misses-init -Wshadow -Wformat=2 -Wswitch -Wswitch-enum #-Wconversion -Wsign-conversion
+WARNINGS=-Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict -Wnull-dereference -Wjump-misses-init -Wshadow -Wformat=2 -Wswitch #-Wswitch-enum #-Wconversion -Wsign-conversion
 CFLAGS=$(WARNINGS) -g -O0 -D_FILE_OFFSET_BITS=64 -Wno-address-of-packed-member -DNDEBUG -masm=intel
-CFLAGS_32=-m32
+CFLAGS_32=$(CFLAGS) -m32
 LDFLAGS=
 LDFLAGS_32=-m32
 
@@ -11,7 +11,7 @@ all: umka_shell umka_fuse umka.sym umka.prp umka.lst tags tools/mkdirrange tools
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
-umka_shell: umka_shell.o umka.o trace.o trace_lbr.o cio.o
+umka_shell: umka_shell.o umka.o trace.o trace_lbr.o cio.o lodepng.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ -static
 
 umka_fuse: umka_fuse.o umka.o cio.o
@@ -19,6 +19,9 @@ umka_fuse: umka_fuse.o umka.o cio.o
 
 umka.o umka.fas: umka.asm skin.skn
 	INCLUDE="$(KOLIBRI)/kernel/trunk;$(KOLIBRI)/programs/develop/libraries/libcrash/trunk" $(FASM) $< umka.o -s umka.fas -m 1234567
+
+lodepng.o: lodepng.c lodepng.h
+	$(CC) $(CFLAGS_32) -c $<
 
 skin.skn: $(KOLIBRI)/skins/Leency/Octo_flat/default.asm
 	$(FASM) $< $@

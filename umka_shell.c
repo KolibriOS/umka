@@ -33,6 +33,7 @@
 #include "kolibri.h"
 #include "syscalls.h"
 #include "trace.h"
+#include "lodepng.h"
 
 #define PATH_MAX 4096
 #define FGETS_BUF_LEN 4096
@@ -485,6 +486,14 @@ void kofu_draw_rect(int argc, char **argv) {
     umka_sys_draw_rect(x, xsize, y, ysize, color, gradient);
 }
 
+void kofu_get_screen_size(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
+    uint32_t xsize, ysize;
+    umka_sys_get_screen_size(&xsize, &ysize);
+    printf("%" PRIu32 "x%" PRIu32 "\n", xsize, ysize);
+}
+
 void kofu_draw_line(int argc, char **argv) {
     size_t x    = strtoul(argv[1], NULL, 0);
     size_t xend = strtoul(argv[2], NULL, 0);
@@ -564,18 +573,18 @@ void kofu_blit_bitmap(int argc, char **argv) {
 
 void kofu_scrot(int argc, char **argv) {
     (void)argc;
-    FILE *img = fopen(argv[1], "w");
-//    const char *header = "P6\n1024 768\n255\n";
-//    fwrite(header, strlen(header), 1, img);
+    uint32_t xsize, ysize;
+    umka_sys_get_screen_size(&xsize, &ysize);
+
     uint32_t *lfb = kos_lfb_base;
-    for (int y = 0; y < 300; y++) {
-        for (int x = 0; x < 400; x++) {
-            uint32_t p = *lfb++;
-            p |= 0xff000000;
-            fwrite(&p, 4, 1, img);
+    for (size_t y = 0; y < ysize; y++) {
+        for (size_t x = 0; x < xsize; x++) {
+            *lfb++ |= 0xff000000;
         }
     }
-    fclose(img);
+
+    unsigned error = lodepng_encode32_file(argv[1], (const unsigned char *)kos_lfb_base, xsize, ysize);
+    if(error) printf("error %u: %s\n", error, lodepng_error_text(error));
 }
 
 void kofu_cd(int argc, char **argv) {
@@ -876,6 +885,7 @@ func_table_t funcs[] = {
                         { "process_info",       kofu_process_info },
                         { "window_redraw",      kofu_window_redraw },
                         { "draw_rect",          kofu_draw_rect },
+                        { "get_screen_size",    kofu_get_screen_size },
                         { "draw_line",          kofu_draw_line },
                         { "display_number",     kofu_display_number },
                         { "set_button_style",   kofu_set_button_style },

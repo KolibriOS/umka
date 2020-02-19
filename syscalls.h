@@ -119,6 +119,17 @@ static inline void umka_sys_draw_rect(size_t x, size_t xsize,
         : "memory");
 }
 
+static inline void umka_sys_get_screen_size(uint32_t *xsize, uint32_t *ysize) {
+    uint32_t xysize;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(xysize)
+        : "a"(14)
+        : "memory");
+    *xsize = (xysize >> 16) + 1;
+    *ysize = (xysize & 0xffffu) + 1;
+}
+
 static inline void umka_sys_draw_line(size_t x, size_t xend,
                                       size_t y, size_t yend,
                                       uint32_t color, int invert) {

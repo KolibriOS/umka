@@ -5,7 +5,7 @@ This is a common project for a set of KolibriOS developer tools which are based
 on original KolibriOS code wrapped and hacked as to run in the UNIX programming
 environment. The idea is to make userspace UNIX tools that use as much unchanged
 KolibriOS source as possible to test architecture-independent parts of the
-kernelin your favorite developer environment.
+kernel in your favorite developer environment.
 
 
 umka_shell
@@ -43,10 +43,14 @@ Framebuffer can be dumped to disk as image file.
 Troubleshooting
 ---------------
 
-gm convert -size 400x300 -depth 8 umka.rgba umka.png
+No troubles -- no shooting.
 
 
-Links
------
+Links & Acknowledgements
+------------------------
 
-[1] https://github.com/libfuse/libfuse
+[1] Filesystem in Userspace library
+    https://github.com/libfuse/libfuse
+
+[2] LodePNG by Lode Vandevenne
+    https://lodev.org/lodepng/

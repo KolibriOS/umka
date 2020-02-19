@@ -50,6 +50,8 @@ get_font_size
 set_font_size 16
 get_font_size
 
-scrot umka.rgba
+get_screen_size
+
+scrot 016_#f01_#draw_all.out.png
 
 disk_del rd
