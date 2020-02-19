@@ -1,5 +1,5 @@
 /*
-    kofu: KolibriOS kernel FS code as userspace interactive shell in Linux
+    umka_shell: User-Mode KolibriOS developer tools, the shell
     Copyright (C) 2018--2020  Ivan Baravy <dunkaist@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
@@ -195,7 +195,7 @@ int split_args(char *s, char **argv) {
     return argc;
 }
 
-void kofu_disk_add(int argc, char **argv) {
+void umka_disk_add(int argc, char **argv) {
     (void)argc;
     const char *file_name = argv[1];
     const char *disk_name = argv[2];
@@ -205,7 +205,7 @@ void kofu_disk_add(int argc, char **argv) {
     return;
 }
 
-void kofu_disk_del(int argc, char **argv) {
+void umka_disk_del(int argc, char **argv) {
     (void)argc;
     const char *name = argv[1];
     if (kos_disk_del(name)) {
@@ -214,7 +214,7 @@ void kofu_disk_del(int argc, char **argv) {
     return;
 }
 
-void kofu_pwd(int argc, char **argv) {
+void umka_pwd(int argc, char **argv) {
     (void)argc;
     (void)argv;
     bool quoted = false;
@@ -223,7 +223,7 @@ void kofu_pwd(int argc, char **argv) {
     printf("%s%s%s\n", quote, cur_dir, quote);
 }
 
-void kofu_set_pixel(int argc, char **argv) {
+void umka_set_pixel(int argc, char **argv) {
     size_t x = strtoul(argv[1], NULL, 0);
     size_t y = strtoul(argv[2], NULL, 0);
     uint32_t color = strtoul(argv[3], NULL, 16);
@@ -231,7 +231,7 @@ void kofu_set_pixel(int argc, char **argv) {
     umka_sys_set_pixel(x, y, color, invert);
 }
 
-void kofu_write_text(int argc, char **argv) {
+void umka_write_text(int argc, char **argv) {
     (void)argc;
     size_t x = strtoul(argv[1], NULL, 0);
     size_t y = strtoul(argv[2], NULL, 0);
@@ -247,7 +247,7 @@ void kofu_write_text(int argc, char **argv) {
     umka_sys_write_text(x, y, color, asciiz, fill_background, font_and_encoding, draw_to_buffer, scale_factor, string, length, background_color_or_buffer);
 }
 
-void kofu_dump_win_stack(int argc, char **argv) {
+void umka_dump_win_stack(int argc, char **argv) {
     int depth = 5;
     if (argc > 1) {
         depth = strtol(argv[1], NULL, 0);
@@ -257,7 +257,7 @@ void kofu_dump_win_stack(int argc, char **argv) {
     }
 }
 
-void kofu_dump_win_pos(int argc, char **argv) {
+void umka_dump_win_pos(int argc, char **argv) {
     int depth = 5;
     if (argc > 1) {
         depth = strtol(argv[1], NULL, 0);
@@ -267,7 +267,7 @@ void kofu_dump_win_pos(int argc, char **argv) {
     }
 }
 
-void kofu_process_info(int argc, char **argv) {
+void umka_process_info(int argc, char **argv) {
     (void)argc;
     process_information_t info;
     int32_t pid = strtol(argv[1], NULL, 0);
@@ -285,7 +285,7 @@ void kofu_process_info(int argc, char **argv) {
     printf("wnd_state: 0x%.2" PRIx8 "\n", info.wnd_state);
 }
 
-void kofu_display_number(int argc, char **argv) {
+void umka_display_number(int argc, char **argv) {
     (void)argc;
     int is_pointer = strtoul(argv[1], NULL, 0);
     int base = strtoul(argv[2], NULL, 0);
@@ -308,7 +308,7 @@ void kofu_display_number(int argc, char **argv) {
     umka_sys_display_number(is_pointer, base, digits_to_display, is_qword, show_leading_zeros, number_or_pointer, x, y, color, fill_background, font, draw_to_buffer, scale_factor, background_color_or_buffer);
 }
 
-void kofu_set_window_colors(int argc, char **argv) {
+void umka_set_window_colors(int argc, char **argv) {
     if (argc != (1 + sizeof(system_colors_t)/4)) {
         printf("10 colors required\n");
         return;
@@ -327,7 +327,7 @@ void kofu_set_window_colors(int argc, char **argv) {
     umka_sys_set_window_colors(&colors);
 }
 
-void kofu_get_window_colors(int argc, char **argv) {
+void umka_get_window_colors(int argc, char **argv) {
     (void)argc;
     (void)argv;
     system_colors_t colors;
@@ -344,14 +344,14 @@ void kofu_get_window_colors(int argc, char **argv) {
     printf("0x%.8" PRIx32 " work_graph\n", colors.work_graph);
 }
 
-void kofu_get_skin_height(int argc, char **argv) {
+void umka_get_skin_height(int argc, char **argv) {
     (void)argc;
     (void)argv;
     uint32_t skin_height = umka_sys_get_skin_height();
     printf("%" PRIu32 "\n", skin_height);
 }
 
-void kofu_get_screen_area(int argc, char **argv) {
+void umka_get_screen_area(int argc, char **argv) {
     (void)argc;
     (void)argv;
     rect_t wa;
@@ -362,7 +362,7 @@ void kofu_get_screen_area(int argc, char **argv) {
     printf("%" PRIu32 " bottom\n", wa.bottom);
 }
 
-void kofu_set_screen_area(int argc, char **argv) {
+void umka_set_screen_area(int argc, char **argv) {
     if (argc != 5) {
         printf("left top right bottom\n");
         return;
@@ -375,7 +375,7 @@ void kofu_set_screen_area(int argc, char **argv) {
     umka_sys_set_screen_area(&wa);
 }
 
-void kofu_get_skin_margins(int argc, char **argv) {
+void umka_get_skin_margins(int argc, char **argv) {
     (void)argc;
     (void)argv;
     rect_t wa;
@@ -386,20 +386,20 @@ void kofu_get_skin_margins(int argc, char **argv) {
     printf("%" PRIu32 " bottom\n", wa.bottom);
 }
 
-void kofu_set_button_style(int argc, char **argv) {
+void umka_set_button_style(int argc, char **argv) {
     (void)argc;
     uint32_t style = strtoul(argv[1], NULL, 0);
     umka_sys_set_button_style(style);
 }
 
-void kofu_set_skin(int argc, char **argv) {
+void umka_set_skin(int argc, char **argv) {
     (void)argc;
     const char *path = argv[1];
     int32_t status = umka_sys_set_skin(path);
     printf("status: %" PRIi32 "\n", status);
 }
 
-void kofu_get_font_smoothing(int argc, char **argv) {
+void umka_get_font_smoothing(int argc, char **argv) {
     (void)argc;
     (void)argv;
     const char *names[] = {"off", "anti-aliasing", "subpixel"};
@@ -407,26 +407,26 @@ void kofu_get_font_smoothing(int argc, char **argv) {
     printf("font smoothing: %i - %s\n", type, names[type]);
 }
 
-void kofu_set_font_smoothing(int argc, char **argv) {
+void umka_set_font_smoothing(int argc, char **argv) {
     (void)argc;
     int type = strtol(argv[1], NULL, 0);
     umka_sys_set_font_smoothing(type);
 }
 
-void kofu_get_font_size(int argc, char **argv) {
+void umka_get_font_size(int argc, char **argv) {
     (void)argc;
     (void)argv;
     size_t size = umka_sys_get_font_size();
     printf("%upx\n", size);
 }
 
-void kofu_set_font_size(int argc, char **argv) {
+void umka_set_font_size(int argc, char **argv) {
     (void)argc;
     uint32_t size = strtoul(argv[1], NULL, 0);
     umka_sys_set_font_size(size);
 }
 
-void kofu_button(int argc, char **argv) {
+void umka_button(int argc, char **argv) {
     (void)argc;
     size_t x     = strtoul(argv[1], NULL, 0);
     size_t xsize = strtoul(argv[2], NULL, 0);
@@ -439,7 +439,7 @@ void kofu_button(int argc, char **argv) {
     umka_sys_button(x, xsize, y, ysize, button_id, draw_button, draw_frame, color);
 }
 
-void kofu_put_image(int argc, char **argv) {
+void umka_put_image(int argc, char **argv) {
     (void)argc;
     FILE *f = fopen(argv[1], "r");
     fseek(f, 0, SEEK_END);
@@ -456,7 +456,7 @@ void kofu_put_image(int argc, char **argv) {
     free(image);
 }
 
-void kofu_put_image_palette(int argc, char **argv) {
+void umka_put_image_palette(int argc, char **argv) {
     (void)argc;
     FILE *f = fopen(argv[1], "r");
     fseek(f, 0, SEEK_END);
@@ -476,7 +476,7 @@ void kofu_put_image_palette(int argc, char **argv) {
     free(image);
 }
 
-void kofu_draw_rect(int argc, char **argv) {
+void umka_draw_rect(int argc, char **argv) {
     size_t x     = strtoul(argv[1], NULL, 0);
     size_t xsize = strtoul(argv[2], NULL, 0);
     size_t y     = strtoul(argv[3], NULL, 0);
@@ -486,7 +486,7 @@ void kofu_draw_rect(int argc, char **argv) {
     umka_sys_draw_rect(x, xsize, y, ysize, color, gradient);
 }
 
-void kofu_get_screen_size(int argc, char **argv) {
+void umka_get_screen_size(int argc, char **argv) {
     (void)argc;
     (void)argv;
     uint32_t xsize, ysize;
@@ -494,7 +494,7 @@ void kofu_get_screen_size(int argc, char **argv) {
     printf("%" PRIu32 "x%" PRIu32 "\n", xsize, ysize);
 }
 
-void kofu_draw_line(int argc, char **argv) {
+void umka_draw_line(int argc, char **argv) {
     size_t x    = strtoul(argv[1], NULL, 0);
     size_t xend = strtoul(argv[2], NULL, 0);
     size_t y    = strtoul(argv[3], NULL, 0);
@@ -504,7 +504,7 @@ void kofu_draw_line(int argc, char **argv) {
     umka_sys_draw_line(x, xend, y, yend, color, invert);
 }
 
-void kofu_set_window_caption(int argc, char **argv) {
+void umka_set_window_caption(int argc, char **argv) {
     (void)argc;
     const char *caption = argv[1];
     int encoding = strtoul(argv[2], NULL, 0);
@@ -512,7 +512,7 @@ void kofu_set_window_caption(int argc, char **argv) {
 }
 
 
-void kofu_draw_window(int argc, char **argv) {
+void umka_draw_window(int argc, char **argv) {
     (void)argc;
     size_t x     = strtoul(argv[1], NULL, 0);
     size_t xsize = strtoul(argv[2], NULL, 0);
@@ -529,13 +529,13 @@ void kofu_draw_window(int argc, char **argv) {
     umka_sys_draw_window(x, xsize, y, ysize, color, has_caption, client_relative, fill_workarea, gradient_fill, movable, style, caption);
 }
 
-void kofu_window_redraw(int argc, char **argv) {
+void umka_window_redraw(int argc, char **argv) {
     (void)argc;
     int begin_end = strtoul(argv[1], NULL, 0);
     umka_sys_window_redraw(begin_end);
 }
 
-void kofu_move_window(int argc, char **argv) {
+void umka_move_window(int argc, char **argv) {
     (void)argc;
     size_t x      = strtoul(argv[1], NULL, 0);
     size_t y      = strtoul(argv[2], NULL, 0);
@@ -544,7 +544,7 @@ void kofu_move_window(int argc, char **argv) {
     umka_sys_move_window(x, y, xsize, ysize);
 }
 
-void kofu_blit_bitmap(int argc, char **argv) {
+void umka_blit_bitmap(int argc, char **argv) {
     (void)argc;
     FILE *f = fopen(argv[1], "r");
     fseek(f, 0, SEEK_END);
@@ -571,7 +571,7 @@ void kofu_blit_bitmap(int argc, char **argv) {
     free(image);
 }
 
-void kofu_scrot(int argc, char **argv) {
+void umka_scrot(int argc, char **argv) {
     (void)argc;
     uint32_t xsize, ysize;
     umka_sys_get_screen_size(&xsize, &ysize);
@@ -587,7 +587,7 @@ void kofu_scrot(int argc, char **argv) {
     if(error) printf("error %u: %s\n", error, lodepng_error_text(error));
 }
 
-void kofu_cd(int argc, char **argv) {
+void umka_cd(int argc, char **argv) {
     (void)argc;
     kos_cd(argv[1]);
     cur_dir_changed = true;
@@ -675,7 +675,7 @@ fs_enc_t parse_encoding(const char *str) {
     return enc;
 }
 
-void kofu_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
+void umka_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
     int opt;
     optind = 1;
     const char *optstring = (f70or80 == F70) ? "f:c:e:" : "f:c:e:p:";
@@ -725,17 +725,17 @@ void kofu_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
     return;
 }
 
-void kofu_ls70(int argc, char **argv) {
+void umka_ls70(int argc, char **argv) {
     const char *usage = \
         "usage: ls70 [dir] [option]...\n"
         "  -f number        index of the first dir entry to read\n"
         "  -c number        number of dir entries to read\n"
         "  -e encoding      cp866|utf16|utf8\n"
         "                   return directory listing in this encoding";
-    kofu_ls(argc, argv, usage, F70);
+    umka_ls(argc, argv, usage, F70);
 }
 
-void kofu_ls80(int argc, char **argv) {
+void umka_ls80(int argc, char **argv) {
     const char *usage = \
         "usage: ls80 [dir] [option]...\n"
         "  -f number        index of the first dir entry to read\n"
@@ -744,10 +744,10 @@ void kofu_ls80(int argc, char **argv) {
         "                   return directory listing in this encoding\n"
         "  -p encoding      cp866|utf16|utf8\n"
         "                   path to dir is specified in this encoding";
-    kofu_ls(argc, argv, usage, F80);
+    umka_ls(argc, argv, usage, F80);
 }
 
-void kofu_stat(int argc, char **argv, f70or80_t f70or80) {
+void umka_stat(int argc, char **argv, f70or80_t f70or80) {
     (void)argc;
     f7080s5arg_t fX0 = {.sf = 5, .flags = 0};
     f7080ret_t r;
@@ -793,15 +793,15 @@ void kofu_stat(int argc, char **argv, f70or80_t f70or80) {
     return;
 }
 
-void kofu_stat70(int argc, char **argv) {
-    kofu_stat(argc, argv, F70);
+void umka_stat70(int argc, char **argv) {
+    umka_stat(argc, argv, F70);
 }
 
-void kofu_stat80(int argc, char **argv) {
-    kofu_stat(argc, argv, F80);
+void umka_stat80(int argc, char **argv) {
+    umka_stat(argc, argv, F80);
 }
 
-void kofu_read(int argc, char **argv, f70or80_t f70or80) {
+void umka_read(int argc, char **argv, f70or80_t f70or80) {
     (void)argc;
     f7080s0arg_t fX0 = {.sf = 0};
     f7080ret_t r;
@@ -853,12 +853,12 @@ void kofu_read(int argc, char **argv, f70or80_t f70or80) {
     return;
 }
 
-void kofu_read70(int argc, char **argv) {
-    kofu_read(argc, argv, F70);
+void umka_read70(int argc, char **argv) {
+    umka_read(argc, argv, F70);
 }
 
-void kofu_read80(int argc, char **argv) {
-    kofu_read(argc, argv, F80);
+void umka_read80(int argc, char **argv) {
+    umka_read(argc, argv, F80);
 }
 
 typedef struct {
@@ -867,51 +867,51 @@ typedef struct {
 } func_table_t;
 
 func_table_t funcs[] = {
-                        { "disk_add",           kofu_disk_add },
-                        { "disk_del",           kofu_disk_del },
-                        { "ls70",               kofu_ls70 },
-                        { "ls80",               kofu_ls80 },
-                        { "stat70",             kofu_stat70 },
-                        { "stat80",             kofu_stat80 },
-                        { "read70",             kofu_read70 },
-                        { "read80",             kofu_read80 },
-                        { "pwd",                kofu_pwd },
-                        { "cd",                 kofu_cd },
-                        { "draw_window",        kofu_draw_window },
-                        { "set_pixel",          kofu_set_pixel },
-                        { "write_text",         kofu_write_text },
-                        { "put_image",          kofu_put_image },
-                        { "button",             kofu_button },
-                        { "process_info",       kofu_process_info },
-                        { "window_redraw",      kofu_window_redraw },
-                        { "draw_rect",          kofu_draw_rect },
-                        { "get_screen_size",    kofu_get_screen_size },
-                        { "draw_line",          kofu_draw_line },
-                        { "display_number",     kofu_display_number },
-                        { "set_button_style",   kofu_set_button_style },
-                        { "set_window_colors",  kofu_set_window_colors },
-                        { "get_window_colors",  kofu_get_window_colors },
-                        { "get_skin_height",    kofu_get_skin_height },
-                        { "get_screen_area",    kofu_get_screen_area },
-                        { "set_screen_area",    kofu_set_screen_area },
-                        { "get_skin_margins",   kofu_get_skin_margins },
-                        { "set_skin",           kofu_set_skin },
-                        { "get_font_smoothing", kofu_get_font_smoothing },
-                        { "set_font_smoothing", kofu_set_font_smoothing },
-                        { "get_font_size",      kofu_get_font_size },
-                        { "set_font_size",      kofu_set_font_size },
-                        { "put_image_palette",  kofu_put_image_palette },
-                        { "move_window",        kofu_move_window },
-                        { "set_window_caption", kofu_set_window_caption },
-                        { "blit_bitmap",        kofu_blit_bitmap },
-                        { "scrot",              kofu_scrot },
-                        { "dump_win_stack",     kofu_dump_win_stack },
-                        { "dump_win_pos",       kofu_dump_win_pos },
+                        { "disk_add",           umka_disk_add },
+                        { "disk_del",           umka_disk_del },
+                        { "ls70",               umka_ls70 },
+                        { "ls80",               umka_ls80 },
+                        { "stat70",             umka_stat70 },
+                        { "stat80",             umka_stat80 },
+                        { "read70",             umka_read70 },
+                        { "read80",             umka_read80 },
+                        { "pwd",                umka_pwd },
+                        { "cd",                 umka_cd },
+                        { "draw_window",        umka_draw_window },
+                        { "set_pixel",          umka_set_pixel },
+                        { "write_text",         umka_write_text },
+                        { "put_image",          umka_put_image },
+                        { "button",             umka_button },
+                        { "process_info",       umka_process_info },
+                        { "window_redraw",      umka_window_redraw },
+                        { "draw_rect",          umka_draw_rect },
+                        { "get_screen_size",    umka_get_screen_size },
+                        { "draw_line",          umka_draw_line },
+                        { "display_number",     umka_display_number },
+                        { "set_button_style",   umka_set_button_style },
+                        { "set_window_colors",  umka_set_window_colors },
+                        { "get_window_colors",  umka_get_window_colors },
+                        { "get_skin_height",    umka_get_skin_height },
+                        { "get_screen_area",    umka_get_screen_area },
+                        { "set_screen_area",    umka_set_screen_area },
+                        { "get_skin_margins",   umka_get_skin_margins },
+                        { "set_skin",           umka_set_skin },
+                        { "get_font_smoothing", umka_get_font_smoothing },
+                        { "set_font_smoothing", umka_set_font_smoothing },
+                        { "get_font_size",      umka_get_font_size },
+                        { "set_font_size",      umka_set_font_size },
+                        { "put_image_palette",  umka_put_image_palette },
+                        { "move_window",        umka_move_window },
+                        { "set_window_caption", umka_set_window_caption },
+                        { "blit_bitmap",        umka_blit_bitmap },
+                        { "scrot",              umka_scrot },
+                        { "dump_win_stack",     umka_dump_win_stack },
+                        { "dump_win_pos",       umka_dump_win_pos },
                         { NULL,                 NULL },
                        };
 
 void usage() {
-    printf("usage: kofu [test_file.t]\n");
+    printf("usage: umka [test_file.t]\n");
 }
 
 void *run_test(const char *infile_name) {

@@ -1,5 +1,5 @@
 /*
-    kofuse: KolibriOS kernel FS code as FUSE in Linux
+    umka_fuse: User-Mode KolibriOS developer tools, the filesystem
     Copyright (C) 2018--2020  Ivan Baravy <dunkaist@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
@@ -50,14 +50,14 @@ static void bdfe_to_stat(bdfe_t *kf, struct stat *st) {
     st->st_ctime = kos_time_to_epoch(&(kf->ctime));
 }
 
-static void *kofuse_init(struct fuse_conn_info *conn,
+static void *umka_init(struct fuse_conn_info *conn,
                         struct fuse_config *cfg) {
         (void) conn;
         cfg->kernel_cache = 1;
         return NULL;
 }
 
-static int kofuse_getattr(const char *path, struct stat *stbuf,
+static int umka_getattr(const char *path, struct stat *stbuf,
                          struct fuse_file_info *fi) {
     (void) fi;
     int res = 0;
@@ -73,7 +73,7 @@ static int kofuse_getattr(const char *path, struct stat *stbuf,
     return res;
 }
 
-static int kofuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
+static int umka_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                          off_t offset, struct fuse_file_info *fi,
                          enum fuse_readdir_flags flags) {
     (void) offset;      // TODO
@@ -93,7 +93,7 @@ static int kofuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     return 0;
 }
 
-static int kofuse_open(const char *path, struct fuse_file_info *fi) {
+static int umka_open(const char *path, struct fuse_file_info *fi) {
 //        if (strcmp(path+1, "blah") != 0)
 //                return -ENOENT;
         (void) path;
@@ -104,7 +104,7 @@ static int kofuse_open(const char *path, struct fuse_file_info *fi) {
         return 0;
 }
 
-static int kofuse_read(const char *path, char *buf, size_t size, off_t offset,
+static int umka_read(const char *path, char *buf, size_t size, off_t offset,
                       struct fuse_file_info *fi) {
     (void) fi;
 
@@ -114,20 +114,20 @@ static int kofuse_read(const char *path, char *buf, size_t size, off_t offset,
     return size;
 }
 
-static struct fuse_operations kofuse_oper = {
-        .init           = kofuse_init,
-        .getattr        = kofuse_getattr,
-        .readdir        = kofuse_readdir,
-        .open           = kofuse_open,
-        .read           = kofuse_read,
+static struct fuse_operations umka_oper = {
+        .init           = umka_init,
+        .getattr        = umka_getattr,
+        .readdir        = umka_readdir,
+        .open           = umka_open,
+        .read           = umka_read,
 };
 
 int main(int argc, char *argv[]) {
         if (argc != 3) {
-                printf("usage: kofuse dir img\n");
+                printf("usage: umka_fuse dir img\n");
                 exit(1);
         }
         kos_init();
         kos_disk_add(argv[2], "hd0");
-        return fuse_main(argc-1, argv, &kofuse_oper, NULL);
+        return fuse_main(argc-1, argv, &umka_oper, NULL);
 }
