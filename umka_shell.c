@@ -214,7 +214,7 @@ void umka_disk_del(int argc, char **argv) {
     return;
 }
 
-void umka_pwd(int argc, char **argv) {
+void shell_pwd(int argc, char **argv) {
     (void)argc;
     (void)argv;
     bool quoted = false;
@@ -875,7 +875,7 @@ func_table_t funcs[] = {
                         { "stat80",             umka_stat80 },
                         { "read70",             umka_read70 },
                         { "read80",             umka_read80 },
-                        { "pwd",                umka_pwd },
+                        { "pwd",                shell_pwd },
                         { "cd",                 shell_cd },
                         { "set_cwd",            shell_cd },
                         { "draw_window",        umka_draw_window },

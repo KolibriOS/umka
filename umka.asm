@@ -5,6 +5,7 @@ __DEBUG_LEVEL__ = 1
 
 extrn 'malloc' as libc_malloc
 extrn 'free' as libc_free
+extrn vdisk_functions
 
 cli equ nop
 iretd equ retd
@@ -113,7 +114,7 @@ include 'gui/mouse.inc'
 include 'hid/keyboard.inc'
 include 'hid/mousedrv.inc'
 include 'network/stack.inc'
- 
+
 include 'sha3.asm'
 
 struct VDISK
@@ -256,8 +257,8 @@ endp
 
 public kos_disk_add
 proc kos_disk_add c uses ebx esi edi ebp, _file_name, _disk_name
-        extrn cio_disk_init
-        ccall   cio_disk_init, [_file_name]
+        extrn vdisk_init
+        ccall   vdisk_init, [_file_name]
         stdcall disk_add, vdisk_functions, [_disk_name], eax, DISK_NO_INSERT_NOTIFICATION
         push    eax
         stdcall disk_media_changed, eax, 1
@@ -324,45 +325,6 @@ proc kos_disk_del c uses ebx esi edi ebp, _name
         ret
 .not_found:
         movi    eax, 1
-        ret
-endp
-
-
-proc vdisk_close stdcall uses ebx esi edi ebp, _userdata
-        extrn cio_disk_free
-        ccall   cio_disk_free, [_userdata]
-        ret
-endp
-
-
-proc vdisk_read stdcall uses ebx esi edi ebp, _userdata, _buffer, _startsector:qword, _numsectors
-        extrn cio_disk_read
-        ccall   cio_disk_read, [_userdata], [_buffer], dword[_startsector+0], dword[_startsector+4], [_numsectors]
-        movi    eax, DISK_STATUS_OK
-        ret
-endp
-
-
-proc vdisk_write stdcall uses ebx esi edi ebp, userdata, buffer, startsector:qword, numsectors
-        extrn cio_disk_write
-        ccall   cio_disk_write, [userdata], [buffer], dword[startsector+0], dword[startsector+4], [numsectors]
-        movi    eax, DISK_STATUS_OK
-        ret
-endp
-
-
-proc vdisk_querymedia stdcall uses ebx esi edi ebp, vdisk, mediainfo
-        mov     ecx, [mediainfo]
-        mov     edx, [vdisk]
-        mov     [ecx + DISKMEDIAINFO.Flags], 0
-        mov     eax, [edx + VDISK.SectSize]
-        mov     [ecx + DISKMEDIAINFO.SectorSize], eax
-        mov     eax, [edx + VDISK.SectCnt.lo]
-        mov     dword [ecx + DISKMEDIAINFO.Capacity + 0], eax
-        mov     eax, [edx + VDISK.SectCnt.hi]
-        mov     dword [ecx + DISKMEDIAINFO.Capacity + 4], eax
-        
-        movi    eax, DISK_STATUS_OK
         ret
 endp
 
@@ -540,16 +502,6 @@ public coverage_end
 
 section '.data' writeable align 64
 ;include_debug_strings
-vdisk_functions:
-        dd vdisk_functions_end - vdisk_functions
-        dd 0;vdisk_close    ; close
-        dd 0    ; closemedia
-        dd vdisk_querymedia
-        dd vdisk_read
-        dd vdisk_write
-        dd 0    ; flush
-        dd 0    ; adjust_cache_size
-vdisk_functions_end:
 
 timer_ticks dd 0
 fpu_owner dd ?

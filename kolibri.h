@@ -1,6 +1,7 @@
 #ifndef KOLIBRI_H_INCLUDED
 #define KOLIBRI_H_INCLUDED
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -65,6 +66,23 @@ typedef enum {
     ERROR_DEVICE,
     ERROR_OUT_OF_MEMORY,
 } f70status_t;
+
+typedef struct {
+    uint32_t flags;
+    uint32_t sector_size;
+    uint64_t capacity;  // in sectors
+} diskmediainfo_t;
+
+typedef struct {
+    uint32_t  strucsize;
+    void (*close)(void *userdata) __attribute__((__stdcall__));
+    void (*closemedia)(void *userdata) __attribute__((__stdcall__));
+    int (*querymedia)(void *userdata, diskmediainfo_t *info) __attribute__((__stdcall__));
+    int (*read)(void *userdata, void *buffer, off_t startsector, size_t *numsectors) __attribute__((__stdcall__));
+    int (*write)(void *userdata, void *buffer, off_t startsector, size_t *numsectors) __attribute__((__stdcall__));
+    int (*flush)(void* userdata) __attribute__((__stdcall__));
+    unsigned int (*adjust_cache_size)(uint32_t suggested_size) __attribute__((__stdcall__));
+} diskfunc_t;
 
 typedef struct {
     uint32_t attr;

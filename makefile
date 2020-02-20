@@ -11,10 +11,10 @@ all: umka_shell umka_fuse umka.sym umka.prp umka.lst tags tools/mkdirrange tools
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
-umka_shell: umka_shell.o umka.o trace.o trace_lbr.o cio.o lodepng.o
+umka_shell: umka_shell.o umka.o trace.o trace_lbr.o vdisk.o lodepng.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ -static
 
-umka_fuse: umka_fuse.o umka.o cio.o
+umka_fuse: umka_fuse.o umka.o vdisk.o
 	$(CC) $(LDFLAGS) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
 umka.o umka.fas: umka.asm skin.skn
@@ -44,7 +44,7 @@ trace.o: trace.c trace.h trace_lbr.h
 trace_lbr.o: trace_lbr.c trace_lbr.h kolibri.h
 	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<
 
-cio.o: cio.c
+vdisk.o: vdisk.c
 	$(CC) $(CFLAGS) $(CFLAGS_32) -c $<
 
 umka_shell.o: umka_shell.c kolibri.h trace.h syscalls.h
