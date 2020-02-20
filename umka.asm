@@ -3,9 +3,6 @@ format ELF
 __DEBUG__ = 1
 __DEBUG_LEVEL__ = 1
 
-extrn 'malloc' as libc_malloc
-extrn 'free' as libc_free
-
 public disk_add
 public disk_del
 public disk_list
@@ -273,20 +270,9 @@ endp
 
 proc alloc_page
         ret
-        push    ecx edx
-        mov     eax, 0x1000
-        ccall   libc_malloc
-        pop     edx ecx
-        ret
 endp
 
 proc alloc_pages _cnt
-        ret
-        push    ecx edx
-        mov     eax, [_cnt]
-        shl     eax, 12
-        ccall   libc_malloc
-        pop     edx ecx
         ret
 endp
 

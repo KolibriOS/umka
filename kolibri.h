@@ -250,4 +250,5 @@ extern uint32_t *kos_lfb_base;
 extern uint16_t *kos_win_stack;
 extern uint16_t *kos_win_pos;
 extern disk_t disk_list;
+
 #endif
