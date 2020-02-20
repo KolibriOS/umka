@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#include <errno.h>
 #include "kolibri.h"
 
 typedef struct {
@@ -12,6 +13,10 @@ typedef struct {
 
 void *vdisk_init(const char *fname) {
     FILE *f = fopen(fname, "r+");
+    if (!f) {
+        printf("vdisk: can't open file '%s': %s\n", fname, strerror(errno));
+        return NULL;
+    }
     fseeko(f, 0, SEEK_END);
     off_t fsize = ftello(f);
     fseeko(f, 0, SEEK_SET);
@@ -55,14 +60,3 @@ int vdisk_querymedia(void *userdata, diskmediainfo_t *minfo) {
     minfo->capacity = vdisk->sect_cnt;
     return ERROR_SUCCESS;
 }
-
-diskfunc_t vdisk_functions = {
-                                 .strucsize = sizeof(diskfunc_t),
-                                 .close = vdisk_close,
-                                 .closemedia = NULL,
-                                 .querymedia = vdisk_querymedia,
-                                 .read = vdisk_read,
-                                 .write = vdisk_write,
-                                 .flush = NULL,
-                                 .adjust_cache_size = NULL,
-                                };

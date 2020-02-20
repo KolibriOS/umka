@@ -5,7 +5,30 @@ __DEBUG_LEVEL__ = 1
 
 extrn 'malloc' as libc_malloc
 extrn 'free' as libc_free
-extrn vdisk_functions
+
+public disk_add
+public disk_del
+public disk_list
+public disk_media_changed
+
+public xfs._.user_functions as 'xfs_user_functions'
+public ext_user_functions
+public fat_user_functions
+public ntfs_user_functions
+
+public i40
+
+public coverage_begin
+public coverage_end
+
+public sha3_256_oneshot as 'hash_oneshot'
+public set_eflags_tf
+public kos_time_to_epoch
+public kos_init
+
+public win_stack_addr as 'kos_win_stack'
+public win_pos_addr as 'kos_win_pos'
+public lfb_base_addr as 'kos_lfb_base'
 
 cli equ nop
 iretd equ retd
@@ -30,10 +53,7 @@ purge mov,add,sub
 purge mov,add,sub
 section '.text' executable align 32
 
-public i40
-
 coverage_begin:
-public coverage_begin
 
 include 'macros.inc'
 macro diff16 msg,blah2,blah3 {
@@ -123,14 +143,12 @@ struct VDISK
   SectSize dd ?  ; sector size
 ends
 
-public sha3_256_oneshot as 'hash_oneshot'
 proc sha3_256_oneshot c uses ebx esi edi ebp, _ctx, _data, _len
         stdcall sha3_256.oneshot, [_ctx], [_data], [_len]
         ret
 endp
 
 ; TODO: move to trace_lbr
-public set_eflags_tf
 set_eflags_tf:
         pushfd
         pop     eax
@@ -143,7 +161,6 @@ set_eflags_tf:
         popfd
         ret
 
-public kos_time_to_epoch
 proc kos_time_to_epoch c uses ebx esi edi ebp, _time
         mov     esi, [_time]
         call    fsCalculateTime
@@ -151,7 +168,6 @@ proc kos_time_to_epoch c uses ebx esi edi ebp, _time
         ret
 endp
 
-public kos_init
 proc kos_init c uses ebx esi edi ebp
         mov     edi, endofcode
         mov     ecx, uglobals_size
@@ -252,79 +268,6 @@ proc kos_init c uses ebx esi edi ebp
         ;call    load_default_skin
         ;call    stack_init
 
-        ret
-endp
-
-public kos_disk_add
-proc kos_disk_add c uses ebx esi edi ebp, _file_name, _disk_name
-        extrn vdisk_init
-        ccall   vdisk_init, [_file_name]
-        stdcall disk_add, vdisk_functions, [_disk_name], eax, DISK_NO_INSERT_NOTIFICATION
-        push    eax
-        stdcall disk_media_changed, eax, 1
-        pop     edx
-        movi    ecx, 1
-        mov     esi, [edx+DISK.Partitions]
-.next_part:
-        cmp     ecx, [edx+DISK.NumPartitions]
-        ja      .part_done
-        DEBUGF 1, "/%s/%d: ", [edx+DISK.Name], ecx
-        lodsd
-        inc     ecx
-        cmp     [eax+PARTITION.FSUserFunctions], xfs._.user_functions
-        jnz     @f
-        DEBUGF 1, "xfs\n"
-        jmp     .next_part
-@@:
-        cmp     [eax+PARTITION.FSUserFunctions], ext_user_functions
-        jnz     @f
-        DEBUGF 1, "ext\n"
-        jmp     .next_part
-@@:
-        cmp     [eax+PARTITION.FSUserFunctions], fat_user_functions
-        jnz     @f
-        DEBUGF 1, "fat\n"
-        jmp     .next_part
-@@:
-        cmp     [eax+PARTITION.FSUserFunctions], ntfs_user_functions
-        jnz     @f
-        DEBUGF 1, "ntfs\n"
-        jmp     .next_part
-@@:
-        DEBUGF 1, "???\n"
-        jmp     .next_part
-.part_done:
-        xor     eax, eax
-        ret
-.error:
-        movi    eax, 1
-        ret
-endp
-
-
-public kos_disk_del
-proc kos_disk_del c uses ebx esi edi ebp, _name
-        mov     eax, [disk_list+LHEAD.next]
-.next_disk:
-        cmp     eax, disk_list
-        jz      .not_found
-        mov     esi, [eax+DISK.Name]
-        mov     edi, [_name]
-@@:
-        movzx   ecx, byte[esi]
-        cmpsb
-        jnz     .skip
-        jecxz   .found
-        jmp     @b
-.skip:
-        mov     eax, [eax+LHEAD.next]
-        jmp     .next_disk
-.found:
-        stdcall disk_del, eax
-        xor     eax, eax
-        ret
-.not_found:
-        movi    eax, 1
         ret
 endp
 
@@ -462,7 +405,6 @@ macro pew x, y {
   end if
 }
 
-1FFFFFFFh fix 0
 include fix pew
 HEAP_BASE equ
 macro org x {}
@@ -497,7 +439,6 @@ purge HEAP_BASE
 restore pew
 
 coverage_end:
-public coverage_end
 
 
 section '.data' writeable align 64
@@ -506,11 +447,8 @@ section '.data' writeable align 64
 timer_ticks dd 0
 fpu_owner dd ?
 
-public win_stack_addr as 'kos_win_stack'
 win_stack_addr dd WIN_STACK
-public win_pos_addr as 'kos_win_pos'
 win_pos_addr dd WIN_POS
-public lfb_base_addr as 'kos_lfb_base'
 lfb_base_addr dd lfb_base
 
 uglobal
@@ -539,7 +477,6 @@ window_data:    rb 0x2000
 CURRENT_TASK:   rb 4
 TASK_COUNT:     rb 12
                 rb 0x1000000
-;os_base rb 0x1000000
 BOOT_LO boot_data
 BOOT boot_data
 lfb_base rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT

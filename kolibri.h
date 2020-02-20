@@ -51,7 +51,7 @@ typedef enum {
     F80 = 80,
 } f70or80_t;
 
-typedef enum {
+enum {
     ERROR_SUCCESS,
     ERROR_DISK_BASE,
     ERROR_UNSUPPORTED_FS,
@@ -65,13 +65,43 @@ typedef enum {
     ERROR_ACCESS_DENIED,
     ERROR_DEVICE,
     ERROR_OUT_OF_MEMORY,
-} f70status_t;
+};
+
+typedef struct lhead lhead_t;
+
+struct lhead {
+    lhead_t *next;
+    lhead_t *prev;
+};
+
+typedef struct {
+    lhead_t  wait_list;
+    uint32_t count;
+} mutex_t;
 
 typedef struct {
     uint32_t flags;
     uint32_t sector_size;
     uint64_t capacity;  // in sectors
 } diskmediainfo_t;
+
+typedef struct {
+    uintptr_t   pointer;
+    uint32_t    data_size;
+    uintptr_t   data;
+    uint32_t    sad_size;
+    uint32_t    search_start;
+    uint32_t    sector_size_log;
+} disk_cache_t;
+
+typedef struct {
+    uint64_t first_sector;
+    uint64_t length;    // in sectors
+    void *disk;
+    void *fs_user_functions;
+} partition_t;
+
+typedef struct disk_t disk_t;
 
 typedef struct {
     uint32_t  strucsize;
@@ -83,6 +113,28 @@ typedef struct {
     int (*flush)(void* userdata) __attribute__((__stdcall__));
     unsigned int (*adjust_cache_size)(uint32_t suggested_size) __attribute__((__stdcall__));
 } diskfunc_t;
+
+struct disk_t {
+    disk_t *next;
+    disk_t *prev;
+    diskfunc_t *functions;
+    const char *name;
+    void *userdata;
+    uint32_t driver_flags;
+    uint32_t ref_count;
+    mutex_t media_lock;
+    uint8_t media_inserted;
+    uint8_t media_used;
+    uint16_t padding;
+    uint32_t media_ref_count;
+    diskmediainfo_t media_info;
+    uint32_t num_partitions;
+    partition_t **partitions;
+    uint32_t cache_size;
+    mutex_t cache_lock;
+    disk_cache_t sys_cache;
+    disk_cache_t app_cache;
+};
 
 typedef struct {
     uint32_t attr;
@@ -176,19 +228,26 @@ typedef struct {
     uint8_t opaque[1024-HASH_SIZE];
 } hash_context;
 
-uint32_t kos_time_to_epoch(uint32_t *time);
 void kos_init(void);
 void i40(void);
-void *kos_disk_add(const char *file_name, const char *disk_name);
-int kos_disk_del(const char *name);
+uint32_t kos_time_to_epoch(uint32_t *time);
+void set_eflags_tf(int x);
+
+void *disk_add(diskfunc_t *disk, const char *name, void *userdata, uint32_t flags)  __attribute__((__stdcall__));
+void *disk_media_changed(diskfunc_t *disk, int inserted) __attribute__((__stdcall__));
+void disk_del(disk_t *disk)  __attribute__((__stdcall__));
 
 void hash_oneshot(void *ctx, void *data, size_t len);
 
-void set_eflags_tf(int x);
+void xfs_user_functions(void);
+void ext_user_functions(void);
+void fat_user_functions(void);
+void ntfs_user_functions(void);
 void coverage_begin(void);
 void coverage_end(void);
 
 extern uint32_t *kos_lfb_base;
 extern uint16_t *kos_win_stack;
 extern uint16_t *kos_win_pos;
+extern disk_t disk_list;
 #endif

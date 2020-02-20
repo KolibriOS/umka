@@ -30,6 +30,7 @@
 #include <fcntl.h>
 #include <assert.h>
 #include <time.h>
+#include "vdisk.h"
 #include "kolibri.h"
 #include "syscalls.h"
 #include "trace.h"
@@ -53,6 +54,16 @@
         }                       \
     } while (0)
 
+diskfunc_t vdisk_functions = {
+                                 .strucsize = sizeof(diskfunc_t),
+                                 .close = vdisk_close,
+                                 .closemedia = NULL,
+                                 .querymedia = vdisk_querymedia,
+                                 .read = vdisk_read,
+                                 .write = vdisk_write,
+                                 .flush = NULL,
+                                 .adjust_cache_size = NULL,
+                                };
 char cur_dir[PATH_MAX] = "/";
 const char *last_dir = cur_dir;
 bool cur_dir_changed = true;
@@ -76,7 +87,7 @@ const char *f70_status_name[] = {
                                  "out_of_memory"
                                 };
 
-const char *get_f70_status_name(f70status_t s) {
+const char *get_f70_status_name(int s) {
     switch (s) {
     case ERROR_SUCCESS:
 //        return "";
@@ -195,22 +206,55 @@ int split_args(char *s, char **argv) {
     return argc;
 }
 
+void umka_disk_list_partitions(disk_t *d) {
+    for (size_t i = 0; i < d->num_partitions; i++) {
+        printf("/%s/%d: ", d->name, i+1);
+        if (d->partitions[i]->fs_user_functions == xfs_user_functions) {
+            printf("xfs\n");
+        } else if (d->partitions[i]->fs_user_functions == ext_user_functions) {
+            printf("ext\n");
+        } else if (d->partitions[i]->fs_user_functions == fat_user_functions) {
+            printf("fat\n");
+        } else if (d->partitions[i]->fs_user_functions == ntfs_user_functions) {
+            printf("ntfs\n");
+        } else {
+            printf("???\n");
+        }
+    }
+}
+
 void umka_disk_add(int argc, char **argv) {
     (void)argc;
     const char *file_name = argv[1];
     const char *disk_name = argv[2];
-    if (kos_disk_add(file_name, disk_name)) {
-        printf("[!!] can't add file '%s' as disk '%s'\n", file_name, disk_name);
+
+    void *userdata = vdisk_init(file_name);
+    if (userdata) {
+        void *vdisk = disk_add(&vdisk_functions, disk_name, userdata, 0);
+        if (vdisk) {
+            disk_media_changed(vdisk, 1);
+            umka_disk_list_partitions(vdisk);
+            return;
+        }
     }
+    printf("umka: can't add file '%s' as disk '%s'\n", file_name, disk_name);
     return;
+}
+
+void umka_disk_del_by_name(const char *name) {
+    for(disk_t *d = disk_list.next; d != &disk_list; d = d->next) {
+        if (!strcmp(d->name, name)) {
+            disk_del(d);
+            return;
+        }
+    }
+    printf("umka: can't find disk '%s'\n", name);
 }
 
 void umka_disk_del(int argc, char **argv) {
     (void)argc;
     const char *name = argv[1];
-    if (kos_disk_del(name)) {
-        printf("[!!] can't find or delete disk '%s'\n", name);
-    }
+    umka_disk_del_by_name(name);
     return;
 }
 
