@@ -17,6 +17,7 @@ umka.fas
 umka.sym
 umka.lst
 umka.prp
+umka.cov
 tags
 *.out
 coverage.*

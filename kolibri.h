@@ -110,8 +110,8 @@ typedef struct {
     int (*querymedia)(void *userdata, diskmediainfo_t *info) __attribute__((__stdcall__));
     int (*read)(void *userdata, void *buffer, off_t startsector, size_t *numsectors) __attribute__((__stdcall__));
     int (*write)(void *userdata, void *buffer, off_t startsector, size_t *numsectors) __attribute__((__stdcall__));
-    int (*flush)(void* userdata) __attribute__((__stdcall__));
-    unsigned int (*adjust_cache_size)(uint32_t suggested_size) __attribute__((__stdcall__));
+    int (*flush)(void *userdata) __attribute__((__stdcall__));
+    unsigned int (*adjust_cache_size)(void *userdata, uint32_t suggested_size) __attribute__((__stdcall__));
 } diskfunc_t;
 
 struct disk_t {
@@ -231,7 +231,6 @@ typedef struct {
 void kos_init(void);
 void i40(void);
 uint32_t kos_time_to_epoch(uint32_t *time);
-void set_eflags_tf(int x);
 
 void *disk_add(diskfunc_t *disk, const char *name, void *userdata, uint32_t flags)  __attribute__((__stdcall__));
 void *disk_media_changed(diskfunc_t *disk, int inserted) __attribute__((__stdcall__));

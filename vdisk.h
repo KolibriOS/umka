@@ -19,4 +19,7 @@ int vdisk_write(void *userdata, void *buffer, off_t startsector, size_t *numsect
 __attribute__((__stdcall__))
 int vdisk_querymedia(void *userdata, diskmediainfo_t *minfo);
 
+__attribute__((__stdcall__))
+unsigned int vdisk_adjust_cache_size(void *userdata, unsigned int suggested_size);
+
 #endif  // VDISK_H_INCLUDED

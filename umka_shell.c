@@ -62,14 +62,14 @@ diskfunc_t vdisk_functions = {
                                  .read = vdisk_read,
                                  .write = vdisk_write,
                                  .flush = NULL,
-                                 .adjust_cache_size = NULL,
+                                 .adjust_cache_size = vdisk_adjust_cache_size,
                                 };
 char cur_dir[PATH_MAX] = "/";
 const char *last_dir = cur_dir;
 bool cur_dir_changed = true;
 
 char cmd_buf[FGETS_BUF_LEN];
-int trace;
+int trace = 0;
 
 const char *f70_status_name[] = {
                                  "success",
@@ -974,7 +974,7 @@ void *run_test(const char *infile_name) {
             usage();
             return NULL;
         }
-        strcpy(last_dot, ".out");
+        strcpy(last_dot, ".out.log");
         infile = fopen(infile_name, "r");
         outfile = fopen(outfile_name, "w");
         if (!infile || !outfile) {

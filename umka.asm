@@ -19,7 +19,6 @@ public coverage_begin
 public coverage_end
 
 public sha3_256_oneshot as 'hash_oneshot'
-public set_eflags_tf
 public kos_time_to_epoch
 public kos_init
 
@@ -144,19 +143,6 @@ proc sha3_256_oneshot c uses ebx esi edi ebp, _ctx, _data, _len
         stdcall sha3_256.oneshot, [_ctx], [_data], [_len]
         ret
 endp
-
-; TODO: move to trace_lbr
-set_eflags_tf:
-        pushfd
-        pop     eax
-        mov     ecx, [esp + 4]
-        and     ecx, 1
-        shl     ecx, 8  ; TF
-        and     eax, NOT (1 SHL 8)
-        or      eax, ecx
-        push    eax
-        popfd
-        ret
 
 proc kos_time_to_epoch c uses ebx esi edi ebp, _time
         mov     esi, [_time]

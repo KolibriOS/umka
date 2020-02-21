@@ -3,7 +3,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-#define MAX_COVERED_CODE_SIZE (128*1024)
+#define MAX_COVERED_CODE_SIZE (256*1024)
 
 typedef struct {
     uint64_t to_cnt, from_cnt;
@@ -18,16 +18,18 @@ void read_coverage_file(const char *fname) {
     fseeko(f, 0, SEEK_END);
     off_t fsize = ftello(f);
     fseeko(f, 0, SEEK_SET);
-    size_t branch_cnt = fsize/(2*sizeof(uint32_t));
+    fread(&coverage_begin, sizeof(uint32_t), 1, f);
+    fread(&coverage_end, sizeof(uint32_t), 1, f);
+    size_t branch_cnt = (fsize-4*2)/(2*4);
     for (size_t i = 0; i < branch_cnt; i++) {
         uint32_t from, to;
         fread(&from, sizeof(uint32_t), 1, f);
         fread(&to, sizeof(uint32_t), 1, f);
-        if (from >= coverage_begin && from < coverage_end /*&& to < 0x80000000u*/) {
+        if (from >= coverage_begin && from < coverage_end) {
             from = from - coverage_begin + coverage_offset;
             branches[from].from_cnt++;
         }
-        if (to >= coverage_begin && to < coverage_end /*&& from < 0x80000000u*/) {
+        if (to >= coverage_begin && to < coverage_end) {
             to = to - coverage_begin + coverage_offset;
             branches[to].to_cnt++;
         }
@@ -94,15 +96,13 @@ int is_cond_jump(const char *s) {
 }
 
 int main(int argc, char **argv) {
-    if (argc < 6) {
-        fprintf(stderr, "usage: covpreproc <listing file> <coverage_begin offset> <coverage_begin address> <coverage_end address> <coverage files ...>\n");
+    if (argc < 4) {
+        fprintf(stderr, "usage: covpreproc <listing file> <coverage_begin offset> <coverage files ...>\n");
         exit(1);
     }
     sscanf(argv[2], "%" SCNx32, &coverage_offset);
-    sscanf(argv[3], "%" SCNx32, &coverage_begin);
-    sscanf(argv[4], "%" SCNx32, &coverage_end);
 
-    for (int i = 5; i < argc; i++) {
+    for (int i = 3; i < argc; i++) {
         read_coverage_file(argv[i]);
     }
 
@@ -123,8 +123,10 @@ int main(int argc, char **argv) {
             unsigned long pos = strtoul(tmp, NULL, 16);
             size_t total_to = 0, total_from = 0;
             for (size_t i = 0; i < inst_len; i++) {
-                total_to += branches[pos + i].to_cnt;
-                total_from += branches[pos + i].from_cnt;
+                if (pos + i < coverage_end - coverage_begin + coverage_offset) {
+                    total_to += branches[pos + i].to_cnt;
+                    total_from += branches[pos + i].from_cnt;
+                }
             }
             cur += total_to;
             if (is_cond) {

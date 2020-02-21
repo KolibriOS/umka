@@ -60,3 +60,10 @@ int vdisk_querymedia(void *userdata, diskmediainfo_t *minfo) {
     minfo->capacity = vdisk->sect_cnt;
     return ERROR_SUCCESS;
 }
+
+__attribute__((__stdcall__))
+unsigned int vdisk_adjust_cache_size(void *userdata, unsigned int suggested_size) {
+    (void)userdata;
+    (void)suggested_size;
+    return 64*1024;
+}

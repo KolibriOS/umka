@@ -37,3 +37,11 @@ draw: $(draw_tests)
 	$(UMKA_SHELL) < $*.t > $@
 	@ cmp $@ $<
 	@ if [ -f "$*.ref.png" ]; then cmp $*.out.png $*.ref.png; fi
+
+coverage:
+	../covpreproc ../umka.lst 0x34 coverage.* > ../umka.cov
+
+clean:
+	rm -f ???_*.out.{log,png} coverage coverage.*
+
+.PHONY: clean coverage
