@@ -45,8 +45,6 @@ MAX_PRIORITY      = 0   ; highest, used for kernel tasks
 USER_PRIORITY     = 1   ; default
 IDLE_PRIORITY     = 2   ; lowest, only IDLE thread goes here
 
-purge mov,add,sub
-purge mov,add,sub
 section '.text' executable align 32
 
 coverage_begin:
@@ -132,12 +130,6 @@ include 'hid/mousedrv.inc'
 include 'network/stack.inc'
 
 include 'sha3.asm'
-
-struct VDISK
-  File     dd ?
-  SectCnt  DQ ?
-  SectSize dd ?  ; sector size
-ends
 
 proc sha3_256_oneshot c uses ebx esi edi ebp, _ctx, _data, _len
         stdcall sha3_256.oneshot, [_ctx], [_data], [_len]
@@ -254,14 +246,6 @@ proc kos_init c uses ebx esi edi ebp
         ret
 endp
 
-proc alloc_page
-        ret
-endp
-
-proc alloc_pages _cnt
-        ret
-endp
-
 proc sys_msg_board
         cmp     cl, 0x0d
         jz      @f
@@ -278,31 +262,10 @@ proc sys_msg_board
         ret
 endp
 
-
-proc disable_irq _irq
-        ret
-endp
-
-proc enable_irq _irq
-        ret
-endp
-
-proc map_page _one, _two, _three
-        ret
-endp
-
-proc create_ring_buffer stdcall, size:dword, flags:dword
-        ret
-endp
-
-proc map_memEx stdcall, lin_addr:dword,slot:dword,\
-                        ofs:dword,buf_size:dword,req_access:dword
-        ret
-endp
-
 change_task:
         mov     [REDRAW_BACKGROUND], 0
         ret
+
 
 sysfn_saveramdisk:
 sysfn_meminfo:
@@ -353,7 +316,8 @@ init_fpu:
 init_mtrr:
 map_io_mem:
 create_trampoline_pgmap:
-        ret
+alloc_page:
+
 sys_settime:
 sys_pcibios:
 sys_IPC:
@@ -363,25 +327,29 @@ f68:
 sys_posix:
         ret
 
+alloc_pages:
+enable_irq:
+disable_irq:
+        ret     4
+create_ring_buffer:
+        ret     8
+map_page:
+        ret     12
+map_memEx:
+        ret     20
 
-macro format a,b,c,d {
-macro pew x \{
-\}
-}
 
-pewpew:
-
-macro pew x, y {
-  if y eq 1
-    include `x
-  end if
+macro include_ x {
+  inclu#de `x
 }
 
 include fix pew
-HEAP_BASE equ
+macro pew x {}
 macro org x {}
-include 'init.inc', 1
-sys_msg_board equ tyu
+macro format [x] {}
+HEAP_BASE equ
+include_ 'init.inc'
+sys_msg_board equ __pew
 
 macro lea r, v {
   if v eq [(ecx-(CURRENT_TASK and 1FFFFFFFh)-TASKDATA.state)*8+SLOT_BASE]
@@ -392,6 +360,7 @@ macro lea r, v {
         lea     r, v
   end if
 }
+
 macro add r, v {
   if v eq CURRENT_TASK - (SLOT_BASE shr 3)
         int3
@@ -399,23 +368,17 @@ macro add r, v {
         add     r, v
   end if
 }
-include 'kernel.asm', 1
-purge lea
-restore lea
-purge add
-restore add
-purge sys_msg_board
-restore org
-purge org
-purge HEAP_BASE
-restore pew
+
+include_ 'kernel.asm'
+
+purge lea,add,org,pew
+restore lea,add,org,pew
+purge sys_msg_board,HEAP_BASE
 
 coverage_end:
 
 
 section '.data' writeable align 64
-;include_debug_strings
-
 timer_ticks dd 0
 fpu_owner dd ?
 
@@ -464,7 +427,4 @@ BUTTON_INFO     rb  64*1024
 BUTTON_INFO     equ
 endg
 
-macro iii {
-inclu#de 'data32.inc'
-}
-iii
+include_ 'data32.inc'
