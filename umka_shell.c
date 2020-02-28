@@ -727,22 +727,22 @@ void umka_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
     uint32_t readdir_enc = DEFAULT_READDIR_ENCODING;
     uint32_t path_enc = DEFAULT_PATH_ENCODING;
     uint32_t from_idx = 0, count = MAX_DIRENTS_TO_READ;
-    if (argc > 1 && *argv[1] != '-') {
+    if (argc > 1 && *argv[optind] != '-') {
         path = argv[optind++];
     }
     while ((opt = getopt(argc, argv, optstring)) != -1) {
         switch (opt) {
         case 'f':
-            from_idx = strtoul(argv[optind++], NULL, 0);
+            from_idx = strtoul(optarg, NULL, 0);
             break;
         case 'c':
-            count = strtoul(argv[optind++], NULL, 0);
+            count = strtoul(optarg, NULL, 0);
             break;
         case 'e':
-            readdir_enc = parse_encoding(argv[optind++]);
+            readdir_enc = parse_encoding(optarg);
             break;
         case 'p':
-            path_enc = parse_encoding(argv[optind++]);
+            path_enc = parse_encoding(optarg);
             break;
         default:
             puts(usage);
