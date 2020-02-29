@@ -74,4 +74,142 @@ d0bfd180d0b8d0b2d0b5d182e29da6d0bcd0b8d1800a
 status = 0 success, count = 26
 d0bfd180d0b8d0b2d0b5d182e29da6f09f9297d0bcd0b8d1800a
 
+/> ls70 /hd0/1/ -e utf8
+status = 6 end_of_file, count = 6
+total = 6
+----f .
+----f ..
+----f dir0
+----f дир❦
+----f ❦❦❦
+----f дир3
+/> ls70 /hd0/1/ -e utf16
+status = 6 end_of_file, count = 6
+total = 6
+----f .
+----f ..
+----f d
+----f 48@f'
+----f f'f'f'
+----f 48@3
+/> ls70 /hd0/1/ -e cp866
+status = 6 end_of_file, count = 6
+total = 6
+----f .
+----f ..
+----f dir0
+----f ���_
+----f ___
+----f ���3
+/> ls70 /hd0/1/ -e default
+status = 6 end_of_file, count = 6
+total = 6
+----f .
+----f ..
+----f d
+----f 48@f'
+----f f'f'f'
+----f 48@3
+/> ls70 /hd0/1/❦❦❦/ -e utf8
+status = 5 file_not_found
+/> ls70 /hd0/1/❦❦❦/ -e utf16
+status = 5 file_not_found
+/> ls70 /hd0/1/❦❦❦/ -e cp866
+status = 5 file_not_found
+/> ls70 /hd0/1/❦❦❦/ -e default
+status = 5 file_not_found
+/> ls70 /hd0/1/дир3/ -e utf8
+status = 5 file_not_found
+/> ls70 /hd0/1/дир3/ -e utf16
+status = 5 file_not_found
+/> ls70 /hd0/1/дир3/ -e cp866
+status = 5 file_not_found
+/> ls70 /hd0/1/дир3/ -e default
+status = 5 file_not_found
+
+/> ls80 /hd0/1/ -e utf8
+status = 6 end_of_file, count = 6
+total = 6
+----f .
+----f ..
+----f dir0
+----f дир❦
+----f ❦❦❦
+----f дир3
+/> ls80 /hd0/1/ -e utf16
+status = 6 end_of_file, count = 6
+total = 6
+----f .
+----f ..
+----f d
+----f 48@f'
+----f f'f'f'
+----f 48@3
+/> ls80 /hd0/1/ -e cp866
+status = 6 end_of_file, count = 6
+total = 6
+----f .
+----f ..
+----f dir0
+----f ���_
+----f ___
+----f ���3
+/> ls80 /hd0/1/ -e default
+status = 6 end_of_file, count = 6
+total = 6
+----f .
+----f ..
+----f d
+----f 48@f'
+----f f'f'f'
+----f 48@3
+/> ls80 /hd0/1/❦❦❦/ -e utf8
+status = 6 end_of_file, count = 3
+total = 3
+----f .
+----f ..
+----f д❦р22
+/> ls80 /hd0/1/❦❦❦/ -e utf16
+status = 6 end_of_file, count = 3
+total = 3
+----f .
+----f ..
+----f 4f'@2
+/> ls80 /hd0/1/❦❦❦/ -e cp866
+status = 6 end_of_file, count = 3
+total = 3
+----f .
+----f ..
+----f �_�22
+/> ls80 /hd0/1/❦❦❦/ -e default
+status = 6 end_of_file, count = 3
+total = 3
+----f .
+----f ..
+----f 4f'@2
+/> ls80 /hd0/1/дир3/ -e utf8
+status = 6 end_of_file, count = 3
+total = 3
+----f .
+----f ..
+----- файл33
+/> ls80 /hd0/1/дир3/ -e utf16
+status = 6 end_of_file, count = 3
+total = 3
+----f .
+----f ..
+----- D09;3
+/> ls80 /hd0/1/дир3/ -e cp866
+status = 6 end_of_file, count = 3
+total = 3
+----f .
+----f ..
+----- 䠩�33
+/> ls80 /hd0/1/дир3/ -e default
+status = 6 end_of_file, count = 3
+total = 3
+----f .
+----f ..
+----- D09;3
+
 /> disk_del hd0

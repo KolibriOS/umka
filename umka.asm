@@ -340,17 +340,15 @@ map_memEx:
         ret     20
 
 
-macro include_ x {
-  inclu#de `x
-}
+HEAP_BASE equ
+include 'init.inc'
+sys_msg_board equ __pew
 
 include fix pew
 macro pew x {}
+macro pew x {inclu#de `x}
 macro org x {}
 macro format [x] {}
-HEAP_BASE equ
-include_ 'init.inc'
-sys_msg_board equ __pew
 
 macro lea r, v {
   if v eq [(ecx-(CURRENT_TASK and 1FFFFFFFh)-TASKDATA.state)*8+SLOT_BASE]
@@ -370,10 +368,10 @@ macro add r, v {
   end if
 }
 
-include_ 'kernel.asm'
+include 'kernel.asm'
 
-purge lea,add,org,pew
-restore lea,add,org,pew
+purge lea,add,org
+restore lea,add,org
 purge sys_msg_board,HEAP_BASE
 
 coverage_end:
@@ -428,4 +426,4 @@ BUTTON_INFO     rb  64*1024
 BUTTON_INFO     equ
 endg
 
-include_ 'data32.inc'
+include 'data32.inc'
