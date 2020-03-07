@@ -7,7 +7,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <sched.h>
 #include "kolibri.h"
 
 #define MSR_IA32_DEBUGCTLMSR        0x1d9
@@ -82,10 +81,6 @@ void trace_lbr_begin() {
     action.sa_flags = SA_SIGINFO;
     sigaction(SIGTRAP, &action, NULL);
 
-    cpu_set_t my_set;
-    CPU_ZERO(&my_set);
-    CPU_SET(0, &my_set);
-    sched_setaffinity(0, sizeof(cpu_set_t), &my_set);
     wrmsr(MSR_IA32_DEBUGCTLMSR, 3);
     msrfd = open("/dev/cpu/0/msr", O_RDONLY);
     if (msrfd < 0) {
