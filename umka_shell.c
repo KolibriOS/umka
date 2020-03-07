@@ -62,7 +62,7 @@ diskfunc_t vdisk_functions = {
                                  .read = vdisk_read,
                                  .write = vdisk_write,
                                  .flush = NULL,
-                                 .adjust_cache_size = vdisk_adjust_cache_size,
+                                 .adjust_cache_size = NULL,
                                 };
 char cur_dir[PATH_MAX] = "/";
 const char *last_dir = cur_dir;
@@ -224,11 +224,33 @@ void umka_disk_list_partitions(disk_t *d) {
 }
 
 void umka_disk_add(int argc, char **argv) {
-    (void)argc;
-    const char *file_name = argv[1];
-    const char *disk_name = argv[2];
+    const char *usage = \
+        "usage: disk_add <file> <name> [option]...\n"
+        "  <file>           absolute or relative path\n"
+        "  <name>           disk name, e.g. hd0 or rd\n"
+        "  -c cache size    size of disk cache in bytes";
+    if (argc < 3) {
+        puts(usage);
+        return;
+    }
+    unsigned cache_size = 0u;
+    int opt;
+    optind = 1;
+    const char *file_name = argv[optind++];
+    const char *disk_name = argv[optind++];
+    while ((opt = getopt(argc, argv, "c:")) != -1) {
+        switch (opt) {
+        case 'c':
+            cache_size = strtoul(optarg, NULL, 0);
+            vdisk_functions.adjust_cache_size = vdisk_adjust_cache_size;
+            break;
+        default:
+            puts(usage);
+            return;
+        }
+    }
 
-    void *userdata = vdisk_init(file_name);
+    void *userdata = vdisk_init(file_name, cache_size);
     if (userdata) {
         void *vdisk = disk_add(&vdisk_functions, disk_name, userdata, 0);
         if (vdisk) {

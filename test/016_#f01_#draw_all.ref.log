@@ -1,4 +1,4 @@
-/> disk_add ../img/kolibri.img rd
+/> disk_add ../img/kolibri.img rd -c 0
 /rd/1: fat
 /> set_skin /sys/DEFAULT.SKN
 status: 0

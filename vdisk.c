@@ -7,11 +7,12 @@
 
 typedef struct {
     FILE *file;
-    uint64_t sect_cnt;
     uint32_t sect_size;
+    uint64_t sect_cnt;
+    unsigned cache_size;
 } vdisk_t;
 
-void *vdisk_init(const char *fname) {
+void *vdisk_init(const char *fname, unsigned cache_size) {
     FILE *f = fopen(fname, "r+");
     if (!f) {
         printf("vdisk: can't open file '%s': %s\n", fname, strerror(errno));
@@ -25,7 +26,10 @@ void *vdisk_init(const char *fname) {
         sect_size = 4096;
     }
     vdisk_t *vdisk = (vdisk_t*)malloc(sizeof(vdisk_t));
-    *vdisk = (vdisk_t){f, (uint64_t)fsize / sect_size, sect_size};
+    *vdisk = (vdisk_t){.file = f,
+                       .sect_size = sect_size,
+                       .sect_cnt = (uint64_t)fsize / sect_size,
+                       .cache_size = cache_size};
     return vdisk;
 }
 
@@ -37,7 +41,8 @@ void vdisk_close(void *userdata) {
 }
 
 __attribute__((__stdcall__))
-int vdisk_read(void *userdata, void *buffer, off_t startsector, size_t *numsectors) {
+int vdisk_read(void *userdata, void *buffer, off_t startsector,
+               size_t *numsectors) {
     vdisk_t *vdisk = userdata;
     fseeko(vdisk->file, startsector * vdisk->sect_size, SEEK_SET);
     fread(buffer, *numsectors * vdisk->sect_size, 1, vdisk->file);
@@ -45,7 +50,8 @@ int vdisk_read(void *userdata, void *buffer, off_t startsector, size_t *numsecto
 }
 
 __attribute__((__stdcall__))
-int vdisk_write(void *userdata, void *buffer, off_t startsector, size_t *numsectors) {
+int vdisk_write(void *userdata, void *buffer, off_t startsector,
+                size_t *numsectors) {
     vdisk_t *vdisk = userdata;
     fseeko(vdisk->file, startsector * vdisk->sect_size, SEEK_SET);
     fwrite(buffer, *numsectors * vdisk->sect_size, 1, vdisk->file);
@@ -62,8 +68,7 @@ int vdisk_querymedia(void *userdata, diskmediainfo_t *minfo) {
 }
 
 __attribute__((__stdcall__))
-unsigned int vdisk_adjust_cache_size(void *userdata, unsigned int suggested_size) {
-    (void)userdata;
+unsigned vdisk_adjust_cache_size(vdisk_t *vdisk, unsigned suggested_size) {
     (void)suggested_size;
-    return 64*1024;
+    return vdisk->cache_size;
 }

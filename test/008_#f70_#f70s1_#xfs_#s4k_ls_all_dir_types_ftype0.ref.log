@@ -1,4 +1,4 @@
-/> disk_add ../img/xfs_v4_ftype0_s4k_b4k_n8k.img hd0
+/> disk_add ../img/xfs_v4_ftype0_s4k_b4k_n8k.img hd0 -c 0
 /hd0/1: xfs
 /> ls70 /hd0/1/sf
 status = 6 end_of_file, count = 5

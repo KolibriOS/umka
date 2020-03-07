@@ -1,4 +1,4 @@
-/> disk_add ../img/xfs_v5_ftype1_s05k_b2k_n8k.img hd0
+/> disk_add ../img/xfs_v5_ftype1_s05k_b2k_n8k.img hd0 -c 0
 /hd0/1: xfs
 /> stat70 /hd0/1/sf_empty
 status = 0 success

@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
                 exit(1);
         }
         kos_init();
-        void *userdata = vdisk_init(argv[2]);
+        void *userdata = vdisk_init(argv[2], 0u);
         void *vdisk = disk_add(&vdisk_functions, "hd0", userdata, 0);
         disk_media_changed(vdisk, 1);
         return fuse_main(argc-1, argv, &umka_oper, NULL);

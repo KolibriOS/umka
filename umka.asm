@@ -389,6 +389,9 @@ uglobal
 context_counter dd ?
 LAPIC_BASE dd ?
 irq_mode dd ?
+ioapic_cnt dd ?
+ioapic_gsi_base dd ?
+MAX_IOAPICS = 2
 cache_ide0  IDE_CACHE
 cache_ide1  IDE_CACHE
 DiskNumber db ?

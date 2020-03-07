@@ -1,4 +1,4 @@
-disk_add ../img/xfs_v4_unicode.img hd0
+disk_add ../img/xfs_v4_unicode.img hd0 -c 0
 
 stat80 /hd0/1/dir0
 stat80 /hd0/1/dir0/
