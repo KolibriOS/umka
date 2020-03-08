@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include <stdint.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -75,7 +74,6 @@ void set_eflags_tf(uint32_t tf) {
 }
 
 void trace_lbr_begin() {
-    printf("hello from lbr!\n");
     struct sigaction action;
     action.sa_sigaction = &handle_sigtrap;
     action.sa_flags = SA_SIGINFO;

@@ -3,7 +3,7 @@ MKFILEPATTERN=../tools/mkfilepattern
 MOUNT_OPT=-t xfs
 TEMP_DIR:=$(shell mktemp -d)
 
-all: s05k s4k unicode v5
+all: s05k s4k unicode v5 kolibri.img
 	rmdir $(TEMP_DIR)
 
 s05k: xfs_v4_ftype0_s05k_b2k_n8k.img xfs_v4_ftype1_s05k_b2k_n8k.img xfs_v4_xattr.img xfs_v4_files_s05k_b4k_n8k.img xfs_v4_ftype0_s05k_b2k_n8k_xattr.img
@@ -13,6 +13,12 @@ s4k: xfs_v4_ftype0_s4k_b4k_n8k.img
 unicode: xfs_v4_unicode.img
 
 v5: xfs_v5_ftype1_s05k_b2k_n8k.img xfs_v5_files_s05k_b4k_n8k.img
+
+kolibri.img: ../default.skn
+	touch $@
+	fallocate -z -o 0 -l 1440KiB $@
+	mkfs.vfat -n KOLIBRIOS -F 12 $@
+	mcopy -vmoi $@ $< ::DEFAULT.SKN
 
 xfs_v4_ftype0_s05k_b2k_n8k.img:
 	fallocate -l 63MiB $@
@@ -120,15 +126,15 @@ xfs_v4_files_s05k_b4k_n8k.img:
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
-	$(MKFILEPATTERN) $(TEMP_DIR)/no_hole 65536
+	$(MKFILEPATTERN) $(TEMP_DIR)/no_hole 0 65536
 #
-	$(MKFILEPATTERN) $(TEMP_DIR)/hole_begin 65536
+	$(MKFILEPATTERN) $(TEMP_DIR)/hole_begin 0 65536
 	fallocate -p -o 0 -l 16KiB $(TEMP_DIR)/hole_begin
 #
-	$(MKFILEPATTERN) $(TEMP_DIR)/hole_middle 65536
+	$(MKFILEPATTERN) $(TEMP_DIR)/hole_middle 0 65536
 	fallocate -p -o 32KiB -l 16KiB $(TEMP_DIR)/hole_middle
 #
-	$(MKFILEPATTERN) $(TEMP_DIR)/hole_end 65536
+	$(MKFILEPATTERN) $(TEMP_DIR)/hole_end 0 65536
 	fallocate -p -o 48KiB -l 16KiB $(TEMP_DIR)/hole_end
 #
 	fallocate -l 4KiB $(TEMP_DIR)/btree_l1_no_hole
@@ -136,7 +142,12 @@ xfs_v4_files_s05k_b4k_n8k.img:
 		fallocate -i -l 4KiB -o 0KiB $(TEMP_DIR)/btree_l1_no_hole ; \
 		fallocate -z -l 4KiB -o 0KiB $(TEMP_DIR)/btree_l1_no_hole ; \
 	done
-	$(MKFILEPATTERN) $(TEMP_DIR)/btree_l1_no_hole 8196096
+	$(MKFILEPATTERN) $(TEMP_DIR)/btree_l1_no_hole 0 8196096
+#
+#	fallocate -l 5GiB $(TEMP_DIR)/4GiB_plus
+	$(MKFILEPATTERN) $(TEMP_DIR)/4GiB_plus 0x120008000 0x1000
+	$(MKFILEPATTERN) $(TEMP_DIR)/4GiB_plus 0x120000000 0x4000
+	$(MKFILEPATTERN) $(TEMP_DIR)/4GiB_plus 0xffffe000 0x4000
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@ 
@@ -274,15 +285,15 @@ xfs_v5_files_s05k_b4k_n8k.img:
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
-	$(MKFILEPATTERN) $(TEMP_DIR)/no_hole 65536
+	$(MKFILEPATTERN) $(TEMP_DIR)/no_hole 0 65536
 #
-	$(MKFILEPATTERN) $(TEMP_DIR)/hole_begin 65536
+	$(MKFILEPATTERN) $(TEMP_DIR)/hole_begin 0 65536
 	fallocate -p -o 0 -l 16KiB $(TEMP_DIR)/hole_begin
 #
-	$(MKFILEPATTERN) $(TEMP_DIR)/hole_middle 65536
+	$(MKFILEPATTERN) $(TEMP_DIR)/hole_middle 0 65536
 	fallocate -p -o 32KiB -l 16KiB $(TEMP_DIR)/hole_middle
 #
-	$(MKFILEPATTERN) $(TEMP_DIR)/hole_end 65536
+	$(MKFILEPATTERN) $(TEMP_DIR)/hole_end 0 65536
 	fallocate -p -o 48KiB -l 16KiB $(TEMP_DIR)/hole_end
 #
 	fallocate -l 4KiB $(TEMP_DIR)/btree_l1_no_hole
@@ -290,7 +301,7 @@ xfs_v5_files_s05k_b4k_n8k.img:
 		fallocate -i -l 4KiB -o 0KiB $(TEMP_DIR)/btree_l1_no_hole ; \
 		fallocate -z -l 4KiB -o 0KiB $(TEMP_DIR)/btree_l1_no_hole ; \
 	done
-	$(MKFILEPATTERN) $(TEMP_DIR)/btree_l1_no_hole 8196096
+	$(MKFILEPATTERN) $(TEMP_DIR)/btree_l1_no_hole 0 8196096
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@ 

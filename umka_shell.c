@@ -46,14 +46,6 @@
 #define DEFAULT_READDIR_ENCODING UTF8
 #define DEFAULT_PATH_ENCODING UTF8
 
-#define CHECK_OPTION_ARG    \
-    do {                        \
-        if (!argv[++optind]) {  \
-            puts(usage);        \
-            return;             \
-        }                       \
-    } while (0)
-
 diskfunc_t vdisk_functions = {
                                  .strucsize = sizeof(diskfunc_t),
                                  .close = vdisk_close,
@@ -977,10 +969,6 @@ func_table_t funcs[] = {
                         { NULL,                 NULL },
                        };
 
-void usage() {
-    printf("usage: umka_shell [test_file.t]\n");
-}
-
 void *run_test(const char *infile_name) {
     FILE *infile, *outfile;
 
@@ -993,7 +981,6 @@ void *run_test(const char *infile_name) {
         char *last_dot = strrchr(outfile_name, '.');
         if (!last_dot) {
             printf("test file must have '.t' suffix\n");
-            usage();
             return NULL;
         }
         strcpy(last_dot, ".out.log");
@@ -1037,21 +1024,32 @@ void *run_test(const char *infile_name) {
 }
 
 int main(int argc, char **argv) {
+    const char *usage = \
+        "usage: umka_shell [test_file.t] [-c]\n"
+        "  -c               trace branches to collect coverage";
+    const char *test_file = NULL;
+
+    int opt;
+    optind = 1;
+    if (argc > 1 && *argv[optind] != '-') {
+        test_file = argv[optind++];
+    }
+    while ((opt = getopt(argc, argv, "c")) != -1) {
+        switch (opt) {
+        case 'c':
+            trace = 1;
+            break;
+        default:
+            puts(usage);
+            return 1;
+        }
+    }
+
     if (trace)
         trace_begin();
     kos_init();
 
-    switch (argc) {
-    case 1:
-        run_test(NULL);
-        break;
-    case 2: {
-        run_test(argv[1]);
-        break;
-    }
-    default:
-        usage();
-    }
+    run_test(test_file);
 
     if (trace)
         trace_end();

@@ -1,8 +1,8 @@
-ifneq ($(COVERAGE),)
-TASKSET=taskset 1
+ifndef COVERAGE
+UMKA_SHELL=../umka_shell
+else
+UMKA_SHELL=sudo taskset 1 ../umka_shell -c
 endif
-
-UMKA_SHELL=$(TASKSET) ../umka_shell
 
 xfs_tests     := $(addsuffix .out.log, $(basename $(wildcard *\#xfs_*.t)))
 s05k_tests    := $(addsuffix .out.log, $(basename $(wildcard *\#s05k_*.t)))

@@ -16,13 +16,15 @@ int main(int argc, char *argv[])
 {
     uint8_t buf[BUF_LEN + 7];
     int64_t len;
+    off_t offset;
     char *path;
-    if (argc != 3) {
-        fprintf(stderr, "mkfilepattern filename size\n");
+    if (argc != 4) {
+        fprintf(stderr, "mkfilepattern filename offset length\n");
         exit(1);
     } else {
         path = argv[1];
-        sscanf(argv[2], "%" SCNi64, &len);
+        offset = strtoll(argv[2], NULL, 0);
+        len = strtoll(argv[3], NULL, 0);
     }
 
     int fd = open(path, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
@@ -31,9 +33,10 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    for (int64_t pos = 0, count = BUF_LEN; pos < len; pos += count) {
-        if (count > len - pos) {
-            count = len - pos;
+    lseek(fd, offset, SEEK_SET);
+    for (int64_t pos = offset, count = BUF_LEN; pos < offset + len; pos += count) {
+        if (count > offset + len - pos) {
+            count = offset + len - pos;
         }
 
         off_t off = 0;

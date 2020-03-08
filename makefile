@@ -6,7 +6,7 @@ CFLAGS_32=$(CFLAGS) -m32
 LDFLAGS=
 LDFLAGS_32=$(LDFLAGS) -m32
 
-all: umka_shell umka_fuse umka.sym umka.prp umka.lst tags tools/mkdirrange tools/mkfilepattern covpreproc
+all: umka_shell umka_fuse umka.sym umka.prp umka.lst tags tools/mkdirrange tools/mkfilepattern covpreproc default.skn skin.skn
 
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
@@ -17,11 +17,14 @@ umka_shell: umka_shell.o umka.o trace.o trace_lbr.o vdisk.o lodepng.o
 umka_fuse: umka_fuse.o umka.o vdisk.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
-umka.o umka.fas: umka.asm skin.skn
+umka.o umka.fas: umka.asm
 	INCLUDE="$(KOLIBRI)/kernel/trunk;$(KOLIBRI)/programs/develop/libraries/libcrash/trunk" $(FASM) $< umka.o -s umka.fas -m 1234567
 
 lodepng.o: lodepng.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
+
+default.skn: $(KOLIBRI)/skins/Leency/Shkvorka/default.asm
+	$(FASM) $< $@
 
 skin.skn: $(KOLIBRI)/skins/Leency/Octo_flat/default.asm
 	$(FASM) $< $@
