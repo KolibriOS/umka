@@ -148,6 +148,7 @@ xfs_v4_files_s05k_b4k_n8k.img:
 	$(MKFILEPATTERN) $(TEMP_DIR)/4GiB_plus 0x120008000 0x1000
 	$(MKFILEPATTERN) $(TEMP_DIR)/4GiB_plus 0x120000000 0x4000
 	$(MKFILEPATTERN) $(TEMP_DIR)/4GiB_plus 0xffffe000 0x4000
+	$(MKFILEPATTERN) $(TEMP_DIR)/4GiB_plus 0x4000 0x4000
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@ 

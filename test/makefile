@@ -46,6 +46,6 @@ coverage:
 	../covpreproc ../umka.lst 0x34 coverage.* > ../umka.cov
 
 clean:
-	rm -f ???_*.out.{log,png} coverage coverage.*
+	rm -f ???_*.out.{log,png} coverage.*
 
 .PHONY: clean coverage
