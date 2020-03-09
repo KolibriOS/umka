@@ -218,7 +218,7 @@ status = 0 success, count = 1
 status = 0 success, count = 1
 00
 /> read70 /hd0/1/hole_end 0x10000 1 -b
-status = 0 success, count = 0
+status = 6 end_of_file, count = 0
 
 /> read70 /hd0/1/hole_end 0x10001 1 -b
 status = 6 end_of_file, count = 0
@@ -255,19 +255,19 @@ status = 0 success, count = 11
 status = 0 success, count = 11
 0000000000000000000000
 /> read70 /hd0/1/hole_end 0xfff6 11 -b
-status = 0 success, count = 10
+status = 6 end_of_file, count = 10
 00000000000000000000
 /> read70 /hd0/1/hole_end 0xfff7 11 -b
-status = 0 success, count = 9
+status = 6 end_of_file, count = 9
 000000000000000000
 /> read70 /hd0/1/hole_end 0xfffe 11 -b
-status = 0 success, count = 2
+status = 6 end_of_file, count = 2
 0000
 /> read70 /hd0/1/hole_end 0xffff 11 -b
-status = 0 success, count = 1
+status = 6 end_of_file, count = 1
 00
 /> read70 /hd0/1/hole_end 0x10000 11 -b
-status = 0 success, count = 0
+status = 6 end_of_file, count = 0
 
 /> read70 /hd0/1/hole_end 0x10001 11 -b
 status = 6 end_of_file, count = 0

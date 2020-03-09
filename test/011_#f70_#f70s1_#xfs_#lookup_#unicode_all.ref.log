@@ -62,16 +62,16 @@ attr: -----
 size: 26
 
 /> read80 /hd0/1/dir0/file00 0 100 -b
-status = 0 success, count = 12
+status = 6 end_of_file, count = 12
 68656c6c6f5f776f726c640a
 /> read80 /hd0/1/dir0/file00/ 0 100 -b
-status = 0 success, count = 12
+status = 6 end_of_file, count = 12
 68656c6c6f5f776f726c640a
 /> read80 /hd0/1/❦❦❦/д❦р22/❦❦ 0 100 -b
-status = 0 success, count = 22
+status = 6 end_of_file, count = 22
 d0bfd180d0b8d0b2d0b5d182e29da6d0bcd0b8d1800a
 /> read80 /hd0/1/дир3/файл33 0 100 -b
-status = 0 success, count = 26
+status = 6 end_of_file, count = 26
 d0bfd180d0b8d0b2d0b5d182e29da6f09f9297d0bcd0b8d1800a
 
 /> ls70 /hd0/1/ -e utf8

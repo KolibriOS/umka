@@ -230,13 +230,13 @@ b70dd656adf5c5b3434b695386dd07658e667f6f9d0cd34af5a3e8527924964f
 
 # data, hole, data
 /> read70 /hd0/1/4GiB_plus 0x120003fff 0x6000 -h
-status = 0 success, count = 20481
+status = 6 end_of_file, count = 20481
 f4ab1c2ab5e007814bc19cf58547cf98df1c1c70a1d02f5c417fe2a15b47239f
 /> read70 /hd0/1/4GiB_plus 0x120004000 0x6000 -h
-status = 0 success, count = 20480
+status = 6 end_of_file, count = 20480
 15b5d85486a41d2c1dfaa3f258e8eecc1047759a976fbd7813d1f9f710fe5a28
 /> read70 /hd0/1/4GiB_plus 0x120004001 0x6000 -h
-status = 0 success, count = 20479
+status = 6 end_of_file, count = 20479
 ba9f86ce5ae88d4875fa38ef47f7257ba00e172ed2e2ee1473599de58c80823c
 
 # hole, data, hole
