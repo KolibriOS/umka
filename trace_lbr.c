@@ -59,18 +59,23 @@ void handle_sigtrap() {
     wrmsr(MSR_IA32_DEBUGCTLMSR, 3);
 }
 
-void set_eflags_tf(uint32_t tf) {
+uint32_t set_eflags_tf(uint32_t tf) {
+    uint32_t prev;
     __asm__ __inline__ __volatile__ (
         "pushfd;"
         "pop    eax;"
-        "shl    ecx, 8;"    // TF
-        "and    eax, ~(1 << 8);"
+        "ror    eax, 8;"
+        "mov    edx, eax;"
+        "and    edx, 1;"
+        "and    eax, ~1;"
         "or     eax, ecx;"
+        "rol    eax, 8;"
         "push   eax;"
         "popfd"
-        :
+        : "=d"(prev)
         : "c"(tf)
         : "eax", "memory");
+    return prev;
 }
 
 void trace_lbr_begin() {
@@ -92,12 +97,18 @@ void trace_lbr_begin() {
     void *coverage_end_addr = &coverage_end;
     write(covfd, &coverage_begin_addr, 4);
     write(covfd, &coverage_end_addr, 4);
-    set_eflags_tf(1);
 }
 
 void trace_lbr_end() {
-    set_eflags_tf(0);
     wrmsr(MSR_IA32_DEBUGCTLMSR, 0);
     close(msrfd);
     close(covfd);
+}
+
+uint32_t trace_lbr_pause(void) {
+    return set_eflags_tf(0u);
+}
+
+void trace_lbr_resume(uint32_t value) {
+    set_eflags_tf(value);
 }
