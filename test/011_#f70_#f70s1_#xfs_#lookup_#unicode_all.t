@@ -50,4 +50,9 @@ ls80 /hd0/1/дир3/ -e utf16
 ls80 /hd0/1/дир3/ -e cp866
 ls80 /hd0/1/дир3/ -e default
 
+ls80 /hd0/1/❦👩❦/ -e utf8
+ls80 /hd0/1/❦👩❦/ -e utf16
+ls80 /hd0/1/❦👩❦/ -e cp866
+ls80 /hd0/1/❦👩❦/ -e default
+
 disk_del hd0

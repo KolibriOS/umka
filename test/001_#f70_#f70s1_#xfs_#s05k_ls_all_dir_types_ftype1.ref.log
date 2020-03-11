@@ -1,5 +1,8 @@
 /> disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.img hd0 -c 0
 /hd0/1: xfs
+/> disk_add ../img/xfs_short_dir_i8.img hd1 -c 0
+/hd1/1: xfs
+
 /> ls70 /hd0/1/sf_empty
 status = 6 end_of_file, count = 2
 total = 2
@@ -20,8 +23,52 @@ status = 0 success, count = 1
 /> ls70 /hd0/1/sf -f 2 -c 1
 status = 0 success, count = 1
 ----f d0000000000_
+/> ls70 /hd0/1/sf -f 3 -c 1
+status = 0 success, count = 1
+----f d0000000001_x
+/> ls70 /hd0/1/sf -f 3 -c 100
+status = 6 end_of_file, count = 2
+total = 5
+----f d0000000001_x
+----f d0000000002_xx
 /> ls70 /hd0/1/sf -f 200 -c 1
 status = 6 end_of_file, count = 0
+
+/> ls70 /hd1/1/sf
+status = 6 end_of_file, count = 7
+total = 7
+----f .
+----f ..
+----f d0000000000_
+----f d0000000001_x
+----f d0000000002_xx
+----f d0000000003_xxx
+----f d0000000004_xxxx
+/> ls70 /hd0/1/sf -f 1 -c 1
+status = 0 success, count = 1
+----f ..
+/> ls70 /hd0/1/sf -f 2 -c 1
+status = 0 success, count = 1
+----f d0000000000_
+/> ls70 /hd0/1/sf -f 3 -c 1
+status = 0 success, count = 1
+----f d0000000001_x
+/> ls70 /hd0/1/sf -f 3 -c 100
+status = 6 end_of_file, count = 2
+total = 5
+----f d0000000001_x
+----f d0000000002_xx
+/> ls70 /hd0/1/sf -f 200 -c 1
+status = 6 end_of_file, count = 0
+/> ls70 /hd1/1/sf/d0000000002_xx
+status = 6 end_of_file, count = 5
+total = 5
+----f .
+----f ..
+----f d0000000007_xxxxxxx
+----f d0000000008_xxxxxxxx
+----f d0000000009_xxxxxxxxx
+
 /> ls70 /hd0/1/block
 status = 6 end_of_file, count = 7
 total = 7
@@ -32,6 +79,16 @@ total = 7
 ----f d0000000002_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ----f d0000000003_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ----f d0000000004_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+/> ls70 /hd0/1/block -f 5 -c 1
+status = 0 success, count = 1
+----f d0000000003_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+/> ls70 /hd0/1/block -f 5 -c 1000
+status = 6 end_of_file, count = 2
+----f d0000000003_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+----f d0000000004_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+/> ls70 /hd0/1/block -f 500 -c 1
+status = 6 end_of_file, count = 0
+
 /> ls70 /hd0/1/leaf
 status = 6 end_of_file, count = 42
 total = 42
@@ -77,6 +134,10 @@ total = 42
 ----f d0000000037_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ----f d0000000038_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ----f d0000000039_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+/> ls70 /hd0/1/leaf -f 1 -c 1
+status = 0 success, count = 1
+----f ..
+
 /> ls70 /hd0/1/node
 status = 0 success, count = 100
 total = 1102
@@ -1204,6 +1265,11 @@ status = 6 end_of_file, count = 2
 total = 1102
 ----f d0000001098_xxxxxxxxxxxxxxxxx
 ----f d0000001099_xxxxxxxxxxxxxxxxxx
+/> ls70 /hd0/1/node -f 2 -c 2
+status = 0 success, count = 2
+----f d0000000000_
+----f d0000000001_x
+
 /> ls70 /hd0/1/btree_leaf
 status = 0 success, count = 100
 total = 1002
@@ -2229,6 +2295,11 @@ status = 6 end_of_file, count = 2
 total = 1002
 ----f d0000000998_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ----f d0000000999_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+/> ls70 /hd0/1/btree_leaf -f 3 -c 3
+status = 0 success, count = 3
+----f d0000000001_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+----f d0000000002_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+----f d0000000003_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 /> ls70 /hd0/1/btree_leaf_free
 status = 0 success, count = 100
 total = 1202
@@ -3458,4 +3529,5 @@ status = 6 end_of_file, count = 2
 total = 1202
 ----f d0000001198_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ----f d0000001199_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
 /> disk_del hd0

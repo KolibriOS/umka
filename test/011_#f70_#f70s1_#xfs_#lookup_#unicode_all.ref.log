@@ -75,40 +75,44 @@ status = 6 end_of_file, count = 26
 d0bfd180d0b8d0b2d0b5d182e29da6f09f9297d0bcd0b8d1800a
 
 /> ls70 /hd0/1/ -e utf8
-status = 6 end_of_file, count = 6
-total = 6
+status = 6 end_of_file, count = 7
+total = 7
 ----f .
 ----f ..
 ----f dir0
 ----f Ð´Ð¸Ñ€â¦
 ----f â¦â¦â¦
+----f â¦ðŸ‘©â¦
 ----f Ð´Ð¸Ñ€3
 /> ls70 /hd0/1/ -e utf16
-status = 6 end_of_file, count = 6
-total = 6
+status = 6 end_of_file, count = 7
+total = 7
 ----f .
 ----f ..
 ----f d
 ----f 48@f'
 ----f f'f'f'
+----f f'iØ=Üf'
 ----f 48@3
 /> ls70 /hd0/1/ -e cp866
-status = 6 end_of_file, count = 6
-total = 6
+status = 6 end_of_file, count = 7
+total = 7
 ----f .
 ----f ..
 ----f dir0
 ----f ¤¨à_
 ----f ___
+----f ___
 ----f ¤¨à3
 /> ls70 /hd0/1/ -e default
-status = 6 end_of_file, count = 6
-total = 6
+status = 6 end_of_file, count = 7
+total = 7
 ----f .
 ----f ..
 ----f d
 ----f 48@f'
 ----f f'f'f'
+----f f'iØ=Üf'
 ----f 48@3
 /> ls70 /hd0/1/â¦â¦â¦/ -e utf8
 status = 5 file_not_found
@@ -128,40 +132,44 @@ status = 5 file_not_found
 status = 5 file_not_found
 
 /> ls80 /hd0/1/ -e utf8
-status = 6 end_of_file, count = 6
-total = 6
+status = 6 end_of_file, count = 7
+total = 7
 ----f .
 ----f ..
 ----f dir0
 ----f Ð´Ð¸Ñ€â¦
 ----f â¦â¦â¦
+----f â¦ðŸ‘©â¦
 ----f Ð´Ð¸Ñ€3
 /> ls80 /hd0/1/ -e utf16
-status = 6 end_of_file, count = 6
-total = 6
+status = 6 end_of_file, count = 7
+total = 7
 ----f .
 ----f ..
 ----f d
 ----f 48@f'
 ----f f'f'f'
+----f f'iØ=Üf'
 ----f 48@3
 /> ls80 /hd0/1/ -e cp866
-status = 6 end_of_file, count = 6
-total = 6
+status = 6 end_of_file, count = 7
+total = 7
 ----f .
 ----f ..
 ----f dir0
 ----f ¤¨à_
 ----f ___
+----f ___
 ----f ¤¨à3
 /> ls80 /hd0/1/ -e default
-status = 6 end_of_file, count = 6
-total = 6
+status = 6 end_of_file, count = 7
+total = 7
 ----f .
 ----f ..
 ----f d
 ----f 48@f'
 ----f f'f'f'
+----f f'iØ=Üf'
 ----f 48@3
 /> ls80 /hd0/1/â¦â¦â¦/ -e utf8
 status = 6 end_of_file, count = 3
@@ -211,5 +219,38 @@ total = 3
 ----f .
 ----f ..
 ----- D09;3
+
+/> ls80 /hd0/1/â¦ðŸ‘©â¦/ -e utf8
+status = 6 end_of_file, count = 5
+total = 5
+----f .
+----f ..
+----f ðŸ‘©â¦â¦
+----f â¦ðŸ‘©â¦
+----f â¦â¦ðŸ‘©
+/> ls80 /hd0/1/â¦ðŸ‘©â¦/ -e utf16
+status = 6 end_of_file, count = 5
+total = 5
+----f .
+----f ..
+----f iØ=Üf'f'
+----f f'iØ=Üf'
+----f f'f'iØ=Ü
+/> ls80 /hd0/1/â¦ðŸ‘©â¦/ -e cp866
+status = 6 end_of_file, count = 5
+total = 5
+----f .
+----f ..
+----f ___
+----f ___
+----f ___
+/> ls80 /hd0/1/â¦ðŸ‘©â¦/ -e default
+status = 6 end_of_file, count = 5
+total = 5
+----f .
+----f ..
+----f iØ=Üf'f'
+----f f'iØ=Üf'
+----f f'f'iØ=Ü
 
 /> disk_del hd0

@@ -399,8 +399,14 @@ status = 0 success, count = 16388096
 /> read70 /hd0/1/file_btree_l2 77777 7777777 -h
 status = 0 success, count = 7777777
 1ec63ef6ec1c57394d07f678d5b4c4f536805b287571996a65d7b22389491022
-/> read70 /hd0/1/file_btree_l2 1 4097 -h
+/> read70 /hd0/1/file_btree_l2 1 0x1001 -h
 status = 0 success, count = 4097
 9d8f63204dd7877d5492ace8aa0b05b6ca2e1c483fecb50da68abfbb91f1cd04
+/> read70 /hd0/1/file_btree_l2 0x1000 0x1000 -h
+status = 0 success, count = 4096
+bb66ddff9fa267bf7a42153d0de9dc029b775e23d6378ade96e6c92ceaf6841a
+/> read70 /hd0/1/file_btree_l2 0x1000 0x1001 -h
+status = 0 success, count = 4097
+aa026c31286b2ba83a047f8d07baa712b34da983235afb79b4d2cb60cf668f2b
 
 /> disk_del hd0

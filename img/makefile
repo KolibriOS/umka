@@ -6,7 +6,7 @@ TEMP_DIR:=$(shell mktemp -d)
 all: s05k s4k unicode v5 kolibri.img coverage
 	rmdir $(TEMP_DIR)
 
-s05k: xfs_v4_ftype0_s05k_b2k_n8k.img xfs_v4_ftype1_s05k_b2k_n8k.img xfs_v4_xattr.img xfs_v4_files_s05k_b4k_n8k.img xfs_v4_ftype0_s05k_b2k_n8k_xattr.img xfs_v4_btrees_l2.img
+s05k: xfs_v4_ftype0_s05k_b2k_n8k.img xfs_v4_ftype1_s05k_b2k_n8k.img xfs_v4_xattr.img xfs_v4_files_s05k_b4k_n8k.img xfs_v4_ftype0_s05k_b2k_n8k_xattr.img xfs_v4_btrees_l2.img xfs_short_dir_i8.img
 
 s4k: xfs_v4_ftype0_s4k_b4k_n8k.img
 
@@ -14,7 +14,7 @@ unicode: xfs_v4_unicode.img
 
 v5: xfs_v5_ftype1_s05k_b2k_n8k.img xfs_v5_files_s05k_b4k_n8k.img
 
-coverage: jfs.img xfs_borg_bit.img
+coverage: jfs.img xfs_borg_bit.img xfs_short_dir_i8.img
 
 kolibri.img: ../default.skn
 	touch $@
@@ -32,6 +32,24 @@ jfs.img:
 xfs_borg_bit.img:
 	fallocate -l 16MiB $@
 	mkfs.xfs -n version=ci $@
+	fallocate -i -o 0 -l 1MiB $@ 
+	parted --script $@ mktable gpt
+	parted --script --align optimal $@ mkpart primary 1MiB 100%
+
+xfs_short_dir_i8.img:
+	echo -en "\x00" > $@
+	fallocate -i -o 0 -l 42TiB $@
+	mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100,size=256 -n size=8k,ftype=0 $@
+#
+	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo chown $$USER $(TEMP_DIR) -R
+#
+	mkdir $(TEMP_DIR)/sf
+	$(MKDIRRANGE) $(TEMP_DIR)/sf 0 5  0 244
+#
+	$(MKDIRRANGE) $(TEMP_DIR)/sf/d0000000002_xx 7 10  0 244
+#
+	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@ 
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
@@ -259,6 +277,10 @@ xfs_v4_unicode.img:
 	mkdir -p $(TEMP_DIR)/dir0
 	mkdir -p $(TEMP_DIR)/дир❦/дир11
 	mkdir -p $(TEMP_DIR)/❦❦❦/д❦р22
+	mkdir -p $(TEMP_DIR)/❦👩❦/
+	mkdir -p $(TEMP_DIR)/❦👩❦/👩❦❦/
+	mkdir -p $(TEMP_DIR)/❦👩❦/❦👩❦/
+	mkdir -p $(TEMP_DIR)/❦👩❦/❦❦👩/
 	mkdir $(TEMP_DIR)/дир3/
 #
 	echo hello_world > $(TEMP_DIR)/dir0/file00
