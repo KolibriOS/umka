@@ -61,7 +61,6 @@ const char *last_dir = cur_dir;
 bool cur_dir_changed = true;
 
 char cmd_buf[FGETS_BUF_LEN];
-uint32_t coverage = 0;
 
 const char *f70_status_name[] = {
                                  "success",

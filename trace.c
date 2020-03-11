@@ -1,5 +1,6 @@
 #include "trace_lbr.h"
-#include "kolibri.h"
+
+uint32_t coverage;
 
 void trace_begin() {
     trace_lbr_begin();

@@ -13,6 +13,15 @@ total = 5
 ----f d0000000000_
 ----f d0000000001_x
 ----f d0000000002_xx
+#ls70 /hd0/1/sf -c 0
+/> ls70 /hd0/1/sf -f 1 -c 1
+status = 0 success, count = 1
+----f ..
+/> ls70 /hd0/1/sf -f 2 -c 1
+status = 0 success, count = 1
+----f d0000000000_
+/> ls70 /hd0/1/sf -f 200 -c 1
+status = 6 end_of_file, count = 0
 /> ls70 /hd0/1/block
 status = 6 end_of_file, count = 7
 total = 7

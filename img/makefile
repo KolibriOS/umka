@@ -3,10 +3,10 @@ MKFILEPATTERN=../tools/mkfilepattern
 MOUNT_OPT=-t xfs
 TEMP_DIR:=$(shell mktemp -d)
 
-all: s05k s4k unicode v5 kolibri.img
+all: s05k s4k unicode v5 kolibri.img coverage
 	rmdir $(TEMP_DIR)
 
-s05k: xfs_v4_ftype0_s05k_b2k_n8k.img xfs_v4_ftype1_s05k_b2k_n8k.img xfs_v4_xattr.img xfs_v4_files_s05k_b4k_n8k.img xfs_v4_ftype0_s05k_b2k_n8k_xattr.img
+s05k: xfs_v4_ftype0_s05k_b2k_n8k.img xfs_v4_ftype1_s05k_b2k_n8k.img xfs_v4_xattr.img xfs_v4_files_s05k_b4k_n8k.img xfs_v4_ftype0_s05k_b2k_n8k_xattr.img xfs_v4_btrees_l2.img
 
 s4k: xfs_v4_ftype0_s4k_b4k_n8k.img
 
@@ -14,15 +14,31 @@ unicode: xfs_v4_unicode.img
 
 v5: xfs_v5_ftype1_s05k_b2k_n8k.img xfs_v5_files_s05k_b4k_n8k.img
 
+coverage: jfs.img xfs_borg_bit.img
+
 kolibri.img: ../default.skn
 	touch $@
 	fallocate -z -o 0 -l 1440KiB $@
 	mkfs.vfat -n KOLIBRIOS -F 12 $@
 	mcopy -vmoi $@ $< ::DEFAULT.SKN
 
+jfs.img:
+	fallocate -l 16MiB $@
+	mkfs.jfs -q $@
+	fallocate -i -o 0 -l 1MiB $@ 
+	parted --script $@ mktable gpt
+	parted --script --align optimal $@ mkpart primary 1MiB 100%
+
+xfs_borg_bit.img:
+	fallocate -l 16MiB $@
+	mkfs.xfs -n version=ci $@
+	fallocate -i -o 0 -l 1MiB $@ 
+	parted --script $@ mktable gpt
+	parted --script --align optimal $@ mkpart primary 1MiB 100%
+
 xfs_v4_ftype0_s05k_b2k_n8k.img:
 	fallocate -l 63MiB $@
-	sudo mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=0 $@
+	mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
@@ -53,7 +69,7 @@ xfs_v4_ftype0_s05k_b2k_n8k.img:
 
 xfs_v4_ftype1_s05k_b2k_n8k.img:
 	fallocate -l 63MiB $@
-	sudo mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=1 $@
+	mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=1 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
@@ -84,7 +100,7 @@ xfs_v4_ftype1_s05k_b2k_n8k.img:
 
 xfs_v4_xattr.img:
 	fallocate -l 63MiB $@
-	sudo mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n ftype=0 $@
+	mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n ftype=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR) -o attr2
 	sudo chown $$USER $(TEMP_DIR) -R
 #
@@ -105,15 +121,21 @@ xfs_v4_xattr.img:
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_v4_deep_btree_dirs.img:
+xfs_v4_btrees_l2.img:
 	fallocate -l 127MiB $@
-	sudo mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=4k,ftype=1 $@
+	mkfs.xfs -b size=1k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=4k,ftype=1 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
-	mkdir $(TEMP_DIR)/btree
-#	$(MKDIRRANGE) $(TEMP_DIR)/btree 0 293181  0 244
-	$(MKDIRRANGE) $(TEMP_DIR)/btree 0 193181  0 244
+	mkdir $(TEMP_DIR)/dir_btree_l2
+	$(MKDIRRANGE) $(TEMP_DIR)/dir_btree_l2 0 193181  214 30
+#
+	fallocate -l 4KiB $(TEMP_DIR)/file_btree_l2
+	for n in $$(seq 1 4000); do \
+		fallocate -i -l 4KiB -o 0KiB $(TEMP_DIR)/file_btree_l2 ; \
+		fallocate -z -l 4KiB -o 0KiB $(TEMP_DIR)/file_btree_l2 ; \
+	done
+	$(MKFILEPATTERN) $(TEMP_DIR)/file_btree_l2 0 16388096
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@ 
@@ -122,7 +144,7 @@ xfs_v4_deep_btree_dirs.img:
 
 xfs_v4_files_s05k_b4k_n8k.img:
 	fallocate -l 127MiB $@
-	sudo mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=0 $@
+	mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
@@ -157,7 +179,7 @@ xfs_v4_files_s05k_b4k_n8k.img:
 
 xfs_v4_ftype0_s4k_b4k_n8k.img:
 	fallocate -l 63MiB $@
-	sudo mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=4k -i maxpct=100 -n size=8k,ftype=0 $@
+	mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=4k -i maxpct=100 -n size=8k,ftype=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
@@ -192,7 +214,7 @@ xfs_v4_ftype0_s4k_b4k_n8k.img:
 
 xfs_v4_ftype0_s05k_b2k_n8k_xattr.img:
 	fallocate -l 63MiB $@
-	sudo mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=0 $@
+	mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
@@ -230,7 +252,7 @@ xfs_v4_ftype0_s05k_b2k_n8k_xattr.img:
 
 xfs_v4_unicode.img:
 	fallocate -l 63MiB $@
-	sudo mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 $@
+	mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
@@ -251,7 +273,7 @@ xfs_v4_unicode.img:
 
 xfs_v5_ftype1_s05k_b2k_n8k.img:
 	fallocate -l 63MiB $@
-	sudo mkfs.xfs -b size=2k -m crc=1,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=1 $@
+	mkfs.xfs -b size=2k -m crc=1,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=1 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
@@ -282,7 +304,7 @@ xfs_v5_ftype1_s05k_b2k_n8k.img:
 
 xfs_v5_files_s05k_b4k_n8k.img:
 	fallocate -l 127MiB $@
-	sudo mkfs.xfs -b size=4k -m crc=1,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=1 $@
+	mkfs.xfs -b size=4k -m crc=1,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=1 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #

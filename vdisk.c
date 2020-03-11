@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <errno.h>
 #include "kolibri.h"
+#include "trace.h"
 
 typedef struct {
     FILE *file;
@@ -35,35 +36,43 @@ void *vdisk_init(const char *fname, unsigned cache_size) {
 
 __attribute__((__stdcall__))
 void vdisk_close(void *userdata) {
+    COVERAGE_OFF();
     vdisk_t *vdisk = userdata;
     fclose(vdisk->file);
     free(vdisk);
+    COVERAGE_ON();
 }
 
 __attribute__((__stdcall__))
 int vdisk_read(void *userdata, void *buffer, off_t startsector,
                size_t *numsectors) {
+    COVERAGE_OFF();
     vdisk_t *vdisk = userdata;
     fseeko(vdisk->file, startsector * vdisk->sect_size, SEEK_SET);
     fread(buffer, *numsectors * vdisk->sect_size, 1, vdisk->file);
+    COVERAGE_ON();
     return ERROR_SUCCESS;
 }
 
 __attribute__((__stdcall__))
 int vdisk_write(void *userdata, void *buffer, off_t startsector,
                 size_t *numsectors) {
+    COVERAGE_OFF();
     vdisk_t *vdisk = userdata;
     fseeko(vdisk->file, startsector * vdisk->sect_size, SEEK_SET);
     fwrite(buffer, *numsectors * vdisk->sect_size, 1, vdisk->file);
+    COVERAGE_ON();
     return ERROR_SUCCESS;
 }
 
 __attribute__((__stdcall__))
 int vdisk_querymedia(void *userdata, diskmediainfo_t *minfo) {
+    COVERAGE_OFF();
     vdisk_t *vdisk = userdata;
     minfo->flags = 0u;
     minfo->sector_size = vdisk->sect_size;
     minfo->capacity = vdisk->sect_cnt;
+    COVERAGE_ON();
     return ERROR_SUCCESS;
 }
 

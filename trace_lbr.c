@@ -11,8 +11,6 @@
 #define MSR_IA32_DEBUGCTLMSR        0x1d9
 #define MSR_IA32_LASTBRANCHFROMIP   0x1db
 #define MSR_IA32_LASTBRANCHTOIP     0x1dc
-#define MSR_IA32_LASTINTFROMIP      0x1dd
-#define MSR_IA32_LASTINTTOIP        0x1de
 
 int covfd, msrfd;
 

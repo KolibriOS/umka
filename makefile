@@ -14,7 +14,7 @@ covpreproc: covpreproc.c
 umka_shell: umka_shell.o umka.o trace.o trace_lbr.o vdisk.o lodepng.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static
 
-umka_fuse: umka_fuse.o umka.o vdisk.o
+umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
 umka.o umka.fas: umka.asm

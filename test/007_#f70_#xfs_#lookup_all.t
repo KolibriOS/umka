@@ -2,6 +2,8 @@ disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.img hd0 -c 0
 stat70 /hd0/1/sf_empty
 stat70 /hd0/1/sf_empty/.
 stat70 /hd0/1/sf_empty/..
+stat70 /hd0/1/sf_empty/d
+stat70 /hd0/1/sf_empty/de
 stat70 /hd0/1/sf_empty/deadbeef
 
 stat70 /hd0/1/sf/.

@@ -1,6 +1,10 @@
 disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.img hd0 -c 0
 ls70 /hd0/1/sf_empty
 ls70 /hd0/1/sf
+#ls70 /hd0/1/sf -c 0
+ls70 /hd0/1/sf -f 1 -c 1
+ls70 /hd0/1/sf -f 2 -c 1
+ls70 /hd0/1/sf -f 200 -c 1
 ls70 /hd0/1/block
 ls70 /hd0/1/leaf
 ls70 /hd0/1/node

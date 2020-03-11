@@ -9,6 +9,10 @@ attr: ----f
 /> stat70 /hd0/1/sf_empty/..
 status = 0 success
 attr: ----f
+/> stat70 /hd0/1/sf_empty/d
+status = 5 file_not_found
+/> stat70 /hd0/1/sf_empty/de
+status = 5 file_not_found
 /> stat70 /hd0/1/sf_empty/deadbeef
 status = 5 file_not_found
 
