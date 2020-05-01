@@ -242,12 +242,18 @@ void xfs_user_functions(void);
 void ext_user_functions(void);
 void fat_user_functions(void);
 void ntfs_user_functions(void);
+
+void kos_enable_acpi(void);
+
 void coverage_begin(void);
 void coverage_end(void);
 
 extern uint32_t *kos_lfb_base;
 extern uint16_t *kos_win_stack;
 extern uint16_t *kos_win_pos;
+extern uint32_t kos_acpi_ssdt_cnt;
+extern uint8_t **kos_acpi_ssdt_base;
+extern size_t *kos_acpi_ssdt_size;
 extern disk_t disk_list;
 
 #endif

@@ -994,6 +994,29 @@ void shell_read80(int argc, char **argv) {
     shell_read(argc, argv, F80);
 }
 
+void shell_acpi_preload_table(int argc, char **argv) {
+    (void)argc;
+    FILE *f = fopen(argv[1], "r");
+    fseek(f, 0, SEEK_END);
+    size_t fsize = ftell(f);
+    rewind(f);
+    uint8_t *table = (uint8_t*)malloc(fsize);
+    fread(table, fsize, 1, f);
+    fclose(f);
+    fprintf(stderr, "# %zu\n", kos_acpi_ssdt_cnt);
+    kos_acpi_ssdt_base[kos_acpi_ssdt_cnt] = table;
+    kos_acpi_ssdt_size[kos_acpi_ssdt_cnt] = fsize;
+    kos_acpi_ssdt_cnt++;
+}
+
+void shell_acpi_enable(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
+    COVERAGE_ON();
+    kos_enable_acpi();
+    COVERAGE_OFF();
+}
+
 typedef struct {
     char *name;
     void (*func) (int, char **);
@@ -1041,6 +1064,8 @@ func_table_t funcs[] = {
                         { "scrot",              shell_scrot },
                         { "dump_win_stack",     shell_dump_win_stack },
                         { "dump_win_pos",       shell_dump_win_pos },
+                        { "acpi_enable",        shell_acpi_enable },
+                        { "acpi_preload_table", shell_acpi_preload_table },
                         { NULL,                 NULL },
                        };
 

@@ -26,6 +26,11 @@ public win_stack_addr as 'kos_win_stack'
 public win_pos_addr as 'kos_win_pos'
 public lfb_base_addr as 'kos_lfb_base'
 
+public enable_acpi as 'kos_enable_acpi'
+public acpi_ssdt_cnt as 'kos_acpi_ssdt_cnt'
+public kos_acpi_ssdt_base
+public kos_acpi_ssdt_size
+
 cli equ nop
 iretd equ retd
 
@@ -105,6 +110,7 @@ include 'blkdev/disk_cache.inc'
 include 'fs/fs_lfn.inc'
 include 'crc.inc'
 include 'unicode.inc'
+include 'acpi/acpi.inc'
 include 'core/string.inc'
 include 'core/malloc.inc'
 include 'core/heap.inc'
@@ -247,6 +253,31 @@ proc kos_init c uses ebx esi edi ebp
         ret
 endp
 
+extrn pci_read
+;uint32_t pci_read(uint32_t bus, uint32_t dev, uint32_t fun, uint32_t offset, size_t len) {
+;       IN: ah=bus,device+func=bh,register address=bl
+;           number of bytes to read (1,2,4) coded into AL, bits 0-1
+;           (0 - byte, 1 - word, 2 - dword)
+proc pci_read_reg uses ebx esi edi
+        mov     ecx, eax
+        and     ecx, 3
+        movi    edx, 1
+        shl     edx, cl
+        push    edx     ; len
+        movzx   edx, bl
+        push    edx     ; offset
+        movzx   edx, bh
+        and     edx, 7
+        push    edx     ; fun
+        movzx   edx, bh
+        shr     edx, 3
+        push    edx     ; dev
+        movzx   edx, ah
+        push    edx     ; bus
+        call    pci_read
+        ret
+endp
+
 proc sys_msg_board
         cmp     cl, 0x0d
         jz      @f
@@ -260,6 +291,11 @@ proc sys_msg_board
         pop     ecx
         popad
 @@:
+        ret
+endp
+
+proc map_io_mem _base, _size, _flags
+        mov     eax, [_base]
         ret
 endp
 
@@ -315,7 +351,6 @@ scheduler_add_thread:
 build_interrupt_table:
 init_fpu:
 init_mtrr:
-map_io_mem:
 create_trampoline_pgmap:
 alloc_page:
 
@@ -384,6 +419,9 @@ fpu_owner dd ?
 win_stack_addr dd WIN_STACK
 win_pos_addr dd WIN_POS
 lfb_base_addr dd lfb_base
+
+kos_acpi_ssdt_base dd acpi_ssdt_base
+kos_acpi_ssdt_size dd acpi_ssdt_size
 
 uglobal
 context_counter dd ?
