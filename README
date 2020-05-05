@@ -19,9 +19,9 @@ file, i.e. can be used for automated testing.
 umka_fuse
 ---------
 
-is like kofu above but commands are translated from FUSE calls, not entered
-manually. Can *potentially* be used to run xfstests (cross-fs-tests) and
-automated tests against reference FS implementations.
+is like umka_shell above but commands are translated from FUSE calls, not
+entered manually. Can *potentially* be used to run xfstests (cross-fs-tests) and
+automatestrcatd tests against reference FS implementations.
 
 
 BUILD
