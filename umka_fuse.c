@@ -38,7 +38,8 @@
 #define DIRENTS_TO_READ 100
 
 static void bdfe_to_stat(bdfe_t *kf, struct stat *st) {
-    if (kf->attr & KF_FOLDER) {
+//    if (kf->attr & KF_FOLDER) {
+    if (st) {
         st->st_mode = S_IFDIR | 0755;
         st->st_nlink = 2;
     } else {
@@ -62,7 +63,6 @@ static int umka_getattr(const char *path, struct stat *stbuf,
                          struct fuse_file_info *fi) {
     (void) fi;
     int res = 0;
-
 
     bdfe_t file;
     f7080s5arg_t fX0 = {.sf = 5, .flags = 0, .buf = &file, .u = {.f80 = {.path_encoding = UTF8, .path = path}}};
