@@ -199,6 +199,31 @@ int split_args(char *s, char **argv) {
     return argc;
 }
 
+void shell_i40(int argc, char **argv) {
+    const char *usage = \
+        "usage: i40 <eax> [ebx [ecx [edx [esi [edi [ebp]]]]]]...\n"
+        "  see '/kernel/docs/sysfuncs.txt' for details";
+    if (argc == 1 || argc > 8) {
+        puts(usage);
+        return;
+    }
+    pushad_t regs = {0, 0, 0, 0, 0, 0, 0, 0};
+    if (argv[1]) regs.eax = strtoul(argv[1], NULL, 0);
+    if (argv[2]) regs.ebx = strtoul(argv[2], NULL, 0);
+    if (argv[3]) regs.ecx = strtoul(argv[3], NULL, 0);
+    if (argv[4]) regs.edx = strtoul(argv[4], NULL, 0);
+    if (argv[5]) regs.esi = strtoul(argv[5], NULL, 0);
+    if (argv[6]) regs.edi = strtoul(argv[6], NULL, 0);
+    if (argv[7]) regs.ebp = strtoul(argv[7], NULL, 0);
+    COVERAGE_ON();
+    umka_i40(&regs);
+    COVERAGE_OFF();
+    printf("eax = %8.8x  %" PRIu32 "  %" PRIi32 "\n"
+           "ebx = %8.8x  %" PRIu32 "  %" PRIi32 "\n",
+           regs.eax, regs.eax, (int32_t)regs.eax,
+           regs.ebx, regs.ebx, (int32_t)regs.ebx);
+}
+
 void shell_disk_list_partitions(disk_t *d) {
     for (size_t i = 0; i < d->num_partitions; i++) {
         printf("/%s/%d: ", d->name, i+1);
@@ -1023,6 +1048,7 @@ typedef struct {
 } func_table_t;
 
 func_table_t funcs[] = {
+                        { "i40",                shell_i40 },
                         { "disk_add",           shell_disk_add },
                         { "disk_del",           shell_disk_del },
                         { "ls70",               shell_ls70 },

@@ -228,6 +228,17 @@ typedef struct {
     uint8_t opaque[1024-HASH_SIZE];
 } hash_context;
 
+typedef struct {
+    uint32_t edi;
+    uint32_t esi;
+    uint32_t ebp;
+    uint32_t esp;
+    uint32_t ebx;
+    uint32_t edx;
+    uint32_t ecx;
+    uint32_t eax;
+} pushad_t;
+
 void kos_init(void);
 void i40(void);
 uint32_t kos_time_to_epoch(uint32_t *time);

@@ -4,6 +4,25 @@
 #include <inttypes.h>
 #include "kolibri.h"
 
+static inline void umka_i40(pushad_t *regs) {
+
+    __asm__ __inline__ __volatile__ (
+        "push   ebp;"
+        "mov    ebp, %[ebp];"
+        "call   i40;"
+        "pop    ebp"
+        : "=a"(regs->eax),
+          "=b"(regs->ebx)
+        : "a"(regs->eax),
+          "b"(regs->ebx),
+          "c"(regs->ecx),
+          "d"(regs->edx),
+          "S"(regs->esi),
+          "D"(regs->edi),
+          [ebp] "Rm"(regs->ebp)
+        : "memory");
+}
+
 static inline void umka_sys_draw_window(size_t x, size_t xsize,
                                         size_t y, size_t ysize,
                                         uint32_t color, int has_caption,
@@ -278,7 +297,7 @@ static inline int32_t umka_sys_set_skin(const char *path) {
     int32_t status;
     __asm__ __inline__ __volatile__ (
         "call   i40"
-        : "=a" (status)
+        : "=a"(status)
         : "a"(48),
           "b"(8),
           "c"(path)
@@ -290,7 +309,7 @@ static inline int umka_sys_get_font_smoothing() {
     int type;
     __asm__ __inline__ __volatile__ (
         "call   i40"
-        : "=a" (type)
+        : "=a"(type)
         : "a"(48),
           "b"(9)
         : "memory");
@@ -311,7 +330,7 @@ static inline int umka_sys_get_font_size() {
     uint32_t size;
     __asm__ __inline__ __volatile__ (
         "call   i40"
-        : "=a" (size)
+        : "=a"(size)
         : "a"(48),
           "b"(11)
         : "memory");
@@ -366,7 +385,7 @@ static inline void umka_sys_lfn(void *f7080sXarg, f7080ret_t *r,
                                 f70or80_t f70or80) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
-        : "=a" (r->status),
+        : "=a"(r->status),
           "=b" (r->count)
         : "a"(f70or80),
           "b"(f7080sXarg)

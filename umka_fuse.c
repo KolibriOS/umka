@@ -53,14 +53,14 @@ static void bdfe_to_stat(bdfe_t *kf, struct stat *st) {
 }
 
 static void *umka_init(struct fuse_conn_info *conn,
-                        struct fuse_config *cfg) {
+                       struct fuse_config *cfg) {
         (void) conn;
         cfg->kernel_cache = 1;
         return NULL;
 }
 
 static int umka_getattr(const char *path, struct stat *stbuf,
-                         struct fuse_file_info *fi) {
+                        struct fuse_file_info *fi) {
     (void) fi;
     int res = 0;
 
@@ -75,8 +75,8 @@ static int umka_getattr(const char *path, struct stat *stbuf,
 }
 
 static int umka_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-                         off_t offset, struct fuse_file_info *fi,
-                         enum fuse_readdir_flags flags) {
+                        off_t offset, struct fuse_file_info *fi,
+                        enum fuse_readdir_flags flags) {
     (void) offset;      // TODO
     (void) fi;
     (void) flags;
@@ -106,7 +106,7 @@ static int umka_open(const char *path, struct fuse_file_info *fi) {
 }
 
 static int umka_read(const char *path, char *buf, size_t size, off_t offset,
-                      struct fuse_file_info *fi) {
+                     struct fuse_file_info *fi) {
     (void) fi;
 
     f7080s0arg_t fX0 = {.sf = 0, .offset = offset, .count = size, .buf = buf, .u = {.f80 = {.path_encoding = UTF8, .path = path}}};
