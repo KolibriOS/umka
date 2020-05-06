@@ -26,10 +26,13 @@ public win_stack_addr as 'kos_win_stack'
 public win_pos_addr as 'kos_win_pos'
 public lfb_base_addr as 'kos_lfb_base'
 
-public enable_acpi as 'kos_enable_acpi'
+public enable_acpi
 public acpi_ssdt_cnt as 'kos_acpi_ssdt_cnt'
 public kos_acpi_ssdt_base
 public kos_acpi_ssdt_size
+
+public stack_init
+public net_add_device
 
 cli equ nop
 iretd equ retd
@@ -115,7 +118,9 @@ include 'core/string.inc'
 include 'core/malloc.inc'
 include 'core/heap.inc'
 include 'core/dll.inc'
+new_sys_threads equ __pew_pew
 include 'core/taskman.inc'
+restore new_sys_threads
 include 'core/timers.inc'
 include 'core/clipboard.inc'
 include 'core/syscall.inc'
@@ -254,10 +259,6 @@ proc kos_init c uses ebx esi edi ebp
 endp
 
 extrn pci_read
-;uint32_t pci_read(uint32_t bus, uint32_t dev, uint32_t fun, uint32_t offset, size_t len) {
-;       IN: ah=bus,device+func=bh,register address=bl
-;           number of bytes to read (1,2,4) coded into AL, bits 0-1
-;           (0 - byte, 1 - word, 2 - dword)
 proc pci_read_reg uses ebx esi edi
         mov     ecx, eax
         and     ecx, 3
@@ -298,6 +299,10 @@ proc map_io_mem _base, _size, _flags
         mov     eax, [_base]
         ret
 endp
+
+new_sys_threads:
+        xor     eax, eax
+        ret
 
 change_task:
         mov     [REDRAW_BACKGROUND], 0

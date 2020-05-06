@@ -239,6 +239,36 @@ typedef struct {
     uint32_t eax;
 } pushad_t;
 
+#define NET_TYPE_ETH 1
+#define NET_TYPE_SLIP 2
+
+// Link state
+#define ETH_LINK_DOWN    0x0    // Link is down
+#define ETH_LINK_UNKNOWN 0x1    // There could be an active link
+#define ETH_LINK_FD      0x2    // full duplex flag
+#define ETH_LINK_10M     0x4    // 10 mbit
+#define ETH_LINK_100M    0x8    // 100 mbit
+#define ETH_LINK_1G      0xc    // gigabit
+
+typedef struct {
+    uint32_t device_type;   // type field
+    uint32_t mtu;           // Maximal Transmission Unit
+    char *name;             // ptr to 0 terminated string
+
+    void *unload;           // ptrs to driver functions
+    void *reset;
+    void *transmit;
+
+    uint64_t bytes_tx;      // statistics, updated by the driver
+    uint64_t bytes_rx;
+    uint32_t packets_tx;
+    uint32_t packets_rx;
+
+    uint32_t link_state;    // link state (0 = no link)
+    uint32_t hwacc;         // bitmask stating enabled HW accelerations (offload
+                            // engines)
+} net_device_t; // NET_DEVICE
+
 void kos_init(void);
 void i40(void);
 uint32_t kos_time_to_epoch(uint32_t *time);
@@ -254,7 +284,36 @@ void ext_user_functions(void);
 void fat_user_functions(void);
 void ntfs_user_functions(void);
 
-void kos_enable_acpi(void);
+static inline void kos_enable_acpi() {
+    __asm__ __inline__ __volatile__ (
+        "pushad;"
+        "call   enable_acpi;"
+        "popad"
+        :
+        :
+        : "memory", "cc");
+}
+
+static inline void kos_stack_init() {
+    __asm__ __inline__ __volatile__ (
+        "pushad;"
+        "call   stack_init;"
+        "popad"
+        :
+        :
+        : "memory", "cc");
+}
+
+static inline int32_t kos_net_add_device(net_device_t *dev) {
+    int32_t dev_num;
+    __asm__ __inline__ __volatile__ (
+        "call   net_add_device"
+        : "=a"(dev_num)
+        : "b"(dev)
+        : "ecx", "edx", "esi", "edi", "memory", "cc");
+
+    return dev_num;
+}
 
 void coverage_begin(void);
 void coverage_end(void);

@@ -11,7 +11,7 @@ all: umka_shell umka_fuse umka.sym umka.prp umka.lst tags tools/mkdirrange tools
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
-umka_shell: umka_shell.o umka.o trace.o trace_lbr.o vdisk.o lodepng.o pci.o
+umka_shell: umka_shell.o umka.o trace.o trace_lbr.o vdisk.o vnet.o lodepng.o pci.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o
@@ -51,6 +51,9 @@ trace_lbr.o: trace_lbr.c trace_lbr.h kolibri.h
 	$(CC) $(CFLAGS_32) -c $<
 
 vdisk.o: vdisk.c
+	$(CC) $(CFLAGS_32) -c $<
+
+vnet.o: vnet.c
 	$(CC) $(CFLAGS_32) -c $<
 
 umka_shell.o: umka_shell.c kolibri.h trace.h syscalls.h

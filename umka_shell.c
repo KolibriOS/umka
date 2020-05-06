@@ -31,6 +31,7 @@
 #include <assert.h>
 #include <time.h>
 #include "vdisk.h"
+#include "vnet.h"
 #include "kolibri.h"
 #include "syscalls.h"
 #include "trace.h"
@@ -56,6 +57,25 @@ diskfunc_t vdisk_functions = {
                                  .flush = NULL,
                                  .adjust_cache_size = NULL,
                                 };
+
+net_device_t vnet = {
+                            .device_type = NET_TYPE_ETH,
+                            .mtu = 1514,
+                            .name = "UMK0770",
+
+                            .unload = vnet_unload,
+                            .reset = vnet_reset,
+                            .transmit = vnet_transmit,
+
+                            .bytes_tx = 0,
+                            .bytes_rx = 0,
+                            .packets_tx = 0,
+                            .packets_rx = 0,
+
+                            .link_state = 0,    // link state (0 = no link)
+                            .hwacc = 0,
+                        };
+
 char cur_dir[PATH_MAX] = "/";
 const char *last_dir = cur_dir;
 bool cur_dir_changed = true;
@@ -1042,58 +1062,286 @@ void shell_acpi_enable(int argc, char **argv) {
     COVERAGE_OFF();
 }
 
+void shell_stack_init(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
+    kos_stack_init();
+}
+
+void shell_net_add_device(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
+    int32_t dev_num = kos_net_add_device(&vnet);
+    printf("device number: %" PRIi32 "\n", dev_num);
+}
+
+void shell_net_get_dev_count(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
+    uint32_t count = umka_sys_net_get_dev_count();
+    printf("active network devices: %u\n", count);
+}
+
+void shell_net_get_dev_type(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_get_dev_type <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    int32_t dev_type = umka_sys_net_get_dev_type(dev_num);
+    printf("status: %s\n", dev_type == -1 ? "fail" : "ok");
+    if (dev_type != -1) {
+        printf("type of network device #%" PRIu8 ": %i\n", dev_num, dev_type);
+    }
+}
+
+void shell_net_get_dev_name(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_get_dev_name <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    char dev_name[64];
+    uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    int32_t status = umka_sys_net_get_dev_name(dev_num, dev_name);
+    printf("status: %s\n", status == -1 ? "fail" : "ok");
+    if (status != -1) {
+        printf("name of network device #%" PRIu8 ": %s\n", dev_num, dev_name);
+    }
+}
+
+void shell_net_dev_reset(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_dev_reset <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    int32_t status = umka_sys_net_dev_reset(dev_num);
+    printf("status: %s\n", status == -1 ? "fail" : "ok");
+}
+
+void shell_net_dev_stop(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_dev_stop <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    int32_t status = umka_sys_net_dev_stop(dev_num);
+    printf("status: %s\n", status == -1 ? "fail" : "ok");
+}
+
+void shell_net_get_dev(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_get_dev <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    intptr_t dev = umka_sys_net_get_dev(dev_num);
+    printf("status: %s\n", dev == -1 ? "fail" : "ok");
+    if (dev != -1) {
+        printf("address of net dev #%" PRIu8 ": 0x%x\n", dev_num, dev);
+    }
+}
+
+void shell_net_get_packet_tx_count(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_get_packet_tx_count <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    uint32_t count = umka_sys_net_get_packet_tx_count(dev_num);
+    printf("status: %s\n", count == UINT32_MAX ? "fail" : "ok");
+    if (count != UINT32_MAX) {
+        printf("packet tx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
+               dev_num, count);
+    }
+}
+
+void shell_net_get_packet_rx_count(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_get_packet_rx_count <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    uint32_t count = umka_sys_net_get_packet_rx_count(dev_num);
+    printf("status: %s\n", count == UINT32_MAX ? "fail" : "ok");
+    if (count != UINT32_MAX) {
+        printf("packet rx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
+               dev_num, count);
+    }
+}
+
+void shell_net_get_byte_tx_count(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_get_byte_tx_count <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    uint32_t count = umka_sys_net_get_byte_tx_count(dev_num);
+    printf("status: %s\n", count == UINT32_MAX ? "fail" : "ok");
+    if (count != UINT32_MAX) {
+        printf("byte tx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
+               dev_num, count);
+    }
+}
+
+void shell_net_get_byte_rx_count(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_get_byte_rx_count <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    uint32_t count = umka_sys_net_get_byte_rx_count(dev_num);
+    printf("status: %s\n", count == UINT32_MAX ? "fail" : "ok");
+    if (count != UINT32_MAX) {
+        printf("byte rx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
+               dev_num, count);
+    }
+}
+
+void print_link_status_names(uint32_t status) {
+    switch (status & 0x3) {
+    case ETH_LINK_DOWN:
+        printf("ETH_LINK_DOWN");
+        break;
+    case ETH_LINK_UNKNOWN:
+        printf("ETH_LINK_UNKNOWN");
+        break;
+    case ETH_LINK_FD:
+        printf("ETH_LINK_FD");
+        break;
+    default:
+        printf("ERROR");
+        break;
+    }
+
+    switch(status & ~3u) {
+    case ETH_LINK_1G:
+        printf(" + ETH_LINK_1G");
+        break;
+    case ETH_LINK_100M:
+        printf(" + ETH_LINK_100M");
+        break;
+    case ETH_LINK_10M:
+        printf(" + ETH_LINK_10M");
+        break;
+    default:
+        printf(" + UNKNOWN");
+        break;
+    }
+}
+
+void shell_net_get_link_status(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_get_link_status <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    uint32_t status = umka_sys_net_get_byte_rx_count(dev_num);
+    printf("status: %s\n", status == UINT32_MAX ? "fail" : "ok");
+    if (status != UINT32_MAX) {
+        printf("link status of net dev #%" PRIu8 ": %" PRIu32 " ",
+               dev_num, status);
+        print_link_status_names(status);
+        putchar('\n');
+    }
+}
+
+
 typedef struct {
     char *name;
     void (*func) (int, char **);
 } func_table_t;
 
 func_table_t funcs[] = {
-                        { "i40",                shell_i40 },
-                        { "disk_add",           shell_disk_add },
-                        { "disk_del",           shell_disk_del },
-                        { "ls70",               shell_ls70 },
-                        { "ls80",               shell_ls80 },
-                        { "stat70",             shell_stat70 },
-                        { "stat80",             shell_stat80 },
-                        { "read70",             shell_read70 },
-                        { "read80",             shell_read80 },
-                        { "pwd",                shell_pwd },
-                        { "cd",                 shell_cd },
-                        { "set_cwd",            shell_cd },
-                        { "draw_window",        shell_draw_window },
-                        { "set_pixel",          shell_set_pixel },
-                        { "write_text",         shell_write_text },
-                        { "put_image",          shell_put_image },
-                        { "button",             shell_button },
-                        { "process_info",       shell_process_info },
-                        { "window_redraw",      shell_window_redraw },
-                        { "draw_rect",          shell_draw_rect },
-                        { "get_screen_size",    shell_get_screen_size },
-                        { "draw_line",          shell_draw_line },
-                        { "display_number",     shell_display_number },
-                        { "set_button_style",   shell_set_button_style },
-                        { "set_window_colors",  shell_set_window_colors },
-                        { "get_window_colors",  shell_get_window_colors },
-                        { "get_skin_height",    shell_get_skin_height },
-                        { "get_screen_area",    shell_get_screen_area },
-                        { "set_screen_area",    shell_set_screen_area },
-                        { "get_skin_margins",   shell_get_skin_margins },
-                        { "set_skin",           shell_set_skin },
-                        { "get_font_smoothing", shell_get_font_smoothing },
-                        { "set_font_smoothing", shell_set_font_smoothing },
-                        { "get_font_size",      shell_get_font_size },
-                        { "set_font_size",      shell_set_font_size },
-                        { "put_image_palette",  shell_put_image_palette },
-                        { "move_window",        shell_move_window },
-                        { "set_window_caption", shell_set_window_caption },
-                        { "blit_bitmap",        shell_blit_bitmap },
-                        { "scrot",              shell_scrot },
-                        { "dump_win_stack",     shell_dump_win_stack },
-                        { "dump_win_pos",       shell_dump_win_pos },
-                        { "acpi_enable",        shell_acpi_enable },
-                        { "acpi_preload_table", shell_acpi_preload_table },
-                        { NULL,                 NULL },
-                       };
+    { "i40",                     shell_i40 },
+    { "disk_add",                shell_disk_add },
+    { "disk_del",                shell_disk_del },
+    { "ls70",                    shell_ls70 },
+    { "ls80",                    shell_ls80 },
+    { "stat70",                  shell_stat70 },
+    { "stat80",                  shell_stat80 },
+    { "read70",                  shell_read70 },
+    { "read80",                  shell_read80 },
+    { "pwd",                     shell_pwd },
+    { "cd",                      shell_cd },
+    { "set_cwd",                 shell_cd },
+    { "draw_window",             shell_draw_window },
+    { "set_pixel",               shell_set_pixel },
+    { "write_text",              shell_write_text },
+    { "put_image",               shell_put_image },
+    { "button",                  shell_button },
+    { "process_info",            shell_process_info },
+    { "window_redraw",           shell_window_redraw },
+    { "draw_rect",               shell_draw_rect },
+    { "get_screen_size",         shell_get_screen_size },
+    { "draw_line",               shell_draw_line },
+    { "display_number",          shell_display_number },
+    { "set_button_style",        shell_set_button_style },
+    { "set_window_colors",       shell_set_window_colors },
+    { "get_window_colors",       shell_get_window_colors },
+    { "get_skin_height",         shell_get_skin_height },
+    { "get_screen_area",         shell_get_screen_area },
+    { "set_screen_area",         shell_set_screen_area },
+    { "get_skin_margins",        shell_get_skin_margins },
+    { "set_skin",                shell_set_skin },
+    { "get_font_smoothing",      shell_get_font_smoothing },
+    { "set_font_smoothing",      shell_set_font_smoothing },
+    { "get_font_size",           shell_get_font_size },
+    { "set_font_size",           shell_set_font_size },
+    { "put_image_palette",       shell_put_image_palette },
+    { "move_window",             shell_move_window },
+    { "set_window_caption",      shell_set_window_caption },
+    { "blit_bitmap",             shell_blit_bitmap },
+    { "scrot",                   shell_scrot },
+    { "dump_win_stack",          shell_dump_win_stack },
+    { "dump_win_pos",            shell_dump_win_pos },
+    { "acpi_enable",             shell_acpi_enable },
+    { "acpi_preload_table",      shell_acpi_preload_table },
+    { "stack_init",              shell_stack_init },
+    { "net_add_device",          shell_net_add_device },
+    { "net_get_dev_count",       shell_net_get_dev_count },
+    { "net_get_dev_type",        shell_net_get_dev_type },
+    { "net_get_dev_name",        shell_net_get_dev_name },
+    { "net_dev_reset",           shell_net_dev_reset },
+    { "net_dev_stop",            shell_net_dev_stop },
+    { "net_get_dev",             shell_net_get_dev },
+    { "net_get_packet_tx_count", shell_net_get_packet_tx_count },
+    { "net_get_packet_rx_count", shell_net_get_packet_rx_count },
+    { "net_get_byte_tx_count",   shell_net_get_byte_tx_count },
+    { "net_get_byte_rx_count",   shell_net_get_byte_rx_count },
+    { "net_get_link_status",     shell_net_get_link_status },
+    { NULL,                      NULL },
+};
 
 void *run_test(const char *infile_name) {
     FILE *infile, *outfile;

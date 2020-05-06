@@ -417,4 +417,127 @@ static inline void umka_sys_blit_bitmap(int operation, int background,
         : "memory");
 }
 
+static inline uint32_t umka_sys_net_get_dev_count() {
+    uint32_t count;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(count)
+        : "a"(74),
+          "b"(255)
+        : "memory");
+    return count;
+}
+
+static inline int32_t umka_sys_net_get_dev_type(uint8_t dev_num) {
+    int32_t type;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(type)
+        : "a"(74),
+          "b"((dev_num << 8) + 0)
+        : "memory");
+    return type;
+}
+
+static inline int32_t umka_sys_net_get_dev_name(uint8_t dev_num, char *name) {
+    int32_t status;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(status)
+        : "a"(74),
+          "b"((dev_num << 8) + 1),
+          "c"(name)
+        : "memory");
+    return status;
+}
+
+static inline int32_t umka_sys_net_dev_reset(uint8_t dev_num) {
+    int32_t status;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(status)
+        : "a"(74),
+          "b"((dev_num << 8) + 2)
+        : "memory");
+    return status;
+}
+
+static inline int32_t umka_sys_net_dev_stop(uint8_t dev_num) {
+    int32_t status;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(status)
+        : "a"(74),
+          "b"((dev_num << 8) + 3)
+        : "memory");
+    return status;
+}
+
+static inline intptr_t umka_sys_net_get_dev(uint8_t dev_num) {
+    intptr_t dev;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(dev)
+        : "a"(74),
+          "b"((dev_num << 8) + 4)
+        : "memory");
+    return dev;
+}
+
+static inline uint32_t umka_sys_net_get_packet_tx_count(uint8_t dev_num) {
+    uint32_t count;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(count)
+        : "a"(74),
+          "b"((dev_num << 8) + 6)
+        : "memory");
+    return count;
+}
+
+static inline uint32_t umka_sys_net_get_packet_rx_count(uint8_t dev_num) {
+    uint32_t count;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(count)
+        : "a"(74),
+          "b"((dev_num << 8) + 7)
+        : "memory");
+    return count;
+}
+
+static inline uint32_t umka_sys_net_get_byte_tx_count(uint8_t dev_num) {
+    uint32_t count;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(count)
+        : "a"(74),
+          "b"((dev_num << 8) + 8)
+        : "memory");
+    return count;
+}
+
+static inline uint32_t umka_sys_net_get_byte_rx_count(uint8_t dev_num) {
+    uint32_t count;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(count)
+        : "a"(74),
+          "b"((dev_num << 8) + 9)
+        : "memory");
+    return count;
+}
+
+static inline uint32_t umka_sys_net_get_link_status(uint8_t dev_num) {
+    uint32_t status;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(status)
+        : "a"(74),
+          "b"((dev_num << 8) + 10)
+        : "memory");
+    return status;
+}
+
+
 #endif
