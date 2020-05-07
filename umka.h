@@ -308,6 +308,14 @@ typedef struct {
         uint8_t data[0];
 } net_buff_t;
 
+typedef struct {
+    uint32_t ip;
+    uint8_t mac[6];
+    uint16_t status;
+    uint16_t ttl;
+} arp_entry_t;
+
+
 void kos_init(void);
 void i40(void);
 uint32_t kos_time_to_epoch(uint32_t *time);
@@ -1042,12 +1050,84 @@ static inline f76ret_t umka_sys_net_ipv4_set_addr(uint32_t dev_num,
     return r;
 }
 
-// Function 76, Protocol 1 - IPv4, Subfunction 4, Read DNS address ===
-// Function 76, Protocol 1 - IPv4, Subfunction 5, Set DNS address ===
-// Function 76, Protocol 1 - IPv4, Subfunction 6, Read subnet mask ===
-// Function 76, Protocol 1 - IPv4, Subfunction 7, Set subnet mask ===
-// Function 76, Protocol 1 - IPv4, Subfunction 8, Read gateway ====
-// Function 76, Protocol 1 - IPv4, Subfunction 9, Set gateway =====
+static inline f76ret_t umka_sys_net_ipv4_get_dns(uint32_t dev_num) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((1 << 16) + (dev_num << 8) + 4)
+        : "memory");
+    return r;
+}
+
+static inline f76ret_t umka_sys_net_ipv4_set_dns(uint32_t dev_num,
+                                                 uint32_t dns) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((1 << 16) + (dev_num << 8) + 5),
+          "c"(dns)
+        : "memory");
+    return r;
+}
+
+static inline f76ret_t umka_sys_net_ipv4_get_subnet(uint32_t dev_num) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((1 << 16) + (dev_num << 8) + 6)
+        : "memory");
+    return r;
+}
+
+static inline f76ret_t umka_sys_net_ipv4_set_subnet(uint32_t dev_num,
+                                                    uint32_t subnet) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((1 << 16) + (dev_num << 8) + 7),
+          "c"(subnet)
+        : "memory");
+    return r;
+}
+
+static inline f76ret_t umka_sys_net_ipv4_get_gw(uint32_t dev_num) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((1 << 16) + (dev_num << 8) + 8)
+        : "memory");
+    return r;
+}
+
+static inline f76ret_t umka_sys_net_ipv4_set_gw(uint32_t dev_num,
+                                                uint32_t gw) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((1 << 16) + (dev_num << 8) + 9),
+          "c"(gw)
+        : "memory");
+    return r;
+}
+
 // Function 76, Protocol 2 - ICMP, Subfunction 0, Read # Packets sent =
 // Function 76, Protocol 2 - ICMP, Subfunction 1, Read # Packets rcvd =
 // Function 76, Protocol 3 - UDP, Subfunction 0, Read # Packets sent ==
@@ -1056,8 +1136,49 @@ static inline f76ret_t umka_sys_net_ipv4_set_addr(uint32_t dev_num,
 // Function 76, Protocol 4 - TCP, Subfunction 1, Read # Packets rcvd ==
 // Function 76, Protocol 5 - ARP, Subfunction 0, Read # Packets sent ==
 // Function 76, Protocol 5 - ARP, Subfunction 1, Read # Packets rcvd ==
-// Function 76, Protocol 5 - ARP, Subfunction 2, Read # ARP entries ==
-// Function 76, Protocol 5 - ARP, Subfunction 3, Read ARP entry ====
+static inline f76ret_t umka_sys_net_arp_get_count(uint32_t dev_num) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((5 << 16) + (dev_num << 8) + 2)
+        : "memory");
+    return r;
+}
+
+static inline f76ret_t umka_sys_net_arp_get_entry(uint32_t dev_num,
+                                                  uint32_t arp_num,
+                                                  void *buf) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((5 << 16) + (dev_num << 8) + 3),
+          "c"(arp_num),
+          "D"(buf)
+        : "memory");
+    return r;
+}
+
+static inline f76ret_t umka_sys_net_arp_add_entry(uint32_t dev_num,
+                                                  void *buf) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((5 << 16) + (dev_num << 8) + 4),
+          "S"(buf)
+        : "memory");
+    return r;
+}
+
+
 // Function 76, Protocol 5 - ARP, Subfunction 4, Add ARP entry ====
 // Function 76, Protocol 5 - ARP, Subfunction 5, Remove ARP entry ====
 // Function 76, Protocol 5 - ARP, Subfunction 6, Send ARP announce ==

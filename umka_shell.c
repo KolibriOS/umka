@@ -1452,6 +1452,196 @@ void shell_net_ipv4_set_addr(int argc, char **argv) {
     }
 }
 
+void shell_net_ipv4_get_dns(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_ipv4_get_dns <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    f76ret_t r = umka_sys_net_ipv4_get_dns(dev_num);
+    if (r.eax == UINT32_MAX) {
+        printf("status: fail\n");
+    } else {
+        printf("%d.%d.%d.%d\n",
+               (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
+               (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
+    }
+}
+
+void shell_net_ipv4_set_dns(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_ipv4_set_dns <dev_num> <dns>\n"
+        "  dev_num        device number as returned by net_add_device\n"
+        "  dns            a.b.c.d";
+    if (argc != 3) {
+        puts(usage);
+        return;
+    }
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    uint32_t dns = inet_addr(argv[2]);
+    f76ret_t r = umka_sys_net_ipv4_set_dns(dev_num, dns);
+    if (r.eax == UINT32_MAX) {
+        printf("status: fail\n");
+    } else {
+        printf("status: ok\n");
+    }
+}
+
+void shell_net_ipv4_get_subnet(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_ipv4_get_subnet <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    f76ret_t r = umka_sys_net_ipv4_get_subnet(dev_num);
+    if (r.eax == UINT32_MAX) {
+        printf("status: fail\n");
+    } else {
+        printf("%d.%d.%d.%d\n",
+               (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
+               (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
+    }
+}
+
+void shell_net_ipv4_set_subnet(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_ipv4_set_subnet <dev_num> <subnet>\n"
+        "  dev_num        device number as returned by net_add_device\n"
+        "  subnet         a.b.c.d";
+    if (argc != 3) {
+        puts(usage);
+        return;
+    }
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    char *subnet_str = argv[2];
+    uint32_t subnet = inet_addr(subnet_str);
+    f76ret_t r = umka_sys_net_ipv4_set_subnet(dev_num, subnet);
+    if (r.eax == UINT32_MAX) {
+        printf("status: fail\n");
+    } else {
+        printf("status: ok\n");
+    }
+}
+
+void shell_net_ipv4_get_gw(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_ipv4_get_gw <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    f76ret_t r = umka_sys_net_ipv4_get_gw(dev_num);
+    if (r.eax == UINT32_MAX) {
+        printf("status: fail\n");
+    } else {
+        printf("%d.%d.%d.%d\n",
+               (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
+               (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
+    }
+}
+
+void shell_net_ipv4_set_gw(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_ipv4_set_gw <dev_num> <gw>\n"
+        "  dev_num        device number as returned by net_add_device\n"
+        "  gw             a.b.c.d";
+    if (argc != 3) {
+        puts(usage);
+        return;
+    }
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    char *gw_str = argv[2];
+    uint32_t gw = inet_addr(gw_str);
+    f76ret_t r = umka_sys_net_ipv4_set_gw(dev_num, gw);
+    if (r.eax == UINT32_MAX) {
+        printf("status: fail\n");
+    } else {
+        printf("status: ok\n");
+    }
+}
+
+void shell_net_arp_get_count(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_arp_get_count <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    f76ret_t r = umka_sys_net_arp_get_count(dev_num);
+    if (r.eax == UINT32_MAX) {
+        printf("status: fail\n");
+    } else {
+        printf("%" PRIi32 "\n", r.eax);
+    }
+}
+
+void shell_net_arp_get_entry(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_arp_get_entry <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device\n"
+        "  arp_num        arp number as returned by net_add_device";
+    if (argc != 3) {
+        puts(usage);
+        return;
+    }
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    uint32_t arp_num = strtoul(argv[2], NULL, 0);
+    arp_entry_t arp;
+    f76ret_t r = umka_sys_net_arp_get_entry(dev_num, arp_num, &arp);
+    if (r.eax == UINT32_MAX) {
+        printf("status: fail\n");
+    } else {
+        printf("arp #%u: IP %d.%d.%d.%d, "
+               "mac %2.2" SCNu8 ":%2.2" SCNu8 ":%2.2" SCNu8
+               ":%2.2" SCNu8 ":%2.2" SCNu8 ":%2.2" SCNu8 " "
+               "status %" PRIu16 " "
+               "ttl %" PRIu16 "\n",
+               arp_num,
+               (uint8_t)(arp.ip >>  0), (uint8_t)(arp.ip >>  8),
+               (uint8_t)(arp.ip >> 16), (uint8_t)(arp.ip >> 24),
+               arp.mac[0], arp.mac[1], arp.mac[2],
+               arp.mac[3], arp.mac[4], arp.mac[5],
+               arp.status, arp.ttl);
+    }
+}
+
+void shell_net_arp_add_entry(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_arp_add_entry <dev_num> <addr> <mac> <status> <ttl>\n"
+        "  dev_num        device number as returned by net_add_device\n"
+        "  arp_num        arp number as returned by net_add_device";
+    if (argc != 6) {
+        puts(usage);
+        return;
+    }
+    arp_entry_t arp;
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    arp.ip = inet_addr(argv[2]);
+    sscanf(argv[3], "%" SCNu8 ":%" SCNu8 ":%" SCNu8
+                    ":%" SCNu8 ":%" SCNu8 ":%" SCNu8,
+                    arp.mac+0, arp.mac+1, arp.mac+2,
+                    arp.mac+3, arp.mac+4, arp.mac+5);
+    arp.status = strtoul(argv[4], NULL, 0);
+    arp.ttl = strtoul(argv[5], NULL, 0);
+fprintf(stderr, "## before\n");
+    f76ret_t r = umka_sys_net_arp_add_entry(dev_num, &arp);
+fprintf(stderr, "## after\n");
+    if (r.eax == UINT32_MAX) {
+        printf("status: fail\n");
+    } else {
+        printf("%" PRIi32 "\n", r.eax);
+    }
+}
 
 
 typedef struct {
@@ -1526,6 +1716,15 @@ func_table_t funcs[] = {
     { "net_eth_read_mac",        shell_net_eth_read_mac },
     { "net_ipv4_get_addr",       shell_net_ipv4_get_addr },
     { "net_ipv4_set_addr",       shell_net_ipv4_set_addr },
+    { "net_ipv4_get_dns",        shell_net_ipv4_get_dns },
+    { "net_ipv4_set_dns",        shell_net_ipv4_set_dns },
+    { "net_ipv4_get_subnet",     shell_net_ipv4_get_subnet },
+    { "net_ipv4_set_subnet",     shell_net_ipv4_set_subnet },
+    { "net_ipv4_get_gw",         shell_net_ipv4_get_gw },
+    { "net_ipv4_set_gw",         shell_net_ipv4_set_gw },
+    { "net_arp_get_count",       shell_net_arp_get_count },
+    { "net_arp_get_entry",       shell_net_arp_get_entry },
+    { "net_arp_add_entry",       shell_net_arp_add_entry },
     { NULL,                      NULL },
 };
 
