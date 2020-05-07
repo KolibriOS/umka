@@ -111,7 +111,7 @@ typedef struct {
     int (*read)(void *userdata, void *buffer, off_t startsector, size_t *numsectors) __attribute__((__stdcall__));
     int (*write)(void *userdata, void *buffer, off_t startsector, size_t *numsectors) __attribute__((__stdcall__));
     int (*flush)(void *userdata) __attribute__((__stdcall__));
-    unsigned int (*adjust_cache_size)(void *userdata, uint32_t suggested_size) __attribute__((__stdcall__));
+    unsigned int (*adjust_cache_size)(void *userdata, size_t suggested_size) __attribute__((__stdcall__));
 } diskfunc_t;
 
 struct disk_t {

@@ -5,7 +5,7 @@
 #include <inttypes.h>
 #include "kolibri.h"
 
-void *vdisk_init(const char *fname, unsigned cache_size);
+void *vdisk_init(const char *fname, int adjust_cache_size, size_t cache_size);
 
 __attribute__((__stdcall__))
 void vdisk_close(void *userdata);
@@ -23,5 +23,7 @@ int vdisk_querymedia(void *userdata, diskmediainfo_t *minfo);
 
 __attribute__((__stdcall__))
 unsigned int vdisk_adjust_cache_size(void *userdata, unsigned suggested_size);
+
+extern diskfunc_t vdisk_functions;
 
 #endif  // VDISK_H_INCLUDED

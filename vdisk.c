@@ -5,15 +5,17 @@
 #include <errno.h>
 #include "kolibri.h"
 #include "trace.h"
+#include "vdisk.h"
 
 typedef struct {
     FILE *file;
     uint32_t sect_size;
     uint64_t sect_cnt;
     unsigned cache_size;
+    int      adjust_cache_size;
 } vdisk_t;
 
-void *vdisk_init(const char *fname, unsigned cache_size) {
+void *vdisk_init(const char *fname, int adjust_cache_size, size_t cache_size) {
     FILE *f = fopen(fname, "r+");
     if (!f) {
         printf("vdisk: can't open file '%s': %s\n", fname, strerror(errno));
@@ -30,7 +32,8 @@ void *vdisk_init(const char *fname, unsigned cache_size) {
     *vdisk = (vdisk_t){.file = f,
                        .sect_size = sect_size,
                        .sect_cnt = (uint64_t)fsize / sect_size,
-                       .cache_size = cache_size};
+                       .cache_size = cache_size,
+                       .adjust_cache_size = adjust_cache_size};
     return vdisk;
 }
 
@@ -77,7 +80,22 @@ int vdisk_querymedia(void *userdata, diskmediainfo_t *minfo) {
 }
 
 __attribute__((__stdcall__))
-unsigned vdisk_adjust_cache_size(vdisk_t *vdisk, unsigned suggested_size) {
-    (void)suggested_size;
-    return vdisk->cache_size;
+size_t vdisk_adjust_cache_size(void *userdata, size_t suggested_size) {
+    vdisk_t *vdisk = userdata;
+    if (vdisk->adjust_cache_size) {
+        return vdisk->cache_size;
+    } else {
+        return suggested_size;
+    }
 }
+
+diskfunc_t vdisk_functions = {
+                                 .strucsize = sizeof(diskfunc_t),
+                                 .close = vdisk_close,
+                                 .closemedia = NULL,
+                                 .querymedia = vdisk_querymedia,
+                                 .read = vdisk_read,
+                                 .write = vdisk_write,
+                                 .flush = NULL,
+                                 .adjust_cache_size = vdisk_adjust_cache_size,
+                                };

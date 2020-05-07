@@ -50,17 +50,6 @@
 #define DEFAULT_READDIR_ENCODING UTF8
 #define DEFAULT_PATH_ENCODING UTF8
 
-diskfunc_t vdisk_functions = {
-                                 .strucsize = sizeof(diskfunc_t),
-                                 .close = vdisk_close,
-                                 .closemedia = NULL,
-                                 .querymedia = vdisk_querymedia,
-                                 .read = vdisk_read,
-                                 .write = vdisk_write,
-                                 .flush = NULL,
-                                 .adjust_cache_size = NULL,
-                                };
-
 net_device_t vnet = {
                             .device_type = NET_TYPE_ETH,
                             .mtu = 1514,
@@ -275,7 +264,8 @@ void shell_disk_add(int argc, char **argv) {
         puts(usage);
         return;
     }
-    unsigned cache_size = 0u;
+    size_t cache_size = 0;
+    int adjust_cache_size = 0;
     int opt;
     optind = 1;
     const char *file_name = argv[optind++];
@@ -284,7 +274,7 @@ void shell_disk_add(int argc, char **argv) {
         switch (opt) {
         case 'c':
             cache_size = strtoul(optarg, NULL, 0);
-            vdisk_functions.adjust_cache_size = vdisk_adjust_cache_size;
+            adjust_cache_size = 1;
             break;
         default:
             puts(usage);
@@ -292,7 +282,7 @@ void shell_disk_add(int argc, char **argv) {
         }
     }
 
-    void *userdata = vdisk_init(file_name, cache_size);
+    void *userdata = vdisk_init(file_name, adjust_cache_size, cache_size);
     if (userdata) {
         COVERAGE_ON();
         void *vdisk = disk_add(&vdisk_functions, disk_name, userdata, 0);

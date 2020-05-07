@@ -123,24 +123,13 @@ static struct fuse_operations umka_oper = {
         .read           = umka_read,
 };
 
-diskfunc_t vdisk_functions = {
-                                 .strucsize = sizeof(diskfunc_t),
-                                 .close = vdisk_close,
-                                 .closemedia = NULL,
-                                 .querymedia = vdisk_querymedia,
-                                 .read = vdisk_read,
-                                 .write = vdisk_write,
-                                 .flush = NULL,
-                                 .adjust_cache_size = NULL,
-                                };
-
 int main(int argc, char *argv[]) {
         if (argc != 3) {
                 printf("usage: umka_fuse dir img\n");
                 exit(1);
         }
         kos_init();
-        void *userdata = vdisk_init(argv[2], 0u);
+        void *userdata = vdisk_init(argv[2], 1, 0u);
         void *vdisk = disk_add(&vdisk_functions, "hd0", userdata, 0);
         disk_media_changed(vdisk, 1);
         return fuse_main(argc-1, argv, &umka_oper, NULL);
