@@ -32,8 +32,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "vdisk.h"
-#include "kolibri.h"
-#include "syscalls.h"
+#include "umka.h"
 
 #define DIRENTS_TO_READ 100
 

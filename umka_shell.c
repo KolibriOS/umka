@@ -35,8 +35,7 @@
 #include <arpa/inet.h>
 #include "vdisk.h"
 #include "vnet.h"
-#include "kolibri.h"
-#include "syscalls.h"
+#include "umka.h"
 #include "trace.h"
 #include "lodepng.h"
 

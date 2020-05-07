@@ -47,7 +47,7 @@ tags: umka.sym
 trace.o: trace.c trace.h trace_lbr.h
 	$(CC) $(CFLAGS_32) -c $<
 
-trace_lbr.o: trace_lbr.c trace_lbr.h kolibri.h
+trace_lbr.o: trace_lbr.c trace_lbr.h umka.h
 	$(CC) $(CFLAGS_32) -c $<
 
 vdisk.o: vdisk.c
@@ -56,10 +56,10 @@ vdisk.o: vdisk.c
 vnet.o: vnet.c
 	$(CC) $(CFLAGS_32) -c $<
 
-umka_shell.o: umka_shell.c kolibri.h trace.h syscalls.h
+umka_shell.o: umka_shell.c umka.h trace.h
 	$(CC) $(CFLAGS_32) -c $<
 
-umka_fuse.o: umka_fuse.c kolibri.h
+umka_fuse.o: umka_fuse.c umka.h
 	$(CC) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $<
 
 tools/mkdirrange: tools/mkdirrange.c

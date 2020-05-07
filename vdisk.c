@@ -3,7 +3,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include <errno.h>
-#include "kolibri.h"
+#include "umka.h"
 #include "trace.h"
 #include "vdisk.h"
 

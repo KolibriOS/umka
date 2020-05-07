@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
-#include "kolibri.h"
+#include "umka.h"
 
 #define MSR_IA32_DEBUGCTLMSR        0x1d9
 #define MSR_IA32_LASTBRANCHFROMIP   0x1db

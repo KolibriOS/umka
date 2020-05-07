@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <inttypes.h>
-#include "kolibri.h"
+#include "umka.h"
 
 void *vnet_init(void);
 
