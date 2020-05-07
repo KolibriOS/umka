@@ -239,7 +239,7 @@ typedef struct {
     uint32_t eax;
 } pushad_t;
 
-#define NET_TYPE_ETH 1
+#define NET_TYPE_ETH  1
 #define NET_TYPE_SLIP 2
 
 // Link state
@@ -249,6 +249,33 @@ typedef struct {
 #define ETH_LINK_10M     0x4    // 10 mbit
 #define ETH_LINK_100M    0x8    // 100 mbit
 #define ETH_LINK_1G      0xc    // gigabit
+
+// Ethernet protocol numbers
+#define ETHER_PROTO_ARP           0x0608
+#define ETHER_PROTO_IPv4          0x0008
+#define ETHER_PROTO_IPv6          0xDD86
+#define ETHER_PROTO_PPP_DISCOVERY 0x6388
+#define ETHER_PROTO_PPP_SESSION   0x6488
+
+// Internet protocol numbers
+#define IP_PROTO_IP   0
+#define IP_PROTO_ICMP 1
+#define IP_PROTO_TCP  6
+#define IP_PROTO_UDP  17
+#define IP_PROTO_RAW  255
+
+// IP options
+#define IP_TOS     1
+#define IP_TTL     2
+#define IP_HDRINCL 3
+
+// PPP protocol numbers
+#define PPP_PROTO_IPv4     0x2100
+#define PPP_PROTO_IPV6     0x5780
+#define PPP_PROTO_ETHERNET 666
+
+// Protocol family
+#define AF_INET4  AF_INET
 
 typedef struct {
     uint32_t device_type;   // type field
@@ -267,7 +294,18 @@ typedef struct {
     uint32_t link_state;    // link state (0 = no link)
     uint32_t hwacc;         // bitmask stating enabled HW accelerations (offload
                             // engines)
+    uint8_t mac[6];
 } net_device_t; // NET_DEVICE
+
+typedef struct {
+        void *next;     // pointer to next frame in list
+        void *prev;     // pointer to previous frame in list
+        net_device_t *device;   // ptr to NET_DEVICE structure
+        uint32_t type;  // encapsulation type: e.g. Ethernet
+        size_t length;  // size of encapsulated data
+        size_t offset;  // offset to actual data (24 bytes for default frame)
+        uint8_t data[0];
+} net_buff_t;
 
 void kos_init(void);
 void i40(void);
@@ -293,6 +331,16 @@ static inline void kos_enable_acpi() {
         :
         : "memory", "cc");
 }
+
+typedef struct {
+    uint32_t value;
+    uint32_t errorcode;
+} f75ret_t;
+
+typedef struct {
+    uint32_t eax;
+    uint32_t ebx;
+} f76ret_t;
 
 static inline void kos_stack_init() {
     __asm__ __inline__ __volatile__ (

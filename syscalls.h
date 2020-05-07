@@ -539,5 +539,157 @@ static inline uint32_t umka_sys_net_get_link_status(uint8_t dev_num) {
     return status;
 }
 
+static inline f75ret_t umka_sys_net_open_socket(uint32_t domain, uint32_t type,
+                                                uint32_t protocol) {
+    f75ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.value),
+          "=b"(r.errorcode)
+        : "a"(75),
+          "b"(0),
+          "c"(domain),
+          "d"(type),
+          "S"(protocol)
+        : "memory");
+    return r;
+}
+
+static inline f75ret_t umka_sys_net_close_socket(uint32_t fd) {
+    f75ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.value),
+          "=b"(r.errorcode)
+        : "a"(75),
+          "b"(1),
+          "c"(fd)
+        : "memory");
+    return r;
+}
+
+static inline f75ret_t umka_sys_net_bind(uint32_t fd, void *sockaddr,
+                                         size_t sockaddr_len) {
+    f75ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.value),
+          "=b"(r.errorcode)
+        : "a"(75),
+          "b"(2),
+          "c"(fd),
+          "d"(sockaddr),
+          "S"(sockaddr_len)
+        : "memory");
+    return r;
+}
+
+static inline f75ret_t umka_sys_net_listen(uint32_t fd, uint32_t backlog) {
+    f75ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.value),
+          "=b"(r.errorcode)
+        : "a"(75),
+          "b"(3),
+          "c"(fd),
+          "d"(backlog)
+        : "memory");
+    return r;
+}
+
+static inline f75ret_t umka_sys_net_connect(uint32_t fd, void *sockaddr,
+                                            size_t sockaddr_len) {
+    f75ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.value),
+          "=b"(r.errorcode)
+        : "a"(75),
+          "b"(4),
+          "c"(fd),
+          "d"(sockaddr),
+          "S"(sockaddr_len)
+        : "memory");
+    return r;
+}
+
+static inline f75ret_t umka_sys_net_accept(uint32_t fd, void *sockaddr,
+                                           size_t sockaddr_len) {
+    f75ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.value),
+          "=b"(r.errorcode)
+        : "a"(75),
+          "b"(5),
+          "c"(fd),
+          "d"(sockaddr),
+          "S"(sockaddr_len)
+        : "memory");
+    return r;
+}
+
+static inline f76ret_t umka_sys_net_eth_read_mac(uint32_t dev_num) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((0 << 16) + (dev_num << 8) + 0)
+        : "memory");
+    return r;
+}
+
+// Function 76, Protocol 1 - IPv4, Subfunction 0, Read # Packets sent =
+// Function 76, Protocol 1 - IPv4, Subfunction 1, Read # Packets rcvd =
+
+static inline f76ret_t umka_sys_net_ipv4_get_addr(uint32_t dev_num) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((1 << 16) + (dev_num << 8) + 2)
+        : "memory");
+    return r;
+}
+
+static inline f76ret_t umka_sys_net_ipv4_set_addr(uint32_t dev_num,
+                                                  uint32_t addr) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((1 << 16) + (dev_num << 8) + 3),
+          "c"(addr)
+        : "memory");
+    return r;
+}
+
+// Function 76, Protocol 1 - IPv4, Subfunction 4, Read DNS address ===
+// Function 76, Protocol 1 - IPv4, Subfunction 5, Set DNS address ===
+// Function 76, Protocol 1 - IPv4, Subfunction 6, Read subnet mask ===
+// Function 76, Protocol 1 - IPv4, Subfunction 7, Set subnet mask ===
+// Function 76, Protocol 1 - IPv4, Subfunction 8, Read gateway ====
+// Function 76, Protocol 1 - IPv4, Subfunction 9, Set gateway =====
+// Function 76, Protocol 2 - ICMP, Subfunction 0, Read # Packets sent =
+// Function 76, Protocol 2 - ICMP, Subfunction 1, Read # Packets rcvd =
+// Function 76, Protocol 3 - UDP, Subfunction 0, Read # Packets sent ==
+// Function 76, Protocol 3 - UDP, Subfunction 1, Read # Packets rcvd ==
+// Function 76, Protocol 4 - TCP, Subfunction 0, Read # Packets sent ==
+// Function 76, Protocol 4 - TCP, Subfunction 1, Read # Packets rcvd ==
+// Function 76, Protocol 5 - ARP, Subfunction 0, Read # Packets sent ==
+// Function 76, Protocol 5 - ARP, Subfunction 1, Read # Packets rcvd ==
+// Function 76, Protocol 5 - ARP, Subfunction 2, Read # ARP entries ==
+// Function 76, Protocol 5 - ARP, Subfunction 3, Read ARP entry ====
+// Function 76, Protocol 5 - ARP, Subfunction 4, Add ARP entry ====
+// Function 76, Protocol 5 - ARP, Subfunction 5, Remove ARP entry ====
+// Function 76, Protocol 5 - ARP, Subfunction 6, Send ARP announce ==
+// Function 76, Protocol 5 - ARP, Subfunction 7, Read # conflicts ===
 
 #endif

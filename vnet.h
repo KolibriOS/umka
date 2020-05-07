@@ -14,6 +14,6 @@ __attribute__((__stdcall__))
 void vnet_reset(void);
 
 __attribute__((__stdcall__))
-void vnet_transmit(void);
+void vnet_transmit(net_buff_t *buf);
 
 #endif  // VNET_H_INCLUDED

@@ -30,6 +30,9 @@
 #include <fcntl.h>
 #include <assert.h>
 #include <time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include "vdisk.h"
 #include "vnet.h"
 #include "kolibri.h"
@@ -72,8 +75,9 @@ net_device_t vnet = {
                             .packets_tx = 0,
                             .packets_rx = 0,
 
-                            .link_state = 0,    // link state (0 = no link)
+                            .link_state = ETH_LINK_FD + ETH_LINK_10M,
                             .hwacc = 0,
+                            .mac = {0x80, 0x2b, 0xf9, 0x3b, 0x6c, 0xca},
                         };
 
 char cur_dir[PATH_MAX] = "/";
@@ -1266,7 +1270,7 @@ void shell_net_get_link_status(int argc, char **argv) {
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
-    uint32_t status = umka_sys_net_get_byte_rx_count(dev_num);
+    uint32_t status = umka_sys_net_get_link_status(dev_num);
     printf("status: %s\n", status == UINT32_MAX ? "fail" : "ok");
     if (status != UINT32_MAX) {
         printf("link status of net dev #%" PRIu8 ": %" PRIu32 " ",
@@ -1275,6 +1279,190 @@ void shell_net_get_link_status(int argc, char **argv) {
         putchar('\n');
     }
 }
+
+void shell_net_open_socket(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_open_socket <domain> <type> <protocol>\n"
+        "  domain         domain\n"
+        "  type           type\n"
+        "  protocol       protocol";
+    if (argc != 4) {
+        puts(usage);
+        return;
+    }
+    uint32_t domain   = strtoul(argv[1], NULL, 0);
+    uint32_t type     = strtoul(argv[2], NULL, 0);
+    uint32_t protocol = strtoul(argv[3], NULL, 0);
+    f75ret_t r = umka_sys_net_open_socket(domain, type, protocol);
+    printf("value: 0x%" PRIx32 "\n", r.value);
+    printf("errorcode: 0x%" PRIx32 "\n", r.errorcode);
+// UINT32_MAX
+}
+
+void shell_net_close_socket(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_close_socket <socket number>\n"
+        "  socket number  socket number";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint32_t fd = strtoul(argv[1], NULL, 0);
+    f75ret_t r = umka_sys_net_close_socket(fd);
+    printf("value: 0x%" PRIx32 "\n", r.value);
+    printf("errorcode: 0x%" PRIx32 "\n", r.errorcode);
+}
+
+void shell_net_bind(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_bind <fd> <port> <ip>\n"
+        "  fd             socket number\n"
+        "  port           port\n"
+        "  addr           addr";
+    if (argc != 4) {
+        puts(usage);
+        return;
+    }
+    uint32_t fd = strtoul(argv[1], NULL, 0);
+    uint16_t port = strtoul(argv[2], NULL, 0);
+    char *addr_str = argv[3];
+    uint32_t addr = inet_addr(addr_str);
+    struct sockaddr_in sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sin_family = AF_INET4;
+    sa.sin_port = htons(port);
+    sa.sin_addr.s_addr = addr;
+    printf("sockaddr at %p\n", &sa);
+    f75ret_t r = umka_sys_net_bind(fd, &sa, sizeof(struct sockaddr_in));
+    printf("value: 0x%" PRIx32 "\n", r.value);
+    printf("errorcode: 0x%" PRIx32 "\n", r.errorcode);
+}
+
+void shell_net_listen(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_listen <fd> <backlog>\n"
+        "  fd             socket number\n"
+        "  backlog        max queue length";
+    if (argc != 3) {
+        puts(usage);
+        return;
+    }
+    uint32_t fd = strtoul(argv[1], NULL, 0);
+    uint32_t backlog = strtoul(argv[2], NULL, 0);
+    f75ret_t r = umka_sys_net_listen(fd, backlog);
+    printf("value: 0x%" PRIx32 "\n", r.value);
+    printf("errorcode: 0x%" PRIx32 "\n", r.errorcode);
+}
+
+void shell_net_connect(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_connect <fd> <port> <ip>\n"
+        "  fd             socket number\n"
+        "  port           port\n"
+        "  addr           addr";
+    if (argc != 4) {
+        puts(usage);
+        return;
+    }
+    uint32_t fd = strtoul(argv[1], NULL, 0);
+    uint16_t port = strtoul(argv[2], NULL, 0);
+    char *addr_str = argv[3];
+    uint32_t addr = inet_addr(addr_str);
+    struct sockaddr_in sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sin_family = AF_INET4;
+    sa.sin_port = htons(port);
+    sa.sin_addr.s_addr = addr;
+    printf("sockaddr at %p\n", &sa);
+    f75ret_t r = umka_sys_net_connect(fd, &sa, sizeof(struct sockaddr_in));
+    printf("value: 0x%" PRIx32 "\n", r.value);
+    printf("errorcode: 0x%" PRIx32 "\n", r.errorcode);
+}
+
+void shell_net_accept(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_accept <fd> <port> <ip>\n"
+        "  fd             socket number\n"
+        "  port           port\n"
+        "  addr           addr";
+    if (argc != 4) {
+        puts(usage);
+        return;
+    }
+    uint32_t fd = strtoul(argv[1], NULL, 0);
+    uint16_t port = strtoul(argv[2], NULL, 0);
+    char *addr_str = argv[3];
+    uint32_t addr = inet_addr(addr_str);
+    struct sockaddr_in sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sin_family = AF_INET4;
+    sa.sin_port = htons(port);
+    sa.sin_addr.s_addr = addr;
+    printf("sockaddr at %p\n", &sa);
+    f75ret_t r = umka_sys_net_accept(fd, &sa, sizeof(struct sockaddr_in));
+    printf("value: 0x%" PRIx32 "\n", r.value);
+    printf("errorcode: 0x%" PRIx32 "\n", r.errorcode);
+}
+
+void shell_net_eth_read_mac(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_eth_read_mac <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    f76ret_t r = umka_sys_net_eth_read_mac(dev_num);
+    if (r.eax == UINT32_MAX) {
+        printf("status: fail\n");
+    } else {
+        printf("%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n",
+               (uint8_t)(r.ebx >>  0), (uint8_t)(r.ebx >>  8),
+               (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
+               (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
+    }
+}
+
+void shell_net_ipv4_get_addr(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_ipv4_get_addr <dev_num>\n"
+        "  dev_num        device number as returned by net_add_device";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    f76ret_t r = umka_sys_net_ipv4_get_addr(dev_num);
+    if (r.eax == UINT32_MAX) {
+        printf("status: fail\n");
+    } else {
+        printf("%d.%d.%d.%d\n",
+               (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
+               (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
+    }
+}
+
+void shell_net_ipv4_set_addr(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_ipv4_set_addr <dev_num> <addr>\n"
+        "  dev_num        device number as returned by net_add_device\n"
+        "  addr           a.b.c.d";
+    if (argc != 3) {
+        puts(usage);
+        return;
+    }
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    char *addr_str = argv[2];
+    uint32_t addr = inet_addr(addr_str);
+    f76ret_t r = umka_sys_net_ipv4_set_addr(dev_num, addr);
+    if (r.eax == UINT32_MAX) {
+        printf("status: fail\n");
+    } else {
+        printf("status: ok\n");
+    }
+}
+
 
 
 typedef struct {
@@ -1340,6 +1528,15 @@ func_table_t funcs[] = {
     { "net_get_byte_tx_count",   shell_net_get_byte_tx_count },
     { "net_get_byte_rx_count",   shell_net_get_byte_rx_count },
     { "net_get_link_status",     shell_net_get_link_status },
+    { "net_open_socket",         shell_net_open_socket },
+    { "net_close_socket",        shell_net_close_socket },
+    { "net_bind",                shell_net_bind },
+    { "net_listen",              shell_net_listen },
+    { "net_connect",             shell_net_connect },
+    { "net_accept",              shell_net_accept },
+    { "net_eth_read_mac",        shell_net_eth_read_mac },
+    { "net_ipv4_get_addr",       shell_net_ipv4_get_addr },
+    { "net_ipv4_set_addr",       shell_net_ipv4_set_addr },
     { NULL,                      NULL },
 };
 
