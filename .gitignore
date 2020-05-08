@@ -4,6 +4,7 @@
 *.o
 umka_shell
 umka_fuse
+umka_os
 mkdirrange
 mkfilepattern
 *.img

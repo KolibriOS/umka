@@ -6,7 +6,7 @@ CFLAGS_32=$(CFLAGS) -m32
 LDFLAGS=
 LDFLAGS_32=$(LDFLAGS) -m32
 
-all: umka_shell umka_fuse umka.sym umka.prp umka.lst tags tools/mkdirrange tools/mkfilepattern covpreproc default.skn skin.skn
+all: umka_shell umka_fuse umka_os umka.sym umka.prp umka.lst tags tools/mkdirrange tools/mkfilepattern covpreproc default.skn skin.skn
 
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
@@ -16,6 +16,9 @@ umka_shell: umka_shell.o umka.o trace.o trace_lbr.o vdisk.o vnet.o lodepng.o pci
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
+
+umka_os: umka_os.o umka.o trace.o trace_lbr.o vdisk.o pci.o
+	$(CC) $(LDFLAGS_32) $^ -o $@
 
 umka.o umka.fas: umka.asm
 	INCLUDE="$(KOLIBRI)/kernel/trunk;$(KOLIBRI)/programs/develop/libraries/libcrash/trunk" $(FASM) $< umka.o -s umka.fas -m 1234567
@@ -62,6 +65,9 @@ umka_shell.o: umka_shell.c umka.h trace.h
 umka_fuse.o: umka_fuse.c umka.h
 	$(CC) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $<
 
+umka_os.o: umka_os.c umka.h
+	$(CC) $(CFLAGS_32) -c $<
+
 tools/mkdirrange: tools/mkdirrange.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
@@ -71,5 +77,5 @@ tools/mkfilepattern: tools/mkfilepattern.c
 .PHONY: all clean
 
 clean:
-	rm -f *.o umka_shell umka_fuse umka.fas umka.sym umka.lst umka.prp coverage tools/mkdirrange tools/mkfilepattern
+	rm -f *.o umka_shell umka_fuse umka_os umka.fas umka.sym umka.lst umka.prp coverage tools/mkdirrange tools/mkfilepattern
 
