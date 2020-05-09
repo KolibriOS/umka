@@ -41,7 +41,18 @@ public kos_acpi_ssdt_size
 public stack_init
 public net_add_device
 
-cli equ nop
+macro cli {
+        pushfd
+        btr     dword[esp], 21
+        popfd
+}
+
+macro sti {
+        pushfd
+        bts     dword[esp], 21
+        popfd
+}
+
 iretd equ retd
 
 lang fix en
@@ -287,8 +298,6 @@ public umka_os
 proc umka_os uses ebx esi edi
         call    kos_init
 
-;        mov     [fdd_motor_status], 0
-
         mov     eax, -1
         mov     edi, thr_slot_map+4
         mov     [edi-4], dword 0xFFFFFFF8
@@ -361,14 +370,6 @@ proc umka_os uses ebx esi edi
         loop    @b
         DEBUGF 1, "2 os\n"
         jmp     .loop
-
-        ret
-endp
-
-; in: edx -> APPDATA for OS/IDLE slot
-; in: ebx = stack base
-proc s2etup_os_slot
-
 
         ret
 endp

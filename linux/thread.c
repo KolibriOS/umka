@@ -6,13 +6,15 @@
 
 sigjmp_buf trampoline;
 
-
 __attribute__((__stdcall__))
 uint32_t umka_sched_add_thread(appdata_t *app) {
     fprintf(stderr, "umka_new_sys_threads before\n");
     fprintf(stderr, "kos_task_count: %d\n", kos_task_count);
     if (!sigsetjmp(trampoline, 1)) {
         __asm__ __inline__ __volatile__ (
+        "pushfd;"
+        "bts    dword ptr [esp], 21;"
+        "popfd;"
         "mov    esp, eax"
         :
         : "a"(app->saved_esp)
