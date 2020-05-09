@@ -22,6 +22,13 @@ public sha3_256_oneshot as 'hash_oneshot'
 public kos_time_to_epoch
 public kos_init
 
+public CURRENT_TASK as 'kos_current_task'
+public current_slot as 'kos_current_slot'
+public TASK_COUNT as 'kos_task_count'
+public task_base_addr as 'kos_task_base'
+public task_data_addr as 'kos_task_data'
+public slot_base_addr as 'kos_slot_base'
+
 public win_stack_addr as 'kos_win_stack'
 public win_pos_addr as 'kos_win_pos'
 public lfb_base_addr as 'kos_lfb_base'
@@ -118,9 +125,9 @@ include 'core/string.inc'
 include 'core/malloc.inc'
 include 'core/heap.inc'
 include 'core/dll.inc'
-new_sys_threads equ __pew_pew
+;new_sys_threads equ __pew_pew
 include 'core/taskman.inc'
-restore new_sys_threads
+;restore new_sys_threads
 include 'core/timers.inc'
 include 'core/clipboard.inc'
 include 'core/syscall.inc'
@@ -173,6 +180,11 @@ proc kos_init c uses ebx esi edi ebp
         mov     [pg_data.kernel_tables], eax
         call    init_kernel_heap
         call    init_malloc
+
+        mov     eax, sys_proc
+        list_init eax
+        add     eax, PROC.thr_list
+        list_init eax
 
         mov     [BOOT.bpp], 32
         mov     [BOOT.x_res], 400
@@ -258,6 +270,109 @@ proc kos_init c uses ebx esi edi ebp
         ret
 endp
 
+public idle as 'umka_idle'
+proc idle uses ebx esi edi
+.loop:
+        mov     ecx, 10000000
+@@:
+        loop    @b
+        DEBUGF 1, "1 idle\n"
+        jmp     .loop
+
+        ret
+endp
+
+extrn raise
+public umka_os
+proc umka_os uses ebx esi edi
+        call    kos_init
+
+;        mov     [fdd_motor_status], 0
+
+        mov     eax, -1
+        mov     edi, thr_slot_map+4
+        mov     [edi-4], dword 0xFFFFFFF8
+        stosd
+        stosd
+        stosd
+        stosd
+        stosd
+        stosd
+        stosd
+
+        mov     [current_process], sys_proc
+
+        mov     dword[CURRENT_TASK], 0
+        mov     dword[TASK_COUNT], 0
+
+        stdcall kernel_alloc, RING0_STACK_SIZE
+        mov     ebx, eax
+        mov     edx, SLOT_BASE+256*1
+        call    setup_os_slot
+        mov     dword [edx], 'IDLE'
+        sub     [edx+APPDATA.saved_esp], 4
+        mov     eax, [edx+APPDATA.saved_esp]
+        mov     dword[eax], idle        ; _thread
+        mov     ecx, IDLE_PRIORITY
+        call    sched_add_thread
+
+        stdcall kernel_alloc, RING0_STACK_SIZE
+        mov     ebx, eax
+        mov     edx, SLOT_BASE+256*2
+        call    setup_os_slot
+        mov     dword [edx], 'OS'
+        sub     [edx+APPDATA.saved_esp], 4
+        mov     eax, [edx+APPDATA.saved_esp]
+        mov     dword[eax], 0
+        xor     ecx, ecx
+        call    sched_add_thread
+
+        mov     dword[CURRENT_TASK], 2
+        mov     dword[TASK_COUNT], 3
+        mov     [current_slot], SLOT_BASE+256*2
+
+;        movi    ebx, 1
+;        mov     ecx, eth_process_input
+;        call    new_sys_threads
+
+        call    stack_init
+
+        mov     edx, SLOT_BASE+256*3
+        xor     ecx, ecx
+        call    sched_add_thread
+
+        mov     edx, SLOT_BASE+256*4
+        xor     ecx, ecx
+        call    sched_add_thread
+
+        mov     edx, SLOT_BASE+256*5
+        xor     ecx, ecx
+        call    sched_add_thread
+
+        mov     dword[TASK_COUNT], 6
+        
+        ccall   raise, SIGPROF
+
+        jmp     osloop
+
+.loop:
+        mov     ecx, 10000000
+@@:
+        loop    @b
+        DEBUGF 1, "2 os\n"
+        jmp     .loop
+
+        ret
+endp
+
+; in: edx -> APPDATA for OS/IDLE slot
+; in: ebx = stack base
+proc s2etup_os_slot
+
+
+        ret
+endp
+
 extrn pci_read
 proc pci_read_reg uses ebx esi edi
         mov     ecx, eax
@@ -300,8 +415,9 @@ proc map_io_mem _base, _size, _flags
         ret
 endp
 
-new_sys_threads:
-        xor     eax, eax
+extrn umka_sched_add_thread
+sched_add_thread:
+        stdcall umka_sched_add_thread, edx
         ret
 
 change_task:
@@ -383,6 +499,7 @@ map_memEx:
 HEAP_BASE equ
 include 'init.inc'
 sys_msg_board equ __pew
+;setup_os_slot equ ___pew
 
 include fix pew
 macro pew x {}
@@ -402,11 +519,19 @@ macro lea r, v {
 
 macro add r, v {
   if v eq CURRENT_TASK - (SLOT_BASE shr 3)
-        int3
+;        int3
+        push    r
+        mov     r, SLOT_BASE
+        shr     r, 3
+        neg     r
+        add     r, CURRENT_TASK
+        add     r, [esp]
+        add     esp, 4
   else
         add     r, v
   end if
 }
+
 
 include 'kernel.asm'
 
@@ -420,6 +545,11 @@ coverage_end:
 section '.data' writeable align 64
 timer_ticks dd 0
 fpu_owner dd ?
+
+task_base_addr dd TASK_BASE
+task_data_addr dd TASK_DATA
+slot_base_addr dd SLOT_BASE
+
 
 win_stack_addr dd WIN_STACK
 win_pos_addr dd WIN_POS

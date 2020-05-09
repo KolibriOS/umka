@@ -18,3 +18,5 @@ STDOUT      = 1
 STDERR      = 2
 
 ENOENT      = 2
+
+SIGPROF     = 27

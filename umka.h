@@ -2,6 +2,7 @@
 #define UMKA_H_INCLUDED
 
 #include <inttypes.h>
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -315,7 +316,8 @@ typedef struct {
     uint16_t ttl;
 } arp_entry_t;
 
-
+void umka_os(void);
+//void umka_idle(void);
 void kos_init(void);
 void i40(void);
 uint32_t kos_time_to_epoch(uint32_t *time);
@@ -374,6 +376,90 @@ static inline int32_t kos_net_add_device(net_device_t *dev) {
 
 void coverage_begin(void);
 void coverage_end(void);
+
+typedef struct appobj_t appobj_t;
+
+struct appobj_t {
+    uint32_t magic;
+    void *destroy;  // internal destructor
+    appobj_t *fd;   // next object in list
+    appobj_t *bk;   // prev object in list
+    uint32_t pid;   // owner id
+};
+
+typedef struct {
+    uint32_t magic;
+    void *destroy;  // internal destructor
+    appobj_t *fd;   // next object in list
+    appobj_t *bk;   // prev object in list
+    uint32_t pid;   // owner id
+    uint32_t id;    // event uid
+    uint32_t state; // internal flags
+    uint32_t code;
+    uint32_t pad[5];
+} event_t;
+
+typedef struct {
+    char app_name[11];
+    uint8_t pad1[5];
+
+    lhead_t list;           // +16
+    uint32_t process;       // +24
+    sigjmp_buf *fpu_state;  // +28
+    void *exc_handler;      // +32
+    uint32_t except_mask;   // +36
+    void *pl0_stack;        // +40
+    void *cursor;           // +44
+    event_t *fd_ev;         // +48
+    event_t *bk_ev;         // +52
+    appobj_t *fd_obj;       // +56
+    appobj_t *bk_obj;       // +60
+    uint32_t saved_esp;     // +64
+    uint32_t io_map[2];     // +68
+    uint32_t dbg_state;     // +76
+/*
+        cur_dir         dd ?            ;+80
+        wait_timeout    dd ?            ;+84
+        saved_esp0      dd ?            ;+88
+        wait_begin      dd ?            ;+92   +++
+        wait_test       dd ?            ;+96   +++
+        wait_param      dd ?            ;+100  +++
+        tls_base        dd ?            ;+104
+                        dd ?            ;+108
+        event_filter    dd ?            ;+112
+        draw_bgr_x      dd ?            ;+116
+        draw_bgr_y      dd ?            ;+120
+                        dd ?            ;+124
+        wnd_shape       dd ?            ;+128
+        wnd_shape_scale dd ?            ;+132
+                        dd ?            ;+136
+                        dd ?            ;+140
+        saved_box       BOX             ;+144
+        ipc_start       dd ?            ;+160
+        ipc_size        dd ?            ;+164
+        event_mask      dd ?            ;+168
+        debugger_slot   dd ?            ;+172
+        terminate_protection dd ?       ;+176
+        keyboard_mode   db ?            ;+180
+        captionEncoding db ?
+                        rb 2
+        exec_params     dd ?            ;+184
+        dbg_event_mem   dd ?            ;+188
+        dbg_regs        DBG_REGS        ;+192
+        wnd_caption     dd ?            ;+212
+        wnd_clientbox   BOX             ;+216
+        priority        dd ?            ;+232
+        in_schedule     LHEAD           ;+236
+*/
+    uint8_t pad[256-80];
+} appdata_t;
+
+extern uint32_t kos_current_task;
+extern appdata_t *kos_current_slot;
+extern size_t kos_task_count;
+extern void *kos_task_base;
+extern void *kos_task_data;
+extern appdata_t *kos_slot_base;
 
 extern uint32_t *kos_lfb_base;
 extern uint16_t *kos_win_stack;
