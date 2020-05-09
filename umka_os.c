@@ -32,6 +32,14 @@ void scheduler(int signo, siginfo_t *info, void *context) {
     }
 }
 
+void monitor() {
+    while (1) {
+        for (int i = 0; i < 10000000; i++) {}
+        printf("6 usera\n");
+    }
+
+}
+
 int main() {
     struct sigaction sa;
 
@@ -43,6 +51,8 @@ int main() {
         printf("Can't install signal handler!\n");
         return 1;
     }
+
+    monitor_thread = monitor;
 
     umka_os();
 

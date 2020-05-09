@@ -22,6 +22,7 @@ public sha3_256_oneshot as 'hash_oneshot'
 public kos_time_to_epoch
 public kos_init
 
+public monitor_thread
 public CURRENT_TASK as 'kos_current_task'
 public current_slot as 'kos_current_slot'
 public TASK_COUNT as 'kos_task_count'
@@ -359,7 +360,9 @@ proc umka_os uses ebx esi edi
         call    sched_add_thread
 
         mov     dword[TASK_COUNT], 6
-        
+
+        stdcall umka_install_thread, [monitor_thread]
+
         ccall   raise, SIGPROF
 
         jmp     osloop
@@ -425,6 +428,25 @@ change_task:
         mov     [REDRAW_BACKGROUND], 0
         ret
 
+public umka_install_thread
+proc umka_install_thread _func
+        stdcall kernel_alloc, RING0_STACK_SIZE
+        mov     ebx, eax
+;        mov     edx, SLOT_BASE+256*6
+        mov     edx, [TASK_COUNT]
+        shl     edx, 8
+        add     edx, SLOT_BASE
+        call    setup_os_slot
+        mov     dword [edx], 'USER'
+        sub     [edx+APPDATA.saved_esp], 4
+        mov     eax, [edx+APPDATA.saved_esp]
+        mov     ecx, [_func]
+        mov     dword[eax], ecx
+        xor     ecx, ecx
+        call    sched_add_thread
+        inc     dword[TASK_COUNT]
+        ret
+endp
 
 sysfn_saveramdisk:
 sysfn_meminfo:
@@ -551,6 +573,7 @@ task_base_addr dd TASK_BASE
 task_data_addr dd TASK_DATA
 slot_base_addr dd SLOT_BASE
 
+monitor_thread dd ?
 
 win_stack_addr dd WIN_STACK
 win_pos_addr dd WIN_POS

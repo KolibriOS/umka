@@ -317,12 +317,12 @@ typedef struct {
 } arp_entry_t;
 
 void umka_os(void);
-//void umka_idle(void);
+void umka_install_thread(void *func) __attribute__((__stdcall__));
 void kos_init(void);
 void i40(void);
 uint32_t kos_time_to_epoch(uint32_t *time);
 
-void *disk_add(diskfunc_t *disk, const char *name, void *userdata, uint32_t flags)  __attribute__((__stdcall__));
+void *disk_add(diskfunc_t *disk, const char *name, void *userdata, uint32_t flags) __attribute__((__stdcall__));
 void *disk_media_changed(diskfunc_t *disk, int inserted) __attribute__((__stdcall__));
 void disk_del(disk_t *disk)  __attribute__((__stdcall__));
 
@@ -460,7 +460,7 @@ extern size_t kos_task_count;
 extern void *kos_task_base;
 extern void *kos_task_data;
 extern appdata_t *kos_slot_base;
-
+extern void (*monitor_thread)(void);
 extern uint32_t *kos_lfb_base;
 extern uint16_t *kos_win_stack;
 extern uint16_t *kos_win_pos;
