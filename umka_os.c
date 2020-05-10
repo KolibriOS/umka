@@ -2,9 +2,15 @@
 #define __USE_GNU
 #include <signal.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/select.h>
+#include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include "umka.h"
 #include "thread.h"
+#include "shell.h"
 
 struct itimerval timeout = {.it_value = {.tv_sec = 0, .tv_usec = 10000}};
 
@@ -23,19 +29,35 @@ void scheduler(int signo, siginfo_t *info, void *context) {
                 kos_current_task = 1;
             }
         } else {
-            printf("########## cli ############\n");
+//            printf("########## cli ############\n");
         }
         kos_current_slot = kos_slot_base + kos_current_task;
+        kos_task_base = ((taskdata_t*)&kos_current_task) + kos_current_task;
         printf("##### kos_current_task: %u\n", kos_current_task);
         setitimer(ITIMER_PROF, &timeout, NULL);
         siglongjmp(*kos_slot_base[kos_current_task].fpu_state, 1);
     }
 }
 
+//void intwrite(int fd, 
+
 void monitor() {
+    fprintf(stderr, "Start monitor thread\n");
+//    mkfifo("/tmp/umka.fifo.2u", 0644);
+//    mkfifo("/tmp/umka.fifo.4u", 0644);
+    FILE *fin = fopen("/tmp/umka.fifo.2u", "r");
+    FILE *fout = fopen("/tmp/umka.fifo.4u", "w");
+//    while (1) {
+    fprintf(stderr, "### from monitor: %d\n", fileno(fout));
+//    }
+    if (!fin || !fout) {
+        fprintf(stderr, "Can't open monitor files!\n");
+        return;
+    }
+    run_test(fin, fout, 0);
     while (1) {
         for (int i = 0; i < 10000000; i++) {}
-        printf("6 usera\n");
+        printf("6 monitor\n");
     }
 
 }

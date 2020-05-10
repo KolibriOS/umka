@@ -26,7 +26,8 @@ public monitor_thread
 public CURRENT_TASK as 'kos_current_task'
 public current_slot as 'kos_current_slot'
 public TASK_COUNT as 'kos_task_count'
-public task_base_addr as 'kos_task_base'
+public TASK_BASE as 'kos_task_base'
+;public task_base_addr as 'kos_task_base'
 public task_data_addr as 'kos_task_data'
 public slot_base_addr as 'kos_slot_base'
 
@@ -282,7 +283,7 @@ proc kos_init c uses ebx esi edi ebp
         ret
 endp
 
-public idle as 'umka_idle'
+public skin_udata
 proc idle uses ebx esi edi
 .loop:
         mov     ecx, 10000000
@@ -542,7 +543,6 @@ macro lea r, v {
 
 macro add r, v {
   if v eq CURRENT_TASK - (SLOT_BASE shr 3)
-;        int3
         push    r
         mov     r, SLOT_BASE
         shr     r, 3

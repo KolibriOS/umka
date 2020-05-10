@@ -454,10 +454,25 @@ typedef struct {
     uint8_t pad[256-80];
 } appdata_t;
 
+typedef struct {
+    uint32_t event_mask;
+    uint32_t pid;
+    uint16_t pad1;
+    uint8_t state;
+    uint8_t pad2;
+    uint16_t pad3;
+    uint8_t wnd_number;
+    uint8_t pad4;
+    uint32_t mem_start;
+    uint32_t counter_sum;
+    uint32_t counter_add;
+    uint32_t cpu_usage;
+} taskdata_t;
+
 extern uint32_t kos_current_task;
 extern appdata_t *kos_current_slot;
 extern size_t kos_task_count;
-extern void *kos_task_base;
+extern taskdata_t *kos_task_base;
 extern void *kos_task_data;
 extern appdata_t *kos_slot_base;
 extern void (*monitor_thread)(void);

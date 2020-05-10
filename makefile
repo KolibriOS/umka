@@ -11,17 +11,20 @@ all: umka_shell umka_fuse umka_os umka.sym umka.prp umka.lst tags tools/mkdirran
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
-umka_shell: umka_shell.o umka.o trace.o trace_lbr.o vdisk.o vnet.o lodepng.o pci.o thread.o
+umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o vnet.o lodepng.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
-umka_os: umka_os.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
+umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o trace_lbr.o vdisk.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static
 
 umka.o umka.fas: umka.asm
 	INCLUDE="$(KOLIBRI)/kernel/trunk;$(KOLIBRI)/programs/develop/libraries/libcrash/trunk" $(FASM) $< umka.o -s umka.fas -m 1234567
+
+shell.o: shell.c
+	$(CC) $(CFLAGS_32) -c $<
 
 thread.o: linux/thread.c
 	$(CC) $(CFLAGS_32) -c $<
