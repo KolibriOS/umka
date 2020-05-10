@@ -138,9 +138,8 @@ include 'core/string.inc'
 include 'core/malloc.inc'
 include 'core/heap.inc'
 include 'core/dll.inc'
-;new_sys_threads equ __pew_pew
+;include 'core/sched.inc'
 include 'core/taskman.inc'
-;restore new_sys_threads
 include 'core/timers.inc'
 include 'core/clipboard.inc'
 include 'core/syscall.inc'
@@ -339,7 +338,8 @@ proc umka_os uses ebx esi edi
         call    sched_add_thread
 
         mov     dword[CURRENT_TASK], 2
-        mov     dword[TASK_COUNT], 3
+        mov     dword[TASK_COUNT], 2
+        mov     dword[TASK_BASE], CURRENT_TASK + 2*sizeof.TASKDATA
         mov     [current_slot], SLOT_BASE+256*2
 
 ;        movi    ebx, 1
@@ -360,7 +360,7 @@ proc umka_os uses ebx esi edi
         xor     ecx, ecx
         call    sched_add_thread
 
-        mov     dword[TASK_COUNT], 6
+        mov     dword[TASK_COUNT], 5
 
         stdcall umka_install_thread, [monitor_thread]
 
@@ -431,10 +431,10 @@ change_task:
 
 public umka_install_thread
 proc umka_install_thread _func
-        stdcall kernel_alloc, RING0_STACK_SIZE
+        stdcall kernel_alloc, RING0_STACK_SIZE + 512    ; fpu_state
         mov     ebx, eax
-;        mov     edx, SLOT_BASE+256*6
         mov     edx, [TASK_COUNT]
+        inc     edx
         shl     edx, 8
         add     edx, SLOT_BASE
         call    setup_os_slot

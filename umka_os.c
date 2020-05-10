@@ -25,7 +25,7 @@ void scheduler(int signo, siginfo_t *info, void *context) {
 //        printf("##### saved\n");
         if (ctx->uc_mcontext.__gregs[REG_EFL] & (1 << 21)) {
             kos_current_task += 1;
-            if (kos_current_task == kos_task_count) {
+            if (kos_current_task > kos_task_count) {
                 kos_current_task = 1;
             }
         } else {
