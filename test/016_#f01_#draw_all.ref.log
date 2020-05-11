@@ -61,7 +61,7 @@ window_stack_value: 2
 process_name: OS
 memory_start: 0x00000000
 used_memory: 4294967295 (0xffffffff)
-pid: 8
+pid: 2
 box: 10 5 300 200
 slot_state: 0
 client_box: 5 24 290 171

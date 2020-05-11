@@ -310,6 +310,7 @@ proc kos_init c uses ebx esi edi ebp
         mov     dword[TASK_COUNT], 2
         mov     dword[TASK_BASE], CURRENT_TASK + 2*sizeof.TASKDATA
         mov     [current_slot], SLOT_BASE+256*2
+        mov     [CURRENT_TASK + 2*sizeof.TASKDATA + TASKDATA.pid], 2
 
         call    set_window_defaults
         call    init_background
