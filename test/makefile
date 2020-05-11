@@ -19,8 +19,11 @@ unicode_tests  := $(addsuffix .out.log, $(basename $(wildcard *\#unicode_*.t)))
 v5_tests       := $(addsuffix .out.log, $(basename $(wildcard *\#v5_*.t)))
 draw_tests     := $(addsuffix .out.log, $(basename $(wildcard *\#draw_*.t)))
 coverage_tests := $(addsuffix .out.log, $(basename $(wildcard *\#coverage_*.t)))
+i40_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#i40_*.t)))
+net_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#net_*.t)))
+arp_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#arp_*.t)))
 
-all: xfs s05k s4k f30 f70 f70s0 f70s1 f70s5 lookup bug xattr unicode v5 draw coverage
+all: xfs s05k s4k f30 f70 f70s0 f70s1 f70s5 lookup bug xattr unicode v5 draw coverage i40 net arp
 	@echo all tests passed
 
 xfs: $(xfs_tests)
@@ -38,8 +41,11 @@ unicode: $(unicode_tests)
 v5: $(v5_tests)
 draw: $(draw_tests)
 coverage: $(coverage_tests)
+i40: $(i40_tests)
+net: $(net_tests)
+arp: $(arp_tests)
 
-%.out.log: %.ref.log %.t
+%.out.log: %.t
 	$(UMKA_SHELL) < $*.t > $@
 	@ cmp $*.{out,ref}.log
 	@ if [ -f "$*.ref.png" ]; then cmp $*.{out,ref}.png; fi

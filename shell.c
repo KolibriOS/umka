@@ -1622,7 +1622,7 @@ void shell_net_arp_get_count(int argc, char **argv) {
 
 void shell_net_arp_get_entry(int argc, char **argv) {
     const char *usage = \
-        "usage: net_arp_get_entry <dev_num>\n"
+        "usage: net_arp_get_entry <dev_num> <arp_num>\n"
         "  dev_num        device number as returned by net_add_device\n"
         "  arp_num        arp number as returned by net_add_device";
     if (argc != 3) {
@@ -1638,8 +1638,8 @@ void shell_net_arp_get_entry(int argc, char **argv) {
     } else {
         fprintf(fout, "arp #%u: IP %d.%d.%d.%d, "
                "mac %2.2" SCNu8 ":%2.2" SCNu8 ":%2.2" SCNu8
-               ":%2.2" SCNu8 ":%2.2" SCNu8 ":%2.2" SCNu8 " "
-               "status %" PRIu16 " "
+               ":%2.2" SCNu8 ":%2.2" SCNu8 ":%2.2" SCNu8 ", "
+               "status %" PRIu16 ", "
                "ttl %" PRIu16 "\n",
                arp_num,
                (uint8_t)(arp.ip >>  0), (uint8_t)(arp.ip >>  8),
@@ -1654,7 +1654,10 @@ void shell_net_arp_add_entry(int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_add_entry <dev_num> <addr> <mac> <status> <ttl>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  arp_num        arp number as returned by net_add_device";
+        "  addr           IP addr\n"
+        "  mac            ethernet addr\n"
+        "  status         see ARP.inc\n"
+        "  ttl            Time to live";
     if (argc != 6) {
         puts(usage);
         return;
@@ -1668,13 +1671,26 @@ void shell_net_arp_add_entry(int argc, char **argv) {
                     arp.mac+3, arp.mac+4, arp.mac+5);
     arp.status = strtoul(argv[4], NULL, 0);
     arp.ttl = strtoul(argv[5], NULL, 0);
-fprintf(fout, "## before\n");
     f76ret_t r = umka_sys_net_arp_add_entry(dev_num, &arp);
-fprintf(fout, "## after\n");
     if (r.eax == UINT32_MAX) {
         fprintf(fout, "status: fail\n");
-    } else {
-        fprintf(fout, "%" PRIi32 "\n", r.eax);
+    }
+}
+
+void shell_net_arp_del_entry(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_arp_del_entry <dev_num> <arp_num>\n"
+        "  dev_num        device number as returned by net_add_device\n"
+        "  arp_num        arp number as returned by net_add_device";
+    if (argc != 3) {
+        puts(usage);
+        return;
+    }
+    uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    int32_t arp_num = strtoul(argv[2], NULL, 0);
+    f76ret_t r = umka_sys_net_arp_del_entry(dev_num, arp_num);
+    if (r.eax == UINT32_MAX) {
+        fprintf(fout, "status: fail\n");
     }
 }
 
@@ -1855,6 +1871,7 @@ func_table_t funcs[] = {
     { "net_arp_get_count",       shell_net_arp_get_count },
     { "net_arp_get_entry",       shell_net_arp_get_entry },
     { "net_arp_add_entry",       shell_net_arp_add_entry },
+    { "net_arp_del_entry",       shell_net_arp_del_entry },
     { "bg_set_size",             shell_bg_set_size },
     { "bg_put_pixel",            shell_bg_put_pixel },
     { "bg_redraw",               shell_bg_redraw },

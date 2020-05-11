@@ -1361,9 +1361,20 @@ static inline f76ret_t umka_sys_net_arp_add_entry(uint32_t dev_num,
     return r;
 }
 
+static inline f76ret_t umka_sys_net_arp_del_entry(uint32_t dev_num,
+                                                  int32_t arp_num) {
+    f76ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.eax),
+          "=b"(r.ebx)
+        : "a"(76),
+          "b"((5 << 16) + (dev_num << 8) + 5),
+          "c"(arp_num)
+        : "memory");
+    return r;
+}
 
-// Function 76, Protocol 5 - ARP, Subfunction 4, Add ARP entry ====
-// Function 76, Protocol 5 - ARP, Subfunction 5, Remove ARP entry ====
 // Function 76, Protocol 5 - ARP, Subfunction 6, Send ARP announce ==
 // Function 76, Protocol 5 - ARP, Subfunction 7, Read # conflicts ===
 
