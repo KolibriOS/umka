@@ -469,6 +469,11 @@ typedef struct {
     uint32_t cpu_usage;
 } taskdata_t;
 
+#define UMKA_SHELL 1u
+#define UMKA_FUSE  2u
+#define UMKA_OS    3u
+
+extern uint32_t umka_tool;
 extern uint32_t kos_current_task;
 extern appdata_t *kos_current_slot;
 extern size_t kos_task_count;
@@ -627,6 +632,83 @@ static inline void umka_sys_get_screen_size(uint32_t *xsize, uint32_t *ysize) {
         : "memory");
     *xsize = (xysize >> 16) + 1;
     *ysize = (xysize & 0xffffu) + 1;
+}
+
+static inline void umka_sys_bg_set_size(uint32_t xsize, uint32_t ysize) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(15),
+          "b"(1),
+          "c"(xsize),
+          "d"(ysize)
+        : "memory");
+}
+
+static inline void umka_sys_bg_put_pixel(uint32_t offset, uint32_t color) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(15),
+          "b"(2),
+          "c"(offset),
+          "d"(color)
+        : "memory");
+}
+
+static inline void umka_sys_bg_redraw() {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(15),
+          "b"(3)
+        : "memory");
+}
+
+static inline void umka_sys_bg_set_mode(uint32_t mode) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(15),
+          "b"(4),
+          "c"(mode)
+        : "memory");
+}
+
+static inline void umka_sys_bg_put_img(void *image, size_t offset,
+                                       size_t size) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(15),
+          "b"(5),
+          "c"(image),
+          "d"(offset),
+          "S"(size)
+        : "memory");
+}
+
+static inline void *umka_sys_bg_map() {
+    void *addr;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(addr)
+        : "a"(15),
+          "b"(6)
+        : "memory");
+    return addr;
+}
+
+static inline uint32_t umka_sys_bg_unmap(void *addr) {
+    uint32_t status;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(status)
+        : "a"(15),
+          "b"(7),
+          "c"(addr)
+        : "memory");
+    return status;
 }
 
 static inline void umka_sys_set_cwd(const char *dir) {

@@ -22,7 +22,6 @@ void scheduler(int signo, siginfo_t *info, void *context) {
 //    printf("##### switching from task %u\n", kos_current_task);
     ucontext_t *ctx = context;
     if (!sigsetjmp(*kos_slot_base[kos_current_task].fpu_state, 1)) {
-//        printf("##### saved\n");
         if (ctx->uc_mcontext.__gregs[REG_EFL] & (1 << 21)) {
             kos_current_task += 1;
             if (kos_current_task > kos_task_count) {
@@ -33,13 +32,11 @@ void scheduler(int signo, siginfo_t *info, void *context) {
         }
         kos_current_slot = kos_slot_base + kos_current_task;
         kos_task_base = ((taskdata_t*)&kos_current_task) + kos_current_task;
-        printf("##### kos_current_task: %u\n", kos_current_task);
+//        printf("##### kos_current_task: %u\n", kos_current_task);
         setitimer(ITIMER_PROF, &timeout, NULL);
         siglongjmp(*kos_slot_base[kos_current_task].fpu_state, 1);
     }
 }
-
-//void intwrite(int fd, 
 
 void monitor() {
     fprintf(stderr, "Start monitor thread\n");
@@ -47,22 +44,21 @@ void monitor() {
 //    mkfifo("/tmp/umka.fifo.4u", 0644);
     FILE *fin = fopen("/tmp/umka.fifo.2u", "r");
     FILE *fout = fopen("/tmp/umka.fifo.4u", "w");
-//    while (1) {
-    fprintf(stderr, "### from monitor: %d\n", fileno(fout));
-//    }
     if (!fin || !fout) {
         fprintf(stderr, "Can't open monitor files!\n");
         return;
     }
     run_test(fin, fout, 0);
+/*
     while (1) {
         for (int i = 0; i < 10000000; i++) {}
         printf("6 monitor\n");
     }
-
+*/
 }
 
 int main() {
+    umka_tool = UMKA_OS;
     struct sigaction sa;
 
     sa.sa_sigaction = scheduler;

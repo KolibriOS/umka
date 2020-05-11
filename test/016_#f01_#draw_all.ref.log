@@ -3,7 +3,7 @@
 /> set_skin /sys/DEFAULT.SKN
 status: 0
 /> window_redraw 1
-/> draw_window 0 300 0 200 0x000088 1 1 1 0 1 4 hello
+/> draw_window 10 300 5 200 0x000088 1 1 1 0 1 4 hello
 /> set_pixel 0 0 0x0000ff
 /> set_pixel 1 1 0xff0000
 /> set_pixel 2 2 0x00ff00
@@ -21,7 +21,7 @@ status: 0
 /> window_redraw 2
 
 /> set_window_caption hi_there 0
-/> move_window 220 35 150 200
+
 /> get_font_smoothing
 font smoothing: 2 - subpixel
 /> set_font_smoothing 0
@@ -41,15 +41,6 @@ font smoothing: 0 - off
 0x007e7e7e work_graph
 /> set_window_colors 0 0 0 0 0 0 0 0 0 0
 
-/> window_redraw 1
-/> draw_window 0 300 0 200 0x000088 1 1 1 0 1 4 hello
-/> set_pixel 0 0 0x0000ff
-/> set_pixel 1 1 0xff0000
-/> set_pixel 2 2 0x00ff00
-/> window_redraw 2
-
-/> set_window_caption hi_2there 0
-
 /> dump_win_stack 5
   0:   0
   1:   1
@@ -67,13 +58,13 @@ font smoothing: 0 - off
 cpu_usage: 0
 window_stack_position: 2
 window_stack_value: 2
-process_name: 
+process_name: OS
 memory_start: 0x00000000
 used_memory: 4294967295 (0xffffffff)
-pid: 0
-box: 220 35 150 200
+pid: 8
+box: 10 5 300 200
 slot_state: 0
-client_box: 5 24 140 171
+client_box: 5 24 290 171
 wnd_state: 0x00
 /> get_skin_height
 24

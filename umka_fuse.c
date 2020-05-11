@@ -64,7 +64,14 @@ static int umka_getattr(const char *path, struct stat *stbuf,
     int res = 0;
 
     bdfe_t file;
-    f7080s5arg_t fX0 = {.sf = 5, .flags = 0, .buf = &file, .u = {.f80 = {.path_encoding = UTF8, .path = path}}};
+    f7080s5arg_t fX0 = {.sf = 5,
+                        .flags = 0,
+                        .buf = &file,
+                        .u = {.f80 = {.path_encoding = UTF8,
+                                      .path = path
+                                     }
+                             }
+                       };
     f7080ret_t r;
     umka_sys_lfn(&fX0, &r, F80);
 
@@ -81,7 +88,16 @@ static int umka_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     (void) flags;
 
     f7080s1info_t *dir = (f7080s1info_t*)malloc(sizeof(f7080s1info_t) + BDFE_LEN_UNICODE * DIRENTS_TO_READ);
-    f7080s1arg_t fX0 = {.sf = 1, .offset = 0, .encoding = UTF8, .size = DIRENTS_TO_READ, .buf = dir, .u = {.f80 = {.path_encoding = UTF8, .path = path}}};
+    f7080s1arg_t fX0 = {.sf = 1,
+                        .offset = 0,
+                        .encoding = UTF8,
+                        .size = DIRENTS_TO_READ,
+                        .buf = dir,
+                        .u = {.f80 = {.path_encoding = UTF8,
+                                      .path = path
+                                     }
+                             }
+                       };
     f7080ret_t r;
     umka_sys_lfn(&fX0, &r, F80);
     bdfe_t *bdfe = dir->bdfes;
@@ -94,14 +110,14 @@ static int umka_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 }
 
 static int umka_open(const char *path, struct fuse_file_info *fi) {
-//        if (strcmp(path+1, "blah") != 0)
-//                return -ENOENT;
-        (void) path;
+//    if (strcmp(path+1, "blah") != 0)
+//        return -ENOENT;
+    (void) path;
 
-        if ((fi->flags & O_ACCMODE) != O_RDONLY)
-                return -EACCES;
+    if ((fi->flags & O_ACCMODE) != O_RDONLY)
+        return -EACCES;
 
-        return 0;
+    return 0;
 }
 
 static int umka_read(const char *path, char *buf, size_t size, off_t offset,
@@ -115,21 +131,22 @@ static int umka_read(const char *path, char *buf, size_t size, off_t offset,
 }
 
 static struct fuse_operations umka_oper = {
-        .init           = umka_init,
-        .getattr        = umka_getattr,
-        .readdir        = umka_readdir,
-        .open           = umka_open,
-        .read           = umka_read,
+    .init           = umka_init,
+    .getattr        = umka_getattr,
+    .readdir        = umka_readdir,
+    .open           = umka_open,
+    .read           = umka_read,
 };
 
 int main(int argc, char *argv[]) {
-        if (argc != 3) {
-                printf("usage: umka_fuse dir img\n");
-                exit(1);
-        }
-        kos_init();
-        void *userdata = vdisk_init(argv[2], 1, 0u);
-        void *vdisk = disk_add(&vdisk_functions, "hd0", userdata, 0);
-        disk_media_changed(vdisk, 1);
-        return fuse_main(argc-1, argv, &umka_oper, NULL);
+    umka_tool = UMKA_FUSE;
+    if (argc != 3) {
+        printf("usage: umka_fuse dir img\n");
+        exit(1);
+    }
+    kos_init();
+    void *userdata = vdisk_init(argv[2], 1, 0u);
+    void *vdisk = disk_add(&vdisk_functions, "hd0", userdata, 0);
+    disk_media_changed(vdisk, 1);
+    return fuse_main(argc-1, argv, &umka_oper, NULL);
 }

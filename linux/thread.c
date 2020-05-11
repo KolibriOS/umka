@@ -8,8 +8,8 @@ sigjmp_buf trampoline;
 
 __attribute__((__stdcall__))
 uint32_t umka_sched_add_thread(appdata_t *app) {
-    fprintf(stderr, "umka_new_sys_threads before\n");
-    fprintf(stderr, "kos_task_count: %d\n", kos_task_count);
+//    fprintf(stderr, "umka_new_sys_threads before\n");
+//    fprintf(stderr, "kos_task_count: %d\n", kos_task_count);
     if (!sigsetjmp(trampoline, 1)) {
         __asm__ __inline__ __volatile__ (
         "pushfd;"
@@ -29,7 +29,7 @@ uint32_t umka_sched_add_thread(appdata_t *app) {
             : "memory");
         }
     }
-    fprintf(stderr, "umka_new_sys_threads after\n");
+//    fprintf(stderr, "umka_new_sys_threads after\n");
     return 0;
 }
 

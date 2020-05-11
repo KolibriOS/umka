@@ -3,6 +3,14 @@ format ELF
 __DEBUG__ = 1
 __DEBUG_LEVEL__ = 1
 
+UMKA_SHELL = 1
+UMKA_FUSE  = 2
+UMKA_OS    = 3
+
+UMKA_MEMORY_BYTES = 128 SHL 20
+UMKA_DISPLAY_WIDTH = 400
+UMKA_DISPLAY_HEIGHT = 300
+
 public disk_add
 public disk_del
 public disk_list
@@ -42,6 +50,15 @@ public kos_acpi_ssdt_size
 
 public stack_init
 public net_add_device
+
+public draw_data
+public img_background
+public BgrDataWidth
+public BgrDataHeight
+public mem_BACKGROUND
+public sys_background
+public REDRAW_BACKGROUND
+public background_defined
 
 macro cli {
         pushfd
@@ -180,13 +197,12 @@ proc kos_init c uses ebx esi edi ebp
         xor     eax, eax
         rep stosb
 
-        MEMORY_BYTES = 128 SHL 20
-        DISPLAY_WIDTH = 400
-        DISPLAY_HEIGHT = 300
-        mov     [pg_data.mem_amount], MEMORY_BYTES
-        mov     [pg_data.pages_count], MEMORY_BYTES / PAGE_SIZE
-        mov     [pg_data.pages_free], MEMORY_BYTES / PAGE_SIZE
-        mov     eax, MEMORY_BYTES SHR 12
+        mov     [xsave_area_size], 0x1000
+
+        mov     [pg_data.mem_amount], UMKA_MEMORY_BYTES
+        mov     [pg_data.pages_count], UMKA_MEMORY_BYTES / PAGE_SIZE
+        mov     [pg_data.pages_free], UMKA_MEMORY_BYTES / PAGE_SIZE
+        mov     eax, UMKA_MEMORY_BYTES SHR 12
         mov     [pg_data.kernel_pages], eax
         shr     eax, 10
         mov     [pg_data.kernel_tables], eax
@@ -199,9 +215,9 @@ proc kos_init c uses ebx esi edi ebp
         list_init eax
 
         mov     [BOOT.bpp], 32
-        mov     [BOOT.x_res], 400
-        mov     [BOOT.y_res], 300
-        mov     [BOOT.pitch], 400*4
+        mov     [BOOT.x_res], UMKA_DISPLAY_WIDTH
+        mov     [BOOT.y_res], UMKA_DISPLAY_HEIGHT
+        mov     [BOOT.pitch], UMKA_DISPLAY_WIDTH*4
         mov     [BOOT.lfb], LFB_BASE
         call    init_video
 
@@ -213,30 +229,6 @@ proc kos_init c uses ebx esi edi ebp
         mov     eax, srv.fd-SRV.fd
         mov     [srv.fd], eax
         mov     [srv.bk], eax
-
-        mov     dword[sysdir_name], 'sys'
-        mov     dword[sysdir_path], 'RD/1'
-        mov     word[sysdir_path+4], 0
-
-        mov     dword[CURRENT_TASK], 2
-        mov     dword[TASK_COUNT], 2
-        mov     dword[TASK_BASE], CURRENT_TASK + 2*sizeof.TASKDATA
-        mov     [current_slot], SLOT_BASE + 256*2
-
-        ;call    ramdisk_init
-
-        mov     ebx, SLOT_BASE + 2*256
-        stdcall kernel_alloc, 0x2000
-        mov     [ebx+APPDATA.process], eax
-        mov     word[cur_dir.path], '/'
-        mov     [ebx+APPDATA.cur_dir], cur_dir
-        mov     [ebx+APPDATA.wnd_clientbox.left], 0
-        mov     [ebx+APPDATA.wnd_clientbox.top], 0
-
-        mov     [X_UNDER], 500
-        mov     [Y_UNDER], 500
-        mov     word[MOUSE_X], 40
-        mov     word[MOUSE_Y], 30
 
         stdcall kernel_alloc, [_display.win_map_size]
         mov     [_display.win_map], eax
@@ -261,43 +253,16 @@ proc kos_init c uses ebx esi edi ebp
 @@:
         mov     [clipboard_main_list], eax
 
+        mov     dword[sysdir_name], 'sys'
+        mov     dword[sysdir_path], 'RD/1'
+        mov     word[sysdir_path+4], 0
 
-        call    set_window_defaults
-        call    init_background
-        call    calculatebackground
-        call    init_display
-        mov     eax, [def_cursor]
-        mov     [SLOT_BASE+APPDATA.cursor+256], eax
-        mov     [SLOT_BASE+APPDATA.cursor+256*2], eax
+        ;call    ramdisk_init
 
-        ; from set_variables
-        xor     eax, eax
-        mov     [BTN_ADDR], dword BUTTON_INFO ; address of button list
-        mov     byte [KEY_COUNT], al              ; keyboard buffer
-        mov     byte [BTN_COUNT], al              ; button buffer
-
-        ;call    load_default_skin
-        ;call    stack_init
-
-        ret
-endp
-
-public skin_udata
-proc idle uses ebx esi edi
-.loop:
-        mov     ecx, 10000000
-@@:
-        loop    @b
-        DEBUGF 1, "1 idle\n"
-        jmp     .loop
-
-        ret
-endp
-
-extrn raise
-public umka_os
-proc umka_os uses ebx esi edi
-        call    kos_init
+        mov     [X_UNDER], 500
+        mov     [Y_UNDER], 500
+        mov     word[MOUSE_X], 40
+        mov     word[MOUSE_Y], 30
 
         mov     eax, -1
         mov     edi, thr_slot_map+4
@@ -315,22 +280,26 @@ proc umka_os uses ebx esi edi
         mov     dword[CURRENT_TASK], 0
         mov     dword[TASK_COUNT], 0
 
-        stdcall kernel_alloc, RING0_STACK_SIZE
+        mov     eax, [xsave_area_size]
+        add     eax, RING0_STACK_SIZE
+        stdcall kernel_alloc, eax
         mov     ebx, eax
         mov     edx, SLOT_BASE+256*1
         call    setup_os_slot
-        mov     dword [edx], 'IDLE'
+        mov     dword[edx], 'IDLE'
         sub     [edx+APPDATA.saved_esp], 4
         mov     eax, [edx+APPDATA.saved_esp]
-        mov     dword[eax], idle        ; _thread
+        mov     dword[eax], idle
         mov     ecx, IDLE_PRIORITY
         call    sched_add_thread
 
-        stdcall kernel_alloc, RING0_STACK_SIZE
+        mov     eax, [xsave_area_size]
+        add     eax, RING0_STACK_SIZE
+        stdcall kernel_alloc, eax
         mov     ebx, eax
         mov     edx, SLOT_BASE+256*2
         call    setup_os_slot
-        mov     dword [edx], 'OS'
+        mov     dword[edx], 'OS'
         sub     [edx+APPDATA.saved_esp], 4
         mov     eax, [edx+APPDATA.saved_esp]
         mov     dword[eax], 0
@@ -342,9 +311,45 @@ proc umka_os uses ebx esi edi
         mov     dword[TASK_BASE], CURRENT_TASK + 2*sizeof.TASKDATA
         mov     [current_slot], SLOT_BASE+256*2
 
-;        movi    ebx, 1
-;        mov     ecx, eth_process_input
-;        call    new_sys_threads
+        call    set_window_defaults
+        call    init_background
+        call    calculatebackground
+        call    init_display
+        mov     eax, [def_cursor]
+        mov     [SLOT_BASE+APPDATA.cursor+256], eax
+        mov     [SLOT_BASE+APPDATA.cursor+256*2], eax
+
+        ; from set_variables
+        xor     eax, eax
+        mov     [BTN_ADDR], dword BUTTON_INFO   ; address of button list
+        mov     byte [KEY_COUNT], al            ; keyboard buffer
+        mov     byte [BTN_COUNT], al            ; button buffer
+
+        mov     ebx, SLOT_BASE + 2*256
+        mov     word[cur_dir.path], '/'
+        mov     [ebx+APPDATA.cur_dir], cur_dir
+
+        ;call    stack_init
+
+        ret
+endp
+
+public skin_udata
+proc idle uses ebx esi edi
+.loop:
+        mov     ecx, 10000000
+@@:
+        loop    @b
+;        DEBUGF 1, "1 idle\n"
+        jmp     .loop
+
+        ret
+endp
+
+extrn raise
+public umka_os
+proc umka_os uses ebx esi edi
+        call    kos_init
 
         call    stack_init
 
@@ -367,13 +372,6 @@ proc umka_os uses ebx esi edi
         ccall   raise, SIGPROF
 
         jmp     osloop
-
-.loop:
-        mov     ecx, 10000000
-@@:
-        loop    @b
-        DEBUGF 1, "2 os\n"
-        jmp     .loop
 
         ret
 endp
@@ -426,12 +424,14 @@ sched_add_thread:
         ret
 
 change_task:
-        mov     [REDRAW_BACKGROUND], 0
         ret
 
 public umka_install_thread
 proc umka_install_thread _func
-        stdcall kernel_alloc, RING0_STACK_SIZE + 512    ; fpu_state
+        ; fpu_state = sigsetjmp
+        mov     eax, [xsave_area_size]
+        add     eax, RING0_STACK_SIZE
+        stdcall kernel_alloc, eax
         mov     ebx, eax
         mov     edx, [TASK_COUNT]
         inc     edx
@@ -523,7 +523,6 @@ map_memEx:
 HEAP_BASE equ
 include 'init.inc'
 sys_msg_board equ __pew
-;setup_os_slot equ ___pew
 
 include fix pew
 macro pew x {}
@@ -555,7 +554,6 @@ macro add r, v {
   end if
 }
 
-
 include 'kernel.asm'
 
 purge lea,add,org
@@ -566,6 +564,8 @@ coverage_end:
 
 
 section '.data' writeable align 64
+public umka_tool
+umka_tool dd ?
 timer_ticks dd 0
 fpu_owner dd ?
 

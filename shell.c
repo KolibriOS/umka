@@ -201,6 +201,7 @@ void prompt() {
     fflush(fout);
 }
 
+/*
 # define __FD_ZERO(fdsp) \
   do {									      \
     int __d0, __d1;							      \
@@ -211,7 +212,7 @@ void prompt() {
 			    "1" (&__FDS_BITS (fdsp)[0])			      \
 			  : "memory");					      \
   } while (0)
-
+*/
 
 int next_line(int is_tty, int block) {
     if (is_tty) {
@@ -221,7 +222,8 @@ int next_line(int is_tty, int block) {
         return fgets(cmd_buf, FGETS_BUF_LEN, fin) != NULL;
     } else {
         fd_set readfds;
-        FD_ZERO(&readfds);
+//        FD_ZERO(&readfds);
+        memset(&readfds, 0, sizeof(readfds));
         FD_SET(fileno(fin), &readfds);
         struct timeval timeout = {.tv_sec = 0, .tv_usec = 0};
         int sr = select(fileno(fin)+1, &readfds, NULL, NULL, &timeout);
@@ -1676,6 +1678,101 @@ fprintf(fout, "## after\n");
     }
 }
 
+void shell_bg_set_size(int argc, char **argv) {
+    const char *usage = \
+        "usage: bg_set_size <xsize> <ysize>\n"
+        "  xsize          in pixels\n"
+        "  ysize          in pixels";
+    if (argc != 3) {
+        puts(usage);
+        return;
+    }
+    uint32_t xsize = strtoul(argv[1], NULL, 0);
+    uint32_t ysize = strtoul(argv[2], NULL, 0);
+    umka_sys_bg_set_size(xsize, ysize);
+}
+
+void shell_bg_put_pixel(int argc, char **argv) {
+    const char *usage = \
+        "usage: bg_put_pixel <offset> <color>\n"
+        "  offset         in bytes, (x+y*xsize)*3\n"
+        "  color          in hex";
+    if (argc != 3) {
+        puts(usage);
+        return;
+    }
+    size_t offset = strtoul(argv[1], NULL, 0);
+    uint32_t color = strtoul(argv[2], NULL, 0);
+    umka_sys_bg_put_pixel(offset, color);
+}
+
+void shell_bg_redraw(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: bg_redraw";
+    if (argc != 1) {
+        puts(usage);
+        return;
+    }
+    umka_sys_bg_redraw();
+}
+
+void shell_bg_set_mode(int argc, char **argv) {
+    const char *usage = \
+        "usage: bg_set_mode <mode>\n"
+        "  mode           1 = tile, 2 = stretch";
+    if (argc != 3) {
+        puts(usage);
+        return;
+    }
+    uint32_t mode = strtoul(argv[1], NULL, 0);
+    umka_sys_bg_set_mode(mode);
+}
+
+void shell_bg_put_img(int argc, char **argv) {
+    const char *usage = \
+        "usage: bg_put_img <image> <offset>\n"
+        "  image          file\n"
+        "  offset         in bytes, (x+y*xsize)*3\n";
+    if (argc != 4) {
+        puts(usage);
+        return;
+    }
+    FILE *f = fopen(argv[1], "r");
+    fseek(f, 0, SEEK_END);
+    size_t fsize = ftell(f);
+    rewind(f);
+    uint8_t *image = (uint8_t*)malloc(fsize);
+    fread(image, fsize, 1, f);
+    fclose(f);
+    size_t offset = strtoul(argv[2], NULL, 0);
+    umka_sys_bg_put_img(image, offset, fsize);
+}
+
+void shell_bg_map(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: bg_map";
+    if (argc != 1) {
+        puts(usage);
+        return;
+    }
+    void *addr = umka_sys_bg_map();
+    fprintf(fout, "%p\n", addr);
+}
+
+void shell_bg_unmap(int argc, char **argv) {
+    const char *usage = \
+        "usage: bg_unmap <addr>\n"
+        "  addr           return value of bg_map";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    void *addr = (void*)strtoul(argv[1], NULL, 0);
+    uint32_t status = umka_sys_bg_unmap(addr);
+    fprintf(fout, "status = %d\n", status);
+}
 
 typedef struct {
     char *name;
@@ -1758,6 +1855,13 @@ func_table_t funcs[] = {
     { "net_arp_get_count",       shell_net_arp_get_count },
     { "net_arp_get_entry",       shell_net_arp_get_entry },
     { "net_arp_add_entry",       shell_net_arp_add_entry },
+    { "bg_set_size",             shell_bg_set_size },
+    { "bg_put_pixel",            shell_bg_put_pixel },
+    { "bg_redraw",               shell_bg_redraw },
+    { "bg_set_mode",             shell_bg_set_mode },
+    { "bg_put_img",              shell_bg_put_img },
+    { "bg_map",                  shell_bg_map },
+    { "bg_unmap",                shell_bg_unmap },
     { NULL,                      NULL },
 };
 
