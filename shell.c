@@ -1076,7 +1076,7 @@ void shell_acpi_preload_table(int argc, char **argv) {
     uint8_t *table = (uint8_t*)malloc(fsize);
     fread(table, fsize, 1, f);
     fclose(f);
-    fprintf(fout, "# %zu\n", kos_acpi_ssdt_cnt);
+    fprintf(fout, "table #%zu\n", kos_acpi_ssdt_cnt);
     kos_acpi_ssdt_base[kos_acpi_ssdt_cnt] = table;
     kos_acpi_ssdt_size[kos_acpi_ssdt_cnt] = fsize;
     kos_acpi_ssdt_cnt++;
