@@ -24,3 +24,4 @@ tags
 coverage.*
 covpreproc
 *.skn
+*.dsl
