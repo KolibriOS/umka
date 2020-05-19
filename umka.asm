@@ -607,6 +607,7 @@ ide_channel5_mutex MUTEX
 ide_channel6_mutex MUTEX
 ide_channel7_mutex MUTEX
 ide_channel8_mutex MUTEX
+align 64
 os_base:        rb 0x1000
 window_data:    rb 0x2000
 CURRENT_TASK:   rb 4
