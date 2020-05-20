@@ -1,5 +1,8 @@
 pci_set_path machines/002/pci
-acpi_set_usage 2
+
+# some _ADR's are methods with memory access
+# don't know how to trick here
+acpi_set_usage 1
 
 acpi_preload_table machines/002/acpi/DSDT
 acpi_preload_table machines/002/acpi/SSDT1
