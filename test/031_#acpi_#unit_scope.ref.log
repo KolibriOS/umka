@@ -32,11 +32,7 @@ aml._.name_path end
 name_string: \
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.scope end
 aml._.namespace_modifier_obj end
@@ -72,11 +68,7 @@ name_string: PCI0
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x0000002B]
@@ -92,11 +84,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -126,11 +114,7 @@ aml._.name_path end
 name_string: \PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 table/position: [0x00000038]
 aml._.term_obj begin
@@ -149,11 +133,7 @@ name_string: DV00
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x0000003F]
@@ -169,11 +149,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -198,11 +174,7 @@ aml._.name_path end
 name_string: DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -231,11 +203,7 @@ aml._.name_path end
 name_string: X___
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -261,11 +229,7 @@ aml._.name_path end
 name_string: \
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 table/position: [0x00000056]
 aml._.term_obj begin
@@ -284,11 +248,7 @@ name_string: RQ__
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.method end
@@ -312,11 +272,7 @@ aml._.name_path end
 name_string: ^Y___
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -345,11 +301,7 @@ aml._.name_path end
 name_string: PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -360,11 +312,7 @@ name_string: ALA0
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -382,11 +330,7 @@ aml._.name_path end
 name_string: PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0DV00'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -397,11 +341,7 @@ name_string: AL01
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -419,11 +359,7 @@ aml._.name_path end
 name_string: PCI0DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0DV00DV00'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -434,11 +370,7 @@ name_string: AL02
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -458,11 +390,7 @@ aml._.name_path end
 name_string: \PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -473,11 +401,7 @@ name_string: AL03
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -497,11 +421,7 @@ aml._.name_path end
 name_string: \PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -512,11 +432,7 @@ name_string: AL04
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -536,11 +452,7 @@ aml._.name_path end
 name_string: \PCI0DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00DV00'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -551,11 +463,7 @@ name_string: AL05
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -576,11 +484,7 @@ aml._.name_path end
 name_string: \
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 table/position: [0x000000C4]
 aml._.term_obj begin
@@ -595,11 +499,7 @@ aml._.name_path end
 name_string: PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -610,11 +510,7 @@ name_string: AL06
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -632,11 +528,7 @@ aml._.name_path end
 name_string: PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0DV00'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -647,11 +539,7 @@ name_string: AL07
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -669,11 +557,7 @@ aml._.name_path end
 name_string: PCI0DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0DV00DV00'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -684,11 +568,7 @@ name_string: AL08
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -708,11 +588,7 @@ aml._.name_path end
 name_string: \PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -723,11 +599,7 @@ name_string: AL09
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -747,11 +619,7 @@ aml._.name_path end
 name_string: \PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -762,11 +630,7 @@ name_string: AL10
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -786,11 +650,7 @@ aml._.name_path end
 name_string: \PCI0DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00DV00'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -801,11 +661,7 @@ name_string: AL11
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -830,11 +686,7 @@ aml._.name_path end
 name_string: PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 table/position: [0x00000122]
 aml._.term_obj begin
@@ -849,11 +701,7 @@ aml._.name_path end
 name_string: DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV00'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -864,11 +712,7 @@ name_string: AL00
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -886,11 +730,7 @@ aml._.name_path end
 name_string: DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV00DV00'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -901,11 +741,7 @@ name_string: AL01
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -925,11 +761,7 @@ aml._.name_path end
 name_string: \PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -940,11 +772,7 @@ name_string: AL02
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -964,11 +792,7 @@ aml._.name_path end
 name_string: \PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -979,11 +803,7 @@ name_string: AL03
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1003,11 +823,7 @@ aml._.name_path end
 name_string: \PCI0DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00DV00'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1018,11 +834,7 @@ name_string: AL04
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1042,11 +854,7 @@ aml._.name_path end
 name_string: ^PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1057,11 +865,7 @@ name_string: AL05
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1081,11 +885,7 @@ aml._.name_path end
 name_string: ^PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0DV00'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1096,11 +896,7 @@ name_string: AL06
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1120,11 +916,7 @@ aml._.name_path end
 name_string: ^PCI0DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0DV00DV00'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1135,11 +927,7 @@ name_string: AL07
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1160,11 +948,7 @@ aml._.name_path end
 name_string: ^PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0DV00'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 table/position: [0x000001A0]
 aml._.term_obj begin
@@ -1179,11 +963,7 @@ aml._.name_path end
 name_string: DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1194,11 +974,7 @@ name_string: AL00
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1218,11 +994,7 @@ aml._.name_path end
 name_string: \PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1233,11 +1005,7 @@ name_string: AL01
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1257,11 +1025,7 @@ aml._.name_path end
 name_string: \PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1272,11 +1036,7 @@ name_string: AL02
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1296,11 +1056,7 @@ aml._.name_path end
 name_string: \PCI0DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1311,11 +1067,7 @@ name_string: AL03
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1335,11 +1087,7 @@ aml._.name_path end
 name_string: ^DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1350,11 +1098,7 @@ name_string: AL04
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1374,11 +1118,7 @@ aml._.name_path end
 name_string: ^DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^DV00DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1389,11 +1129,7 @@ name_string: AL05
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1413,11 +1149,7 @@ aml._.name_path end
 name_string: ^^PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^^PCI0'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1428,11 +1160,7 @@ name_string: AL06
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1452,11 +1180,7 @@ aml._.name_path end
 name_string: ^^PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^^PCI0DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1467,11 +1191,7 @@ name_string: AL07
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1491,11 +1211,7 @@ aml._.name_path end
 name_string: ^^PCI0DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^^PCI0DV00DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1506,11 +1222,7 @@ name_string: AL08
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1537,11 +1249,7 @@ aml._.name_path end
 name_string: PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0DV00'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 table/position: [0x0000022B]
 aml._.term_obj begin
@@ -1556,11 +1264,7 @@ aml._.name_path end
 name_string: DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1571,11 +1275,7 @@ name_string: AL09
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1595,11 +1295,7 @@ aml._.name_path end
 name_string: \PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1610,11 +1306,7 @@ name_string: AL10
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1634,11 +1326,7 @@ aml._.name_path end
 name_string: \PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1649,11 +1337,7 @@ name_string: AL11
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1673,11 +1357,7 @@ aml._.name_path end
 name_string: \PCI0DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1688,11 +1368,7 @@ name_string: AL12
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1712,11 +1388,7 @@ aml._.name_path end
 name_string: ^DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1727,11 +1399,7 @@ name_string: AL13
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1751,11 +1419,7 @@ aml._.name_path end
 name_string: ^DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^DV00DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1766,11 +1430,7 @@ name_string: AL14
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1790,11 +1450,7 @@ aml._.name_path end
 name_string: ^^PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^^PCI0'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1805,11 +1461,7 @@ name_string: AL15
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1829,11 +1481,7 @@ aml._.name_path end
 name_string: ^^PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^^PCI0DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1844,11 +1492,7 @@ name_string: AL16
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1868,11 +1512,7 @@ aml._.name_path end
 name_string: ^^PCI0DV00DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^^PCI0DV00DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1883,11 +1523,7 @@ name_string: AL17
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.alias end
@@ -1912,11 +1548,7 @@ aml._.name_path end
 name_string: \
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 table/position: [0x000002AF]
 aml._.term_obj begin
@@ -1935,11 +1567,7 @@ name_string: DV0A
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x000002B6]
@@ -1955,11 +1583,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0A'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -1990,11 +1614,7 @@ name_string: PCI0DV0A
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x000002C9]
@@ -2010,11 +1630,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0A'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2045,11 +1661,7 @@ name_string: PCI0DV00DV0A
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0DV00'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x000002E1]
@@ -2065,11 +1677,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0A'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2102,11 +1710,7 @@ name_string: \DV0B
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x000002F0]
@@ -2122,11 +1726,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0B'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2159,11 +1759,7 @@ name_string: \PCI0DV0B
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x00000304]
@@ -2179,11 +1775,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0B'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2216,11 +1808,7 @@ name_string: \PCI0DV00DV0B
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x0000031D]
@@ -2236,11 +1824,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0B'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2274,11 +1858,7 @@ aml._.name_path end
 name_string: PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 table/position: [0x0000032B]
 aml._.term_obj begin
@@ -2297,11 +1877,7 @@ name_string: DV0C
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x00000332]
@@ -2317,11 +1893,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0C'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2352,11 +1924,7 @@ name_string: DV00DV0C
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV00'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x00000345]
@@ -2372,11 +1940,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0C'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2409,11 +1973,7 @@ name_string: \DV0D
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x00000354]
@@ -2429,11 +1989,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0D'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2466,11 +2022,7 @@ name_string: \PCI0DV0D
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x00000368]
@@ -2486,11 +2038,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0D'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2523,11 +2071,7 @@ name_string: \PCI0DV00DV0D
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x00000381]
@@ -2543,11 +2087,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0D'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2580,11 +2120,7 @@ name_string: ^DV0E
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x00000390]
@@ -2600,11 +2136,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0E'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2637,11 +2169,7 @@ name_string: ^PCI0DV0E
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x000003A4]
@@ -2657,11 +2185,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0E'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2694,11 +2218,7 @@ name_string: ^PCI0DV00DV0E
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0DV00'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x000003BD]
@@ -2714,11 +2234,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0E'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2748,11 +2264,7 @@ aml._.name_path end
 name_string: ^PCI0DV00
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0DV00'
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 table/position: [0x000003D1]
 aml._.term_obj begin
@@ -2771,11 +2283,7 @@ name_string: DV0F
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x000003D8]
@@ -2791,11 +2299,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0F'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2828,11 +2332,7 @@ name_string: \DV0F
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x000003E7]
@@ -2848,11 +2348,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0F'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2885,11 +2381,7 @@ name_string: \PCI0DV0F
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x000003FB]
@@ -2905,11 +2397,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0F'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2942,11 +2430,7 @@ name_string: \PCI0DV00DV0G
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x00000414]
@@ -2962,11 +2446,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0G'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -2999,11 +2479,7 @@ name_string: ^DV0G
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x00000423]
@@ -3019,11 +2495,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0G'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -3056,11 +2528,7 @@ name_string: ^DV00DV0H
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x00000437]
@@ -3076,11 +2544,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0H'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -3113,11 +2577,7 @@ name_string: ^^DV0H
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^^'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x00000447]
@@ -3133,11 +2593,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0H'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -3170,11 +2626,7 @@ name_string: ^^PCI0DV0H
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^^PCI0'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x0000045C]
@@ -3190,11 +2642,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0H'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -3227,11 +2675,7 @@ name_string: ^^PCI0DV00DV0I
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^^PCI0DV00'
-tree name: 'root'
-scope name: 'DV00'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 table/position: [0x00000476]
@@ -3247,11 +2691,7 @@ aml._.name_path end
 name_string: _ADR
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'DV0I'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -3288,11 +2728,7 @@ aml._.name_path end
 name_string: PKG0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -3559,11 +2995,7 @@ aml._.name_path end
 name_string: \PCI0
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0'
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 table/position: [0x00000540]
 aml._.term_obj begin
@@ -3578,11 +3010,7 @@ aml._.name_path end
 name_string: PKG1
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -3936,11 +3364,7 @@ name_string: M000
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.method end
@@ -3964,11 +3388,7 @@ name_string: M001
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.method end
@@ -3992,11 +3412,7 @@ name_string: M002
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.method end
@@ -4020,11 +3436,7 @@ name_string: M003
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.method end
@@ -4048,11 +3460,7 @@ name_string: M004
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.method end
@@ -4076,11 +3484,7 @@ name_string: M005
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.method end
@@ -4104,11 +3508,7 @@ name_string: M006
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'PCI0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.attach_node end
 aml._.method end
@@ -4292,11 +3692,7 @@ aml._.name_path end
 name_string: A001
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: ''
-tree name: 'root'
-scope name: 'root'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
@@ -4467,11 +3863,7 @@ aml._.name_path end
 name_string: DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_path begin
@@ -4479,11 +3871,7 @@ aml._.name_path end
 name_string: PCI0DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_path begin
@@ -4491,11 +3879,7 @@ aml._.name_path end
 name_string: PCI0DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0DV00DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4505,11 +3889,7 @@ aml._.name_path end
 name_string: \DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4519,11 +3899,7 @@ aml._.name_path end
 name_string: \PCI0DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4533,11 +3909,7 @@ aml._.name_path end
 name_string: \PCI0DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4547,11 +3919,7 @@ aml._.name_path end
 name_string: DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_path begin
@@ -4559,11 +3927,7 @@ aml._.name_path end
 name_string: PCI0DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_path begin
@@ -4571,11 +3935,7 @@ aml._.name_path end
 name_string: PCI0DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0DV00DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4585,11 +3945,7 @@ aml._.name_path end
 name_string: \DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4599,11 +3955,7 @@ aml._.name_path end
 name_string: \PCI0DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4613,11 +3965,7 @@ aml._.name_path end
 name_string: \PCI0DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4627,11 +3975,7 @@ aml._.name_path end
 name_string: DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_path begin
@@ -4639,11 +3983,7 @@ aml._.name_path end
 name_string: PCI0DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_path begin
@@ -4651,11 +3991,7 @@ aml._.name_path end
 name_string: PCI0DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'PCI0DV00DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4665,11 +4001,7 @@ aml._.name_path end
 name_string: \DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4679,11 +4011,7 @@ aml._.name_path end
 name_string: \PCI0DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4693,11 +4021,7 @@ aml._.name_path end
 name_string: \PCI0DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00DV0A'
-tree name: 'root'
-scope name: 'PKG0'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4707,11 +4031,7 @@ aml._.name_path end
 name_string: DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_path begin
@@ -4719,11 +4039,7 @@ aml._.name_path end
 name_string: DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV00DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4733,11 +4049,7 @@ aml._.name_path end
 name_string: \DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4747,11 +4059,7 @@ aml._.name_path end
 name_string: \PCI0DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4761,11 +4069,7 @@ aml._.name_path end
 name_string: \PCI0DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4775,11 +4079,7 @@ aml._.name_path end
 name_string: ^DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4789,11 +4089,7 @@ aml._.name_path end
 name_string: ^PCI0DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4803,11 +4099,7 @@ aml._.name_path end
 name_string: ^PCI0DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0DV00DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4817,11 +4109,7 @@ aml._.name_path end
 name_string: DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_path begin
@@ -4829,11 +4117,7 @@ aml._.name_path end
 name_string: DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV00DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4843,11 +4127,7 @@ aml._.name_path end
 name_string: \DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4857,11 +4137,7 @@ aml._.name_path end
 name_string: \PCI0DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4871,11 +4147,7 @@ aml._.name_path end
 name_string: \PCI0DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4885,11 +4157,7 @@ aml._.name_path end
 name_string: ^DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4899,11 +4167,7 @@ aml._.name_path end
 name_string: ^PCI0DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4913,11 +4177,7 @@ aml._.name_path end
 name_string: ^PCI0DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0DV00DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4927,11 +4187,7 @@ aml._.name_path end
 name_string: DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_path begin
@@ -4939,11 +4195,7 @@ aml._.name_path end
 name_string: DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: 'DV00DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4953,11 +4205,7 @@ aml._.name_path end
 name_string: \DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4967,11 +4215,7 @@ aml._.name_path end
 name_string: \PCI0DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4981,11 +4225,7 @@ aml._.name_path end
 name_string: \PCI0DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '\PCI0DV00DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -4995,11 +4235,7 @@ aml._.name_path end
 name_string: ^DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -5009,11 +4245,7 @@ aml._.name_path end
 name_string: ^PCI0DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 aml._.name_string begin
 aml._.name_string begin again
@@ -5023,11 +4255,7 @@ aml._.name_path end
 name_string: ^PCI0DV00DV0A
 aml._.name_string end
 aml._.get_node_by_name begin
-aml._.name_to_node begin
 name: '^PCI0DV00DV0A'
-tree name: 'root'
-scope name: 'PKG1'
-aml._.name_to_node end
 aml._.get_node_by_name end
 ==========ACPI_TREE==========
 \A001 Integer        = 0x000000000000A001
