@@ -40,6 +40,12 @@ implementation or libc calls. Block devices are emulated with regular files.
 Framebuffer can be dumped to disk as image file.
 
 
+Testing
+-------
+
+sudo cp --parents --no-preserve=mode /sys/firmware/acpi/tables/?SDT* /sys/bus/pci/devices/*/config . > /data/work/proj/kolibri/umka/acpi.txt
+
+
 Troubleshooting
 ---------------
 

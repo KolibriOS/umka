@@ -13,6 +13,7 @@ mkfilepattern
 *.img.lz4
 *.img.info
 *.out.???
+*.out.indent
 .gdb_history
 umka.fas
 umka.sym
