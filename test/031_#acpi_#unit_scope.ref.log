@@ -39,6 +39,11 @@ aml._.namespace_modifier_obj end
 aml._.object end
 aml._.term_obj end
 ==========ACPI_TREE==========
+\_TZ_ Scope         
+\_SI_ Scope         
+\_SB_ Scope         
+\_PR_ Scope         
+\_GPE Scope         
 -----------------------------
 acpi.aml.process_table end
 acpi.aml.process_table begin
@@ -3667,6 +3672,11 @@ aml._.term_obj end
 \PCI0\DV00\DV00 Integer        = 0x0000000000000000
 \PCI0\DV00\_ADR Integer        = 0x0000000000000001
 \PCI0\_ADR Integer        = 0x0000000000000000
+\_TZ_ Scope         
+\_SI_ Scope         
+\_SB_ Scope         
+\_PR_ Scope         
+\_GPE Scope         
 -----------------------------
 acpi.aml.process_table end
 acpi.aml.process_table begin
@@ -3853,6 +3863,11 @@ aml._.term_obj end
 \PCI0\DV00\DV00 Integer        = 0x0000000000000000
 \PCI0\DV00\_ADR Integer        = 0x0000000000000001
 \PCI0\_ADR Integer        = 0x0000000000000000
+\_TZ_ Scope         
+\_SI_ Scope         
+\_SB_ Scope         
+\_PR_ Scope         
+\_GPE Scope         
 -----------------------------
 acpi.aml.process_table end
 aml._.name_string begin
@@ -4406,4 +4421,9 @@ aml._.get_node_by_name end
 \PCI0\DV00\DV00 Integer        = 0x0000000000000000
 \PCI0\DV00\_ADR Integer        = 0x0000000000000001
 \PCI0\_ADR Integer        = 0x0000000000000000
+\_TZ_ Scope         
+\_SI_ Scope         
+\_SB_ Scope         
+\_PR_ Scope         
+\_GPE Scope         
 -----------------------------
