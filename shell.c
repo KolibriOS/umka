@@ -38,6 +38,7 @@
 #include "vnet.h"
 #include "umka.h"
 #include "trace.h"
+#include "pci.h"
 #include "lodepng.h"
 
 #define PATH_MAX 4096
@@ -1117,6 +1118,28 @@ void shell_acpi_get_usage(int argc, char **argv) {
     fprintf(fout, "ACPI usage: %" PRIu32 "\n", kos_acpi_usage);
 }
 
+void shell_pci_set_path(int argc, char **argv) {
+    const char *usage = \
+        "usage: pci_set_path <path>\n"
+        "  path           where aaaa:bb:cc.d dirs are";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    strcpy(pci_path, argv[1]);
+}
+
+void shell_pci_get_path(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: pci_get_path";
+    if (argc != 1) {
+        puts(usage);
+        return;
+    }
+    fprintf(fout, "pci path: %s\n", pci_path);
+}
+
 void shell_stack_init(int argc, char **argv) {
     (void)argc;
     (void)argv;
@@ -1908,6 +1931,8 @@ func_table_t funcs[] = {
     { "bg_put_img",              shell_bg_put_img },
     { "bg_map",                  shell_bg_map },
     { "bg_unmap",                shell_bg_unmap },
+    { "pci_set_path",            shell_pci_set_path },
+    { "pci_get_path",            shell_pci_get_path },
     { NULL,                      NULL },
 };
 
