@@ -1070,6 +1070,10 @@ void shell_read80(int argc, char **argv) {
 void shell_acpi_preload_table(int argc, char **argv) {
     (void)argc;
     FILE *f = fopen(argv[1], "r");
+    if (!f) {
+        fprintf(fout, "[umka] can't open file: %s\n", argv[1]);
+        return;
+    }
     fseek(f, 0, SEEK_END);
     size_t fsize = ftell(f);
     rewind(f);
@@ -1088,6 +1092,29 @@ void shell_acpi_enable(int argc, char **argv) {
     COVERAGE_ON();
     kos_enable_acpi();
     COVERAGE_OFF();
+}
+
+void shell_acpi_set_usage(int argc, char **argv) {
+    const char *usage = \
+        "usage: acpi_set_usage <num>\n"
+        "  num            one of ACPI_USAGE_*";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    uint32_t acpi_usage = strtoul(argv[1], NULL, 0);
+    kos_acpi_usage = acpi_usage;
+}
+
+void shell_acpi_get_usage(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: acpi_get_usage";
+    if (argc != 1) {
+        puts(usage);
+        return;
+    }
+    fprintf(fout, "ACPI usage: %" PRIu32 "\n", kos_acpi_usage);
 }
 
 void shell_stack_init(int argc, char **argv) {
@@ -1838,6 +1865,8 @@ func_table_t funcs[] = {
     { "scrot",                   shell_scrot },
     { "dump_win_stack",          shell_dump_win_stack },
     { "dump_win_pos",            shell_dump_win_pos },
+    { "acpi_set_usage",          shell_acpi_set_usage },
+    { "acpi_get_usage",          shell_acpi_get_usage },
     { "acpi_enable",             shell_acpi_enable },
     { "acpi_preload_table",      shell_acpi_preload_table },
     { "stack_init",              shell_stack_init },

@@ -25,3 +25,4 @@ coverage.*
 covpreproc
 *.skn
 *.dsl
+*.aml

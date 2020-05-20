@@ -487,6 +487,7 @@ extern uint16_t *kos_win_pos;
 extern uint32_t kos_acpi_ssdt_cnt;
 extern uint8_t **kos_acpi_ssdt_base;
 extern size_t *kos_acpi_ssdt_size;
+extern uint32_t kos_acpi_usage;
 extern disk_t disk_list;
 
 static inline void umka_i40(pushad_t *regs) {

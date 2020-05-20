@@ -47,6 +47,7 @@ public enable_acpi
 public acpi_ssdt_cnt as 'kos_acpi_ssdt_cnt'
 public kos_acpi_ssdt_base
 public kos_acpi_ssdt_size
+public acpi_usage as 'kos_acpi_usage'
 
 public stack_init
 public net_add_device
