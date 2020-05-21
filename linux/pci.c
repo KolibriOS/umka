@@ -9,10 +9,12 @@
 
 char pci_path[PATH_MAX] = ".";
 
-__attribute__((stdcall)) uint32_t pci_read(uint32_t bus, uint32_t dev, uint32_t fun, uint32_t offset, size_t len) {
+__attribute__((stdcall)) uint32_t pci_read(uint32_t bus, uint32_t dev,
+                                           uint32_t fun, uint32_t offset,
+                                           size_t len) {
     char path[PATH_MAX*2];
     uint32_t value = 0;
-    sprintf(path, "%s/%4.4u:%2.2u:%2.2u.%u/config", pci_path, 0, bus, dev, fun);
+    sprintf(path, "%s/%4.4x:%2.2x:%2.2x.%u/config", pci_path, 0, bus, dev, fun);
     int fd = open(path, O_RDONLY);
     if (!fd) {
         // TODO: report an error
