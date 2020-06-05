@@ -20025,12 +20025,12 @@ aml._.term_obj end
 \_SB_\PCI0\ISA_\LPEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\ISA_\CBEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\ISA_\CAEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\ISA_\LPCE OpRegion       [PCI_Config] Len:00000002
+\_SB_\PCI0\ISA_\LPCE OpRegion       [PCIConfig] Len:00000002
 \_SB_\PCI0\ISA_\LPTD RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000006 Len:00000002 Acc:0
 \_SB_\PCI0\ISA_\COMB RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000003 Len:00000003 Acc:0
 \_SB_\PCI0\ISA_\COMA RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000000 Len:00000003 Acc:0
-\_SB_\PCI0\ISA_\LPCD OpRegion       [PCI_Config] Len:00000002
-\_SB_\PCI0\ISA_\PIRQ OpRegion       [PCI_Config] Len:0000000C
+\_SB_\PCI0\ISA_\LPCD OpRegion       [PCIConfig] Len:00000002
+\_SB_\PCI0\ISA_\PIRQ OpRegion       [PCIConfig] Len:0000000C
 \_SB_\PCI0\ISA_\_ADR Integer        = 0x00000000001F0000
 \_SB_\PCI0\_OSC Method         length:0x00000075 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\_UID Integer        = 0x0000000000000001
@@ -24126,12 +24126,12 @@ aml._.get_node_by_name end
 \_SB_\PCI0\ISA_\LPEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\ISA_\CBEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\ISA_\CAEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\ISA_\LPCE OpRegion       [PCI_Config] Len:00000002
+\_SB_\PCI0\ISA_\LPCE OpRegion       [PCIConfig] Len:00000002
 \_SB_\PCI0\ISA_\LPTD RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000006 Len:00000002 Acc:0
 \_SB_\PCI0\ISA_\COMB RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000003 Len:00000003 Acc:0
 \_SB_\PCI0\ISA_\COMA RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000000 Len:00000003 Acc:0
-\_SB_\PCI0\ISA_\LPCD OpRegion       [PCI_Config] Len:00000002
-\_SB_\PCI0\ISA_\PIRQ OpRegion       [PCI_Config] Len:0000000C
+\_SB_\PCI0\ISA_\LPCD OpRegion       [PCIConfig] Len:00000002
+\_SB_\PCI0\ISA_\PIRQ OpRegion       [PCIConfig] Len:0000000C
 \_SB_\PCI0\ISA_\_ADR Integer        = 0x00000000001F0000
 \_SB_\PCI0\_OSC Method         length:0x00000075 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\_UID Integer        = 0x0000000000000001

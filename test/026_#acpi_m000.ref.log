@@ -58217,7 +58217,7 @@ aml._.term_obj end
 \_SB_\PCI0\GPP6\XPDV\LPSW RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000040 Len:00000001 Acc:0
 \_SB_\PCI0\GPP6\XPDV\PCMS RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\GPP6\XPDV\DVID RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCI_Config] Len:00000080
+\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCIConfig] Len:00000080
 \_SB_\PCI0\GPP6\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP6\D027 Device        
 \_SB_\PCI0\GPP6\D027\_ADR Integer        = 0x00000000000000FF
@@ -58235,9 +58235,9 @@ aml._.term_obj end
 \_SB_\PCI0\GPP5\XPDV\WIST Method         length:0x00000121 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GPP5\XPDV\DCTR RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000020 Len:00000010 Acc:1
 \_SB_\PCI0\GPP5\XPDV\DCAP RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000000 Len:00000020 Acc:1
-\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCI_Config] Len:00000006
+\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCIConfig] Len:00000006
 \_SB_\PCI0\GPP5\XPDV\VDID RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\RPXX] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\GPP5\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP5\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GPP5\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -58895,7 +58895,7 @@ aml._.term_obj end
 \_SB_\PCI0\IOMA Device        
 \_SB_\PCI0\IOMA\MBAS RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\IOMA\DID_ RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\IOMA\_ADR Integer        = 0x0000000000000002
 \_SB_\PCI0\NAPE Method         length:0x0000006A Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\NAPM Mutex          sync_level:0
@@ -62320,7 +62320,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000D+0x00000020
+ a+b: 0x000000000000000D + 0x0000000000000020
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -62470,7 +62470,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000E+0x00000020
+ a+b: 0x000000000000000E + 0x0000000000000020
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -62567,7 +62567,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x00000000+0xF8000000
+ a+b: 0x0000000000000000 + 0x00000000F8000000
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -63918,7 +63918,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000D+0x00000034
+ a+b: 0x000000000000000D + 0x0000000000000034
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -64068,7 +64068,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000E+0x00000034
+ a+b: 0x000000000000000E + 0x0000000000000034
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -64165,7 +64165,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x00000000+0xF8000000
+ a+b: 0x0000000000000000 + 0x00000000F8000000
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -65516,7 +65516,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000D+0x00000048
+ a+b: 0x000000000000000D + 0x0000000000000048
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -65666,7 +65666,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000E+0x00000048
+ a+b: 0x000000000000000E + 0x0000000000000048
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -65763,7 +65763,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x00000000+0xF8000000
+ a+b: 0x0000000000000000 + 0x00000000F8000000
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -67114,7 +67114,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000D+0x0000005C
+ a+b: 0x000000000000000D + 0x000000000000005C
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -67264,7 +67264,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000E+0x0000005C
+ a+b: 0x000000000000000E + 0x000000000000005C
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -67361,7 +67361,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x00000000+0xF8000000
+ a+b: 0x0000000000000000 + 0x00000000F8000000
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -68712,7 +68712,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000D+0x00000070
+ a+b: 0x000000000000000D + 0x0000000000000070
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -68862,7 +68862,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000E+0x00000070
+ a+b: 0x000000000000000E + 0x0000000000000070
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -68959,7 +68959,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x00000000+0xF8000000
+ a+b: 0x0000000000000000 + 0x00000000F8000000
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -70310,7 +70310,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000D+0x00000084
+ a+b: 0x000000000000000D + 0x0000000000000084
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -70460,7 +70460,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000E+0x00000084
+ a+b: 0x000000000000000E + 0x0000000000000084
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -70557,7 +70557,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x00000000+0xF8000000
+ a+b: 0x0000000000000000 + 0x00000000F8000000
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -71908,7 +71908,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000D+0x00000098
+ a+b: 0x000000000000000D + 0x0000000000000098
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -72058,7 +72058,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x0000000E+0x00000098
+ a+b: 0x000000000000000E + 0x0000000000000098
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -72155,7 +72155,7 @@ types 2 to 2
 aml._.cast.integer_to_integer begin
 aml._.cast.integer_to_integer end
 aml._.cast end
- eax+ecx: 0x00000000+0xF8000000
+ a+b: 0x0000000000000000 + 0x00000000F8000000
 aml._.target begin
 aml._.super_name begin
 aml._.simple_name begin
@@ -76658,7 +76658,7 @@ aml._.term_obj end
 \_SB_\PCI0\GPP6\XPDV\LPSW RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000040 Len:00000001 Acc:0
 \_SB_\PCI0\GPP6\XPDV\PCMS RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\GPP6\XPDV\DVID RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCI_Config] Len:00000080
+\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCIConfig] Len:00000080
 \_SB_\PCI0\GPP6\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP6\D027 Device        
 \_SB_\PCI0\GPP6\D027\_ADR Integer        = 0x00000000000000FF
@@ -76676,9 +76676,9 @@ aml._.term_obj end
 \_SB_\PCI0\GPP5\XPDV\WIST Method         length:0x00000121 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GPP5\XPDV\DCTR RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000020 Len:00000010 Acc:1
 \_SB_\PCI0\GPP5\XPDV\DCAP RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000000 Len:00000020 Acc:1
-\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCI_Config] Len:00000006
+\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCIConfig] Len:00000006
 \_SB_\PCI0\GPP5\XPDV\VDID RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\RPXX] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\GPP5\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP5\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GPP5\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -77336,7 +77336,7 @@ aml._.term_obj end
 \_SB_\PCI0\IOMA Device        
 \_SB_\PCI0\IOMA\MBAS RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\IOMA\DID_ RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\IOMA\_ADR Integer        = 0x0000000000000002
 \_SB_\PCI0\NAPE Method         length:0x0000006A Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\NAPM Mutex          sync_level:0
@@ -89908,7 +89908,7 @@ aml._.term_obj end
 \_SB_\PCI0\GPP6\XPDV\LPSW RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000040 Len:00000001 Acc:0
 \_SB_\PCI0\GPP6\XPDV\PCMS RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\GPP6\XPDV\DVID RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCI_Config] Len:00000080
+\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCIConfig] Len:00000080
 \_SB_\PCI0\GPP6\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP6\D027 Device        
 \_SB_\PCI0\GPP6\D027\_ADR Integer        = 0x00000000000000FF
@@ -89926,9 +89926,9 @@ aml._.term_obj end
 \_SB_\PCI0\GPP5\XPDV\WIST Method         length:0x00000121 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GPP5\XPDV\DCTR RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000020 Len:00000010 Acc:1
 \_SB_\PCI0\GPP5\XPDV\DCAP RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000000 Len:00000020 Acc:1
-\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCI_Config] Len:00000006
+\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCIConfig] Len:00000006
 \_SB_\PCI0\GPP5\XPDV\VDID RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\RPXX] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\GPP5\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP5\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GPP5\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -90586,7 +90586,7 @@ aml._.term_obj end
 \_SB_\PCI0\IOMA Device        
 \_SB_\PCI0\IOMA\MBAS RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\IOMA\DID_ RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\IOMA\_ADR Integer        = 0x0000000000000002
 \_SB_\PCI0\NAPE Method         length:0x0000006A Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\NAPM Mutex          sync_level:0
@@ -95549,7 +95549,7 @@ aml._.term_obj end
 \_SB_\PCI0\GPP6\XPDV\LPSW RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000040 Len:00000001 Acc:0
 \_SB_\PCI0\GPP6\XPDV\PCMS RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\GPP6\XPDV\DVID RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCI_Config] Len:00000080
+\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCIConfig] Len:00000080
 \_SB_\PCI0\GPP6\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP6\D027 Device        
 \_SB_\PCI0\GPP6\D027\_ADR Integer        = 0x00000000000000FF
@@ -95567,9 +95567,9 @@ aml._.term_obj end
 \_SB_\PCI0\GPP5\XPDV\WIST Method         length:0x00000121 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GPP5\XPDV\DCTR RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000020 Len:00000010 Acc:1
 \_SB_\PCI0\GPP5\XPDV\DCAP RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000000 Len:00000020 Acc:1
-\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCI_Config] Len:00000006
+\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCIConfig] Len:00000006
 \_SB_\PCI0\GPP5\XPDV\VDID RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\RPXX] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\GPP5\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP5\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GPP5\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -96230,7 +96230,7 @@ aml._.term_obj end
 \_SB_\PCI0\IOMA Device        
 \_SB_\PCI0\IOMA\MBAS RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\IOMA\DID_ RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\IOMA\_ADR Integer        = 0x0000000000000002
 \_SB_\PCI0\NAPE Method         length:0x0000006A Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\NAPM Mutex          sync_level:0
@@ -101678,7 +101678,7 @@ aml._.term_obj end
 \_SB_\PCI0\GPP6\XPDV\LPSW RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000040 Len:00000001 Acc:0
 \_SB_\PCI0\GPP6\XPDV\PCMS RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\GPP6\XPDV\DVID RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCI_Config] Len:00000080
+\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCIConfig] Len:00000080
 \_SB_\PCI0\GPP6\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP6\D027 Device        
 \_SB_\PCI0\GPP6\D027\_ADR Integer        = 0x00000000000000FF
@@ -101696,9 +101696,9 @@ aml._.term_obj end
 \_SB_\PCI0\GPP5\XPDV\WIST Method         length:0x00000121 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GPP5\XPDV\DCTR RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000020 Len:00000010 Acc:1
 \_SB_\PCI0\GPP5\XPDV\DCAP RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000000 Len:00000020 Acc:1
-\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCI_Config] Len:00000006
+\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCIConfig] Len:00000006
 \_SB_\PCI0\GPP5\XPDV\VDID RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\RPXX] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\GPP5\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP5\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GPP5\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -102372,7 +102372,7 @@ aml._.term_obj end
 \_SB_\PCI0\IOMA Device        
 \_SB_\PCI0\IOMA\MBAS RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\IOMA\DID_ RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\IOMA\_ADR Integer        = 0x0000000000000002
 \_SB_\PCI0\NAPE Method         length:0x0000006A Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\NAPM Mutex          sync_level:0
@@ -108357,7 +108357,7 @@ aml._.term_obj end
 \_SB_\PCI0\GPP6\XPDV\LPSW RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000040 Len:00000001 Acc:0
 \_SB_\PCI0\GPP6\XPDV\PCMS RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\GPP6\XPDV\DVID RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCI_Config] Len:00000080
+\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCIConfig] Len:00000080
 \_SB_\PCI0\GPP6\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP6\D027 Device        
 \_SB_\PCI0\GPP6\D027\_ADR Integer        = 0x00000000000000FF
@@ -108375,9 +108375,9 @@ aml._.term_obj end
 \_SB_\PCI0\GPP5\XPDV\WIST Method         length:0x00000121 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GPP5\XPDV\DCTR RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000020 Len:00000010 Acc:1
 \_SB_\PCI0\GPP5\XPDV\DCAP RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000000 Len:00000020 Acc:1
-\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCI_Config] Len:00000006
+\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCIConfig] Len:00000006
 \_SB_\PCI0\GPP5\XPDV\VDID RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\RPXX] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\GPP5\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP5\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GPP5\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -109094,7 +109094,7 @@ aml._.term_obj end
 \_SB_\PCI0\IOMA Device        
 \_SB_\PCI0\IOMA\MBAS RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\IOMA\DID_ RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\IOMA\_ADR Integer        = 0x0000000000000002
 \_SB_\PCI0\NAPE Method         length:0x0000006A Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\NAPM Mutex          sync_level:0
@@ -116046,7 +116046,7 @@ aml._.term_obj end
 \_SB_\PCI0\GPP6\XPDV\LPSW RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000040 Len:00000001 Acc:0
 \_SB_\PCI0\GPP6\XPDV\PCMS RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\GPP6\XPDV\DVID RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCI_Config] Len:00000080
+\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCIConfig] Len:00000080
 \_SB_\PCI0\GPP6\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP6\D027 Device        
 \_SB_\PCI0\GPP6\D027\_ADR Integer        = 0x00000000000000FF
@@ -116064,9 +116064,9 @@ aml._.term_obj end
 \_SB_\PCI0\GPP5\XPDV\WIST Method         length:0x00000121 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GPP5\XPDV\DCTR RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000020 Len:00000010 Acc:1
 \_SB_\PCI0\GPP5\XPDV\DCAP RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000000 Len:00000020 Acc:1
-\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCI_Config] Len:00000006
+\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCIConfig] Len:00000006
 \_SB_\PCI0\GPP5\XPDV\VDID RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\RPXX] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\GPP5\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP5\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GPP5\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -116783,7 +116783,7 @@ aml._.term_obj end
 \_SB_\PCI0\IOMA Device        
 \_SB_\PCI0\IOMA\MBAS RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\IOMA\DID_ RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\IOMA\_ADR Integer        = 0x0000000000000002
 \_SB_\PCI0\NAPE Method         length:0x0000006A Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\NAPM Mutex          sync_level:0
@@ -122241,7 +122241,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\GPP6\XPDV\LPSW RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000040 Len:00000001 Acc:0
 \_SB_\PCI0\GPP6\XPDV\PCMS RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\GPP6\XPDV\DVID RegionField    Rgn [\_SB_\PCI0\GPP6\XPDV\PCFG] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCI_Config] Len:00000080
+\_SB_\PCI0\GPP6\XPDV\PCFG OpRegion       [PCIConfig] Len:00000080
 \_SB_\PCI0\GPP6\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP6\D027 Device        
 \_SB_\PCI0\GPP6\D027\_ADR Integer        = 0x00000000000000FF
@@ -122259,9 +122259,9 @@ aml._.get_node_by_name end
 \_SB_\PCI0\GPP5\XPDV\WIST Method         length:0x00000121 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GPP5\XPDV\DCTR RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000020 Len:00000010 Acc:1
 \_SB_\PCI0\GPP5\XPDV\DCAP RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\FLDR] Off:00000000 Len:00000020 Acc:1
-\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCI_Config] Len:00000006
+\_SB_\PCI0\GPP5\XPDV\FLDR OpRegion       [PCIConfig] Len:00000006
 \_SB_\PCI0\GPP5\XPDV\VDID RegionField    Rgn [\_SB_\PCI0\GPP5\XPDV\RPXX] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\GPP5\XPDV\RPXX OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\GPP5\XPDV\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\GPP5\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GPP5\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -122978,7 +122978,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\IOMA Device        
 \_SB_\PCI0\IOMA\MBAS RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000020 Len:00000020 Acc:0
 \_SB_\PCI0\IOMA\DID_ RegionField    Rgn [\_SB_\PCI0\IOMA\NBF2] Off:00000000 Len:00000020 Acc:0
-\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\IOMA\NBF2 OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\IOMA\_ADR Integer        = 0x0000000000000002
 \_SB_\PCI0\NAPE Method         length:0x0000006A Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\NAPM Mutex          sync_level:0

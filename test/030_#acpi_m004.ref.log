@@ -44734,7 +44734,7 @@ FN01
 \_SB_\PCI0\NHPG Method         length:0x00000060 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\_INI Method         length:0x000000C4 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\TASM RegionField    Rgn [\_SB_\PCI0\MCHP] Off:00000000 Len:0000000A Acc:0
-\_SB_\PCI0\MCHP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\MCHP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0 Device        
 \_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GFX0\SCIP Method         length:0x00000011 Args:0 serialize:0 sync_level:0
@@ -44875,7 +44875,7 @@ FN01
 \_SB_\PCI0\GFX0\GMFN RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000004 Len:00000001 Acc:0
 \_SB_\PCI0\GFX0\GUMA RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000001 Len:00000003 Acc:0
 \_SB_\PCI0\GFX0\GIVD RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\GFX0\IGDP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\GFX0\IGDP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0\NDDS Method         length:0x00000061 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\CDDS Method         length:0x0000006B Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\SDDL Method         length:0x00000067 Args:1 serialize:0 sync_level:0
@@ -44960,9 +44960,9 @@ FN01
 \_SB_\PCI0\SBUS\HSTS RegionField    Rgn [\_SB_\PCI0\SBUS\SMBI] Off:00000000 Len:00000008 Acc:1
 \_SB_\PCI0\SBUS\SMBI OpRegion       [SystemIO] Len:00000010
 \_SB_\PCI0\SBUS\SBAR RegionField    Rgn [\_SB_\PCI0\SBUS\SMPB] Off:00000000 Len:0000000B Acc:3
-\_SB_\PCI0\SBUS\SMPB OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\SBUS\SMPB OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\SBUS\I2CE RegionField    Rgn [\_SB_\PCI0\SBUS\SMBP] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\SBUS\SMBP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\SBUS\SMBP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\SBUS\_ADR Integer        = 0x00000000001F0003
 \_SB_\PCI0\SAT1 Device        
 \_SB_\PCI0\SAT1\_ADR Integer        = 0x00000000001F0005
@@ -44974,7 +44974,7 @@ FN01
 \_SB_\PCI0\HDEF\DCKS RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000002 Len:00000001 Acc:2
 \_SB_\PCI0\HDEF\DCKM RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000001 Len:00000001 Acc:2
 \_SB_\PCI0\HDEF\DCKA RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000000 Len:00000001 Acc:2
-\_SB_\PCI0\HDEF\HDAR OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\HDEF\HDAR OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\HDEF\_ADR Integer        = 0x00000000001B0000
 \_SB_\PCI0\XHC_ Device        
 \_SB_\PCI0\XHC_\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -45026,7 +45026,7 @@ FN01
 \_SB_\PCI0\XHC_\PR2_ RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000002 Len:00000020 Acc:3
 \_SB_\PCI0\XHC_\PMES RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000001 Len:00000001 Acc:3
 \_SB_\PCI0\XHC_\PMEE RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\XHC_\XPRT OpRegion       [PCI_Config] Len:0000006C
+\_SB_\PCI0\XHC_\XPRT OpRegion       [PCIConfig] Len:0000006C
 \_SB_\PCI0\XHC_\_ADR Integer        = 0x0000000000140000
 \_SB_\PCI0\EHC2 Device        
 \_SB_\PCI0\EHC2\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -45068,7 +45068,7 @@ FN01
 \_SB_\PCI0\EHC2\_S3D Method         length:0x00000003 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\EHC2\_PSW Method         length:0x00000011 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\EHC2\PWUC RegionField    Rgn [\_SB_\PCI0\EHC2\PWKE] Off:00000000 Len:00000006 Acc:3
-\_SB_\PCI0\EHC2\PWKE OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\EHC2\PWKE OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\EHC2\_ADR Integer        = 0x00000000001A0000
 \_SB_\PCI0\EHC1 Device        
 \_SB_\PCI0\EHC1\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -45122,7 +45122,7 @@ FN01
 \_SB_\PCI0\EHC1\_S3D Method         length:0x00000003 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\EHC1\_PSW Method         length:0x00000011 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\EHC1\PWUC RegionField    Rgn [\_SB_\PCI0\EHC1\PWKE] Off:00000000 Len:00000008 Acc:3
-\_SB_\PCI0\EHC1\PWKE OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\EHC1\PWKE OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\EHC1\_ADR Integer        = 0x00000000001D0000
 \_SB_\PCI0\GLAN Device        
 \_SB_\PCI0\GLAN\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -45147,7 +45147,7 @@ FN01
 \_SB_\PCI0\RP06\HPCE RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP06\LASX RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP06\L0SE RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP06\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP06\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP06\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -45175,7 +45175,7 @@ FN01
 \_SB_\PCI0\RP05\HPCE RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP05\LASX RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP05\L0SE RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP05\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP05\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP05\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -45201,7 +45201,7 @@ FN01
 \_SB_\PCI0\PEG0\PEGP Device        
 \_SB_\PCI0\PEG0\PEGP\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PEG0\PEGP\LNKV RegionField    Rgn [\_SB_\PCI0\PEG0\PEGP\DGFX] Off:00000000 Len:00000008 Acc:3
-\_SB_\PCI0\PEG0\PEGP\DGFX OpRegion       [PCI_Config] Len:000000F0
+\_SB_\PCI0\PEG0\PEGP\DGFX OpRegion       [PCIConfig] Len:000000F0
 \_SB_\PCI0\PEG0\PEGP\_ADR Integer        = 0x000000000000FFFF
 \_SB_\PCI0\PEG0\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PEG0\_ADR Integer        = 0x0000000000010000
@@ -45226,7 +45226,7 @@ FN01
 \_SB_\PCI0\RP08\HPCE RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP08\LASX RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP08\L0SE RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP08\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP08\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP08\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -45254,7 +45254,7 @@ FN01
 \_SB_\PCI0\RP07\HPCE RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP07\LASX RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP07\L0SE RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP07\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP07\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP07\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -45282,7 +45282,7 @@ FN01
 \_SB_\PCI0\RP04\HPCE RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP04\LASX RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP04\L0SE RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP04\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP04\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP04\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -45310,7 +45310,7 @@ FN01
 \_SB_\PCI0\RP03\HPCE RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP03\LASX RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP03\L0SE RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP03\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP03\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP03\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -45338,7 +45338,7 @@ FN01
 \_SB_\PCI0\RP02\HPCE RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP02\LASX RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP02\L0SE RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP02\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP02\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP02\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -45366,7 +45366,7 @@ FN01
 \_SB_\PCI0\RP01\HPCE RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP01\LASX RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP01\L0SE RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP01\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP01\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP01\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -45416,7 +45416,7 @@ FN01
 \_SB_\PCI0\LPCB\H_EC\_STA Method         length:0x00000011 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\LPCB\H_EC\_UID Integer        = 0x0000000000000001
 \_SB_\PCI0\LPCB\H_EC\_HID Integer        = 0x00000000090CD041
-\_SB_\PCI0\LPCB\LPCR OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\LPCB\LPCR OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\LPCB\SLPX RegionField    Rgn [\_SB_\PCI0\LPCB\SLPR] Off:00000001 Len:00000001 Acc:1
 \_SB_\PCI0\LPCB\SLPE RegionField    Rgn [\_SB_\PCI0\LPCB\SLPR] Off:00000000 Len:00000001 Acc:1
 \_SB_\PCI0\LPCB\SLPR OpRegion       [SystemIO] Len:00000008
@@ -45625,8 +45625,8 @@ FN01
 \_SB_\PCI0\LPCB\RAEN RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000010 Len:00000001 Acc:0
 \_SB_\PCI0\LPCB\IOD1 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000008 Len:00000008 Acc:0
 \_SB_\PCI0\LPCB\IOD0 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000000 Len:00000008 Acc:0
-\_SB_\PCI0\LPCB\LPC0 OpRegion       [PCI_Config] Len:000000C0
-\_SB_\PCI0\LPCB\LPC1 OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\LPCB\LPC0 OpRegion       [PCIConfig] Len:000000C0
+\_SB_\PCI0\LPCB\LPC1 OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\LPCB\_ADR Integer        = 0x00000000001F0000
 \_SB_\PCI0\TPMX Device        
 \_SB_\PCI0\TPMX\_STA Method         length:0x0000000B Args:0 serialize:0 sync_level:0
@@ -45698,7 +45698,7 @@ FN01
 \_SB_\PCI0\MHEN RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000015 Len:00000001 Acc:3
 \_SB_\PCI0\EPBR RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000001 Len:00000014 Acc:3
 \_SB_\PCI0\EPEN RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\HBUS OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\HBUS OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\_UID Integer        = 0x0000000000000000
 \_SB_\PCI0\_BBN Method         length:0x00000005 Args:0 serialize:0 sync_level:0
@@ -48758,7 +48758,7 @@ FN01
 \_SB_\PCI0\NHPG Method         length:0x00000060 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\_INI Method         length:0x000000C4 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\TASM RegionField    Rgn [\_SB_\PCI0\MCHP] Off:00000000 Len:0000000A Acc:0
-\_SB_\PCI0\MCHP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\MCHP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0 Device        
 \_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GFX0\SCIP Method         length:0x00000011 Args:0 serialize:0 sync_level:0
@@ -48899,7 +48899,7 @@ FN01
 \_SB_\PCI0\GFX0\GMFN RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000004 Len:00000001 Acc:0
 \_SB_\PCI0\GFX0\GUMA RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000001 Len:00000003 Acc:0
 \_SB_\PCI0\GFX0\GIVD RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\GFX0\IGDP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\GFX0\IGDP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0\NDDS Method         length:0x00000061 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\CDDS Method         length:0x0000006B Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\SDDL Method         length:0x00000067 Args:1 serialize:0 sync_level:0
@@ -48984,9 +48984,9 @@ FN01
 \_SB_\PCI0\SBUS\HSTS RegionField    Rgn [\_SB_\PCI0\SBUS\SMBI] Off:00000000 Len:00000008 Acc:1
 \_SB_\PCI0\SBUS\SMBI OpRegion       [SystemIO] Len:00000010
 \_SB_\PCI0\SBUS\SBAR RegionField    Rgn [\_SB_\PCI0\SBUS\SMPB] Off:00000000 Len:0000000B Acc:3
-\_SB_\PCI0\SBUS\SMPB OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\SBUS\SMPB OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\SBUS\I2CE RegionField    Rgn [\_SB_\PCI0\SBUS\SMBP] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\SBUS\SMBP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\SBUS\SMBP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\SBUS\_ADR Integer        = 0x00000000001F0003
 \_SB_\PCI0\SAT1 Device        
 \_SB_\PCI0\SAT1\_ADR Integer        = 0x00000000001F0005
@@ -49026,7 +49026,7 @@ FN01
 \_SB_\PCI0\HDEF\DCKS RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000002 Len:00000001 Acc:2
 \_SB_\PCI0\HDEF\DCKM RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000001 Len:00000001 Acc:2
 \_SB_\PCI0\HDEF\DCKA RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000000 Len:00000001 Acc:2
-\_SB_\PCI0\HDEF\HDAR OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\HDEF\HDAR OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\HDEF\_ADR Integer        = 0x00000000001B0000
 \_SB_\PCI0\XHC_ Device        
 \_SB_\PCI0\XHC_\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -49078,7 +49078,7 @@ FN01
 \_SB_\PCI0\XHC_\PR2_ RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000002 Len:00000020 Acc:3
 \_SB_\PCI0\XHC_\PMES RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000001 Len:00000001 Acc:3
 \_SB_\PCI0\XHC_\PMEE RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\XHC_\XPRT OpRegion       [PCI_Config] Len:0000006C
+\_SB_\PCI0\XHC_\XPRT OpRegion       [PCIConfig] Len:0000006C
 \_SB_\PCI0\XHC_\_ADR Integer        = 0x0000000000140000
 \_SB_\PCI0\EHC2 Device        
 \_SB_\PCI0\EHC2\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -49120,7 +49120,7 @@ FN01
 \_SB_\PCI0\EHC2\_S3D Method         length:0x00000003 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\EHC2\_PSW Method         length:0x00000011 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\EHC2\PWUC RegionField    Rgn [\_SB_\PCI0\EHC2\PWKE] Off:00000000 Len:00000006 Acc:3
-\_SB_\PCI0\EHC2\PWKE OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\EHC2\PWKE OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\EHC2\_ADR Integer        = 0x00000000001A0000
 \_SB_\PCI0\EHC1 Device        
 \_SB_\PCI0\EHC1\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -49174,7 +49174,7 @@ FN01
 \_SB_\PCI0\EHC1\_S3D Method         length:0x00000003 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\EHC1\_PSW Method         length:0x00000011 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\EHC1\PWUC RegionField    Rgn [\_SB_\PCI0\EHC1\PWKE] Off:00000000 Len:00000008 Acc:3
-\_SB_\PCI0\EHC1\PWKE OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\EHC1\PWKE OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\EHC1\_ADR Integer        = 0x00000000001D0000
 \_SB_\PCI0\GLAN Device        
 \_SB_\PCI0\GLAN\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -49199,7 +49199,7 @@ FN01
 \_SB_\PCI0\RP06\HPCE RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP06\LASX RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP06\L0SE RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP06\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP06\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP06\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -49227,7 +49227,7 @@ FN01
 \_SB_\PCI0\RP05\HPCE RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP05\LASX RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP05\L0SE RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP05\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP05\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP05\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -49253,7 +49253,7 @@ FN01
 \_SB_\PCI0\PEG0\PEGP Device        
 \_SB_\PCI0\PEG0\PEGP\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PEG0\PEGP\LNKV RegionField    Rgn [\_SB_\PCI0\PEG0\PEGP\DGFX] Off:00000000 Len:00000008 Acc:3
-\_SB_\PCI0\PEG0\PEGP\DGFX OpRegion       [PCI_Config] Len:000000F0
+\_SB_\PCI0\PEG0\PEGP\DGFX OpRegion       [PCIConfig] Len:000000F0
 \_SB_\PCI0\PEG0\PEGP\_ADR Integer        = 0x000000000000FFFF
 \_SB_\PCI0\PEG0\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PEG0\_ADR Integer        = 0x0000000000010000
@@ -49278,7 +49278,7 @@ FN01
 \_SB_\PCI0\RP08\HPCE RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP08\LASX RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP08\L0SE RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP08\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP08\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP08\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -49306,7 +49306,7 @@ FN01
 \_SB_\PCI0\RP07\HPCE RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP07\LASX RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP07\L0SE RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP07\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP07\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP07\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -49334,7 +49334,7 @@ FN01
 \_SB_\PCI0\RP04\HPCE RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP04\LASX RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP04\L0SE RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP04\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP04\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP04\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -49362,7 +49362,7 @@ FN01
 \_SB_\PCI0\RP03\HPCE RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP03\LASX RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP03\L0SE RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP03\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP03\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP03\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -49390,7 +49390,7 @@ FN01
 \_SB_\PCI0\RP02\HPCE RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP02\LASX RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP02\L0SE RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP02\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP02\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP02\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -49418,7 +49418,7 @@ FN01
 \_SB_\PCI0\RP01\HPCE RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP01\LASX RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP01\L0SE RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP01\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP01\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP01\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -49468,7 +49468,7 @@ FN01
 \_SB_\PCI0\LPCB\H_EC\_STA Method         length:0x00000011 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\LPCB\H_EC\_UID Integer        = 0x0000000000000001
 \_SB_\PCI0\LPCB\H_EC\_HID Integer        = 0x00000000090CD041
-\_SB_\PCI0\LPCB\LPCR OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\LPCB\LPCR OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\LPCB\SLPX RegionField    Rgn [\_SB_\PCI0\LPCB\SLPR] Off:00000001 Len:00000001 Acc:1
 \_SB_\PCI0\LPCB\SLPE RegionField    Rgn [\_SB_\PCI0\LPCB\SLPR] Off:00000000 Len:00000001 Acc:1
 \_SB_\PCI0\LPCB\SLPR OpRegion       [SystemIO] Len:00000008
@@ -49677,8 +49677,8 @@ FN01
 \_SB_\PCI0\LPCB\RAEN RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000010 Len:00000001 Acc:0
 \_SB_\PCI0\LPCB\IOD1 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000008 Len:00000008 Acc:0
 \_SB_\PCI0\LPCB\IOD0 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000000 Len:00000008 Acc:0
-\_SB_\PCI0\LPCB\LPC0 OpRegion       [PCI_Config] Len:000000C0
-\_SB_\PCI0\LPCB\LPC1 OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\LPCB\LPC0 OpRegion       [PCIConfig] Len:000000C0
+\_SB_\PCI0\LPCB\LPC1 OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\LPCB\_ADR Integer        = 0x00000000001F0000
 \_SB_\PCI0\TPMX Device        
 \_SB_\PCI0\TPMX\_STA Method         length:0x0000000B Args:0 serialize:0 sync_level:0
@@ -49750,7 +49750,7 @@ FN01
 \_SB_\PCI0\MHEN RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000015 Len:00000001 Acc:3
 \_SB_\PCI0\EPBR RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000001 Len:00000014 Acc:3
 \_SB_\PCI0\EPEN RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\HBUS OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\HBUS OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\_UID Integer        = 0x0000000000000000
 \_SB_\PCI0\_BBN Method         length:0x00000005 Args:0 serialize:0 sync_level:0
@@ -55715,7 +55715,7 @@ FN01
 \_SB_\PCI0\NHPG Method         length:0x00000060 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\_INI Method         length:0x000000C4 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\TASM RegionField    Rgn [\_SB_\PCI0\MCHP] Off:00000000 Len:0000000A Acc:0
-\_SB_\PCI0\MCHP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\MCHP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0 Device        
 \_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GFX0\SCIP Method         length:0x00000011 Args:0 serialize:0 sync_level:0
@@ -55856,7 +55856,7 @@ FN01
 \_SB_\PCI0\GFX0\GMFN RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000004 Len:00000001 Acc:0
 \_SB_\PCI0\GFX0\GUMA RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000001 Len:00000003 Acc:0
 \_SB_\PCI0\GFX0\GIVD RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\GFX0\IGDP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\GFX0\IGDP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0\NDDS Method         length:0x00000061 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\CDDS Method         length:0x0000006B Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\SDDL Method         length:0x00000067 Args:1 serialize:0 sync_level:0
@@ -55941,9 +55941,9 @@ FN01
 \_SB_\PCI0\SBUS\HSTS RegionField    Rgn [\_SB_\PCI0\SBUS\SMBI] Off:00000000 Len:00000008 Acc:1
 \_SB_\PCI0\SBUS\SMBI OpRegion       [SystemIO] Len:00000010
 \_SB_\PCI0\SBUS\SBAR RegionField    Rgn [\_SB_\PCI0\SBUS\SMPB] Off:00000000 Len:0000000B Acc:3
-\_SB_\PCI0\SBUS\SMPB OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\SBUS\SMPB OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\SBUS\I2CE RegionField    Rgn [\_SB_\PCI0\SBUS\SMBP] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\SBUS\SMBP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\SBUS\SMBP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\SBUS\_ADR Integer        = 0x00000000001F0003
 \_SB_\PCI0\SAT1 Device        
 \_SB_\PCI0\SAT1\_ADR Integer        = 0x00000000001F0005
@@ -55983,7 +55983,7 @@ FN01
 \_SB_\PCI0\HDEF\DCKS RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000002 Len:00000001 Acc:2
 \_SB_\PCI0\HDEF\DCKM RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000001 Len:00000001 Acc:2
 \_SB_\PCI0\HDEF\DCKA RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000000 Len:00000001 Acc:2
-\_SB_\PCI0\HDEF\HDAR OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\HDEF\HDAR OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\HDEF\_ADR Integer        = 0x00000000001B0000
 \_SB_\PCI0\XHC_ Device        
 \_SB_\PCI0\XHC_\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -56035,7 +56035,7 @@ FN01
 \_SB_\PCI0\XHC_\PR2_ RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000002 Len:00000020 Acc:3
 \_SB_\PCI0\XHC_\PMES RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000001 Len:00000001 Acc:3
 \_SB_\PCI0\XHC_\PMEE RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\XHC_\XPRT OpRegion       [PCI_Config] Len:0000006C
+\_SB_\PCI0\XHC_\XPRT OpRegion       [PCIConfig] Len:0000006C
 \_SB_\PCI0\XHC_\_ADR Integer        = 0x0000000000140000
 \_SB_\PCI0\EHC2 Device        
 \_SB_\PCI0\EHC2\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -56077,7 +56077,7 @@ FN01
 \_SB_\PCI0\EHC2\_S3D Method         length:0x00000003 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\EHC2\_PSW Method         length:0x00000011 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\EHC2\PWUC RegionField    Rgn [\_SB_\PCI0\EHC2\PWKE] Off:00000000 Len:00000006 Acc:3
-\_SB_\PCI0\EHC2\PWKE OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\EHC2\PWKE OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\EHC2\_ADR Integer        = 0x00000000001A0000
 \_SB_\PCI0\EHC1 Device        
 \_SB_\PCI0\EHC1\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -56131,7 +56131,7 @@ FN01
 \_SB_\PCI0\EHC1\_S3D Method         length:0x00000003 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\EHC1\_PSW Method         length:0x00000011 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\EHC1\PWUC RegionField    Rgn [\_SB_\PCI0\EHC1\PWKE] Off:00000000 Len:00000008 Acc:3
-\_SB_\PCI0\EHC1\PWKE OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\EHC1\PWKE OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\EHC1\_ADR Integer        = 0x00000000001D0000
 \_SB_\PCI0\GLAN Device        
 \_SB_\PCI0\GLAN\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -56156,7 +56156,7 @@ FN01
 \_SB_\PCI0\RP06\HPCE RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP06\LASX RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP06\L0SE RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP06\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP06\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP06\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -56184,7 +56184,7 @@ FN01
 \_SB_\PCI0\RP05\HPCE RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP05\LASX RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP05\L0SE RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP05\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP05\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP05\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -56210,7 +56210,7 @@ FN01
 \_SB_\PCI0\PEG0\PEGP Device        
 \_SB_\PCI0\PEG0\PEGP\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PEG0\PEGP\LNKV RegionField    Rgn [\_SB_\PCI0\PEG0\PEGP\DGFX] Off:00000000 Len:00000008 Acc:3
-\_SB_\PCI0\PEG0\PEGP\DGFX OpRegion       [PCI_Config] Len:000000F0
+\_SB_\PCI0\PEG0\PEGP\DGFX OpRegion       [PCIConfig] Len:000000F0
 \_SB_\PCI0\PEG0\PEGP\_ADR Integer        = 0x000000000000FFFF
 \_SB_\PCI0\PEG0\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PEG0\_ADR Integer        = 0x0000000000010000
@@ -56235,7 +56235,7 @@ FN01
 \_SB_\PCI0\RP08\HPCE RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP08\LASX RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP08\L0SE RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP08\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP08\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP08\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -56263,7 +56263,7 @@ FN01
 \_SB_\PCI0\RP07\HPCE RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP07\LASX RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP07\L0SE RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP07\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP07\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP07\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -56291,7 +56291,7 @@ FN01
 \_SB_\PCI0\RP04\HPCE RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP04\LASX RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP04\L0SE RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP04\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP04\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP04\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -56319,7 +56319,7 @@ FN01
 \_SB_\PCI0\RP03\HPCE RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP03\LASX RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP03\L0SE RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP03\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP03\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP03\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -56347,7 +56347,7 @@ FN01
 \_SB_\PCI0\RP02\HPCE RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP02\LASX RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP02\L0SE RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP02\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP02\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP02\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -56375,7 +56375,7 @@ FN01
 \_SB_\PCI0\RP01\HPCE RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP01\LASX RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP01\L0SE RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP01\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP01\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP01\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -56425,7 +56425,7 @@ FN01
 \_SB_\PCI0\LPCB\H_EC\_STA Method         length:0x00000011 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\LPCB\H_EC\_UID Integer        = 0x0000000000000001
 \_SB_\PCI0\LPCB\H_EC\_HID Integer        = 0x00000000090CD041
-\_SB_\PCI0\LPCB\LPCR OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\LPCB\LPCR OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\LPCB\SLPX RegionField    Rgn [\_SB_\PCI0\LPCB\SLPR] Off:00000001 Len:00000001 Acc:1
 \_SB_\PCI0\LPCB\SLPE RegionField    Rgn [\_SB_\PCI0\LPCB\SLPR] Off:00000000 Len:00000001 Acc:1
 \_SB_\PCI0\LPCB\SLPR OpRegion       [SystemIO] Len:00000008
@@ -56634,8 +56634,8 @@ FN01
 \_SB_\PCI0\LPCB\RAEN RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000010 Len:00000001 Acc:0
 \_SB_\PCI0\LPCB\IOD1 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000008 Len:00000008 Acc:0
 \_SB_\PCI0\LPCB\IOD0 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000000 Len:00000008 Acc:0
-\_SB_\PCI0\LPCB\LPC0 OpRegion       [PCI_Config] Len:000000C0
-\_SB_\PCI0\LPCB\LPC1 OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\LPCB\LPC0 OpRegion       [PCIConfig] Len:000000C0
+\_SB_\PCI0\LPCB\LPC1 OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\LPCB\_ADR Integer        = 0x00000000001F0000
 \_SB_\PCI0\TPMX Device        
 \_SB_\PCI0\TPMX\_STA Method         length:0x0000000B Args:0 serialize:0 sync_level:0
@@ -56707,7 +56707,7 @@ FN01
 \_SB_\PCI0\MHEN RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000015 Len:00000001 Acc:3
 \_SB_\PCI0\EPBR RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000001 Len:00000014 Acc:3
 \_SB_\PCI0\EPEN RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\HBUS OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\HBUS OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\_UID Integer        = 0x0000000000000000
 \_SB_\PCI0\_BBN Method         length:0x00000005 Args:0 serialize:0 sync_level:0
@@ -60438,7 +60438,7 @@ FN01
 \_SB_\PCI0\NHPG Method         length:0x00000060 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\_INI Method         length:0x000000C4 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\TASM RegionField    Rgn [\_SB_\PCI0\MCHP] Off:00000000 Len:0000000A Acc:0
-\_SB_\PCI0\MCHP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\MCHP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0 Device        
 \_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GFX0\SCIP Method         length:0x00000011 Args:0 serialize:0 sync_level:0
@@ -60579,7 +60579,7 @@ FN01
 \_SB_\PCI0\GFX0\GMFN RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000004 Len:00000001 Acc:0
 \_SB_\PCI0\GFX0\GUMA RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000001 Len:00000003 Acc:0
 \_SB_\PCI0\GFX0\GIVD RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\GFX0\IGDP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\GFX0\IGDP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0\NDDS Method         length:0x00000061 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\CDDS Method         length:0x0000006B Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\SDDL Method         length:0x00000067 Args:1 serialize:0 sync_level:0
@@ -60664,9 +60664,9 @@ FN01
 \_SB_\PCI0\SBUS\HSTS RegionField    Rgn [\_SB_\PCI0\SBUS\SMBI] Off:00000000 Len:00000008 Acc:1
 \_SB_\PCI0\SBUS\SMBI OpRegion       [SystemIO] Len:00000010
 \_SB_\PCI0\SBUS\SBAR RegionField    Rgn [\_SB_\PCI0\SBUS\SMPB] Off:00000000 Len:0000000B Acc:3
-\_SB_\PCI0\SBUS\SMPB OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\SBUS\SMPB OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\SBUS\I2CE RegionField    Rgn [\_SB_\PCI0\SBUS\SMBP] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\SBUS\SMBP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\SBUS\SMBP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\SBUS\_ADR Integer        = 0x00000000001F0003
 \_SB_\PCI0\SAT1 Device        
 \_SB_\PCI0\SAT1\_ADR Integer        = 0x00000000001F0005
@@ -60706,7 +60706,7 @@ FN01
 \_SB_\PCI0\HDEF\DCKS RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000002 Len:00000001 Acc:2
 \_SB_\PCI0\HDEF\DCKM RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000001 Len:00000001 Acc:2
 \_SB_\PCI0\HDEF\DCKA RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000000 Len:00000001 Acc:2
-\_SB_\PCI0\HDEF\HDAR OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\HDEF\HDAR OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\HDEF\_ADR Integer        = 0x00000000001B0000
 \_SB_\PCI0\XHC_ Device        
 \_SB_\PCI0\XHC_\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -60758,7 +60758,7 @@ FN01
 \_SB_\PCI0\XHC_\PR2_ RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000002 Len:00000020 Acc:3
 \_SB_\PCI0\XHC_\PMES RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000001 Len:00000001 Acc:3
 \_SB_\PCI0\XHC_\PMEE RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\XHC_\XPRT OpRegion       [PCI_Config] Len:0000006C
+\_SB_\PCI0\XHC_\XPRT OpRegion       [PCIConfig] Len:0000006C
 \_SB_\PCI0\XHC_\_ADR Integer        = 0x0000000000140000
 \_SB_\PCI0\EHC2 Device        
 \_SB_\PCI0\EHC2\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -60800,7 +60800,7 @@ FN01
 \_SB_\PCI0\EHC2\_S3D Method         length:0x00000003 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\EHC2\_PSW Method         length:0x00000011 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\EHC2\PWUC RegionField    Rgn [\_SB_\PCI0\EHC2\PWKE] Off:00000000 Len:00000006 Acc:3
-\_SB_\PCI0\EHC2\PWKE OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\EHC2\PWKE OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\EHC2\_ADR Integer        = 0x00000000001A0000
 \_SB_\PCI0\EHC1 Device        
 \_SB_\PCI0\EHC1\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -60854,7 +60854,7 @@ FN01
 \_SB_\PCI0\EHC1\_S3D Method         length:0x00000003 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\EHC1\_PSW Method         length:0x00000011 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\EHC1\PWUC RegionField    Rgn [\_SB_\PCI0\EHC1\PWKE] Off:00000000 Len:00000008 Acc:3
-\_SB_\PCI0\EHC1\PWKE OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\EHC1\PWKE OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\EHC1\_ADR Integer        = 0x00000000001D0000
 \_SB_\PCI0\GLAN Device        
 \_SB_\PCI0\GLAN\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -60879,7 +60879,7 @@ FN01
 \_SB_\PCI0\RP06\HPCE RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP06\LASX RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP06\L0SE RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP06\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP06\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP06\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -60907,7 +60907,7 @@ FN01
 \_SB_\PCI0\RP05\HPCE RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP05\LASX RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP05\L0SE RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP05\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP05\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP05\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -60933,7 +60933,7 @@ FN01
 \_SB_\PCI0\PEG0\PEGP Device        
 \_SB_\PCI0\PEG0\PEGP\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PEG0\PEGP\LNKV RegionField    Rgn [\_SB_\PCI0\PEG0\PEGP\DGFX] Off:00000000 Len:00000008 Acc:3
-\_SB_\PCI0\PEG0\PEGP\DGFX OpRegion       [PCI_Config] Len:000000F0
+\_SB_\PCI0\PEG0\PEGP\DGFX OpRegion       [PCIConfig] Len:000000F0
 \_SB_\PCI0\PEG0\PEGP\_ADR Integer        = 0x000000000000FFFF
 \_SB_\PCI0\PEG0\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PEG0\_ADR Integer        = 0x0000000000010000
@@ -60958,7 +60958,7 @@ FN01
 \_SB_\PCI0\RP08\HPCE RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP08\LASX RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP08\L0SE RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP08\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP08\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP08\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -60986,7 +60986,7 @@ FN01
 \_SB_\PCI0\RP07\HPCE RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP07\LASX RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP07\L0SE RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP07\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP07\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP07\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -61014,7 +61014,7 @@ FN01
 \_SB_\PCI0\RP04\HPCE RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP04\LASX RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP04\L0SE RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP04\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP04\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP04\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -61042,7 +61042,7 @@ FN01
 \_SB_\PCI0\RP03\HPCE RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP03\LASX RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP03\L0SE RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP03\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP03\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP03\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -61070,7 +61070,7 @@ FN01
 \_SB_\PCI0\RP02\HPCE RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP02\LASX RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP02\L0SE RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP02\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP02\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP02\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -61098,7 +61098,7 @@ FN01
 \_SB_\PCI0\RP01\HPCE RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP01\LASX RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP01\L0SE RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP01\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP01\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP01\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -61148,7 +61148,7 @@ FN01
 \_SB_\PCI0\LPCB\H_EC\_STA Method         length:0x00000011 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\LPCB\H_EC\_UID Integer        = 0x0000000000000001
 \_SB_\PCI0\LPCB\H_EC\_HID Integer        = 0x00000000090CD041
-\_SB_\PCI0\LPCB\LPCR OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\LPCB\LPCR OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\LPCB\SLPX RegionField    Rgn [\_SB_\PCI0\LPCB\SLPR] Off:00000001 Len:00000001 Acc:1
 \_SB_\PCI0\LPCB\SLPE RegionField    Rgn [\_SB_\PCI0\LPCB\SLPR] Off:00000000 Len:00000001 Acc:1
 \_SB_\PCI0\LPCB\SLPR OpRegion       [SystemIO] Len:00000008
@@ -61357,8 +61357,8 @@ FN01
 \_SB_\PCI0\LPCB\RAEN RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000010 Len:00000001 Acc:0
 \_SB_\PCI0\LPCB\IOD1 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000008 Len:00000008 Acc:0
 \_SB_\PCI0\LPCB\IOD0 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000000 Len:00000008 Acc:0
-\_SB_\PCI0\LPCB\LPC0 OpRegion       [PCI_Config] Len:000000C0
-\_SB_\PCI0\LPCB\LPC1 OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\LPCB\LPC0 OpRegion       [PCIConfig] Len:000000C0
+\_SB_\PCI0\LPCB\LPC1 OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\LPCB\_ADR Integer        = 0x00000000001F0000
 \_SB_\PCI0\TPMX Device        
 \_SB_\PCI0\TPMX\_STA Method         length:0x0000000B Args:0 serialize:0 sync_level:0
@@ -61430,7 +61430,7 @@ FN01
 \_SB_\PCI0\MHEN RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000015 Len:00000001 Acc:3
 \_SB_\PCI0\EPBR RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000001 Len:00000014 Acc:3
 \_SB_\PCI0\EPEN RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\HBUS OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\HBUS OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\_UID Integer        = 0x0000000000000000
 \_SB_\PCI0\_BBN Method         length:0x00000005 Args:0 serialize:0 sync_level:0
@@ -64761,7 +64761,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\NHPG Method         length:0x00000060 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\_INI Method         length:0x000000C4 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\TASM RegionField    Rgn [\_SB_\PCI0\MCHP] Off:00000000 Len:0000000A Acc:0
-\_SB_\PCI0\MCHP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\MCHP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0 Device        
 \_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\GFX0\SCIP Method         length:0x00000011 Args:0 serialize:0 sync_level:0
@@ -64902,7 +64902,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\GFX0\GMFN RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000004 Len:00000001 Acc:0
 \_SB_\PCI0\GFX0\GUMA RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000001 Len:00000003 Acc:0
 \_SB_\PCI0\GFX0\GIVD RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\GFX0\IGDP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\GFX0\IGDP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0\NDDS Method         length:0x00000061 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\CDDS Method         length:0x0000006B Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\SDDL Method         length:0x00000067 Args:1 serialize:0 sync_level:0
@@ -64987,9 +64987,9 @@ aml._.get_node_by_name end
 \_SB_\PCI0\SBUS\HSTS RegionField    Rgn [\_SB_\PCI0\SBUS\SMBI] Off:00000000 Len:00000008 Acc:1
 \_SB_\PCI0\SBUS\SMBI OpRegion       [SystemIO] Len:00000010
 \_SB_\PCI0\SBUS\SBAR RegionField    Rgn [\_SB_\PCI0\SBUS\SMPB] Off:00000000 Len:0000000B Acc:3
-\_SB_\PCI0\SBUS\SMPB OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\SBUS\SMPB OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\SBUS\I2CE RegionField    Rgn [\_SB_\PCI0\SBUS\SMBP] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\SBUS\SMBP OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\SBUS\SMBP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\SBUS\_ADR Integer        = 0x00000000001F0003
 \_SB_\PCI0\SAT1 Device        
 \_SB_\PCI0\SAT1\_ADR Integer        = 0x00000000001F0005
@@ -65029,7 +65029,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\HDEF\DCKS RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000002 Len:00000001 Acc:2
 \_SB_\PCI0\HDEF\DCKM RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000001 Len:00000001 Acc:2
 \_SB_\PCI0\HDEF\DCKA RegionField    Rgn [\_SB_\PCI0\HDEF\HDAR] Off:00000000 Len:00000001 Acc:2
-\_SB_\PCI0\HDEF\HDAR OpRegion       [PCI_Config] Len:00000010
+\_SB_\PCI0\HDEF\HDAR OpRegion       [PCIConfig] Len:00000010
 \_SB_\PCI0\HDEF\_ADR Integer        = 0x00000000001B0000
 \_SB_\PCI0\XHC_ Device        
 \_SB_\PCI0\XHC_\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -65081,7 +65081,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\XHC_\PR2_ RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000002 Len:00000020 Acc:3
 \_SB_\PCI0\XHC_\PMES RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000001 Len:00000001 Acc:3
 \_SB_\PCI0\XHC_\PMEE RegionField    Rgn [\_SB_\PCI0\XHC_\XPRT] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\XHC_\XPRT OpRegion       [PCI_Config] Len:0000006C
+\_SB_\PCI0\XHC_\XPRT OpRegion       [PCIConfig] Len:0000006C
 \_SB_\PCI0\XHC_\_ADR Integer        = 0x0000000000140000
 \_SB_\PCI0\EHC2 Device        
 \_SB_\PCI0\EHC2\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -65123,7 +65123,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\EHC2\_S3D Method         length:0x00000003 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\EHC2\_PSW Method         length:0x00000011 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\EHC2\PWUC RegionField    Rgn [\_SB_\PCI0\EHC2\PWKE] Off:00000000 Len:00000006 Acc:3
-\_SB_\PCI0\EHC2\PWKE OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\EHC2\PWKE OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\EHC2\_ADR Integer        = 0x00000000001A0000
 \_SB_\PCI0\EHC1 Device        
 \_SB_\PCI0\EHC1\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -65177,7 +65177,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\EHC1\_S3D Method         length:0x00000003 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\EHC1\_PSW Method         length:0x00000011 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\EHC1\PWUC RegionField    Rgn [\_SB_\PCI0\EHC1\PWKE] Off:00000000 Len:00000008 Acc:3
-\_SB_\PCI0\EHC1\PWKE OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\EHC1\PWKE OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\EHC1\_ADR Integer        = 0x00000000001D0000
 \_SB_\PCI0\GLAN Device        
 \_SB_\PCI0\GLAN\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -65202,7 +65202,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\RP06\HPCE RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP06\LASX RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP06\L0SE RegionField    Rgn [\_SB_\PCI0\RP06\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP06\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP06\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP06\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -65230,7 +65230,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\RP05\HPCE RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP05\LASX RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP05\L0SE RegionField    Rgn [\_SB_\PCI0\RP05\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP05\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP05\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP05\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -65256,7 +65256,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\PEG0\PEGP Device        
 \_SB_\PCI0\PEG0\PEGP\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PEG0\PEGP\LNKV RegionField    Rgn [\_SB_\PCI0\PEG0\PEGP\DGFX] Off:00000000 Len:00000008 Acc:3
-\_SB_\PCI0\PEG0\PEGP\DGFX OpRegion       [PCI_Config] Len:000000F0
+\_SB_\PCI0\PEG0\PEGP\DGFX OpRegion       [PCIConfig] Len:000000F0
 \_SB_\PCI0\PEG0\PEGP\_ADR Integer        = 0x000000000000FFFF
 \_SB_\PCI0\PEG0\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PEG0\_ADR Integer        = 0x0000000000010000
@@ -65281,7 +65281,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\RP08\HPCE RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP08\LASX RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP08\L0SE RegionField    Rgn [\_SB_\PCI0\RP08\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP08\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP08\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP08\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -65309,7 +65309,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\RP07\HPCE RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP07\LASX RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP07\L0SE RegionField    Rgn [\_SB_\PCI0\RP07\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP07\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP07\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP07\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -65337,7 +65337,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\RP04\HPCE RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP04\LASX RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP04\L0SE RegionField    Rgn [\_SB_\PCI0\RP04\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP04\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP04\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP04\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -65365,7 +65365,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\RP03\HPCE RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP03\LASX RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP03\L0SE RegionField    Rgn [\_SB_\PCI0\RP03\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP03\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP03\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP03\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -65393,7 +65393,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\RP02\HPCE RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP02\LASX RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP02\L0SE RegionField    Rgn [\_SB_\PCI0\RP02\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP02\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP02\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP02\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -65421,7 +65421,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\RP01\HPCE RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000002 Len:00000001 Acc:0
 \_SB_\PCI0\RP01\LASX RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\RP01\L0SE RegionField    Rgn [\_SB_\PCI0\RP01\PXCS] Off:00000000 Len:00000001 Acc:0
-\_SB_\PCI0\RP01\PXCS OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\RP01\PXCS OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\RP01\_HPP Package        elements:4
      Integer        = 0x0000000000000008
      Integer        = 0x0000000000000040
@@ -65471,7 +65471,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\LPCB\H_EC\_STA Method         length:0x00000011 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\LPCB\H_EC\_UID Integer        = 0x0000000000000001
 \_SB_\PCI0\LPCB\H_EC\_HID Integer        = 0x00000000090CD041
-\_SB_\PCI0\LPCB\LPCR OpRegion       [PCI_Config] Len:00000004
+\_SB_\PCI0\LPCB\LPCR OpRegion       [PCIConfig] Len:00000004
 \_SB_\PCI0\LPCB\SLPX RegionField    Rgn [\_SB_\PCI0\LPCB\SLPR] Off:00000001 Len:00000001 Acc:1
 \_SB_\PCI0\LPCB\SLPE RegionField    Rgn [\_SB_\PCI0\LPCB\SLPR] Off:00000000 Len:00000001 Acc:1
 \_SB_\PCI0\LPCB\SLPR OpRegion       [SystemIO] Len:00000008
@@ -65680,8 +65680,8 @@ aml._.get_node_by_name end
 \_SB_\PCI0\LPCB\RAEN RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000010 Len:00000001 Acc:0
 \_SB_\PCI0\LPCB\IOD1 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000008 Len:00000008 Acc:0
 \_SB_\PCI0\LPCB\IOD0 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000000 Len:00000008 Acc:0
-\_SB_\PCI0\LPCB\LPC0 OpRegion       [PCI_Config] Len:000000C0
-\_SB_\PCI0\LPCB\LPC1 OpRegion       [PCI_Config] Len:000000C0
+\_SB_\PCI0\LPCB\LPC0 OpRegion       [PCIConfig] Len:000000C0
+\_SB_\PCI0\LPCB\LPC1 OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\LPCB\_ADR Integer        = 0x00000000001F0000
 \_SB_\PCI0\TPMX Device        
 \_SB_\PCI0\TPMX\_STA Method         length:0x0000000B Args:0 serialize:0 sync_level:0
@@ -65753,7 +65753,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\MHEN RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000015 Len:00000001 Acc:3
 \_SB_\PCI0\EPBR RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000001 Len:00000014 Acc:3
 \_SB_\PCI0\EPEN RegionField    Rgn [\_SB_\PCI0\HBUS] Off:00000000 Len:00000001 Acc:3
-\_SB_\PCI0\HBUS OpRegion       [PCI_Config] Len:00000100
+\_SB_\PCI0\HBUS OpRegion       [PCIConfig] Len:00000100
 \_SB_\PCI0\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\_UID Integer        = 0x0000000000000000
 \_SB_\PCI0\_BBN Method         length:0x00000005 Args:0 serialize:0 sync_level:0
