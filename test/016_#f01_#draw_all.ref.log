@@ -64,7 +64,7 @@ used_memory: 4294967295 (0xffffffff)
 pid: 2
 box: 10 5 300 200
 slot_state: 0
-client_box: 5 24 290 171
+client_box: 5 24 291 172
 wnd_state: 0x00
 /> get_skin_height
 24
