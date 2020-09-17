@@ -1425,7 +1425,7 @@ void shell_net_bind(int argc, char **argv) {
     sa.sin_family = AF_INET4;
     sa.sin_port = htons(port);
     sa.sin_addr.s_addr = addr;
-    fprintf(fout, "sockaddr at %p\n", &sa);
+    fprintf(fout, "sockaddr at %p\n", (void*)&sa);
     f75ret_t r = umka_sys_net_bind(fd, &sa, sizeof(struct sockaddr_in));
     fprintf(fout, "value: 0x%" PRIx32 "\n", r.value);
     fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
@@ -1466,7 +1466,7 @@ void shell_net_connect(int argc, char **argv) {
     sa.sin_family = AF_INET4;
     sa.sin_port = htons(port);
     sa.sin_addr.s_addr = addr;
-    fprintf(fout, "sockaddr at %p\n", &sa);
+    fprintf(fout, "sockaddr at %p\n", (void*)&sa);
     f75ret_t r = umka_sys_net_connect(fd, &sa, sizeof(struct sockaddr_in));
     fprintf(fout, "value: 0x%" PRIx32 "\n", r.value);
     fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
@@ -1491,7 +1491,7 @@ void shell_net_accept(int argc, char **argv) {
     sa.sin_family = AF_INET4;
     sa.sin_port = htons(port);
     sa.sin_addr.s_addr = addr;
-    fprintf(fout, "sockaddr at %p\n", &sa);
+    fprintf(fout, "sockaddr at %p\n", (void*)&sa);
     f75ret_t r = umka_sys_net_accept(fd, &sa, sizeof(struct sockaddr_in));
     fprintf(fout, "value: 0x%" PRIx32 "\n", r.value);
     fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);

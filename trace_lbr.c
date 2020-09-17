@@ -90,9 +90,9 @@ void trace_lbr_begin() {
     }
     char coverage_filename[32];
     sprintf(coverage_filename, "coverage.%i", getpid());
-    covfd = open(coverage_filename, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-    void *coverage_begin_addr = &coverage_begin;
-    void *coverage_end_addr = &coverage_end;
+    covfd = open(coverage_filename, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH | S_IWOTH);
+    void *coverage_begin_addr = coverage_begin;
+    void *coverage_end_addr = coverage_end;
     write(covfd, &coverage_begin_addr, 4);
     write(covfd, &coverage_end_addr, 4);
 }

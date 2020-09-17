@@ -148,7 +148,7 @@ typedef struct {
     uint32_t mtime;
     uint32_t mdate;
     uint64_t size;
-    char name[0];
+    char name[0x7777];  // how to handle this properly? FIXME
 } bdfe_t;
 
 typedef struct {
@@ -196,7 +196,7 @@ typedef struct {
     uint32_t cnt;
     uint32_t total_cnt;
     uint32_t zeroed[5];
-    bdfe_t bdfes[0];
+    bdfe_t bdfes[];
 } f7080s1info_t;
 
 typedef struct {
@@ -279,14 +279,27 @@ typedef struct {
 // Protocol family
 #define AF_INET4  AF_INET
 
+typedef struct net_device_t net_device_t;
+
 typedef struct {
+        void *next;     // pointer to next frame in list
+        void *prev;     // pointer to previous frame in list
+        net_device_t *device;   // ptr to NET_DEVICE structure
+        uint32_t type;  // encapsulation type: e.g. Ethernet
+        size_t length;  // size of encapsulated data
+        size_t offset;  // offset to actual data (24 bytes for default frame)
+        uint8_t data[];
+} net_buff_t;
+
+struct net_device_t {
     uint32_t device_type;   // type field
     uint32_t mtu;           // Maximal Transmission Unit
     char *name;             // ptr to 0 terminated string
 
-    void *unload;           // ptrs to driver functions
-    void *reset;
-    void *transmit;
+    // ptrs to driver functions
+    __attribute__((__stdcall__)) void (*unload) (void);
+    __attribute__((__stdcall__)) void (*reset) (void);
+    __attribute__((__stdcall__)) void (*transmit) (net_buff_t *);
 
     uint64_t bytes_tx;      // statistics, updated by the driver
     uint64_t bytes_rx;
@@ -297,17 +310,7 @@ typedef struct {
     uint32_t hwacc;         // bitmask stating enabled HW accelerations (offload
                             // engines)
     uint8_t mac[6];
-} net_device_t; // NET_DEVICE
-
-typedef struct {
-        void *next;     // pointer to next frame in list
-        void *prev;     // pointer to previous frame in list
-        net_device_t *device;   // ptr to NET_DEVICE structure
-        uint32_t type;  // encapsulation type: e.g. Ethernet
-        size_t length;  // size of encapsulated data
-        size_t offset;  // offset to actual data (24 bytes for default frame)
-        uint8_t data[0];
-} net_buff_t;
+}; // NET_DEVICE
 
 typedef struct {
     uint32_t ip;
@@ -328,10 +331,10 @@ void disk_del(disk_t *disk)  __attribute__((__stdcall__));
 
 void hash_oneshot(void *ctx, void *data, size_t len);
 
-void xfs_user_functions(void);
-void ext_user_functions(void);
-void fat_user_functions(void);
-void ntfs_user_functions(void);
+extern uint8_t xfs_user_functions[];
+extern uint8_t ext_user_functions[];
+extern uint8_t fat_user_functions[];
+extern uint8_t ntfs_user_functions[];
 
 static inline void kos_enable_acpi() {
     __asm__ __inline__ __volatile__ (
@@ -386,8 +389,8 @@ static inline int32_t kos_net_add_device(net_device_t *dev) {
     return dev_num;
 }
 
-void coverage_begin(void);
-void coverage_end(void);
+extern uint8_t coverage_begin[];
+extern uint8_t coverage_end[];
 
 typedef struct appobj_t appobj_t;
 

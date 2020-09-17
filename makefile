@@ -1,27 +1,36 @@
 FASM=fasm
 CC=gcc
-WARNINGS=-Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict -Wnull-dereference -Wjump-misses-init -Wshadow -Wformat=2 -Wswitch -Wswitch-enum #-Wconversion -Wsign-conversion
-CFLAGS=$(WARNINGS) -std=c99 -g -O0 -D_FILE_OFFSET_BITS=64 -Wno-address-of-packed-member -DNDEBUG -masm=intel -D_POSIX_C_SOURCE=200809L -Ilinux
+WARNINGS=-Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op \
+         -Wrestrict -Wnull-dereference -Wjump-misses-init -Wshadow -Wformat=2 \
+         -Wswitch -Wswitch-enum -Wpedantic \
+         #-Wconversion -Wsign-conversion
+NOWARNINGS=-Wno-address-of-packed-member
+CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c99 -g -O0 -D_FILE_OFFSET_BITS=64 \
+       -DNDEBUG -masm=intel -D_POSIX_C_SOURCE=200809L -Ilinux
 CFLAGS_32=$(CFLAGS) -m32
 LDFLAGS=
 LDFLAGS_32=$(LDFLAGS) -m32
 
-all: umka_shell umka_fuse umka_os umka.sym umka.prp umka.lst tags tools/mkdirrange tools/mkfilepattern covpreproc default.skn skin.skn
+all: umka_shell umka_fuse umka_os umka.sym umka.prp umka.lst tags \
+     tools/mkdirrange tools/mkfilepattern covpreproc default.skn skin.skn
 
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
-umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o vnet.o lodepng.o pci.o thread.o
+umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o vnet.o \
+            lodepng.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
-umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o trace_lbr.o vdisk.o pci.o thread.o
+umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o trace_lbr.o \
+         vdisk.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static
 
 umka.o umka.fas: umka.asm
-	INCLUDE="$(KOLIBRI)/kernel/trunk;$(KOLIBRI)/programs/develop/libraries/libcrash/trunk" $(FASM) $< umka.o -s umka.fas -m 1234567
+	INCLUDE="$(KOLIBRI)/kernel/trunk;$(KOLIBRI)/programs/develop/libraries/libcrash/trunk" \
+            $(FASM) $< umka.o -s umka.fas -m 1234567
 
 shell.o: shell.c
 	$(CC) $(CFLAGS_32) -c $<
@@ -83,5 +92,6 @@ tools/mkfilepattern: tools/mkfilepattern.c
 .PHONY: all clean
 
 clean:
-	rm -f *.o umka_shell umka_fuse umka_os umka.fas umka.sym umka.lst umka.prp coverage tools/mkdirrange tools/mkfilepattern
+	rm -f *.o umka_shell umka_fuse umka_os umka.fas umka.sym umka.lst umka.prp \
+          coverage tools/mkdirrange tools/mkfilepattern
 
