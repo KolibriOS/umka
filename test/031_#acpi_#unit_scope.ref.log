@@ -13,7 +13,7 @@ table length 0x00000028
 Table signature: 'SSDT'
 Table length (with header): 0x00000028
 Revision: 0x01
-Checksum: 0xD3
+Checksum: 0xE9
 OEM ID: 'UMKA '
 OEM Table ID: 'UMKADSDT'
 OEM Table Revision: 0x00000001
@@ -51,7 +51,7 @@ table length 0x0000068C
 Table signature: 'DSDT'
 Table length (with header): 0x0000068C
 Revision: 0x02
-Checksum: 0x9E
+Checksum: 0xB4
 OEM ID: 'UMKA '
 OEM Table ID: 'UMKADSDT'
 OEM Table Revision: 0x00000000
@@ -3684,7 +3684,7 @@ table length 0x0000002C
 Table signature: 'DSDT'
 Table length (with header): 0x0000002C
 Revision: 0x01
-Checksum: 0xC7
+Checksum: 0xDD
 OEM ID: 'UMKA '
 OEM Table ID: 'UMKADSDT'
 OEM Table Revision: 0x00000001

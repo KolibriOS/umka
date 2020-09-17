@@ -1,0 +1,198 @@
+/> acpi_set_usage 1
+
+/> acpi_preload_table machines/unit/acpi/field.aml
+table #0
+
+/> acpi_enable
+acpi.aml.process_table begin
+table length 0x00000053
+Table signature: 'DSDT'
+Table length (with header): 0x00000053
+Revision: 0x01
+Checksum: 0x48
+OEM ID: 'UMKA '
+OEM Table ID: 'UMKADSDT'
+OEM Table Revision: 0x00000001
+
+table/position: [0x00000024]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.op_region begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000026
+aml._.name_path begin
+aml._.name_path end
+name_string: M000
+aml._.name_string end
+aml._.attach_node begin
+aml._.get_node_by_name begin
+name: ''
+aml._.get_node_by_name end
+aml._.attach_node end
+RegionSpace: 0x00
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.word_const begin
+aml._.word_const end
+aml._.data_object end
+aml._.term_arg end
+aml._.cast begin
+types 2 to 2
+aml._.cast.integer_to_integer begin
+aml._.cast.integer_to_integer end
+aml._.cast end
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.byte_const begin
+aml._.byte_const end
+aml._.data_object end
+aml._.term_arg end
+aml._.cast begin
+types 2 to 2
+aml._.cast.integer_to_integer begin
+aml._.cast.integer_to_integer end
+aml._.cast end
+RegionLength: 0x00000011
+aml._.op_region end
+aml._.named_obj end
+aml._.object end
+aml._.term_obj end
+table/position: [0x00000030]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.region_field begin
+pkg_length: 0x00000010
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000033
+aml._.name_path begin
+aml._.name_path end
+name_string: M000
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'M000'
+aml._.get_node_by_name end
+aml._.field_list begin
+aml._.field_element begin
+aml._.named_field begin
+name_seg: 'FM00'
+pkg_length: 0x00000001
+aml._.named_field end
+aml._.field_element end
+aml._.field_element begin
+aml._.named_field begin
+name_seg: 'FM01'
+pkg_length: 0x00000002
+aml._.named_field end
+aml._.field_element end
+aml._.field_list end
+aml._.region_field end
+aml._.named_obj end
+aml._.object end
+aml._.term_obj end
+table/position: [0x00000042]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.method begin
+pkg_length: 0x00000010
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000044
+aml._.name_path begin
+aml._.name_path end
+name_string: TEST
+aml._.name_string end
+aml._.attach_node begin
+aml._.get_node_by_name begin
+name: ''
+aml._.get_node_by_name end
+aml._.attach_node end
+aml._.method end
+aml._.named_obj end
+aml._.object end
+aml._.term_obj end
+==========ACPI_TREE==========
+\TEST Method         length:0x0000000A Args:0 serialize:0 sync_level:0
+\FM01 RegionField    Rgn [\M000] Off:00000001 Len:00000002 Acc:1
+\FM00 RegionField    Rgn [\M000] Off:00000000 Len:00000001 Acc:1
+\M000 OpRegion       [SystemMemory] Len:00000011
+\_TZ_ Scope         
+\_SI_ Scope         
+\_SB_ Scope         
+\_PR_ Scope         
+\_GPE Scope         
+-----------------------------
+acpi.aml.process_table end
+==========ACPI_TREE==========
+\TEST Method         length:0x0000000A Args:0 serialize:0 sync_level:0
+\FM01 RegionField    Rgn [\M000] Off:00000001 Len:00000002 Acc:1
+\FM00 RegionField    Rgn [\M000] Off:00000000 Len:00000001 Acc:1
+\M000 OpRegion       [SystemMemory] Len:00000011
+\_TZ_ Scope         
+\_SI_ Scope         
+\_SB_ Scope         
+\_PR_ Scope         
+\_GPE Scope         
+-----------------------------
+
+/> acpi_call \TEST
+acpi.call_name begin
+aml._.get_node_by_name begin
+name: '\TEST'
+aml._.get_node_by_name end
+acpi.call_node begin
+# func name TEST
+# bytes 0x65680D70
+# bytes 0x006F6C6C
+# bytes 0x0000315B
+table/position: [0x00000049]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.string begin
+aml._.string end
+aml._.data_object end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.debug_obj begin
+aml._.debug_obj end
+aml._.super_name end
+aml._.store_table begin
+types 3 to 19
+aml._.store_table.string_to_debug_object begin
+AML_DBG: hello
+aml._.store_table.string_to_debug_object end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+acpi.call_node end
+acpi.call_name end
+calling acpi method: '\TEST'
+acpi method returned

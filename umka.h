@@ -343,6 +343,18 @@ static inline void kos_enable_acpi() {
         : "memory", "cc");
 }
 
+static inline void kos_acpi_call_name(void *ctx, const char *name) {
+    __asm__ __inline__ __volatile__ (
+        "pushad;"
+        "push   %[name];"
+        "push   %[ctx];"
+        "call   acpi.call_name;"
+        "popad"
+        :
+        : [ctx] "r"(ctx), [name] "r"(name)
+        : "memory", "cc");
+}
+
 typedef struct {
     uint32_t value;
     uint32_t errorcode;
@@ -478,15 +490,16 @@ extern uint32_t kos_current_task;
 extern appdata_t *kos_current_slot;
 extern size_t kos_task_count;
 extern taskdata_t *kos_task_base;
-extern void *kos_task_data;
-extern appdata_t *kos_slot_base;
+extern taskdata_t kos_task_data[];
+extern appdata_t kos_slot_base[];
 extern void (*monitor_thread)(void);
-extern uint32_t *kos_lfb_base;
-extern uint16_t *kos_win_stack;
-extern uint16_t *kos_win_pos;
+extern uint32_t kos_lfb_base[];
+extern uint16_t kos_win_stack[];
+extern uint16_t kos_win_pos[];
 extern uint32_t kos_acpi_ssdt_cnt;
-extern uint8_t **kos_acpi_ssdt_base;
-extern size_t *kos_acpi_ssdt_size;
+extern uint8_t *kos_acpi_ssdt_base[];
+extern size_t kos_acpi_ssdt_size[];
+extern void *acpi_ctx;
 extern uint32_t kos_acpi_usage;
 extern disk_t disk_list;
 

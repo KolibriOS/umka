@@ -1118,6 +1118,25 @@ void shell_acpi_get_usage(int argc, char **argv) {
     fprintf(fout, "ACPI usage: %" PRIu32 "\n", kos_acpi_usage);
 }
 
+void shell_acpi_call(int argc, char **argv) {
+    const char *usage = \
+        "usage: acpi_call <method> [args...]\n"
+        "  method         name of acpi method to call, e.g. \\_SB_PCI0_PRT";
+    if (argc > 2) {
+        puts("arguments are not supported / not implemented!");
+        puts(usage);
+        return;
+    }
+    if (argc < 2) {
+        puts(usage);
+        return;
+    }
+    const char *method = argv[1];
+    fprintf(fout, "calling acpi method: '%s'\n", method);
+    kos_acpi_call_name(acpi_ctx, method);
+    fprintf(fout, "acpi method returned\n");
+}
+
 void shell_pci_set_path(int argc, char **argv) {
     const char *usage = \
         "usage: pci_set_path <path>\n"
@@ -1892,6 +1911,7 @@ func_table_t funcs[] = {
     { "acpi_get_usage",          shell_acpi_get_usage },
     { "acpi_enable",             shell_acpi_enable },
     { "acpi_preload_table",      shell_acpi_preload_table },
+    { "acpi_call",               shell_acpi_call },
     { "stack_init",              shell_stack_init },
     { "net_add_device",          shell_net_add_device },
     { "net_get_dev_count",       shell_net_get_dev_count },

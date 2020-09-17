@@ -35,18 +35,19 @@ public CURRENT_TASK as 'kos_current_task'
 public current_slot as 'kos_current_slot'
 public TASK_COUNT as 'kos_task_count'
 public TASK_BASE as 'kos_task_base'
-;public task_base_addr as 'kos_task_base'
-public task_data_addr as 'kos_task_data'
-public slot_base_addr as 'kos_slot_base'
+public TASK_DATA as 'kos_task_data'
+public SLOT_BASE as 'kos_slot_base'
 
-public win_stack_addr as 'kos_win_stack'
-public win_pos_addr as 'kos_win_pos'
-public lfb_base_addr as 'kos_lfb_base'
+public WIN_STACK as 'kos_win_stack'
+public WIN_POS as 'kos_win_pos'
+public lfb_base as 'kos_lfb_base'
 
 public enable_acpi
+public acpi.call_name
 public acpi_ssdt_cnt as 'kos_acpi_ssdt_cnt'
-public kos_acpi_ssdt_base
-public kos_acpi_ssdt_size
+public acpi_ssdt_base as 'kos_acpi_ssdt_base'
+public acpi_ssdt_size as 'kos_acpi_ssdt_size'
+public acpi_ctx
 public acpi_usage as 'kos_acpi_usage'
 
 public stack_init
@@ -572,18 +573,7 @@ umka_tool dd ?
 timer_ticks dd 0
 fpu_owner dd ?
 
-task_base_addr dd TASK_BASE
-task_data_addr dd TASK_DATA
-slot_base_addr dd SLOT_BASE
-
 monitor_thread dd ?
-
-win_stack_addr dd WIN_STACK
-win_pos_addr dd WIN_POS
-lfb_base_addr dd lfb_base
-
-kos_acpi_ssdt_base dd acpi_ssdt_base
-kos_acpi_ssdt_size dd acpi_ssdt_size
 
 uglobal
 context_counter dd ?
