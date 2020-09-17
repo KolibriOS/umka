@@ -145,6 +145,28 @@ VGABasePtr         = os_base + 0x000A0000
 UPPER_KERNEL_PAGES = os_base + 0x00400000
 HEAP_BASE          = os_base + 0x00800000
 
+macro save_ring3_context {
+        pushad
+}
+
+macro restore_ring3_context {
+        popad
+}
+
+macro add r, v {
+  if v eq CURRENT_TASK - (SLOT_BASE shr 3)
+        push    r
+        mov     r, SLOT_BASE
+        shr     r, 3
+        neg     r
+        add     r, CURRENT_TASK
+        add     r, [esp]
+        add     esp, 4
+  else
+        add     r, v
+  end if
+}
+
 include 'system.inc'
 include 'fdo.inc'
 include 'blkdev/disk.inc'
@@ -152,12 +174,14 @@ include 'blkdev/disk_cache.inc'
 include 'fs/fs_lfn.inc'
 include 'crc.inc'
 include 'unicode.inc'
+include 'core/sched.inc'
+include 'core/irq.inc'
+include 'core/apic.inc'
 include 'acpi/acpi.inc'
 include 'core/string.inc'
 include 'core/malloc.inc'
 include 'core/heap.inc'
 include 'core/dll.inc'
-;include 'core/sched.inc'
 include 'core/taskman.inc'
 include 'core/timers.inc'
 include 'core/clipboard.inc'
@@ -427,9 +451,6 @@ sched_add_thread:
         stdcall umka_sched_add_thread, edx
         ret
 
-change_task:
-        ret
-
 public umka_install_thread
 proc umka_install_thread _func
         ; fpu_state = sigsetjmp
@@ -459,7 +480,6 @@ check_fdd_motor_status:
 check_ATAPI_device_event:
 check_fdd_motor_status_has_work?:
 check_ATAPI_device_event_has_work?:
-get_clock_ns:
 request_terminate:
 system_shutdown:
 terminate:
@@ -468,18 +488,12 @@ clear_CD_cache:
 allow_medium_removal:
 EjectMedium:
 save_image:
-init_irqs:
-PIC_init:
 init_sys_v86:
-PIT_init:
 ramdisk_init:
-APIC_init:
-unmask_timer:
 pci_enum:
 load_pe_driver:
 usb_init:
 fdc_init:
-attach_int_handler:
 mtrr_validate:
 protect_from_terminate:
 unprotect_from_terminate:
@@ -496,12 +510,12 @@ lock_application_table:
 unlock_application_table:
 get_pg_addr:
 free_page:
-scheduler_add_thread:
 build_interrupt_table:
 init_fpu:
 init_mtrr:
 create_trampoline_pgmap:
 alloc_page:
+pci_write_reg:
 
 sys_settime:
 sys_pcibios:
@@ -510,11 +524,10 @@ pci_api:
 sys_resize_app_memory:
 f68:
 sys_posix:
+v86_irq:
         ret
 
 alloc_pages:
-enable_irq:
-disable_irq:
         ret     4
 create_ring_buffer:
         ret     8
@@ -544,20 +557,6 @@ macro lea r, v {
   end if
 }
 
-macro add r, v {
-  if v eq CURRENT_TASK - (SLOT_BASE shr 3)
-        push    r
-        mov     r, SLOT_BASE
-        shr     r, 3
-        neg     r
-        add     r, CURRENT_TASK
-        add     r, [esp]
-        add     esp, 4
-  else
-        add     r, v
-  end if
-}
-
 include 'kernel.asm'
 
 purge lea,add,org
@@ -570,18 +569,12 @@ coverage_end:
 section '.data' writeable align 64
 public umka_tool
 umka_tool dd ?
-timer_ticks dd 0
 fpu_owner dd ?
 
 monitor_thread dd ?
 
 uglobal
-context_counter dd ?
-LAPIC_BASE dd ?
-irq_mode dd ?
-ioapic_cnt dd ?
-ioapic_gsi_base dd ?
-MAX_IOAPICS = 2
+v86_irqhooks rd IRQ_RESERVED*2
 cache_ide0  IDE_CACHE
 cache_ide1  IDE_CACHE
 DiskNumber db ?
