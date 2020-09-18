@@ -336,6 +336,8 @@ extern uint8_t ext_user_functions[];
 extern uint8_t fat_user_functions[];
 extern uint8_t ntfs_user_functions[];
 
+extern uint8_t kos_ramdisk[2880*512];
+
 static inline void kos_enable_acpi() {
     __asm__ __inline__ __volatile__ (
         "pushad;"

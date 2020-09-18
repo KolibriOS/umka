@@ -42,6 +42,8 @@ public WIN_STACK as 'kos_win_stack'
 public WIN_POS as 'kos_win_pos'
 public lfb_base as 'kos_lfb_base'
 
+public RAMDISK as 'kos_ramdisk'
+
 public enable_acpi
 public acpi.call_name
 public acpi_ssdt_cnt as 'kos_acpi_ssdt_cnt'
@@ -110,6 +112,9 @@ window_data equ twer
 CURRENT_TASK equ twer2
 TASK_COUNT equ gyads
 SLOT_BASE equ gfdskh
+;macro OS_BASE [x] {
+;  OS_BASE equ os_base
+;}
 include 'const.inc'
 restore window_data
 restore CURRENT_TASK
@@ -616,10 +621,18 @@ macro lea r, v {
   end if
 }
 
+macro mov r, v {
+  if v eq (HEAP_BASE-OS_BASE-CLEAN_ZONE) / 4
+        int3
+  else
+        mov     r, v
+  end if
+}
+
 include 'kernel.asm'
 
-purge lea,add,org
-restore lea,add,org
+purge lea,add,org,mov
+restore lea,add,org,mov
 purge sys_msg_board,HEAP_BASE
 
 coverage_end:
@@ -671,5 +684,20 @@ SB16Buffer      equ
 BUTTON_INFO     rb  64*1024
 BUTTON_INFO     equ
 endg
+
+macro org x {
+  if x eq (OS_BASE+0x0100000)
+  else
+    org x
+  end if
+}
+
+macro align x {
+  if x eq 65536
+  else if x eq 4096
+  else
+    align x
+  end if
+}
 
 include 'data32.inc'
