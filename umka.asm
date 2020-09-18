@@ -169,41 +169,73 @@ macro add r, v {
 
 include 'system.inc'
 include 'fdo.inc'
-include 'blkdev/disk.inc'
-include 'blkdev/disk_cache.inc'
-include 'fs/fs_lfn.inc'
-include 'crc.inc'
-include 'unicode.inc'
-include 'core/sched.inc'
-include 'core/irq.inc'
+
 include 'core/sync.inc'
-include 'core/apic.inc'
-include 'acpi/acpi.inc'
-include 'core/string.inc'
-include 'core/malloc.inc'
+;include 'core/sys32.inc'
+include 'core/sched.inc'
+include 'core/syscall.inc'
+;include 'core/fpu.inc'
+;include 'core/memory.inc'
+;include 'core/mtrr.inc'
 include 'core/heap.inc'
-include 'core/dll.inc'
+include 'core/malloc.inc'
 include 'core/taskman.inc'
+include 'core/dll.inc'
+;include 'core/peload.inc'
+;include 'core/exports.inc'
+include 'core/string.inc'
+;include 'core/v86.inc'
+include 'core/irq.inc'
+include 'core/apic.inc'
 include 'core/timers.inc'
 include 'core/clipboard.inc'
-include 'core/syscall.inc'
 include 'core/slab.inc'
-include 'video/framebuffer.inc'
+
+include 'posix/posix.inc'
+
+;include 'boot/shutdown.inc'
+
 include 'video/vesa20.inc'
-include 'video/vga.inc'
 include 'video/blitter.inc'
+include 'video/vga.inc'
 include 'video/cursors.inc'
-include 'sound/playnote.inc'
-include 'unpacker.inc'
+include 'video/framebuffer.inc'
+
 include 'gui/window.inc'
-include 'gui/button.inc'
-include 'gui/skincode.inc'
-include 'gui/font.inc'
 include 'gui/event.inc'
+include 'gui/font.inc'
+include 'gui/button.inc'
 include 'gui/mouse.inc'
+include 'gui/skincode.inc'
+
 include 'hid/keyboard.inc'
 include 'hid/mousedrv.inc'
+;include 'hid/set_dtc.inc'      ; setting date,time,clock and alarm-clock
+
+include 'sound/playnote.inc'
+
+;include 'bus/pci/pci32.inc'
+;include 'bus/usb/init.inc'
+
+;include 'blkdev/flp_drv.inc'   ; floppy driver
+;include 'blkdev/fdc.inc'
+;include 'blkdev/cd_drv.inc'    ; CD driver
+;include 'blkdev/ide_cache.inc' ; CD cache
+;include 'blkdev/hd_drv.inc'    ; HDD driver
+;include 'blkdev/bd_drv.inc'    ; BIOS disks driver
+include 'blkdev/rd.inc'         ; ramdisk driver
+include 'blkdev/disk.inc'
+include 'blkdev/disk_cache.inc'
+
+include 'fs/fs_lfn.inc'
+
 include 'network/stack.inc'
+
+include 'crc.inc'
+include 'unicode.inc'
+include 'acpi/acpi.inc'
+
+include 'unpacker.inc'
 
 include 'sha3.asm'
 
@@ -521,7 +553,6 @@ allow_medium_removal:
 EjectMedium:
 save_image:
 init_sys_v86:
-ramdisk_init:
 pci_enum:
 load_pe_driver:
 usb_init:
@@ -552,7 +583,6 @@ sys_IPC:
 pci_api:
 sys_resize_app_memory:
 f68:
-sys_posix:
 v86_irq:
         ret
 
