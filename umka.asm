@@ -176,6 +176,7 @@ include 'crc.inc'
 include 'unicode.inc'
 include 'core/sched.inc'
 include 'core/irq.inc'
+include 'core/sync.inc'
 include 'core/apic.inc'
 include 'acpi/acpi.inc'
 include 'core/string.inc'
@@ -206,6 +207,7 @@ include 'network/stack.inc'
 
 include 'sha3.asm'
 
+; TODO: stdcall attribute in umka.h
 proc sha3_256_oneshot c uses ebx esi edi ebp, _ctx, _data, _len
         stdcall sha3_256.oneshot, [_ctx], [_data], [_len]
         ret
@@ -225,6 +227,36 @@ proc kos_init c uses ebx esi edi ebp
         rep stosb
 
         mov     [xsave_area_size], 0x1000
+
+        mov     ecx, pg_data.mutex
+        call    mutex_init
+
+        mov     ecx, disk_list_mutex
+        call    mutex_init
+
+        mov     ecx, keyboard_list_mutex
+        call    mutex_init
+
+        mov     ecx, unpack_mutex
+        call    mutex_init
+
+        mov     ecx, application_table_mutex
+        call    mutex_init
+
+        mov     ecx, ide_mutex
+        call    mutex_init
+        mov     ecx, ide_channel1_mutex
+        call    mutex_init
+        mov     ecx, ide_channel2_mutex
+        call    mutex_init
+        mov     ecx, ide_channel3_mutex
+        call    mutex_init
+        mov     ecx, ide_channel4_mutex
+        call    mutex_init
+        mov     ecx, ide_channel5_mutex
+        call    mutex_init
+        mov     ecx, ide_channel6_mutex
+        call    mutex_init
 
         mov     [pg_data.mem_amount], UMKA_MEMORY_BYTES
         mov     [pg_data.pages_count], UMKA_MEMORY_BYTES / PAGE_SIZE
@@ -503,9 +535,6 @@ prevent_medium_removal:
 Read_TOC:
 commit_pages:
 release_pages:
-mutex_init:
-mutex_lock:
-mutex_unlock:
 lock_application_table:
 unlock_application_table:
 get_pg_addr:
