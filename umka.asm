@@ -43,6 +43,7 @@ public WIN_POS as 'kos_win_pos'
 public lfb_base as 'kos_lfb_base'
 
 public RAMDISK as 'kos_ramdisk'
+public ramdisk_init as 'kos_ramdisk_init'
 
 public enable_acpi
 public acpi.call_name

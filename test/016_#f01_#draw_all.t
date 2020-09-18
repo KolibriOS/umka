@@ -1,4 +1,5 @@
-disk_add ../img/kolibri.img rd -c 0
+#disk_add ../img/kolibri.img rd -c 0
+ramdisk_init ../img/kolibri.img
 set_skin /sys/DEFAULT.SKN
 window_redraw 1
 draw_window 10 300 5 200 0x000088 1 1 1 0 1 4 hello

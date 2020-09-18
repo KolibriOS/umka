@@ -325,7 +325,7 @@ void kos_init(void);
 void i40(void);
 uint32_t kos_time_to_epoch(uint32_t *time);
 
-void *disk_add(diskfunc_t *disk, const char *name, void *userdata, uint32_t flags) __attribute__((__stdcall__));
+disk_t *disk_add(diskfunc_t *disk, const char *name, void *userdata, uint32_t flags) __attribute__((__stdcall__));
 void *disk_media_changed(diskfunc_t *disk, int inserted) __attribute__((__stdcall__));
 void disk_del(disk_t *disk)  __attribute__((__stdcall__));
 
@@ -337,6 +337,7 @@ extern uint8_t fat_user_functions[];
 extern uint8_t ntfs_user_functions[];
 
 extern uint8_t kos_ramdisk[2880*512];
+disk_t *kos_ramdisk_init(void);
 
 static inline void kos_enable_acpi() {
     __asm__ __inline__ __volatile__ (

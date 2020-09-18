@@ -34,6 +34,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <errno.h>
 #include "vdisk.h"
 #include "vnet.h"
 #include "umka.h"
@@ -286,6 +287,36 @@ void shell_disk_list_partitions(disk_t *d) {
             fputs("???\n", fout);
         }
     }
+}
+
+void shell_ramdisk_init(int argc, char **argv) {
+    const char *usage = \
+        "usage: ramdisk_init <file>\n"
+        "  <file>           absolute or relative path";
+    if (argc != 2) {
+        puts(usage);
+        return;
+    }
+    const char *fname = argv[1];
+    FILE *f = fopen(fname, "r");
+    if (!f) {
+        fprintf(fout, "[!] can't open file '%s': %s\n", fname, strerror(errno));
+        return;
+    }
+    fseek(f, 0, SEEK_END);
+    size_t fsize = ftell(f);
+    if (fsize > 2880*512) {
+        fprintf(fout, "[!] file '%s' is too big, max size is 1474560 bytes\n",
+                fname);
+        return;
+    }
+    rewind(f);
+    fread(kos_ramdisk, fsize, 1, f);
+    fclose(f);
+    COVERAGE_ON();
+    void *ramdisk = kos_ramdisk_init();
+    COVERAGE_OFF();
+    shell_disk_list_partitions(ramdisk);
 }
 
 void shell_disk_add(int argc, char **argv) {
@@ -1133,7 +1164,9 @@ void shell_acpi_call(int argc, char **argv) {
     }
     const char *method = argv[1];
     fprintf(fout, "calling acpi method: '%s'\n", method);
+    COVERAGE_ON();
     kos_acpi_call_name(acpi_ctx, method);
+    COVERAGE_OFF();
     fprintf(fout, "acpi method returned\n");
 }
 
@@ -1866,6 +1899,7 @@ typedef struct {
 
 func_table_t funcs[] = {
     { "i40",                     shell_i40 },
+    { "ramdisk_init",            shell_ramdisk_init },
     { "disk_add",                shell_disk_add },
     { "disk_del",                shell_disk_del },
     { "ls70",                    shell_ls70 },
