@@ -701,4 +701,5 @@ macro align x {
   end if
 }
 
+macro assert [x] {}
 include 'data32.inc'

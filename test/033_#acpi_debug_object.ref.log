@@ -9,7 +9,7 @@ table length 0x00000084
 Table signature: 'DSDT'
 Table length (with header): 0x00000084
 Revision: 0x01
-Checksum: 0x8B
+Checksum: 0xA6
 OEM ID: 'UMKA '
 OEM Table ID: 'UMKADSDT'
 OEM Table Revision: 0x00000001
@@ -66,7 +66,7 @@ aml._.name_string begin again
 offset: 0x00000034
 aml._.name_path begin
 aml._.name_path end
-name_string: TEST
+name_string: MAIN
 aml._.name_string end
 aml._.attach_node begin
 aml._.get_node_by_name begin
@@ -78,7 +78,7 @@ aml._.named_obj end
 aml._.object end
 aml._.term_obj end
 ==========ACPI_TREE==========
-\TEST Method         length:0x0000004B Args:0 serialize:0 sync_level:0
+\MAIN Method         length:0x0000004B Args:0 serialize:0 sync_level:0
 \BUFF Buffer         Len:0x00000004
 \_TZ_ Scope         
 \_SI_ Scope         
@@ -88,7 +88,7 @@ aml._.term_obj end
 -----------------------------
 acpi.aml.process_table end
 ==========ACPI_TREE==========
-\TEST Method         length:0x0000004B Args:0 serialize:0 sync_level:0
+\MAIN Method         length:0x0000004B Args:0 serialize:0 sync_level:0
 \BUFF Buffer         Len:0x00000004
 \_TZ_ Scope         
 \_SI_ Scope         
@@ -97,13 +97,13 @@ acpi.aml.process_table end
 \_GPE Scope         
 -----------------------------
 
-/> acpi_call \TEST
+/> acpi_call \MAIN
 acpi.call_name begin
 aml._.get_node_by_name begin
-name: '\TEST'
+name: '\MAIN'
 aml._.get_node_by_name end
 acpi.call_node begin
-# func name TEST
+# func name MAIN
 # bytes 0x65680D70
 # bytes 0x006F6C6C
 # bytes 0x0A70315B
@@ -403,5 +403,5 @@ aml._.store end
 aml._.term_obj end
 acpi.call_node end
 acpi.call_name end
-calling acpi method: '\TEST'
+calling acpi method: '\MAIN'
 acpi method returned
