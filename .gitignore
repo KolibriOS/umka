@@ -5,6 +5,7 @@
 umka_shell
 umka_fuse
 umka_os
+umka_ping
 mkdirrange
 mkfilepattern
 *.img

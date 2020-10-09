@@ -58,22 +58,22 @@ public net_add_device
 
 public draw_data
 public img_background
-public BgrDataWidth
-public BgrDataHeight
 public mem_BACKGROUND
 public sys_background
 public REDRAW_BACKGROUND
-public background_defined
+public scheduler_add_thread
+public new_sys_threads
+public osloop
 
 macro cli {
         pushfd
-        btr     dword[esp], 21
+        bts     dword[esp], 21
         popfd
 }
 
 macro sti {
         pushfd
-        bts     dword[esp], 21
+        btr     dword[esp], 21
         popfd
 }
 
@@ -88,8 +88,6 @@ macro int n {
     int n
   end if
 }
-
-UEFI = 1
 
 MAX_PRIORITY      = 0   ; highest, used for kernel tasks
 USER_PRIORITY     = 1   ; default
@@ -111,6 +109,13 @@ macro BOOT_LO a {}
 macro BOOT a {}
 window_data equ twer
 CURRENT_TASK equ twer2
+TASK_BASE equ twer3
+TASK_DATA equ twer4
+TASK_EVENT equ twer5
+CDDataBuf equ twer6
+idts equ twer7
+WIN_STACK equ twer8
+WIN_POS equ twer9
 TASK_COUNT equ gyads
 SLOT_BASE equ gfdskh
 ;macro OS_BASE [x] {
@@ -119,6 +124,7 @@ SLOT_BASE equ gfdskh
 include 'const.inc'
 restore window_data
 restore CURRENT_TASK
+restore TASK_BASE,TASK_DATA,TASK_EVENT,CDDataBuf,idts,WIN_STACK,WIN_POS
 restore TASK_COUNT
 restore SLOT_BASE
 purge BOOT_LO,BOOT
@@ -128,13 +134,13 @@ LFB_BASE = lfb_base
 ;window_data        = os_base + 0x00001000
 ;CURRENT_TASK       = os_base + 0x00003000
 ;TASK_COUNT         = os_base + 0x00003004
-TASK_BASE          = os_base + 0x00003010
-TASK_DATA          = os_base + 0x00003020
-TASK_EVENT         = os_base + 0x00003020
-CDDataBuf          = os_base + 0x00005000
-idts               = os_base + 0x0000B100
-WIN_STACK          = os_base + 0x0000C000
-WIN_POS            = os_base + 0x0000C400
+;TASK_BASE          = os_base + 0x00003010
+;TASK_DATA          = os_base + 0x00003020
+;TASK_EVENT         = os_base + 0x00003020
+;CDDataBuf          = os_base + 0x00005000
+;idts               = os_base + 0x0000B100
+;WIN_STACK          = os_base + 0x0000C000
+;WIN_POS            = os_base + 0x0000C400
 FDD_BUFF           = os_base + 0x0000D000
 WIN_TEMP_XY        = os_base + 0x0000F300
 KEY_COUNT          = os_base + 0x0000F400
@@ -166,8 +172,8 @@ macro add r, v {
         shr     r, 3
         neg     r
         add     r, CURRENT_TASK
-        add     r, [esp]
         add     esp, 4
+        add     r, [esp-4]
   else
         add     r, v
   end if
@@ -178,7 +184,18 @@ include 'fdo.inc'
 
 include 'core/sync.inc'
 ;include 'core/sys32.inc'
+macro call target {
+  if target eq do_change_task
+        call    _do_change_task
+  else
+        call    target
+  end if
+}
+do_change_task equ hjk
+irq0 equ jhg
 include 'core/sched.inc'
+restore do_change_task
+restore irq0
 include 'core/syscall.inc'
 ;include 'core/fpu.inc'
 ;include 'core/memory.inc'
@@ -388,7 +405,7 @@ proc kos_init c uses ebx esi edi ebp
         mov     eax, [edx+APPDATA.saved_esp]
         mov     dword[eax], idle
         mov     ecx, IDLE_PRIORITY
-        call    sched_add_thread
+        call    scheduler_add_thread
 
         mov     eax, [xsave_area_size]
         add     eax, RING0_STACK_SIZE
@@ -401,7 +418,7 @@ proc kos_init c uses ebx esi edi ebp
         mov     eax, [edx+APPDATA.saved_esp]
         mov     dword[eax], 0
         xor     ecx, ecx
-        call    sched_add_thread
+        call    scheduler_add_thread
 
         mov     dword[CURRENT_TASK], 2
         mov     dword[TASK_COUNT], 2
@@ -427,8 +444,6 @@ proc kos_init c uses ebx esi edi ebp
         mov     word[cur_dir.path], '/'
         mov     [ebx+APPDATA.cur_dir], cur_dir
 
-        ;call    stack_init
-
         ret
 endp
 
@@ -440,36 +455,6 @@ proc idle uses ebx esi edi
         loop    @b
 ;        DEBUGF 1, "1 idle\n"
         jmp     .loop
-
-        ret
-endp
-
-extrn raise
-public umka_os
-proc umka_os uses ebx esi edi
-        call    kos_init
-
-        call    stack_init
-
-        mov     edx, SLOT_BASE+256*3
-        xor     ecx, ecx
-        call    sched_add_thread
-
-        mov     edx, SLOT_BASE+256*4
-        xor     ecx, ecx
-        call    sched_add_thread
-
-        mov     edx, SLOT_BASE+256*5
-        xor     ecx, ecx
-        call    sched_add_thread
-
-        mov     dword[TASK_COUNT], 5
-
-        stdcall umka_install_thread, [monitor_thread]
-
-        ccall   raise, SIGPROF
-
-        jmp     osloop
 
         ret
 endp
@@ -511,36 +496,55 @@ proc sys_msg_board
         ret
 endp
 
-proc map_io_mem _base, _size, _flags
-        mov     eax, [_base]
+proc delay_ms
+
         ret
 endp
 
-extrn umka_sched_add_thread
-sched_add_thread:
-        stdcall umka_sched_add_thread, edx
-        ret
 
-public umka_install_thread
-proc umka_install_thread _func
-        ; fpu_state = sigsetjmp
-        mov     eax, [xsave_area_size]
-        add     eax, RING0_STACK_SIZE
-        stdcall kernel_alloc, eax
-        mov     ebx, eax
-        mov     edx, [TASK_COUNT]
-        inc     edx
-        shl     edx, 8
-        add     edx, SLOT_BASE
-        call    setup_os_slot
-        mov     dword [edx], 'USER'
-        sub     [edx+APPDATA.saved_esp], 4
-        mov     eax, [edx+APPDATA.saved_esp]
-        mov     ecx, [_func]
-        mov     dword[eax], ecx
-        xor     ecx, ecx
-        call    sched_add_thread
-        inc     dword[TASK_COUNT]
+extrn reset_procmask
+extrn get_fake_if
+extrn restart_timer
+public irq0
+proc irq0 c, _signo, _info, _context
+        pushfd
+        pushad
+
+        ccall   reset_procmask
+        ccall   get_fake_if, [_context]
+        test    eax, eax
+        jz      .done
+
+        mov     bl, SCHEDULE_ANY_PRIORITY
+        call    find_next_task
+        jz      .done  ; if there is only one running process
+        call    do_change_task
+.done:
+        ccall   restart_timer
+        popad
+        popfd
+        ret
+endp
+
+proc _do_change_task
+        mov     eax, [current_slot]
+        sub     eax, SLOT_BASE
+        shr     eax, 8
+        mov     ecx, ebx
+        sub     ecx, SLOT_BASE
+        shr     ecx, 8
+        DEBUGF 2, "### switching task from %d to %d\n",eax,ecx
+
+        mov     esi, ebx
+        xchg    esi, [current_slot]
+; set new stack after saving old
+        mov     [esi+APPDATA.saved_esp], esp
+        mov     esp, [ebx+APPDATA.saved_esp]
+        ret
+endp
+
+proc map_io_mem _base, _size, _flags
+        mov     eax, [_base]
         ret
 endp
 
@@ -605,6 +609,7 @@ map_memEx:
 HEAP_BASE equ
 include 'init.inc'
 sys_msg_board equ __pew
+delay_ms equ __pew8
 
 include fix pew
 macro pew x {}
@@ -634,7 +639,7 @@ include 'kernel.asm'
 
 purge lea,add,org,mov
 restore lea,add,org,mov
-purge sys_msg_board,HEAP_BASE
+purge sys_msg_board,HEAP_BASE,__pew8
 
 coverage_end:
 
@@ -670,6 +675,13 @@ os_base:        rb 0x1000
 window_data:    rb 0x2000
 CURRENT_TASK:   rb 4
 TASK_COUNT:     rb 12
+TASK_BASE       rd 4
+TASK_DATA       rd 0x7f8
+TASK_EVENT = TASK_DATA
+CDDataBuf:      rd 0x1840
+idts            rd 0x3c0
+WIN_STACK       rw 0x200
+WIN_POS         rw 0x600
                 rb 0x1000000
 BOOT_LO boot_data
 BOOT boot_data

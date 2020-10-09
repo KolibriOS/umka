@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
+#define __USE_GNU
+#include <signal.h>
 
 #define BDFE_LEN_CP866 304
 #define BDFE_LEN_UNICODE 560
@@ -299,7 +301,7 @@ struct net_device_t {
     // ptrs to driver functions
     __attribute__((__stdcall__)) void (*unload) (void);
     __attribute__((__stdcall__)) void (*reset) (void);
-    __attribute__((__stdcall__)) void (*transmit) (net_buff_t *);
+    __attribute__((__stdcall__)) int (*transmit) (net_buff_t *);
 
     uint64_t bytes_tx;      // statistics, updated by the driver
     uint64_t bytes_rx;
@@ -319,8 +321,9 @@ typedef struct {
     uint16_t ttl;
 } arp_entry_t;
 
-void umka_os(void);
-void umka_install_thread(void *func) __attribute__((__stdcall__));
+void osloop(void);
+void irq0(int signo, siginfo_t *info, void *context);
+
 void kos_init(void);
 void i40(void);
 uint32_t kos_time_to_epoch(uint32_t *time);
@@ -338,6 +341,18 @@ extern uint8_t ntfs_user_functions[];
 
 extern uint8_t kos_ramdisk[2880*512];
 disk_t *kos_ramdisk_init(void);
+
+static inline void umka_new_sys_threads(uint32_t flags, void (*entry)(), void *stack) {
+    __asm__ __inline__ __volatile__ (
+        "pushad;"
+        "call   new_sys_threads;"
+        "popad"
+        :
+        : "b"(flags),
+          "c"(entry),
+          "d"(stack)
+        : "memory", "cc");
+}
 
 static inline void kos_enable_acpi() {
     __asm__ __inline__ __volatile__ (
@@ -499,6 +514,9 @@ extern taskdata_t *kos_task_base;
 extern taskdata_t kos_task_data[];
 extern appdata_t kos_slot_base[];
 extern void (*monitor_thread)(void);
+extern void umka_do_change_task(appdata_t *new);
+extern void scheduler_add_thread(void);
+extern void find_next_task(void);
 extern uint32_t kos_lfb_base[];
 extern uint16_t kos_win_stack[];
 extern uint16_t kos_win_pos[];
@@ -508,6 +526,44 @@ extern size_t kos_acpi_ssdt_size[];
 extern void *acpi_ctx;
 extern uint32_t kos_acpi_usage;
 extern disk_t disk_list;
+
+static inline void umka_scheduler_add_thread(appdata_t *thread, int32_t priority) {
+    __asm__ __inline__ __volatile__ (
+        "call   do_change_thread"
+        :
+        : "c"(priority),
+          "d"(thread)
+        : "memory", "cc");
+
+}
+
+#define MAX_PRIORITY    0
+#define USER_PRIORITY   1
+#define IDLE_PRIORITY   2
+#define NR_SCHED_QUEUES 3
+
+#define SCHEDULE_ANY_PRIORITY 0
+#define SCHEDULE_HIGHER_PRIORITY 1
+
+typedef struct {
+    appdata_t *appdata;
+    taskdata_t *taskdata;
+    int same;
+} find_next_task_t;
+
+static inline find_next_task_t umka_find_next_task(int32_t priority) {
+    find_next_task_t fnt;
+    __asm__ __inline__ __volatile__ (
+        "call   find_next_task;"
+        "setz   al;"
+        "movzx  eax, al"
+        : "=b"(fnt.appdata),
+          "=D"(fnt.taskdata),
+          "=a"(fnt.same)
+        : "b"(priority)
+        : "memory", "cc");
+    return fnt;
+}
 
 static inline void umka_i40(pushad_t *regs) {
 
@@ -1208,6 +1264,40 @@ static inline f75ret_t umka_sys_net_accept(uint32_t fd, void *sockaddr,
           "c"(fd),
           "d"(sockaddr),
           "S"(sockaddr_len)
+        : "memory");
+    return r;
+}
+
+static inline f75ret_t umka_sys_net_send(uint32_t fd, void *buf,
+                                         size_t buf_len, uint32_t flags) {
+    f75ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.value),
+          "=b"(r.errorcode)
+        : "a"(75),
+          "b"(6),
+          "c"(fd),
+          "d"(buf),
+          "S"(buf_len),
+          "D"(flags)
+        : "memory");
+    return r;
+}
+
+static inline f75ret_t umka_sys_net_receive(uint32_t fd, void *buf,
+                                            size_t buf_len, uint32_t flags) {
+    f75ret_t r;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(r.value),
+          "=b"(r.errorcode)
+        : "a"(75),
+          "b"(7),
+          "c"(fd),
+          "d"(buf),
+          "S"(buf_len),
+          "D"(flags)
         : "memory");
     return r;
 }

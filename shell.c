@@ -54,7 +54,7 @@
 
 FILE *fin, *fout;
 
-net_device_t vnet = {
+static net_device_t vnet = {
                             .device_type = NET_TYPE_ETH,
                             .mtu = 1514,
                             .name = "UMK0770",
@@ -294,7 +294,7 @@ void shell_ramdisk_init(int argc, char **argv) {
         "usage: ramdisk_init <file>\n"
         "  <file>           absolute or relative path";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     const char *fname = argv[1];
@@ -326,7 +326,7 @@ void shell_disk_add(int argc, char **argv) {
         "  <name>           disk name, e.g. hd0 or rd\n"
         "  -c cache size    size of disk cache in bytes";
     if (argc < 3) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     size_t cache_size = 0;
@@ -342,7 +342,7 @@ void shell_disk_add(int argc, char **argv) {
             adjust_cache_size = 1;
             break;
         default:
-            puts(usage);
+            fputs(usage, fout);
             return;
         }
     }
@@ -935,7 +935,7 @@ void shell_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
             path_enc = parse_encoding(optarg);
             break;
         default:
-            puts(usage);
+            fputs(usage, fout);
             return;
         }
     }
@@ -1131,7 +1131,7 @@ void shell_acpi_set_usage(int argc, char **argv) {
         "usage: acpi_set_usage <num>\n"
         "  num            one of ACPI_USAGE_*";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t acpi_usage = strtoul(argv[1], NULL, 0);
@@ -1143,7 +1143,7 @@ void shell_acpi_get_usage(int argc, char **argv) {
     const char *usage = \
         "usage: acpi_get_usage";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     fprintf(fout, "ACPI usage: %" PRIu32 "\n", kos_acpi_usage);
@@ -1155,11 +1155,11 @@ void shell_acpi_call(int argc, char **argv) {
         "  method         name of acpi method to call, e.g. \\_SB_PCI0_PRT";
     if (argc > 2) {
         puts("arguments are not supported / not implemented!");
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     if (argc < 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     const char *method = argv[1];
@@ -1175,7 +1175,7 @@ void shell_pci_set_path(int argc, char **argv) {
         "usage: pci_set_path <path>\n"
         "  path           where aaaa:bb:cc.d dirs are";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     strcpy(pci_path, argv[1]);
@@ -1186,7 +1186,7 @@ void shell_pci_get_path(int argc, char **argv) {
     const char *usage = \
         "usage: pci_get_path";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     fprintf(fout, "pci path: %s\n", pci_path);
@@ -1217,7 +1217,7 @@ void shell_net_get_dev_type(int argc, char **argv) {
         "usage: net_get_dev_type <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1233,7 +1233,7 @@ void shell_net_get_dev_name(int argc, char **argv) {
         "usage: net_get_dev_name <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     char dev_name[64];
@@ -1250,7 +1250,7 @@ void shell_net_dev_reset(int argc, char **argv) {
         "usage: net_dev_reset <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1263,7 +1263,7 @@ void shell_net_dev_stop(int argc, char **argv) {
         "usage: net_dev_stop <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1276,7 +1276,7 @@ void shell_net_get_dev(int argc, char **argv) {
         "usage: net_get_dev <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1292,7 +1292,7 @@ void shell_net_get_packet_tx_count(int argc, char **argv) {
         "usage: net_get_packet_tx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1309,7 +1309,7 @@ void shell_net_get_packet_rx_count(int argc, char **argv) {
         "usage: net_get_packet_rx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1326,7 +1326,7 @@ void shell_net_get_byte_tx_count(int argc, char **argv) {
         "usage: net_get_byte_tx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1343,7 +1343,7 @@ void shell_net_get_byte_rx_count(int argc, char **argv) {
         "usage: net_get_byte_rx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1392,7 +1392,7 @@ void shell_net_get_link_status(int argc, char **argv) {
         "usage: net_get_link_status <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1413,7 +1413,7 @@ void shell_net_open_socket(int argc, char **argv) {
         "  type           type\n"
         "  protocol       protocol";
     if (argc != 4) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t domain   = strtoul(argv[1], NULL, 0);
@@ -1430,7 +1430,7 @@ void shell_net_close_socket(int argc, char **argv) {
         "usage: net_close_socket <socket number>\n"
         "  socket number  socket number";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
@@ -1446,7 +1446,7 @@ void shell_net_bind(int argc, char **argv) {
         "  port           port\n"
         "  addr           addr";
     if (argc != 4) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
@@ -1470,7 +1470,7 @@ void shell_net_listen(int argc, char **argv) {
         "  fd             socket number\n"
         "  backlog        max queue length";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
@@ -1487,7 +1487,7 @@ void shell_net_connect(int argc, char **argv) {
         "  port           port\n"
         "  addr           addr";
     if (argc != 4) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
@@ -1512,7 +1512,7 @@ void shell_net_accept(int argc, char **argv) {
         "  port           port\n"
         "  addr           addr";
     if (argc != 4) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
@@ -1535,7 +1535,7 @@ void shell_net_eth_read_mac(int argc, char **argv) {
         "usage: net_eth_read_mac <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1555,7 +1555,7 @@ void shell_net_ipv4_get_addr(int argc, char **argv) {
         "usage: net_ipv4_get_addr <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1575,7 +1575,7 @@ void shell_net_ipv4_set_addr(int argc, char **argv) {
         "  dev_num        device number as returned by net_add_device\n"
         "  addr           a.b.c.d";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1594,7 +1594,7 @@ void shell_net_ipv4_get_dns(int argc, char **argv) {
         "usage: net_ipv4_get_dns <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1614,7 +1614,7 @@ void shell_net_ipv4_set_dns(int argc, char **argv) {
         "  dev_num        device number as returned by net_add_device\n"
         "  dns            a.b.c.d";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1632,7 +1632,7 @@ void shell_net_ipv4_get_subnet(int argc, char **argv) {
         "usage: net_ipv4_get_subnet <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1652,7 +1652,7 @@ void shell_net_ipv4_set_subnet(int argc, char **argv) {
         "  dev_num        device number as returned by net_add_device\n"
         "  subnet         a.b.c.d";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1671,7 +1671,7 @@ void shell_net_ipv4_get_gw(int argc, char **argv) {
         "usage: net_ipv4_get_gw <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1691,7 +1691,7 @@ void shell_net_ipv4_set_gw(int argc, char **argv) {
         "  dev_num        device number as returned by net_add_device\n"
         "  gw             a.b.c.d";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1710,7 +1710,7 @@ void shell_net_arp_get_count(int argc, char **argv) {
         "usage: net_arp_get_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1728,7 +1728,7 @@ void shell_net_arp_get_entry(int argc, char **argv) {
         "  dev_num        device number as returned by net_add_device\n"
         "  arp_num        arp number as returned by net_add_device";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1761,7 +1761,7 @@ void shell_net_arp_add_entry(int argc, char **argv) {
         "  status         see ARP.inc\n"
         "  ttl            Time to live";
     if (argc != 6) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     arp_entry_t arp;
@@ -1785,7 +1785,7 @@ void shell_net_arp_del_entry(int argc, char **argv) {
         "  dev_num        device number as returned by net_add_device\n"
         "  arp_num        arp number as returned by net_add_device";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -1802,7 +1802,7 @@ void shell_bg_set_size(int argc, char **argv) {
         "  xsize          in pixels\n"
         "  ysize          in pixels";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t xsize = strtoul(argv[1], NULL, 0);
@@ -1816,7 +1816,7 @@ void shell_bg_put_pixel(int argc, char **argv) {
         "  offset         in bytes, (x+y*xsize)*3\n"
         "  color          in hex";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     size_t offset = strtoul(argv[1], NULL, 0);
@@ -1829,7 +1829,7 @@ void shell_bg_redraw(int argc, char **argv) {
     const char *usage = \
         "usage: bg_redraw";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     umka_sys_bg_redraw();
@@ -1840,7 +1840,7 @@ void shell_bg_set_mode(int argc, char **argv) {
         "usage: bg_set_mode <mode>\n"
         "  mode           1 = tile, 2 = stretch";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     uint32_t mode = strtoul(argv[1], NULL, 0);
@@ -1853,7 +1853,7 @@ void shell_bg_put_img(int argc, char **argv) {
         "  image          file\n"
         "  offset         in bytes, (x+y*xsize)*3\n";
     if (argc != 4) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     FILE *f = fopen(argv[1], "r");
@@ -1872,7 +1872,7 @@ void shell_bg_map(int argc, char **argv) {
     const char *usage = \
         "usage: bg_map";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     void *addr = umka_sys_bg_map();
@@ -1884,7 +1884,7 @@ void shell_bg_unmap(int argc, char **argv) {
         "usage: bg_unmap <addr>\n"
         "  addr           return value of bg_map";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, fout);
         return;
     }
     void *addr = (void*)strtoul(argv[1], NULL, 0);

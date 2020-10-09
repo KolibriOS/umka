@@ -1,4 +1,4 @@
-FASM=fasm
+FASM=fasm -dUEFI=1 -dextended_primary_loader=1
 CC=gcc
 WARNINGS=-Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op \
          -Wrestrict -Wnull-dereference -Wjump-misses-init -Wshadow -Wformat=2 \
@@ -11,7 +11,7 @@ CFLAGS_32=$(CFLAGS) -m32
 LDFLAGS=
 LDFLAGS_32=$(LDFLAGS) -m32
 
-all: umka_shell umka_fuse umka_os umka.sym umka.prp umka.lst tags \
+all: umka_shell umka_fuse umka_os umka_ping umka.sym umka.prp umka.lst tags \
      tools/mkdirrange tools/mkfilepattern covpreproc default.skn skin.skn
 
 covpreproc: covpreproc.c
@@ -25,7 +25,11 @@ umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o trace_lbr.o \
-         vdisk.o pci.o thread.o
+         pci.o thread.o
+	$(CC) $(LDFLAGS_32) $^ -o $@ -static
+
+umka_ping: umka_ping.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o \
+         trace_lbr.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static
 
 umka.o umka.fas: umka.asm
@@ -82,6 +86,9 @@ umka_fuse.o: umka_fuse.c umka.h
 
 umka_os.o: umka_os.c umka.h
 	$(CC) $(CFLAGS_32) -c $<
+
+umka_ping.o: umka_ping.c umka.h
+	$(CC) $(CFLAGS_32) -D_DEFAULT_SOURCE -c $<
 
 tools/mkdirrange: tools/mkdirrange.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@

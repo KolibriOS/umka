@@ -1,19 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <inttypes.h>
 #include <errno.h>
 #include "umka.h"
 #include "trace.h"
 
+int tapfd;
+
 typedef struct {
-    unsigned x;
+    int fd;
 } vnet_t;
 
-void *vnet_init() {
+void *vnet_init(int fd) {
     printf("vnet_init\n");
     vnet_t *vnet = (vnet_t*)malloc(sizeof(vnet_t));
-    *vnet = (vnet_t){.x = 0,};
+    *vnet = (vnet_t){.fd = fd,};
+    tapfd = fd;
     return vnet;
 }
 
@@ -39,10 +43,14 @@ static void dump_net_buff(net_buff_t *buf) {
 }
 
 __attribute__((__stdcall__))
-void vnet_transmit(net_buff_t *buf) {
+int vnet_transmit(net_buff_t *buf) {
     printf("vnet_transmit: %d bytes\n", buf->length);
     dump_net_buff(buf);
+    write(tapfd, buf->data, buf->length);
+    buf->length = 0;
     COVERAGE_OFF();
     COVERAGE_ON();
+    printf("vnet_transmit: done\n");
+    return 0;
 }
 

@@ -5,7 +5,7 @@
 #include <inttypes.h>
 #include "umka.h"
 
-void *vnet_init(void);
+void *vnet_init(int fd);
 
 __attribute__((__stdcall__))
 void vnet_unload(void);
@@ -14,6 +14,6 @@ __attribute__((__stdcall__))
 void vnet_reset(void);
 
 __attribute__((__stdcall__))
-void vnet_transmit(net_buff_t *buf);
+int vnet_transmit(net_buff_t *buf);
 
 #endif  // VNET_H_INCLUDED

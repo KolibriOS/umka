@@ -1,35 +1,24 @@
-#include <inttypes.h>
 #include <setjmp.h>
+#define __USE_GNU
+#include <signal.h>
+#include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include "../umka.h"
+#include <sys/time.h>
 
-sigjmp_buf trampoline;
+sigset_t mask;
+struct itimerval timeout = {.it_value = {.tv_sec = 0, .tv_usec = 10000}};
 
-__attribute__((__stdcall__))
-uint32_t umka_sched_add_thread(appdata_t *app) {
-//    fprintf(stderr, "umka_new_sys_threads before\n");
-//    fprintf(stderr, "kos_task_count: %d\n", kos_task_count);
-    if (!sigsetjmp(trampoline, 1)) {
-        __asm__ __inline__ __volatile__ (
-        "pushfd;"
-        "bts    dword ptr [esp], 21;"
-        "popfd;"
-        "mov    esp, eax"
-        :
-        : "a"(app->saved_esp)
-        : "memory");
-        if (!sigsetjmp(*app->fpu_state, 1)) {
-            longjmp(trampoline, 1);
-        } else {
-            __asm__ __inline__ __volatile__ (
-            "ret"
-            :
-            :
-            : "memory");
-        }
-    }
-//    fprintf(stderr, "umka_new_sys_threads after\n");
-    return 0;
+void reset_procmask(void) {
+    sigemptyset (&mask);
+	sigaddset (&mask, SIGPROF);
+    sigprocmask(SIG_UNBLOCK, &mask, NULL);
 }
 
+int get_fake_if(ucontext_t *ctx) {
+    // we fake IF with id flag
+    return ctx->uc_mcontext.__gregs[REG_EFL] & (1 << 21);
+}
+
+void restart_timer(void) {
+    setitimer(ITIMER_PROF, &timeout, NULL);
+}

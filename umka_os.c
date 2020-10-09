@@ -1,5 +1,3 @@
-#include <setjmp.h>
-#define __USE_GNU
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,34 +7,9 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include "umka.h"
-#include "thread.h"
 #include "shell.h"
 
-struct itimerval timeout = {.it_value = {.tv_sec = 0, .tv_usec = 10000}};
-
-
-void scheduler(int signo, siginfo_t *info, void *context) {
-    (void)signo;
-    (void)info;
-    (void)context;
-//    printf("##### switching from task %u\n", kos_current_task);
-    ucontext_t *ctx = context;
-    if (!sigsetjmp(*kos_slot_base[kos_current_task].fpu_state, 1)) {
-        if (ctx->uc_mcontext.__gregs[REG_EFL] & (1 << 21)) {
-            kos_current_task += 1;
-            if (kos_current_task > kos_task_count) {
-                kos_current_task = 1;
-            }
-        } else {
-//            printf("########## cli ############\n");
-        }
-        kos_current_slot = kos_slot_base + kos_current_task;
-        kos_task_base = ((taskdata_t*)&kos_current_task) + kos_current_task;
-//        printf("##### kos_current_task: %u\n", kos_current_task);
-        setitimer(ITIMER_PROF, &timeout, NULL);
-        siglongjmp(*kos_slot_base[kos_current_task].fpu_state, 1);
-    }
-}
+#define MONITOR_THREAD_STACK_SIZE 0x100000
 
 void monitor() {
     fprintf(stderr, "Start monitor thread\n");
@@ -49,19 +22,13 @@ void monitor() {
         return;
     }
     run_test(fin, fout, 0);
-/*
-    while (1) {
-        for (int i = 0; i < 10000000; i++) {}
-        printf("6 monitor\n");
-    }
-*/
 }
 
 int main() {
     umka_tool = UMKA_OS;
-    struct sigaction sa;
 
-    sa.sa_sigaction = scheduler;
+    struct sigaction sa;
+    sa.sa_sigaction = irq0;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_SIGINFO;
 
@@ -72,7 +39,14 @@ int main() {
 
     monitor_thread = monitor;
 
-    umka_os();
+    kos_init();
+    kos_stack_init();
+    uint8_t *monitor_stack = malloc(MONITOR_THREAD_STACK_SIZE);
+    umka_new_sys_threads(1, monitor, monitor_stack + MONITOR_THREAD_STACK_SIZE);
+
+    raise(SIGPROF);
+
+    osloop();   // doesn't return
 
     return 0;
 }
