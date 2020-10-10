@@ -5,10 +5,10 @@ WARNINGS=-Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op \
          -Wswitch -Wswitch-enum -Wpedantic \
          #-Wconversion -Wsign-conversion
 NOWARNINGS=-Wno-address-of-packed-member
-CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c99 -g -O0 -D_FILE_OFFSET_BITS=64 \
-       -DNDEBUG -masm=intel -D_POSIX_C_SOURCE=200809L -Ilinux
+CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -g -O0 -D_FILE_OFFSET_BITS=64 \
+       -DNDEBUG -masm=intel -D_POSIX_C_SOURCE=200809L -Ilinux -fno-pie
 CFLAGS_32=$(CFLAGS) -m32
-LDFLAGS=
+LDFLAGS=-no-pie
 LDFLAGS_32=$(LDFLAGS) -m32
 
 all: umka_shell umka_fuse umka_os umka_ping umka.sym umka.prp umka.lst tags \

@@ -21,6 +21,10 @@ typedef struct {
 } box_t;
 
 typedef struct {
+    uint32_t dr0, dr1, dr2, dr3, dr7;
+} dbg_regs_t;
+
+typedef struct {
     uint32_t cpu_usage;
     uint16_t window_stack_position;
     uint16_t window_stack_value;
@@ -36,6 +40,8 @@ typedef struct {
     uint8_t wnd_state;
     uint8_t pad3[1024-71];
 } __attribute__((packed)) process_information_t;
+
+_Static_assert(sizeof(process_information_t) == 0x400, "must be 0x400 bytes long");
 
 typedef struct {
     uint32_t frame, grab, work_3d_dark, work_3d_light, grab_text, work,
@@ -436,56 +442,56 @@ typedef struct {
     char app_name[11];
     uint8_t pad1[5];
 
-    lhead_t list;           // +16
-    uint32_t process;       // +24
-    sigjmp_buf *fpu_state;  // +28
-    void *exc_handler;      // +32
-    uint32_t except_mask;   // +36
-    void *pl0_stack;        // +40
-    void *cursor;           // +44
-    event_t *fd_ev;         // +48
-    event_t *bk_ev;         // +52
-    appobj_t *fd_obj;       // +56
-    appobj_t *bk_obj;       // +60
-    uint32_t saved_esp;     // +64
-    uint32_t io_map[2];     // +68
-    uint32_t dbg_state;     // +76
-/*
-        cur_dir         dd ?            ;+80
-        wait_timeout    dd ?            ;+84
-        saved_esp0      dd ?            ;+88
-        wait_begin      dd ?            ;+92   +++
-        wait_test       dd ?            ;+96   +++
-        wait_param      dd ?            ;+100  +++
-        tls_base        dd ?            ;+104
-                        dd ?            ;+108
-        event_filter    dd ?            ;+112
-        draw_bgr_x      dd ?            ;+116
-        draw_bgr_y      dd ?            ;+120
-                        dd ?            ;+124
-        wnd_shape       dd ?            ;+128
-        wnd_shape_scale dd ?            ;+132
-                        dd ?            ;+136
-                        dd ?            ;+140
-        saved_box       BOX             ;+144
-        ipc_start       dd ?            ;+160
-        ipc_size        dd ?            ;+164
-        event_mask      dd ?            ;+168
-        debugger_slot   dd ?            ;+172
-        terminate_protection dd ?       ;+176
-        keyboard_mode   db ?            ;+180
-        captionEncoding db ?
-                        rb 2
-        exec_params     dd ?            ;+184
-        dbg_event_mem   dd ?            ;+188
-        dbg_regs        DBG_REGS        ;+192
-        wnd_caption     dd ?            ;+212
-        wnd_clientbox   BOX             ;+216
-        priority        dd ?            ;+232
-        in_schedule     LHEAD           ;+236
-*/
-    uint8_t pad[256-80];
+    lhead_t list;                  // +16
+    uint32_t process;              // +24
+    sigjmp_buf *fpu_state;         // +28
+    void *exc_handler;             // +32
+    uint32_t except_mask;          // +36
+    void *pl0_stack;               // +40
+    void *cursor;                  // +44
+    event_t *fd_ev;                // +48
+    event_t *bk_ev;                // +52
+    appobj_t *fd_obj;              // +56
+    appobj_t *bk_obj;              // +60
+    uint32_t saved_esp;            // +64
+    uint32_t io_map[2];            // +68
+    uint32_t dbg_state;            // +76
+    char *cur_dir;                 // +80
+    uint32_t wait_timeout;         // +84
+    uint32_t saved_esp0;           // +88
+    uint32_t wait_begin;           // +92
+    int (*wait_test)(void);        // +96
+    void *wait_param;              // +100
+    void *tls_base;                // +104
+    uint32_t pad2;                 // +108
+    uint32_t event_filter;         // +112
+    uint32_t draw_bgr_x;           // +116
+    uint32_t draw_bgr_y;           // +120
+    uint32_t pad3;                 // +124
+    uint8_t *wnd_shape;            // +128
+    uint32_t wnd_shape_scale;      // +132
+    uint32_t pad4;                 // +136
+    uint32_t pad5;                 // +140
+    box_t saved_box;               // +144
+    uint32_t *ipc_start;           // +160
+    size_t ipc_size;               // +164
+    uint32_t event_mask;           // +168
+    uint32_t debugger_slot;        // +172
+    uint32_t terminate_protection; // +176
+    uint8_t keyboard_mode;         // +180
+    uint8_t captionEncoding;       // +181
+    uint8_t pad6[2];               // +182
+    char *exec_params;             // +184
+    void *dbg_event_mem;           // +188
+    dbg_regs_t dbg_regs;           // +192
+    char *wnd_caption;             // +212
+    box_t wnd_clientbox;           // +216
+    uint32_t priority;             // +232
+    lhead_t in_schedule;           // +236
+    uint32_t pad8[3];              // +244
 } appdata_t;
+
+_Static_assert(sizeof(appdata_t) == 256, "must be 0x100 bytes long");
 
 typedef struct {
     uint32_t event_mask;
@@ -501,6 +507,8 @@ typedef struct {
     uint32_t counter_add;
     uint32_t cpu_usage;
 } taskdata_t;
+
+_Static_assert(sizeof(taskdata_t) == 32, "must be 0x20 bytes long");
 
 #define UMKA_SHELL 1u
 #define UMKA_FUSE  2u
