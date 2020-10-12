@@ -443,6 +443,144 @@ void shell_dump_win_pos(int argc, char **argv) {
     }
 }
 
+void shell_dump_appdata(int argc, char **argv) {
+    // TODO: usage
+    int idx;
+    int show_pointers = 0;
+    if (argc > 1) {
+        idx = strtol(argv[1], NULL, 0);
+    }
+    if (argc > 2 && !strcmp(argv[2], "-p")) {
+        show_pointers = 1;
+    }
+    appdata_t *a = kos_slot_base + idx;
+    fprintf(fout, "app_name: %s\n", a->app_name);
+    if (show_pointers) {
+        fprintf(fout, "process: %p\n", (void*)a->process);
+        fprintf(fout, "fpu_state: %p\n", (void*)a->fpu_state);
+        fprintf(fout, "exc_handler: %p\n", (void*)a->exc_handler);
+    }
+    fprintf(fout, "except_mask: %" PRIx32 "\n", a->except_mask);
+    if (show_pointers) {
+        fprintf(fout, "pl0_stack: %p\n", (void*)a->pl0_stack);
+        fprintf(fout, "cursor: %p\n", (void*)a->cursor);
+        fprintf(fout, "fd_ev: %p\n", (void*)a->fd_ev);
+        fprintf(fout, "bk_ev: %p\n", (void*)a->bk_ev);
+        fprintf(fout, "fd_obj: %p\n", (void*)a->fd_obj);
+        fprintf(fout, "bk_obj: %p\n", (void*)a->bk_obj);
+        fprintf(fout, "saved_esp: %p\n", (void*)a->saved_esp);
+    }
+    fprintf(fout, "dbg_state: %u\n", a->dbg_state);
+    fprintf(fout, "cur_dir: %s\n", a->cur_dir);
+    fprintf(fout, "event_filter: %" PRIx32 "\n", a->event_filter);
+    fprintf(fout, "draw_bgr_x: %u\n", a->draw_bgr_x);
+    fprintf(fout, "draw_bgr_y: %u\n", a->draw_bgr_y);
+    fprintf(fout, "event_mask: %" PRIx32 "\n", a->event_mask);
+    fprintf(fout, "terminate_protection: %u\n", a->terminate_protection);
+    fprintf(fout, "keyboard_mode: %u\n", a->keyboard_mode);
+    fprintf(fout, "captionEncoding: %u\n", a->captionEncoding);
+    fprintf(fout, "exec_params: %s\n", a->exec_params);
+    fprintf(fout, "wnd_caption: %s\n", a->wnd_caption);
+    fprintf(fout, "wnd_clientbox (ltwh): %u %u %u %u\n", a->wnd_clientbox.left,
+            a->wnd_clientbox.top, a->wnd_clientbox.width,
+            a->wnd_clientbox.height);
+    fprintf(fout, "priority: %u\n", a->priority);
+}
+
+void shell_dump_taskdata(int argc, char **argv) {
+    // TODO: usage
+    int idx;
+    if (argc > 1) {
+        idx = strtol(argv[1], NULL, 0);
+    }
+    taskdata_t *t = kos_task_base + idx;
+    fprintf(fout, "event_mask: %" PRIx32 "\n", t->event_mask);
+}
+
+void shell_mouse_move(int argc, char **argv) {
+    const char *usage = \
+        "usage: mouse_move [-l] [-m] [-r] [-x {+|-|=}<value>]"
+            "[-y {+|-|=}<value>] [-h {+|-}<value>] [-v {+|-}<value>]\n"
+        "  -l             left button is held\n"
+        "  -m             middle button is held\n"
+        "  -r             right button is held\n"
+        "  -x             increase, decrease or set x coordinate\n"
+        "  -y             increase, decrease or set y coordinate\n"
+        "  -h             scroll horizontally\n"
+        "  -v             scroll vertically\n";
+
+    int lbheld = 0, mbheld = 0, rbheld = 0, xabs = 0, yabs = 0;
+    int32_t xmoving = 0, ymoving = 0, hscroll = 0, vscroll = 0;
+    int opt;
+    optind = 1;
+    while ((opt = getopt(argc, argv, "lmrx:y:h:v:")) != -1) {
+        switch (opt) {
+        case 'l':
+            lbheld = 1;
+            break;
+        case 'm':
+            mbheld = 1;
+            break;
+        case 'r':
+            rbheld = 1;
+            break;
+        case 'x':
+            switch (*optarg++) {
+            case '=':
+                xabs = 1;
+                __attribute__ ((fallthrough));
+            case '+':
+                xmoving = strtol(optarg, NULL, 0);
+                break;
+            case '-':
+                xmoving = -strtol(optarg, NULL, 0);
+                break;
+            default:
+                fputs(usage, fout);
+                return;
+            }
+            break;
+        case 'y':
+            switch (*optarg++) {
+            case '=':
+                yabs = 1;
+                __attribute__ ((fallthrough));
+            case '+':
+                ymoving = strtol(optarg, NULL, 0);
+                break;
+            case '-':
+                ymoving = -strtol(optarg, NULL, 0);
+                break;
+            default:
+                fputs(usage, fout);
+                return;
+            }
+            break;
+        case 'h':
+            if ((optarg[0] != '+') && (optarg[0] != '-')) {
+                fputs(usage, fout);
+                return;
+            }
+            hscroll = strtol(optarg, NULL, 0);
+            break;
+        case 'v':
+            if ((optarg[0] != '+') && (optarg[0] != '-')) {
+                fputs(usage, fout);
+                return;
+            }
+            vscroll = strtol(optarg, NULL, 0);
+            break;
+        default:
+            fputs(usage, fout);
+            return;
+        }
+    }
+    COVERAGE_ON();
+    umka_mouse_move(lbheld, mbheld, rbheld, xabs, xmoving, yabs, ymoving,
+                    hscroll, vscroll);
+    COVERAGE_OFF();
+}
+
 void shell_process_info(int argc, char **argv) {
     (void)argc;
     process_information_t info;
@@ -1941,6 +2079,8 @@ func_table_t funcs[] = {
     { "scrot",                   shell_scrot },
     { "dump_win_stack",          shell_dump_win_stack },
     { "dump_win_pos",            shell_dump_win_pos },
+    { "dump_appdata",            shell_dump_appdata },
+    { "dump_taskdata",           shell_dump_taskdata },
     { "acpi_set_usage",          shell_acpi_set_usage },
     { "acpi_get_usage",          shell_acpi_get_usage },
     { "acpi_enable",             shell_acpi_enable },
@@ -1987,6 +2127,7 @@ func_table_t funcs[] = {
     { "bg_unmap",                shell_bg_unmap },
     { "pci_set_path",            shell_pci_set_path },
     { "pci_get_path",            shell_pci_get_path },
+    { "mouse_move",              shell_mouse_move },
     { NULL,                      NULL },
 };
 

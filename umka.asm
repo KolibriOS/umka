@@ -30,7 +30,6 @@ public sha3_256_oneshot as 'hash_oneshot'
 public kos_time_to_epoch
 public kos_init
 
-public monitor_thread
 public CURRENT_TASK as 'kos_current_task'
 public current_slot as 'kos_current_slot'
 public TASK_COUNT as 'kos_task_count'
@@ -64,6 +63,7 @@ public REDRAW_BACKGROUND
 public scheduler_add_thread
 public new_sys_threads
 public osloop
+public set_mouse_data as 'kos_set_mouse_data'
 
 macro cli {
         pushfd
@@ -193,8 +193,19 @@ macro call target {
 }
 do_change_task equ hjk
 irq0 equ jhg
+macro mov r, v {
+  if r eq [CURRENT_TASK] & v eq bh
+        push    ebx
+        sub     ebx, SLOT_BASE
+        mov     [CURRENT_TASK], bh
+        pop     ebx
+  else
+        mov     r, v
+  end if
+}
 include 'core/sched.inc'
-restore do_change_task
+purge mov
+purge call
 restore irq0
 include 'core/syscall.inc'
 ;include 'core/fpu.inc'
@@ -423,7 +434,7 @@ proc kos_init c uses ebx esi edi ebp
         mov     dword[CURRENT_TASK], 2
         mov     dword[TASK_COUNT], 2
         mov     dword[TASK_BASE], CURRENT_TASK + 2*sizeof.TASKDATA
-        mov     [current_slot], SLOT_BASE+256*2
+        mov     [current_slot], SLOT_BASE+2*sizeof.APPDATA
         mov     [CURRENT_TASK + 2*sizeof.TASKDATA + TASKDATA.pid], 2
 
         call    set_window_defaults
@@ -431,8 +442,8 @@ proc kos_init c uses ebx esi edi ebp
         call    calculatebackground
         call    init_display
         mov     eax, [def_cursor]
-        mov     [SLOT_BASE+APPDATA.cursor+256], eax
-        mov     [SLOT_BASE+APPDATA.cursor+256*2], eax
+        mov     [SLOT_BASE+APPDATA.cursor+sizeof.APPDATA], eax
+        mov     [SLOT_BASE+APPDATA.cursor+sizeof.APPDATA*2], eax
 
         ; from set_variables
         xor     eax, eax
@@ -440,7 +451,7 @@ proc kos_init c uses ebx esi edi ebp
         mov     byte [KEY_COUNT], al            ; keyboard buffer
         mov     byte [BTN_COUNT], al            ; button buffer
 
-        mov     ebx, SLOT_BASE + 2*256
+        mov     ebx, SLOT_BASE + 2*sizeof.APPDATA
         mov     word[cur_dir.path], '/'
         mov     [ebx+APPDATA.cur_dir], cur_dir
 
@@ -501,7 +512,6 @@ proc delay_ms
         ret
 endp
 
-
 extrn reset_procmask
 extrn get_fake_if
 extrn restart_timer
@@ -518,7 +528,7 @@ proc irq0 c, _signo, _info, _context
         mov     bl, SCHEDULE_ANY_PRIORITY
         call    find_next_task
         jz      .done  ; if there is only one running process
-        call    do_change_task
+        call    _do_change_task
 .done:
         ccall   restart_timer
         popad
@@ -644,12 +654,10 @@ purge sys_msg_board,HEAP_BASE,__pew8
 coverage_end:
 
 
-section '.data' writeable align 64
+section '.data' writeable align 4096
 public umka_tool
 umka_tool dd ?
 fpu_owner dd ?
-
-monitor_thread dd ?
 
 uglobal
 v86_irqhooks rd IRQ_RESERVED*2
@@ -685,7 +693,9 @@ WIN_POS         rw 0x600
                 rb 0x1000000
 BOOT_LO boot_data
 BOOT boot_data
+align 4096
 lfb_base rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
+align 4096
 cur_dir:
 .encoding rb 1
 .path     rb maxPathLength

@@ -8,6 +8,7 @@ umka_os
 umka_ping
 mkdirrange
 mkfilepattern
+lfbviewx
 *.img
 *.img.xz
 *.img.gz

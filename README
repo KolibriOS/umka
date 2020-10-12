@@ -2,26 +2,52 @@ UMKa -- User-Mode KolibriOS developer tools
 ===========================================
 
 This is a common project for a set of KolibriOS developer tools which are based
-on original KolibriOS code wrapped and hacked as to run in the UNIX programming
-environment. The idea is to make userspace UNIX tools that use as much unchanged
-KolibriOS source as possible to test architecture-independent parts of the
-kernel in your favorite developer environment.
+on original KolibriOS kernel code wrapped and hacked as to run in the UNIX
+programming environment. The idea is to make userspace UNIX tools that use as
+much unchanged KolibriOS kernel source as possible to test
+architecture-independent parts of the kernel in your favorite developer
+environment.
 
 
 umka_shell
 ----------
 
 is an interactive shell with commands that are wrappers around KolibriOS kernel
-block, FS, UI and other functions. Can read input from the keyboard, stdin and a
-file, i.e. can be used for automated testing.
+syscalls and other internal functions. What works now: block layer including
+disk cache, FS, UI and graphics, scheduler, ACPI/AML interpreter,
+synchronization primitives, strings, slab allocator, events, unpacker, other
+minor functions.
+
+It can also be used for automated testing by feeding it a file of commands
+instead of typing them.
+
+Example:
+    $ umka_shell < mytest.t > mytest.out.log
 
 
 umka_fuse
 ---------
 
 is like umka_shell above but commands are translated from FUSE calls, not
-entered manually. Can *potentially* be used to run xfstests (cross-fs-tests) and
-automatestrcatd tests against reference FS implementations.
+entered manually or read from a file. Can *potentially* be used to run xfstests
+(cross-fs-tests) and automated tests against reference FS implementation.
+
+
+umka_os
+-------
+
+is KolibriOS kernel running main loop (osloop), scheduler and all the threads
+including network stack.
+
+
+tools
+-----
+
+mkdirrange
+
+mkfilepattern
+
+lfbviewx
 
 
 BUILD
@@ -43,13 +69,14 @@ Framebuffer can be dumped to disk as image file.
 Testing
 -------
 
-sudo cp --parents --no-preserve=mode /sys/firmware/acpi/tables/?SDT* /sys/bus/pci/devices/*/config .
+sudo cp --parents /sys/firmware/acpi/tables/?SDT* /sys/bus/pci/devices/*/config .
 
 
 Troubleshooting
 ---------------
 
-No troubles -- no shooting.
+# sysctl -w kernel.yama.ptrace_scope=0
+# sysctl -w vm.mmap_min_addr=0
 
 
 Links & Acknowledgements

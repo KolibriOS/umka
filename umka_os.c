@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/mman.h>
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -37,7 +38,15 @@ int main() {
         return 1;
     }
 
-    monitor_thread = monitor;
+
+/*
+    void *app_base = mmap((void*)0x000000, 16*0x100000, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (app_base == MAP_FAILED) {
+        perror("mmap failed");
+        exit(1);
+    }
+*/
+    printf("pid=%d, kos_lfb_base=%p\n", getpid(), (void*)kos_lfb_base);
 
     kos_init();
     kos_stack_init();

@@ -12,7 +12,7 @@ LDFLAGS=-no-pie
 LDFLAGS_32=$(LDFLAGS) -m32
 
 all: umka_shell umka_fuse umka_os umka_ping umka.sym umka.prp umka.lst tags \
-     tools/mkdirrange tools/mkfilepattern covpreproc default.skn skin.skn
+     covpreproc default.skn skin.skn
 
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
@@ -85,20 +85,13 @@ umka_fuse.o: umka_fuse.c umka.h
 	$(CC) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $<
 
 umka_os.o: umka_os.c umka.h
-	$(CC) $(CFLAGS_32) -c $<
+	$(CC) $(CFLAGS_32) -c $< -D_DEFAULT_SOURCE
 
 umka_ping.o: umka_ping.c umka.h
 	$(CC) $(CFLAGS_32) -D_DEFAULT_SOURCE -c $<
-
-tools/mkdirrange: tools/mkdirrange.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
-
-tools/mkfilepattern: tools/mkfilepattern.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
 .PHONY: all clean
 
 clean:
 	rm -f *.o umka_shell umka_fuse umka_os umka.fas umka.sym umka.lst umka.prp \
-          coverage tools/mkdirrange tools/mkfilepattern
-
+          coverage

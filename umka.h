@@ -336,7 +336,7 @@ uint32_t kos_time_to_epoch(uint32_t *time);
 
 disk_t *disk_add(diskfunc_t *disk, const char *name, void *userdata, uint32_t flags) __attribute__((__stdcall__));
 void *disk_media_changed(diskfunc_t *disk, int inserted) __attribute__((__stdcall__));
-void disk_del(disk_t *disk)  __attribute__((__stdcall__));
+void disk_del(disk_t *disk) __attribute__((__stdcall__));
 
 void hash_oneshot(void *ctx, void *data, size_t len);
 
@@ -347,6 +347,19 @@ extern uint8_t ntfs_user_functions[];
 
 extern uint8_t kos_ramdisk[2880*512];
 disk_t *kos_ramdisk_init(void);
+
+void kos_set_mouse_data(uint32_t btn_state, int32_t xmoving, int32_t ymoving,
+                        int32_t vscroll, int32_t hscroll)
+                        __attribute__((__stdcall__));
+
+static inline void umka_mouse_move(int lbheld, int mbheld, int rbheld,
+                                   int xabs, int32_t xmoving,
+                                   int yabs, int32_t ymoving,
+                                   int32_t hscroll, int32_t vscroll) {
+    uint32_t btn_state = lbheld + (rbheld << 1) + (mbheld << 2) +
+                         (yabs << 30) + (xabs << 31);
+    kos_set_mouse_data(btn_state, xmoving, ymoving, vscroll, hscroll);
+}
 
 static inline void umka_new_sys_threads(uint32_t flags, void (*entry)(), void *stack) {
     __asm__ __inline__ __volatile__ (
@@ -439,12 +452,34 @@ typedef struct {
 } event_t;
 
 typedef struct {
+    lhead_t list;
+    lhead_t thr_list;
+    mutex_t heap_lock;
+    void *heap_base;
+    void *heap_top;
+    uint32_t mem_used;
+    void *dlls_list_ptr;
+    void *pdt_0_phys;
+    void *pdt_1_phys;
+    void *io_map_0;
+    void *io_map_1;
+
+    void *ht_lock;
+    void *ht_free;
+    void *ht_next;
+    void *htab[(1024-18*4)/4];
+    void *pdt_0[1024];
+} proc_t;
+
+_Static_assert(sizeof(proc_t) == 0x1400, "must be 0x1400 bytes long");
+
+typedef struct {
     char app_name[11];
     uint8_t pad1[5];
 
     lhead_t list;                  // +16
-    uint32_t process;              // +24
-    sigjmp_buf *fpu_state;         // +28
+    proc_t *process;               // +24
+    void *fpu_state;               // +28
     void *exc_handler;             // +32
     uint32_t except_mask;          // +36
     void *pl0_stack;               // +40
@@ -453,7 +488,7 @@ typedef struct {
     event_t *bk_ev;                // +52
     appobj_t *fd_obj;              // +56
     appobj_t *bk_obj;              // +60
-    uint32_t saved_esp;            // +64
+    void *saved_esp;               // +64
     uint32_t io_map[2];            // +68
     uint32_t dbg_state;            // +76
     char *cur_dir;                 // +80
@@ -521,7 +556,6 @@ extern size_t kos_task_count;
 extern taskdata_t *kos_task_base;
 extern taskdata_t kos_task_data[];
 extern appdata_t kos_slot_base[];
-extern void (*monitor_thread)(void);
 extern void umka_do_change_task(appdata_t *new);
 extern void scheduler_add_thread(void);
 extern void find_next_task(void);
