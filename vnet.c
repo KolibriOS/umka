@@ -83,3 +83,25 @@ int vnet_transmit(net_buff_t *buf) {
     return 0;
 }
 
+void vnet_receive_frame(net_device_t *dev, void *data, size_t size) {
+    net_buff_t *buf = kos_net_buff_alloc(size + offsetof(net_buff_t, data));
+    if (!buf) {
+        fprintf(stderr, "[vnet] Can't allocate network buffer!\n");
+        return;
+    }
+    buf->length = size;
+    buf->device = dev;
+    buf->offset = offsetof(net_buff_t, data);
+    memcpy(buf->data, data, size);
+    __asm__ __inline__ __volatile__ (
+        "pushad;"
+        "lea    ecx, 1f;"
+        "push   ecx;"
+        "push   eax;"
+        "jmp    kos_eth_input;"
+        "1:"
+        "popad"
+        :
+        : "a"(buf)
+        : "memory", "ecx");
+}

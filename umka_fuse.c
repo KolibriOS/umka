@@ -51,8 +51,8 @@ static void bdfe_to_stat(bdfe_t *kf, struct stat *st) {
     st->st_ctime = kos_time_to_epoch(&(kf->ctime));
 }
 
-static void *umka_init(struct fuse_conn_info *conn,
-                       struct fuse_config *cfg) {
+static void *umka_fuse_init(struct fuse_conn_info *conn,
+                            struct fuse_config *cfg) {
         (void) conn;
         cfg->kernel_cache = 1;
         return NULL;
@@ -131,7 +131,7 @@ static int umka_read(const char *path, char *buf, size_t size, off_t offset,
 }
 
 static struct fuse_operations umka_oper = {
-    .init           = umka_init,
+    .init           = umka_fuse_init,
     .getattr        = umka_getattr,
     .readdir        = umka_readdir,
     .open           = umka_open,
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
         printf("usage: umka_fuse dir img\n");
         exit(1);
     }
-    kos_init();
+    umka_init();
     void *userdata = vdisk_init(argv[2], 1, 0u);
     void *vdisk = disk_add(&vdisk_functions, "hd0", userdata, 0);
     disk_media_changed(vdisk, 1);

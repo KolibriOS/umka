@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
         trace_begin();
 
     COVERAGE_ON();
-    kos_init();
+    umka_init();
     COVERAGE_OFF();
 
     run_test(fin, fout, 1);

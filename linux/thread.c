@@ -11,12 +11,6 @@ void reset_procmask(void) {
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
 }
 
-void set_procmask(void) {
-    sigemptyset (&mask);
-	sigaddset (&mask, SIGPROF);
-    sigprocmask(SIG_BLOCK, &mask, NULL);
-}
-
 int get_fake_if(ucontext_t *ctx) {
     // we fake IF with id flag
     return !(ctx->uc_mcontext.__gregs[REG_EFL] & (1 << 21));

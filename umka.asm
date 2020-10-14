@@ -28,7 +28,7 @@ public coverage_end
 
 public sha3_256_oneshot as 'hash_oneshot'
 public kos_time_to_epoch
-public kos_init
+public umka_init
 
 public CURRENT_TASK as 'kos_current_task'
 public current_slot as 'kos_current_slot'
@@ -52,7 +52,7 @@ public acpi_ssdt_size as 'kos_acpi_ssdt_size'
 public acpi_ctx
 public acpi_usage as 'kos_acpi_usage'
 
-public stack_init
+public stack_init as 'kos_stack_init'
 public net_add_device
 
 public draw_data
@@ -60,12 +60,12 @@ public img_background
 public mem_BACKGROUND
 public sys_background
 public REDRAW_BACKGROUND
-public scheduler_add_thread
-public new_sys_threads
-public osloop
+public new_sys_threads as 'kos_new_sys_threads'
+public osloop as 'kos_osloop'
 public set_mouse_data as 'kos_set_mouse_data'
 public scheduler_current as 'kos_scheduler_current'
 public eth_input as 'kos_eth_input'
+public net_buff_alloc as 'kos_net_buff_alloc'
 
 macro cli {
         pushfd
@@ -288,7 +288,7 @@ proc kos_time_to_epoch c uses ebx esi edi ebp, _time
         ret
 endp
 
-proc kos_init c uses ebx esi edi ebp
+proc umka_init c uses ebx esi edi ebp
         mov     edi, endofcode
         mov     ecx, uglobals_size
         xor     eax, eax
@@ -539,36 +539,20 @@ proc delay_ms
         ret
 endp
 
-;public inject_packet as 'kos_inject_packet'
-public umka_inject_packet
-proc umka_inject_packet c uses ebx esi edi, _data, _size, _dev
-        mov     ebx, [_dev]
-        mov     ecx, [_size]
-        push    ecx
-        add     ecx, NET_BUFF.data
-        stdcall net_buff_alloc, ecx             ; Allocate a buffer to put packet into
-        pop     ecx
-        test    eax, eax                        ; Test if we allocated succesfully
-        jz      .abort
-        mov     [eax + NET_BUFF.length], ecx
-        mov     [eax + NET_BUFF.device], ebx
-        mov     [eax + NET_BUFF.offset], NET_BUFF.data
+public umka_cli
+proc umka_cli
+        cli     ; macro
+        ret
+endp
 
-        lea     edi, [eax + NET_BUFF.data]      ; Where we will copy too
-        mov     esi, [_data]                    ; The buffer we will copy from
-        rep movsb
-
-        push    .abort
-        push    eax                             ; buffer ptr for Eth_input
-
-        jmp     eth_input                     ; Send it to kernel
-.abort:
+public umka_sti
+proc umka_sti
+        sti     ; macro
         ret
 endp
 
 extrn reset_procmask
 extrn get_fake_if
-extrn restart_timer
 public irq0
 proc irq0 c, _signo, _info, _context
         DEBUGF 2, "### irq0\n"

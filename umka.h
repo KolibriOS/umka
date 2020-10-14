@@ -346,10 +346,10 @@ typedef struct {
     uint16_t ttl;
 } arp_entry_t;
 
-void osloop(void);
+void kos_osloop(void);
 void irq0(int signo, siginfo_t *info, void *context);
 
-void kos_init(void);
+void umka_init(void);
 void i40(void);
 uint32_t kos_time_to_epoch(uint32_t *time);
 
@@ -380,12 +380,12 @@ static inline void umka_mouse_move(int lbheld, int mbheld, int rbheld,
     kos_set_mouse_data(btn_state, xmoving, ymoving, vscroll, hscroll);
 }
 
-void umka_inject_packet(void *data, size_t size, net_device_t *dev);
+net_buff_t *kos_net_buff_alloc(size_t size) __attribute__((__stdcall__));
 
 static inline void umka_new_sys_threads(uint32_t flags, void (*entry)(), void *stack) {
     __asm__ __inline__ __volatile__ (
         "pushad;"
-        "call   new_sys_threads;"
+        "call   kos_new_sys_threads;"
         "popad"
         :
         : "b"(flags),
@@ -426,10 +426,10 @@ typedef struct {
     uint32_t ebx;
 } f76ret_t;
 
-static inline void kos_stack_init() {
+static inline void umka_stack_init() {
     __asm__ __inline__ __volatile__ (
         "pushad;"
-        "call   stack_init;"
+        "call   kos_stack_init;"
         "popad"
         :
         :
@@ -446,6 +446,9 @@ static inline int32_t kos_net_add_device(net_device_t *dev) {
 
     return dev_num;
 }
+
+void umka_cli(void);
+void umka_sti(void);
 
 extern uint8_t coverage_begin[];
 extern uint8_t coverage_end[];

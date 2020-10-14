@@ -1354,7 +1354,7 @@ void shell_pci_get_path(int argc, char **argv) {
 void shell_stack_init(int argc, char **argv) {
     (void)argc;
     (void)argv;
-    kos_stack_init();
+    umka_stack_init();
 }
 
 void shell_net_add_device(int argc, char **argv) {

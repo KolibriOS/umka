@@ -16,4 +16,6 @@ void vnet_reset(void);
 __attribute__((__stdcall__))
 int vnet_transmit(net_buff_t *buf);
 
+void vnet_receive_frame(net_device_t *dev, void *data, size_t size);
+
 #endif  // VNET_H_INCLUDED

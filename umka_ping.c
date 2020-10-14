@@ -83,12 +83,7 @@ int tapfd;
 _Atomic int go_ping = 0;
 
 int umka_thread_ping(void) {
-    __asm__ __inline__ __volatile__ (
-        "pushfd;"
-        "btr dword ptr[esp], 21;"
-        "popfd"
-        : : : "memory");
-
+    umka_sti();
     while (!go_ping) { /* wait until initialized */ }
     fprintf(stderr, "[ping] tapfd is %i\n", tapfd);
 
@@ -135,26 +130,19 @@ int umka_thread_ping(void) {
     return 0;
 }
 
-uint8_t buffer[2*1024];
-int plen = 0;
-
 void umka_thread_net_drv(void) {
-    __asm__ __inline__ __volatile__ (
-        "pushfd;"
-        "btr dword ptr[esp], 21;"
-        "popfd"
-        : : : "memory");
-
+    umka_sti();
     fprintf(stderr, "[net_drv] starting\n");
+    uint8_t buffer[2048];
+    int plen = 0;
     char tapdev[IFNAMSIZ] = "tap0";
     tapfd = tap_alloc(tapdev);
     net_device_t *vnet = vnet_init(tapfd);
     kos_net_add_device(vnet);
-    umka_sys_net_dev_reset(1);
 
     char devname[64];
     for (size_t i = 0; i < umka_sys_net_get_dev_count(); i++) {
-//        umka_sys_net_dev_reset(i);
+        umka_sys_net_dev_reset(i);
         umka_sys_net_get_dev_name(i, devname);
         uint32_t devtype = umka_sys_net_get_dev_type(i);
         printf("[net_drv] device %i: %s %u\n", i, devname, devtype);
@@ -197,7 +185,7 @@ void umka_thread_net_drv(void) {
                 fprintf(stderr, " %2.2x", buffer[i]);
             }
             fprintf(stderr, "\n");
-            umka_inject_packet(buffer, plen, vnet);
+            vnet_receive_frame(vnet, buffer, plen);
         } else if(plen == -1 && (errno == EAGAIN || errno == EINTR)) {
             continue;
         } else {
