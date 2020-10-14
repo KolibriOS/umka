@@ -64,6 +64,8 @@ public scheduler_add_thread
 public new_sys_threads
 public osloop
 public set_mouse_data as 'kos_set_mouse_data'
+public scheduler_current as 'kos_scheduler_current'
+public eth_input as 'kos_eth_input'
 
 macro cli {
         pushfd
@@ -346,6 +348,31 @@ proc kos_init c uses ebx esi edi ebp
         mov     [BOOT.lfb], LFB_BASE
         call    init_video
 
+        stdcall alloc_kernel_space, 0x50000         ; FIXME check size
+        mov     [default_io_map], eax
+
+        add     eax, 0x2000
+        mov     [ipc_tmp], eax
+        mov     ebx, 0x1000
+
+        add     eax, 0x40000
+        mov     [proc_mem_map], eax
+
+        add     eax, 0x8000
+        mov     [proc_mem_pdir], eax
+
+        add     eax, ebx
+        mov     [proc_mem_tab], eax
+
+        add     eax, ebx
+        mov     [tmp_task_ptab], eax
+
+        add     eax, ebx
+        mov     [ipc_pdir], eax
+
+        add     eax, ebx
+        mov     [ipc_ptab], eax
+
         stdcall kernel_alloc, (unpack.LZMA_BASE_SIZE+(unpack.LZMA_LIT_SIZE shl \
                 (unpack.lc+unpack.lp)))*4
         mov     [unpack.p], eax
@@ -512,25 +539,58 @@ proc delay_ms
         ret
 endp
 
+;public inject_packet as 'kos_inject_packet'
+public umka_inject_packet
+proc umka_inject_packet c uses ebx esi edi, _data, _size, _dev
+        mov     ebx, [_dev]
+        mov     ecx, [_size]
+        push    ecx
+        add     ecx, NET_BUFF.data
+        stdcall net_buff_alloc, ecx             ; Allocate a buffer to put packet into
+        pop     ecx
+        test    eax, eax                        ; Test if we allocated succesfully
+        jz      .abort
+        mov     [eax + NET_BUFF.length], ecx
+        mov     [eax + NET_BUFF.device], ebx
+        mov     [eax + NET_BUFF.offset], NET_BUFF.data
+
+        lea     edi, [eax + NET_BUFF.data]      ; Where we will copy too
+        mov     esi, [_data]                    ; The buffer we will copy from
+        rep movsb
+
+        push    .abort
+        push    eax                             ; buffer ptr for Eth_input
+
+        jmp     eth_input                     ; Send it to kernel
+.abort:
+        ret
+endp
+
 extrn reset_procmask
 extrn get_fake_if
 extrn restart_timer
 public irq0
 proc irq0 c, _signo, _info, _context
+        DEBUGF 2, "### irq0\n"
         pushfd
+        cli
         pushad
 
+        inc     [timer_ticks]
+        call    updatecputimes
         ccall   reset_procmask
         ccall   get_fake_if, [_context]
         test    eax, eax
-        jz      .done
+        jnz     @f
+        DEBUGF 2, "### cli\n"
+        jmp     .done
+@@:
 
         mov     bl, SCHEDULE_ANY_PRIORITY
         call    find_next_task
         jz      .done  ; if there is only one running process
         call    _do_change_task
 .done:
-        ccall   restart_timer
         popad
         popfd
         ret

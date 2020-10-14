@@ -13,6 +13,12 @@
 #define MONITOR_THREAD_STACK_SIZE 0x100000
 
 void monitor() {
+    __asm__ __inline__ __volatile__ (
+        "pushfd;"
+        "btr dword ptr[esp], 21;"
+        "popfd"
+        : : : "memory");
+
     fprintf(stderr, "Start monitor thread\n");
 //    mkfifo("/tmp/umka.fifo.2u", 0644);
 //    mkfifo("/tmp/umka.fifo.4u", 0644);
@@ -25,7 +31,20 @@ void monitor() {
     run_test(fin, fout, 0);
 }
 
+void restart_timer(void);
+void umka_thread_ping(void);
+void umka_thread_net_drv(void);
+
+struct itimerval timeout = {.it_value = {.tv_sec = 0, .tv_usec = 10000},
+                            .it_interval = {.tv_sec = 0, .tv_usec = 10000}};
+
 int main() {
+    __asm__ __inline__ __volatile__ (
+        "pushfd;"
+        "btr dword ptr[esp], 21;"
+        "popfd"
+        : : : "memory");
+
     umka_tool = UMKA_OS;
 
     struct sigaction sa;
@@ -51,9 +70,15 @@ int main() {
     kos_init();
     kos_stack_init();
     uint8_t *monitor_stack = malloc(MONITOR_THREAD_STACK_SIZE);
-    umka_new_sys_threads(1, monitor, monitor_stack + MONITOR_THREAD_STACK_SIZE);
+    umka_new_sys_threads(0, monitor, monitor_stack + MONITOR_THREAD_STACK_SIZE);
 
-    raise(SIGPROF);
+    uint8_t *net_drv_stack = malloc(MONITOR_THREAD_STACK_SIZE);
+    umka_new_sys_threads(0, umka_thread_net_drv, net_drv_stack + MONITOR_THREAD_STACK_SIZE);
+
+    uint8_t *ping_stack = malloc(MONITOR_THREAD_STACK_SIZE);
+    umka_new_sys_threads(0, umka_thread_ping, ping_stack + MONITOR_THREAD_STACK_SIZE);
+
+    setitimer(ITIMER_PROF, &timeout, NULL);
 
     osloop();   // doesn't return
 

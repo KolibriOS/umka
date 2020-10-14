@@ -160,7 +160,7 @@ typedef struct {
 } bdfe_t;
 
 typedef struct {
-    uint32_t status;
+    int32_t status;
     uint32_t count;
 } f7080ret_t;
 
@@ -224,6 +224,24 @@ typedef struct {
         } f80;
     } u;
 } __attribute__((packed)) f7080s5arg_t;
+
+typedef struct {
+    uint32_t sf;
+    uint32_t flags;
+    char *params;
+    uint32_t reserved1;
+    uint32_t reserved2;
+    union {
+        struct {
+            uint8_t zero;
+            const char *path;
+        } __attribute__((packed)) f70;
+        struct {
+            uint32_t path_encoding;
+            const char *path;
+        } f80;
+    } u;
+} __attribute__((packed)) f7080s7arg_t;
 
 #define KF_READONLY 0x01
 #define KF_HIDDEN   0x02
@@ -318,6 +336,7 @@ struct net_device_t {
     uint32_t hwacc;         // bitmask stating enabled HW accelerations (offload
                             // engines)
     uint8_t mac[6];
+    void *userdata;         // not in kolibri, umka-specific
 }; // NET_DEVICE
 
 typedef struct {
@@ -360,6 +379,8 @@ static inline void umka_mouse_move(int lbheld, int mbheld, int rbheld,
                          (yabs << 30) + (xabs << 31);
     kos_set_mouse_data(btn_state, xmoving, ymoving, vscroll, hscroll);
 }
+
+void umka_inject_packet(void *data, size_t size, net_device_t *dev);
 
 static inline void umka_new_sys_threads(uint32_t flags, void (*entry)(), void *stack) {
     __asm__ __inline__ __volatile__ (
@@ -548,6 +569,13 @@ _Static_assert(sizeof(taskdata_t) == 32, "must be 0x20 bytes long");
 #define UMKA_SHELL 1u
 #define UMKA_FUSE  2u
 #define UMKA_OS    3u
+
+#define MAX_PRIORITY    0 // highest, used for kernel tasks
+#define USER_PRIORITY   1 // default
+#define IDLE_PRIORITY   2 // lowest, only IDLE thread goes here
+#define NR_SCHED_QUEUES 3 // MUST equal IDLE_PRIORYTY + 1
+
+extern appdata_t *kos_scheduler_current[NR_SCHED_QUEUES];
 
 extern uint32_t umka_tool;
 extern uint32_t kos_current_task;

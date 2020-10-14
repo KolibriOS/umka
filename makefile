@@ -11,7 +11,7 @@ CFLAGS_32=$(CFLAGS) -m32
 LDFLAGS=-no-pie
 LDFLAGS_32=$(LDFLAGS) -m32
 
-all: umka_shell umka_fuse umka_os umka_ping umka.sym umka.prp umka.lst tags \
+all: umka_shell umka_fuse umka_os umka.sym umka.prp umka.lst tags \
      covpreproc default.skn skin.skn
 
 covpreproc: covpreproc.c
@@ -25,11 +25,7 @@ umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs`
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o trace_lbr.o \
-         pci.o thread.o
-	$(CC) $(LDFLAGS_32) $^ -o $@ -static
-
-umka_ping: umka_ping.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o \
-         trace_lbr.o pci.o thread.o
+         pci.o thread.o umka_ping.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static
 
 umka.o umka.fas: umka.asm

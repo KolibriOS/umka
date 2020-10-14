@@ -54,25 +54,6 @@
 
 FILE *fin, *fout;
 
-static net_device_t vnet = {
-                            .device_type = NET_TYPE_ETH,
-                            .mtu = 1514,
-                            .name = "UMK0770",
-
-                            .unload = vnet_unload,
-                            .reset = vnet_reset,
-                            .transmit = vnet_transmit,
-
-                            .bytes_tx = 0,
-                            .bytes_rx = 0,
-                            .packets_tx = 0,
-                            .packets_rx = 0,
-
-                            .link_state = ETH_LINK_FD + ETH_LINK_10M,
-                            .hwacc = 0,
-                            .mac = {0x80, 0x2b, 0xf9, 0x3b, 0x6c, 0xca},
-                        };
-
 char cur_dir[PATH_MAX] = "/";
 const char *last_dir = cur_dir;
 bool cur_dir_changed = true;
@@ -485,6 +466,18 @@ void shell_dump_appdata(int argc, char **argv) {
             a->wnd_clientbox.top, a->wnd_clientbox.width,
             a->wnd_clientbox.height);
     fprintf(fout, "priority: %u\n", a->priority);
+
+    fprintf(fout, "in_schedule: prev");
+    if (show_pointers) {
+        fprintf(fout, " %p", (void*)a->in_schedule.prev);
+    }
+    fprintf(fout, " (%u), next",
+            (appdata_t*)a->in_schedule.prev - kos_slot_base);
+    if (show_pointers) {
+        fprintf(fout, " %p", (void*)a->in_schedule.next);
+    }
+    fprintf(fout, " (%u)\n",
+            (appdata_t*)a->in_schedule.next - kos_slot_base);
 }
 
 void shell_dump_taskdata(int argc, char **argv) {
@@ -493,8 +486,14 @@ void shell_dump_taskdata(int argc, char **argv) {
     if (argc > 1) {
         idx = strtol(argv[1], NULL, 0);
     }
-    taskdata_t *t = kos_task_base + idx;
+    taskdata_t *t = kos_task_data + idx;
     fprintf(fout, "event_mask: %" PRIx32 "\n", t->event_mask);
+    fprintf(fout, "pid: %" PRId32 "\n", t->pid);
+    fprintf(fout, "state: 0x%" PRIx8 "\n", t->state);
+    fprintf(fout, "wnd_number: %" PRIu8 "\n", t->wnd_number);
+    fprintf(fout, "counter_sum: %" PRIu32 "\n", t->counter_sum);
+    fprintf(fout, "counter_add: %" PRIu32 "\n", t->counter_add);
+    fprintf(fout, "cpu_usage: %" PRIu32 "\n", t->cpu_usage);
 }
 
 void shell_mouse_move(int argc, char **argv) {
@@ -1047,6 +1046,28 @@ fs_enc_t parse_encoding(const char *str) {
     return enc;
 }
 
+void shell_exec(int argc, char **argv) {
+    (void)argc;
+    f7080s7arg_t fX0 = {.sf = 7};
+    f7080ret_t r;
+    int opt = 1;
+    fX0.u.f70.zero = 0;
+    fX0.u.f70.path = argv[opt++];
+    fX0.flags = 0;
+    fX0.params = "test";
+
+    COVERAGE_ON();
+    umka_sys_lfn(&fX0, &r, F70);
+    COVERAGE_OFF();
+    if (r.status < 0) {
+        r.status = -r.status;
+    } else {
+        fprintf(fout, "pid: %" PRIu32 "\n", r.status);
+        r.status = 0;
+    }
+    print_f70_status(&r, 1);
+}
+
 void shell_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
     int opt;
     optind = 1;
@@ -1339,7 +1360,8 @@ void shell_stack_init(int argc, char **argv) {
 void shell_net_add_device(int argc, char **argv) {
     (void)argc;
     (void)argv;
-    int32_t dev_num = kos_net_add_device(&vnet);
+    net_device_t *vnet = vnet_init(42);   // FIXME: tap & list like block devices
+    int32_t dev_num = kos_net_add_device(vnet);
     fprintf(fout, "device number: %" PRIi32 "\n", dev_num);
 }
 
@@ -2128,6 +2150,7 @@ func_table_t funcs[] = {
     { "pci_set_path",            shell_pci_set_path },
     { "pci_get_path",            shell_pci_get_path },
     { "mouse_move",              shell_mouse_move },
+    { "exec",                    shell_exec },
     { NULL,                      NULL },
 };
 

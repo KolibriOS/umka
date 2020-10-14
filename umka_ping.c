@@ -16,66 +16,43 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <arpa/inet.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #include <limits.h>
+#include <linux/if_tun.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <sys/select.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/types.h>
 #include <unistd.h>
-#include <netinet/in.h>
 #include "shell.h"
 #include "umka.h"
 #include "trace.h"
 #include "vnet.h"
 
-// tap
-#include <stdint.h>
-#include <net/if.h>
-#include <linux/if_tun.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <arpa/inet.h> 
-#include <sys/select.h>
-#include <sys/time.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+uint8_t packet[4096] = {0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 'a','b',
+                        'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+                        'y', 'z', '0', '1', '2', '3', '4', '5'};
 
-static net_device_t vnet = {
-                            .device_type = NET_TYPE_ETH,
-                            .mtu = 1514,
-                            .name = "UMK0770",
-
-                            .unload = vnet_unload,
-                            .reset = vnet_reset,
-                            .transmit = vnet_transmit,
-
-                            .bytes_tx = 0,
-                            .bytes_rx = 0,
-                            .packets_tx = 0,
-                            .packets_rx = 0,
-
-                            .link_state = ETH_LINK_FD + ETH_LINK_10M,
-                            .hwacc = 0,
-                            .mac = {0x80, 0x2b, 0xf9, 0x3b, 0x6c, 0xca},
-                        };
-
-uint8_t packet[4096] = {8,  0,  0, 0,  0, 0,  0, 0,  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5'};
-
-int tap_alloc(char *dev)
-{
+int tap_alloc(char *dev) {
     int flags = IFF_TAP | IFF_NO_PI;
     struct ifreq ifr;
     int fd, err;
     char *clonedev = "/dev/net/tun";
 
-    if( (fd = open(clonedev , O_RDWR)) < 0 )
+    if( (fd = open(clonedev , O_RDWR | O_NONBLOCK)) < 0 )
     {
         perror("Opening /dev/net/tun");
         return fd;
@@ -102,74 +79,26 @@ int tap_alloc(char *dev)
     return fd;
 }
 
-int main(int argc, char **argv) {
-    umka_tool = UMKA_SHELL;
-    const char *usage = \
-        "usage: umka_shell <ip | hostname> [-c]\n"
-        "  -c               collect coverage";
-    int opt;
-    while ((opt = getopt(argc, argv, "c")) != -1) {
-        switch (opt) {
-        case 'c':
-            coverage = 1;
-            break;
-        default:
-            puts(usage);
-            return 1;
-        }
-    }
+int tapfd;
+_Atomic int go_ping = 0;
+
+int umka_thread_ping(void) {
+    __asm__ __inline__ __volatile__ (
+        "pushfd;"
+        "btr dword ptr[esp], 21;"
+        "popfd"
+        : : : "memory");
+
+    while (!go_ping) { /* wait until initialized */ }
+    fprintf(stderr, "[ping] tapfd is %i\n", tapfd);
 
     if (coverage)
         trace_begin();
 
-    COVERAGE_ON();
-    kos_init();
-    COVERAGE_OFF();
-
-    kos_stack_init();
-    char tapdev[IFNAMSIZ] = "tap0";
-    int tapfd = tap_alloc(tapdev);
-    vnet_init(tapfd);
-
-    kos_net_add_device(&vnet);
-    char devname[64];
-    umka_sys_net_dev_reset(1);
-    for (size_t i = 0; i < umka_sys_net_get_dev_count(); i++) {
-//        umka_sys_net_dev_reset(i);
-        umka_sys_net_get_dev_name(i, devname);
-        uint32_t devtype = umka_sys_net_get_dev_type(i);
-        printf("device %i: %s %u\n", i, devname, devtype);
-    }
-
-    f76ret_t r76;
-    r76 = umka_sys_net_ipv4_set_subnet(1, inet_addr("0.0.0.0"));
-    if (r76.eax == (uint32_t)-1) {
-        fprintf(stderr, "error\n");
-        exit(1);
-    }
-
-    r76 = umka_sys_net_ipv4_set_gw(1, inet_addr("192.168.1.1"));
-    if (r76.eax == (uint32_t)-1) {
-        fprintf(stderr, "error\n");
-        exit(1);
-    }
-
-    r76 = umka_sys_net_ipv4_set_dns(1, inet_addr("217.10.36.5"));
-    if (r76.eax == (uint32_t)-1) {
-        fprintf(stderr, "error\n");
-        exit(1);
-    }
-
-    r76 = umka_sys_net_ipv4_set_addr(1, inet_addr("192.168.1.27"));
-    if (r76.eax == (uint32_t)-1) {
-        fprintf(stderr, "error\n");
-        exit(1);
-    }
-
     f75ret_t r75;
-    r75 = umka_sys_net_open_socket(AF_INET4, SOCK_RAW, IPPROTO_ICMP);
+    r75 = umka_sys_net_open_socket(AF_INET4, SOCK_STREAM, IPPROTO_TCP);
     if (r75.errorcode == (uint32_t)-1) {
-        fprintf(stderr, "error\n");
+        fprintf(stderr, "[ping] error\n");
         exit(1);
     }
     uint32_t sockfd = r75.value;
@@ -177,7 +106,8 @@ int main(int argc, char **argv) {
 //    uint32_t addr = inet_addr("127.0.0.1");
 //    uint32_t addr = inet_addr("192.243.108.5");
     uint32_t addr = inet_addr("10.50.0.1");
-    uint16_t port = 0;
+//    uint32_t addr = inet_addr("192.168.1.30");
+    uint16_t port = 5000;
 
     struct sockaddr_in sa;
     memset(&sa, 0, sizeof(sa));
@@ -187,18 +117,93 @@ int main(int argc, char **argv) {
 
     r75 = umka_sys_net_connect(sockfd, &sa, sizeof(struct sockaddr_in));
     if (r75.errorcode == (uint32_t)-1) {
-        fprintf(stderr, "error %u\n", r75.errorcode);
+        fprintf(stderr, "[ping] error %u\n", r75.errorcode);
         exit(1);
     }
 
-    r75 = umka_sys_net_send(sockfd, packet, 64, 0);
+    r75 = umka_sys_net_send(sockfd, packet, 128, 0);
     if (r75.errorcode == (uint32_t)-1) {
-        fprintf(stderr, "error %u\n", r75.errorcode);
+        fprintf(stderr, "[ping] error %u\n", r75.errorcode);
         exit(1);
     }
 
     if (coverage)
         trace_end();
 
+    while (true) {}
+
     return 0;
+}
+
+uint8_t buffer[2*1024];
+int plen = 0;
+
+void umka_thread_net_drv(void) {
+    __asm__ __inline__ __volatile__ (
+        "pushfd;"
+        "btr dword ptr[esp], 21;"
+        "popfd"
+        : : : "memory");
+
+    fprintf(stderr, "[net_drv] starting\n");
+    char tapdev[IFNAMSIZ] = "tap0";
+    tapfd = tap_alloc(tapdev);
+    net_device_t *vnet = vnet_init(tapfd);
+    kos_net_add_device(vnet);
+    umka_sys_net_dev_reset(1);
+
+    char devname[64];
+    for (size_t i = 0; i < umka_sys_net_get_dev_count(); i++) {
+//        umka_sys_net_dev_reset(i);
+        umka_sys_net_get_dev_name(i, devname);
+        uint32_t devtype = umka_sys_net_get_dev_type(i);
+        printf("[net_drv] device %i: %s %u\n", i, devname, devtype);
+    }
+
+    f76ret_t r76;
+    r76 = umka_sys_net_ipv4_set_subnet(1, inet_addr("255.255.255.0"));
+    if (r76.eax == (uint32_t)-1) {
+        fprintf(stderr, "[net_drv] error\n");
+        exit(1);
+    }
+
+//    r76 = umka_sys_net_ipv4_set_gw(1, inet_addr("192.168.1.1"));
+    r76 = umka_sys_net_ipv4_set_gw(1, inet_addr("10.50.0.1"));
+    if (r76.eax == (uint32_t)-1) {
+        fprintf(stderr, "error\n");
+        exit(1);
+    }
+
+    r76 = umka_sys_net_ipv4_set_dns(1, inet_addr("217.10.36.5"));
+    if (r76.eax == (uint32_t)-1) {
+        fprintf(stderr, "[net_drv] error\n");
+        exit(1);
+    }
+
+    r76 = umka_sys_net_ipv4_set_addr(1, inet_addr("10.50.0.2"));
+    if (r76.eax == (uint32_t)-1) {
+        fprintf(stderr, "[net_drv] error\n");
+        exit(1);
+    }
+
+    go_ping = 1;
+
+    while(true)
+    {
+        plen = read(tapfd, buffer, 2*1024);
+        if (plen > 0) {
+            fprintf(stderr, "[net_drv] read %i bytes\n", plen);
+            for (int i = 0; i < plen; i++) {
+                fprintf(stderr, " %2.2x", buffer[i]);
+            }
+            fprintf(stderr, "\n");
+            umka_inject_packet(buffer, plen, vnet);
+        } else if(plen == -1 && (errno == EAGAIN || errno == EINTR)) {
+            continue;
+        } else {
+            perror("[net_drv] reading data");
+            exit(1);
+        }
+    }
+
 }

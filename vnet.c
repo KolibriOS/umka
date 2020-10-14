@@ -6,18 +6,39 @@
 #include <errno.h>
 #include "umka.h"
 #include "trace.h"
-
-int tapfd;
+#include "vnet.h"
 
 typedef struct {
     int fd;
-} vnet_t;
+} vnet_userdata_t;
 
-void *vnet_init(int fd) {
-    printf("vnet_init\n");
-    vnet_t *vnet = (vnet_t*)malloc(sizeof(vnet_t));
-    *vnet = (vnet_t){.fd = fd,};
-    tapfd = fd;
+net_device_t *vnet_init(int fd) {
+//    printf("vnet_init\n");
+    vnet_userdata_t *u = (vnet_userdata_t*)malloc(sizeof(vnet_userdata_t));
+    u->fd = fd;
+
+    net_device_t *vnet = (net_device_t*)malloc(sizeof(net_device_t));
+    *vnet = (net_device_t){
+             .device_type = NET_TYPE_ETH,
+             .mtu = 1514,
+             .name = "UMK0770",
+
+             .unload = vnet_unload,
+             .reset = vnet_reset,
+             .transmit = vnet_transmit,
+
+             .bytes_tx = 0,
+             .bytes_rx = 0,
+             .packets_tx = 0,
+             .packets_rx = 0,
+
+             .link_state = ETH_LINK_FD + ETH_LINK_10M,
+             .hwacc = 0,
+             .mac = {0x80, 0x2b, 0xf9, 0x3b, 0x6c, 0xca},
+
+             .userdata = u,
+    };
+
     return vnet;
 }
 
@@ -44,9 +65,17 @@ static void dump_net_buff(net_buff_t *buf) {
 
 __attribute__((__stdcall__))
 int vnet_transmit(net_buff_t *buf) {
+    net_device_t *vnet;
+    __asm__ __inline__ __volatile__ (
+        "nop"
+        : "=b"(vnet)
+        :
+        : "memory");
+
+    vnet_userdata_t *u = vnet->userdata;
     printf("vnet_transmit: %d bytes\n", buf->length);
     dump_net_buff(buf);
-    write(tapfd, buf->data, buf->length);
+    write(u->fd, buf->data, buf->length);
     buf->length = 0;
     COVERAGE_OFF();
     COVERAGE_ON();
