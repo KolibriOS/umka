@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
-#define __USE_GNU
 #include <signal.h>
 
 #define BDFE_LEN_CP866 304
@@ -41,11 +40,20 @@ typedef struct {
     uint8_t pad3[1024-71];
 } __attribute__((packed)) process_information_t;
 
-_Static_assert(sizeof(process_information_t) == 0x400, "must be 0x400 bytes long");
+_Static_assert(sizeof(process_information_t) == 0x400,
+               "must be 0x400 bytes long");
 
 typedef struct {
-    uint32_t frame, grab, work_3d_dark, work_3d_light, grab_text, work,
-             work_button, work_button_text, work_text, work_graph;
+    uint32_t frame;
+    uint32_t grab;
+    uint32_t work_3d_dark;
+    uint32_t work_3d_light;
+    uint32_t grab_text;
+    uint32_t work;
+    uint32_t work_button;
+    uint32_t work_button_text;
+    uint32_t work_text;
+    uint32_t work_graph;
 } system_colors_t;
 
 typedef enum {
@@ -115,13 +123,19 @@ typedef struct disk_t disk_t;
 
 typedef struct {
     uint32_t  strucsize;
-    void (*close)(void *userdata) __attribute__((__stdcall__));
-    void (*closemedia)(void *userdata) __attribute__((__stdcall__));
-    int (*querymedia)(void *userdata, diskmediainfo_t *info) __attribute__((__stdcall__));
-    int (*read)(void *userdata, void *buffer, off_t startsector, size_t *numsectors) __attribute__((__stdcall__));
-    int (*write)(void *userdata, void *buffer, off_t startsector, size_t *numsectors) __attribute__((__stdcall__));
-    int (*flush)(void *userdata) __attribute__((__stdcall__));
-    unsigned int (*adjust_cache_size)(void *userdata, size_t suggested_size) __attribute__((__stdcall__));
+    __attribute__((__stdcall__)) void (*close)(void *userdata);
+    __attribute__((__stdcall__)) void (*closemedia)(void *userdata);
+    __attribute__((__stdcall__)) int (*querymedia)(void *userdata,
+                                                   diskmediainfo_t *info);
+    __attribute__((__stdcall__)) int (*read)(void *userdata, void *buffer,
+                                             off_t startsector,
+                                             size_t *numsectors);
+    __attribute__((__stdcall__)) int (*write)(void *userdata, void *buffer,
+                                              off_t startsector,
+                                              size_t *numsectors);
+    __attribute__((__stdcall__)) int (*flush)(void *userdata);
+    __attribute__((__stdcall__)) unsigned int
+        (*adjust_cache_size)(void *userdata, size_t suggested_size);
 } diskfunc_t;
 
 struct disk_t {
@@ -346,18 +360,32 @@ typedef struct {
     uint16_t ttl;
 } arp_entry_t;
 
-void kos_osloop(void);
-void irq0(int signo, siginfo_t *info, void *context);
+__attribute__((__noreturn__)) void
+kos_osloop(void);
 
-void umka_init(void);
-void i40(void);
-uint32_t kos_time_to_epoch(uint32_t *time);
+void
+irq0(int signo, siginfo_t *info, void *context);
 
-disk_t *disk_add(diskfunc_t *disk, const char *name, void *userdata, uint32_t flags) __attribute__((__stdcall__));
-void *disk_media_changed(diskfunc_t *disk, int inserted) __attribute__((__stdcall__));
-void disk_del(disk_t *disk) __attribute__((__stdcall__));
+void
+umka_init(void);
 
-void hash_oneshot(void *ctx, void *data, size_t len);
+void
+i40(void);
+
+uint32_t
+kos_time_to_epoch(uint32_t *time);
+
+__attribute__((__stdcall__)) disk_t *
+disk_add(diskfunc_t *disk, const char *name, void *userdata, uint32_t flags);
+
+__attribute__((__stdcall__)) void *
+disk_media_changed(diskfunc_t *disk, int inserted);
+
+__attribute__((__stdcall__)) void
+disk_del(disk_t *disk);
+
+void
+hash_oneshot(void *ctx, void *data, size_t len);
 
 extern uint8_t xfs_user_functions[];
 extern uint8_t ext_user_functions[];
@@ -365,24 +393,27 @@ extern uint8_t fat_user_functions[];
 extern uint8_t ntfs_user_functions[];
 
 extern uint8_t kos_ramdisk[2880*512];
-disk_t *kos_ramdisk_init(void);
 
-void kos_set_mouse_data(uint32_t btn_state, int32_t xmoving, int32_t ymoving,
-                        int32_t vscroll, int32_t hscroll)
-                        __attribute__((__stdcall__));
+disk_t *
+kos_ramdisk_init(void);
 
-static inline void umka_mouse_move(int lbheld, int mbheld, int rbheld,
-                                   int xabs, int32_t xmoving,
-                                   int yabs, int32_t ymoving,
-                                   int32_t hscroll, int32_t vscroll) {
+__attribute__((__stdcall__)) void
+kos_set_mouse_data(uint32_t btn_state, int32_t xmoving, int32_t ymoving,
+                   int32_t vscroll, int32_t hscroll);
+
+static inline void
+umka_mouse_move(int lbheld, int mbheld, int rbheld, int xabs, int32_t xmoving,
+                int yabs, int32_t ymoving, int32_t hscroll, int32_t vscroll) {
     uint32_t btn_state = lbheld + (rbheld << 1) + (mbheld << 2) +
                          (yabs << 30) + (xabs << 31);
     kos_set_mouse_data(btn_state, xmoving, ymoving, vscroll, hscroll);
 }
 
-net_buff_t *kos_net_buff_alloc(size_t size) __attribute__((__stdcall__));
+__attribute__((__stdcall__)) net_buff_t *
+kos_net_buff_alloc(size_t size);
 
-static inline void umka_new_sys_threads(uint32_t flags, void (*entry)(), void *stack) {
+static inline void
+umka_new_sys_threads(uint32_t flags, void (*entry)(), void *stack) {
     __asm__ __inline__ __volatile__ (
         "pushad;"
         "call   kos_new_sys_threads;"
@@ -394,7 +425,8 @@ static inline void umka_new_sys_threads(uint32_t flags, void (*entry)(), void *s
         : "memory", "cc");
 }
 
-static inline void kos_enable_acpi() {
+static inline void
+kos_enable_acpi() {
     __asm__ __inline__ __volatile__ (
         "pushad;"
         "call   enable_acpi;"
@@ -404,7 +436,8 @@ static inline void kos_enable_acpi() {
         : "memory", "cc");
 }
 
-static inline void kos_acpi_call_name(void *ctx, const char *name) {
+static inline void
+kos_acpi_call_name(void *ctx, const char *name) {
     __asm__ __inline__ __volatile__ (
         "pushad;"
         "push   %[name];"
@@ -426,7 +459,8 @@ typedef struct {
     uint32_t ebx;
 } f76ret_t;
 
-static inline void umka_stack_init() {
+static inline void
+umka_stack_init() {
     __asm__ __inline__ __volatile__ (
         "pushad;"
         "call   kos_stack_init;"
@@ -436,7 +470,8 @@ static inline void umka_stack_init() {
         : "memory", "cc");
 }
 
-static inline int32_t kos_net_add_device(net_device_t *dev) {
+static inline int32_t
+kos_net_add_device(net_device_t *dev) {
     int32_t dev_num;
     __asm__ __inline__ __volatile__ (
         "call   net_add_device"
@@ -447,8 +482,11 @@ static inline int32_t kos_net_add_device(net_device_t *dev) {
     return dev_num;
 }
 
-void umka_cli(void);
-void umka_sti(void);
+void
+umka_cli(void);
+
+void
+umka_sti(void);
 
 extern uint8_t coverage_begin[];
 extern uint8_t coverage_end[];
@@ -590,7 +628,7 @@ extern appdata_t kos_slot_base[];
 extern void umka_do_change_task(appdata_t *new);
 extern void scheduler_add_thread(void);
 extern void find_next_task(void);
-extern uint32_t kos_lfb_base[];
+extern uint8_t kos_lfb_base[];
 extern uint16_t kos_win_stack[];
 extern uint16_t kos_win_pos[];
 extern uint32_t kos_acpi_ssdt_cnt;
@@ -600,7 +638,8 @@ extern void *acpi_ctx;
 extern uint32_t kos_acpi_usage;
 extern disk_t disk_list;
 
-static inline void umka_scheduler_add_thread(appdata_t *thread, int32_t priority) {
+static inline void
+umka_scheduler_add_thread(appdata_t *thread, int32_t priority) {
     __asm__ __inline__ __volatile__ (
         "call   do_change_thread"
         :
@@ -624,7 +663,8 @@ typedef struct {
     int same;
 } find_next_task_t;
 
-static inline find_next_task_t umka_find_next_task(int32_t priority) {
+static inline find_next_task_t
+umka_find_next_task(int32_t priority) {
     find_next_task_t fnt;
     __asm__ __inline__ __volatile__ (
         "call   find_next_task;"
@@ -638,8 +678,8 @@ static inline find_next_task_t umka_find_next_task(int32_t priority) {
     return fnt;
 }
 
-static inline void umka_i40(pushad_t *regs) {
-
+static inline void
+umka_i40(pushad_t *regs) {
     __asm__ __inline__ __volatile__ (
         "push   ebp;"
         "mov    ebp, %[ebp];"
@@ -657,13 +697,11 @@ static inline void umka_i40(pushad_t *regs) {
         : "memory");
 }
 
-static inline void umka_sys_draw_window(size_t x, size_t xsize,
-                                        size_t y, size_t ysize,
-                                        uint32_t color, int has_caption,
-                                        int client_relative,
-                                        int fill_workarea, int gradient_fill,
-                                        int movable, uint32_t style,
-                                        const char *caption) {
+static inline void
+umka_sys_draw_window(size_t x, size_t xsize, size_t y, size_t ysize,
+                     uint32_t color, int has_caption, int client_relative,
+                     int fill_workarea, int gradient_fill, int movable,
+                     uint32_t style, const char *caption) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -678,8 +716,8 @@ static inline void umka_sys_draw_window(size_t x, size_t xsize,
         : "memory");
 }
 
-static inline void umka_sys_set_pixel(size_t x, size_t y, uint32_t color,
-                                      int invert) {
+static inline void
+umka_sys_set_pixel(size_t x, size_t y, uint32_t color, int invert) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -690,14 +728,11 @@ static inline void umka_sys_set_pixel(size_t x, size_t y, uint32_t color,
         : "memory");
 }
 
-static inline void umka_sys_write_text(size_t x, size_t y,
-                                       uint32_t color,
-                                       int asciiz, int fill_background,
-                                       int font_and_encoding,
-                                       int draw_to_buffer,
-                                       int scale_factor,
-                                       const char *string, size_t length,
-                                       uintptr_t background_color_or_buffer) {
+static inline void
+umka_sys_write_text(size_t x, size_t y, uint32_t color, int asciiz,
+                    int fill_background, int font_and_encoding,
+                    int draw_to_buffer, int scale_factor, const char *string,
+                    size_t length, uintptr_t background_color_or_buffer) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -712,8 +747,9 @@ static inline void umka_sys_write_text(size_t x, size_t y,
         : "memory");
 }
 
-static inline void umka_sys_put_image(void *image, size_t xsize, size_t ysize,
-                                      size_t x, size_t y) {
+static inline void
+umka_sys_put_image(void *image, size_t xsize, size_t ysize, size_t x,
+                   size_t y) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -724,11 +760,10 @@ static inline void umka_sys_put_image(void *image, size_t xsize, size_t ysize,
         : "memory");
 }
 
-static inline void umka_sys_button(size_t x, size_t xsize,
-                                   size_t y, size_t ysize,
-                                   size_t button_id,
-                                   int draw_button, int draw_frame,
-                                   uint32_t color) {
+static inline void
+umka_sys_button(size_t x, size_t xsize, size_t y, size_t ysize,
+                size_t button_id, int draw_button, int draw_frame,
+                uint32_t color) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -740,7 +775,8 @@ static inline void umka_sys_button(size_t x, size_t xsize,
         : "memory");
 }
 
-static inline void umka_sys_process_info(int32_t pid, void *param) {
+static inline void
+umka_sys_process_info(int32_t pid, void *param) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -750,7 +786,8 @@ static inline void umka_sys_process_info(int32_t pid, void *param) {
         : "memory");
 }
 
-static inline void umka_sys_window_redraw(int begin_end) {
+static inline void
+umka_sys_window_redraw(int begin_end) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -759,9 +796,9 @@ static inline void umka_sys_window_redraw(int begin_end) {
         : "memory");
 }
 
-static inline void umka_sys_draw_rect(size_t x, size_t xsize,
-                                      size_t y, size_t ysize,
-                                      uint32_t color, int gradient) {
+static inline void
+umka_sys_draw_rect(size_t x, size_t xsize, size_t y, size_t ysize,
+                   uint32_t color, int gradient) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -772,7 +809,8 @@ static inline void umka_sys_draw_rect(size_t x, size_t xsize,
         : "memory");
 }
 
-static inline void umka_sys_get_screen_size(uint32_t *xsize, uint32_t *ysize) {
+static inline void
+umka_sys_get_screen_size(uint32_t *xsize, uint32_t *ysize) {
     uint32_t xysize;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -783,7 +821,8 @@ static inline void umka_sys_get_screen_size(uint32_t *xsize, uint32_t *ysize) {
     *ysize = (xysize & 0xffffu) + 1;
 }
 
-static inline void umka_sys_bg_set_size(uint32_t xsize, uint32_t ysize) {
+static inline void
+umka_sys_bg_set_size(uint32_t xsize, uint32_t ysize) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -794,7 +833,8 @@ static inline void umka_sys_bg_set_size(uint32_t xsize, uint32_t ysize) {
         : "memory");
 }
 
-static inline void umka_sys_bg_put_pixel(uint32_t offset, uint32_t color) {
+static inline void
+umka_sys_bg_put_pixel(uint32_t offset, uint32_t color) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -805,7 +845,8 @@ static inline void umka_sys_bg_put_pixel(uint32_t offset, uint32_t color) {
         : "memory");
 }
 
-static inline void umka_sys_bg_redraw() {
+static inline void
+umka_sys_bg_redraw() {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -814,7 +855,8 @@ static inline void umka_sys_bg_redraw() {
         : "memory");
 }
 
-static inline void umka_sys_bg_set_mode(uint32_t mode) {
+static inline void
+umka_sys_bg_set_mode(uint32_t mode) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -824,8 +866,8 @@ static inline void umka_sys_bg_set_mode(uint32_t mode) {
         : "memory");
 }
 
-static inline void umka_sys_bg_put_img(void *image, size_t offset,
-                                       size_t size) {
+static inline void
+umka_sys_bg_put_img(void *image, size_t offset, size_t size) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -837,7 +879,8 @@ static inline void umka_sys_bg_put_img(void *image, size_t offset,
         : "memory");
 }
 
-static inline void *umka_sys_bg_map() {
+static inline void *
+umka_sys_bg_map() {
     void *addr;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -848,7 +891,8 @@ static inline void *umka_sys_bg_map() {
     return addr;
 }
 
-static inline uint32_t umka_sys_bg_unmap(void *addr) {
+static inline uint32_t
+umka_sys_bg_unmap(void *addr) {
     uint32_t status;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -860,7 +904,8 @@ static inline uint32_t umka_sys_bg_unmap(void *addr) {
     return status;
 }
 
-static inline void umka_sys_set_cwd(const char *dir) {
+static inline void
+umka_sys_set_cwd(const char *dir) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -870,7 +915,8 @@ static inline void umka_sys_set_cwd(const char *dir) {
         : "memory");
 }
 
-static inline void umka_sys_get_cwd(const char *buf, size_t len) {
+static inline void
+umka_sys_get_cwd(const char *buf, size_t len) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -881,9 +927,9 @@ static inline void umka_sys_get_cwd(const char *buf, size_t len) {
         : "memory");
 }
 
-static inline void umka_sys_draw_line(size_t x, size_t xend,
-                                      size_t y, size_t yend,
-                                      uint32_t color, int invert) {
+static inline void
+umka_sys_draw_line(size_t x, size_t xend, size_t y, size_t yend, uint32_t color,
+                   int invert) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -894,15 +940,13 @@ static inline void umka_sys_draw_line(size_t x, size_t xend,
         : "memory");
 }
 
-static inline void umka_sys_display_number(int is_pointer, int base,
-                                           int digits_to_display, int is_qword,
-                                           int show_leading_zeros,
-                                           int number_or_pointer,
-                                           size_t x, size_t y,
-                                           uint32_t color, int fill_background,
-                                           int font, int draw_to_buffer,
-                                           int scale_factor,
-                                           uintptr_t background_color_or_buffer) {
+static inline void
+umka_sys_display_number(int is_pointer, int base, int digits_to_display,
+                        int is_qword, int show_leading_zeros,
+                        int number_or_pointer, size_t x, size_t y,
+                        uint32_t color, int fill_background, int font,
+                        int draw_to_buffer, int scale_factor,
+                        uintptr_t background_color_or_buffer) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -917,7 +961,8 @@ static inline void umka_sys_display_number(int is_pointer, int base,
         : "memory");
 }
 
-static inline void umka_sys_set_button_style(int style) {
+static inline void
+umka_sys_set_button_style(int style) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -927,7 +972,8 @@ static inline void umka_sys_set_button_style(int style) {
         : "memory");
 }
 
-static inline void umka_sys_set_window_colors(void *colors) {
+static inline void
+umka_sys_set_window_colors(void *colors) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -938,7 +984,8 @@ static inline void umka_sys_set_window_colors(void *colors) {
         : "memory");
 }
 
-static inline void umka_sys_get_window_colors(void *colors) {
+static inline void
+umka_sys_get_window_colors(void *colors) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -949,7 +996,8 @@ static inline void umka_sys_get_window_colors(void *colors) {
         : "memory");
 }
 
-static inline uint32_t umka_sys_get_skin_height() {
+static inline uint32_t
+umka_sys_get_skin_height() {
     uint32_t skin_height;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -960,7 +1008,8 @@ static inline uint32_t umka_sys_get_skin_height() {
     return skin_height;
 }
 
-static inline void umka_sys_get_screen_area(rect_t *wa) {
+static inline void
+umka_sys_get_screen_area(rect_t *wa) {
     uint32_t eax, ebx;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -975,7 +1024,8 @@ static inline void umka_sys_get_screen_area(rect_t *wa) {
     wa->bottom = ebx & 0xffffu;
 }
 
-static inline void umka_sys_set_screen_area(rect_t *wa) {
+static inline void
+umka_sys_set_screen_area(rect_t *wa) {
     uint32_t ecx, edx;
     ecx = (wa->left << 16) + wa->right;
     edx = (wa->top << 16) + wa->bottom;
@@ -989,7 +1039,8 @@ static inline void umka_sys_set_screen_area(rect_t *wa) {
         : "memory");
 }
 
-static inline void umka_sys_get_skin_margins(rect_t *wa) {
+static inline void
+umka_sys_get_skin_margins(rect_t *wa) {
     uint32_t eax, ebx;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1004,7 +1055,8 @@ static inline void umka_sys_get_skin_margins(rect_t *wa) {
     wa->bottom = ebx & 0xffffu;
 }
 
-static inline int32_t umka_sys_set_skin(const char *path) {
+static inline int32_t
+umka_sys_set_skin(const char *path) {
     int32_t status;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1016,7 +1068,8 @@ static inline int32_t umka_sys_set_skin(const char *path) {
     return status;
 }
 
-static inline int umka_sys_get_font_smoothing() {
+static inline int
+umka_sys_get_font_smoothing() {
     int type;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1027,7 +1080,8 @@ static inline int umka_sys_get_font_smoothing() {
     return type;
 }
 
-static inline void umka_sys_set_font_smoothing(int type) {
+static inline void
+umka_sys_set_font_smoothing(int type) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -1037,7 +1091,8 @@ static inline void umka_sys_set_font_smoothing(int type) {
         : "memory");
 }
 
-static inline int umka_sys_get_font_size() {
+static inline int
+umka_sys_get_font_size() {
     uint32_t size;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1048,7 +1103,8 @@ static inline int umka_sys_get_font_size() {
     return size;
 }
 
-static inline void umka_sys_set_font_size(uint32_t size) {
+static inline void
+umka_sys_set_font_size(uint32_t size) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -1058,11 +1114,10 @@ static inline void umka_sys_set_font_size(uint32_t size) {
         : "memory");
 }
 
-static inline void umka_sys_put_image_palette(void *image,
-                                              size_t xsize, size_t ysize,
-                                              size_t x, size_t y,
-                                              size_t bpp, void *palette,
-                                              size_t row_offset) {
+static inline void
+umka_sys_put_image_palette(void *image, size_t xsize, size_t ysize,
+                           size_t x, size_t y, size_t bpp, void *palette,
+                           size_t row_offset) {
     __asm__ __inline__ __volatile__ (
         "push   ebp;"
         "mov    ebp, %[row_offset];"
@@ -1079,8 +1134,8 @@ static inline void umka_sys_put_image_palette(void *image,
         : "memory");
 }
 
-static inline void umka_sys_move_window(size_t x, size_t y,
-                                        ssize_t xsize, ssize_t ysize) {
+static inline void
+umka_sys_move_window(size_t x, size_t y, ssize_t xsize, ssize_t ysize) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -1092,8 +1147,8 @@ static inline void umka_sys_move_window(size_t x, size_t y,
         : "memory");
 }
 
-static inline void umka_sys_lfn(void *f7080sXarg, f7080ret_t *r,
-                                f70or80_t f70or80) {
+static inline void
+umka_sys_lfn(void *f7080sXarg, f7080ret_t *r, f70or80_t f70or80) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r->status),
@@ -1103,8 +1158,8 @@ static inline void umka_sys_lfn(void *f7080sXarg, f7080ret_t *r,
         : "memory");
 }
 
-static inline void umka_sys_set_window_caption(const char *caption,
-                                               int encoding) {
+static inline void
+umka_sys_set_window_caption(const char *caption, int encoding) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -1115,9 +1170,9 @@ static inline void umka_sys_set_window_caption(const char *caption,
         : "memory");
 }
 
-static inline void umka_sys_blit_bitmap(int operation, int background,
-                                        int transparent, int client_relative,
-                                        void *params) {
+static inline void
+umka_sys_blit_bitmap(int operation, int background, int transparent,
+                     int client_relative, void *params) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -1128,7 +1183,8 @@ static inline void umka_sys_blit_bitmap(int operation, int background,
         : "memory");
 }
 
-static inline uint32_t umka_sys_net_get_dev_count() {
+static inline uint32_t
+umka_sys_net_get_dev_count() {
     uint32_t count;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1139,7 +1195,8 @@ static inline uint32_t umka_sys_net_get_dev_count() {
     return count;
 }
 
-static inline int32_t umka_sys_net_get_dev_type(uint8_t dev_num) {
+static inline int32_t
+umka_sys_net_get_dev_type(uint8_t dev_num) {
     int32_t type;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1150,7 +1207,8 @@ static inline int32_t umka_sys_net_get_dev_type(uint8_t dev_num) {
     return type;
 }
 
-static inline int32_t umka_sys_net_get_dev_name(uint8_t dev_num, char *name) {
+static inline int32_t
+umka_sys_net_get_dev_name(uint8_t dev_num, char *name) {
     int32_t status;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1162,7 +1220,8 @@ static inline int32_t umka_sys_net_get_dev_name(uint8_t dev_num, char *name) {
     return status;
 }
 
-static inline int32_t umka_sys_net_dev_reset(uint8_t dev_num) {
+static inline int32_t
+umka_sys_net_dev_reset(uint8_t dev_num) {
     int32_t status;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1173,7 +1232,8 @@ static inline int32_t umka_sys_net_dev_reset(uint8_t dev_num) {
     return status;
 }
 
-static inline int32_t umka_sys_net_dev_stop(uint8_t dev_num) {
+static inline int32_t
+umka_sys_net_dev_stop(uint8_t dev_num) {
     int32_t status;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1184,7 +1244,8 @@ static inline int32_t umka_sys_net_dev_stop(uint8_t dev_num) {
     return status;
 }
 
-static inline intptr_t umka_sys_net_get_dev(uint8_t dev_num) {
+static inline intptr_t
+umka_sys_net_get_dev(uint8_t dev_num) {
     intptr_t dev;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1195,7 +1256,8 @@ static inline intptr_t umka_sys_net_get_dev(uint8_t dev_num) {
     return dev;
 }
 
-static inline uint32_t umka_sys_net_get_packet_tx_count(uint8_t dev_num) {
+static inline uint32_t
+umka_sys_net_get_packet_tx_count(uint8_t dev_num) {
     uint32_t count;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1206,7 +1268,8 @@ static inline uint32_t umka_sys_net_get_packet_tx_count(uint8_t dev_num) {
     return count;
 }
 
-static inline uint32_t umka_sys_net_get_packet_rx_count(uint8_t dev_num) {
+static inline uint32_t
+umka_sys_net_get_packet_rx_count(uint8_t dev_num) {
     uint32_t count;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1217,7 +1280,8 @@ static inline uint32_t umka_sys_net_get_packet_rx_count(uint8_t dev_num) {
     return count;
 }
 
-static inline uint32_t umka_sys_net_get_byte_tx_count(uint8_t dev_num) {
+static inline uint32_t
+umka_sys_net_get_byte_tx_count(uint8_t dev_num) {
     uint32_t count;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1228,7 +1292,8 @@ static inline uint32_t umka_sys_net_get_byte_tx_count(uint8_t dev_num) {
     return count;
 }
 
-static inline uint32_t umka_sys_net_get_byte_rx_count(uint8_t dev_num) {
+static inline uint32_t
+umka_sys_net_get_byte_rx_count(uint8_t dev_num) {
     uint32_t count;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1239,7 +1304,8 @@ static inline uint32_t umka_sys_net_get_byte_rx_count(uint8_t dev_num) {
     return count;
 }
 
-static inline uint32_t umka_sys_net_get_link_status(uint8_t dev_num) {
+static inline uint32_t
+umka_sys_net_get_link_status(uint8_t dev_num) {
     uint32_t status;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1250,8 +1316,8 @@ static inline uint32_t umka_sys_net_get_link_status(uint8_t dev_num) {
     return status;
 }
 
-static inline f75ret_t umka_sys_net_open_socket(uint32_t domain, uint32_t type,
-                                                uint32_t protocol) {
+static inline f75ret_t
+umka_sys_net_open_socket(uint32_t domain, uint32_t type, uint32_t protocol) {
     f75ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1266,7 +1332,8 @@ static inline f75ret_t umka_sys_net_open_socket(uint32_t domain, uint32_t type,
     return r;
 }
 
-static inline f75ret_t umka_sys_net_close_socket(uint32_t fd) {
+static inline f75ret_t
+umka_sys_net_close_socket(uint32_t fd) {
     f75ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1279,8 +1346,8 @@ static inline f75ret_t umka_sys_net_close_socket(uint32_t fd) {
     return r;
 }
 
-static inline f75ret_t umka_sys_net_bind(uint32_t fd, void *sockaddr,
-                                         size_t sockaddr_len) {
+static inline f75ret_t
+umka_sys_net_bind(uint32_t fd, void *sockaddr, size_t sockaddr_len) {
     f75ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1295,7 +1362,8 @@ static inline f75ret_t umka_sys_net_bind(uint32_t fd, void *sockaddr,
     return r;
 }
 
-static inline f75ret_t umka_sys_net_listen(uint32_t fd, uint32_t backlog) {
+static inline f75ret_t
+umka_sys_net_listen(uint32_t fd, uint32_t backlog) {
     f75ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1309,8 +1377,8 @@ static inline f75ret_t umka_sys_net_listen(uint32_t fd, uint32_t backlog) {
     return r;
 }
 
-static inline f75ret_t umka_sys_net_connect(uint32_t fd, void *sockaddr,
-                                            size_t sockaddr_len) {
+static inline f75ret_t
+umka_sys_net_connect(uint32_t fd, void *sockaddr, size_t sockaddr_len) {
     f75ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1325,8 +1393,8 @@ static inline f75ret_t umka_sys_net_connect(uint32_t fd, void *sockaddr,
     return r;
 }
 
-static inline f75ret_t umka_sys_net_accept(uint32_t fd, void *sockaddr,
-                                           size_t sockaddr_len) {
+static inline f75ret_t
+umka_sys_net_accept(uint32_t fd, void *sockaddr, size_t sockaddr_len) {
     f75ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1341,8 +1409,8 @@ static inline f75ret_t umka_sys_net_accept(uint32_t fd, void *sockaddr,
     return r;
 }
 
-static inline f75ret_t umka_sys_net_send(uint32_t fd, void *buf,
-                                         size_t buf_len, uint32_t flags) {
+static inline f75ret_t
+umka_sys_net_send(uint32_t fd, void *buf, size_t buf_len, uint32_t flags) {
     f75ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1358,8 +1426,8 @@ static inline f75ret_t umka_sys_net_send(uint32_t fd, void *buf,
     return r;
 }
 
-static inline f75ret_t umka_sys_net_receive(uint32_t fd, void *buf,
-                                            size_t buf_len, uint32_t flags) {
+static inline f75ret_t
+umka_sys_net_receive(uint32_t fd, void *buf, size_t buf_len, uint32_t flags) {
     f75ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1375,7 +1443,8 @@ static inline f75ret_t umka_sys_net_receive(uint32_t fd, void *buf,
     return r;
 }
 
-static inline f76ret_t umka_sys_net_eth_read_mac(uint32_t dev_num) {
+static inline f76ret_t
+umka_sys_net_eth_read_mac(uint32_t dev_num) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1390,7 +1459,8 @@ static inline f76ret_t umka_sys_net_eth_read_mac(uint32_t dev_num) {
 // Function 76, Protocol 1 - IPv4, Subfunction 0, Read # Packets sent =
 // Function 76, Protocol 1 - IPv4, Subfunction 1, Read # Packets rcvd =
 
-static inline f76ret_t umka_sys_net_ipv4_get_addr(uint32_t dev_num) {
+static inline f76ret_t
+umka_sys_net_ipv4_get_addr(uint32_t dev_num) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1402,8 +1472,8 @@ static inline f76ret_t umka_sys_net_ipv4_get_addr(uint32_t dev_num) {
     return r;
 }
 
-static inline f76ret_t umka_sys_net_ipv4_set_addr(uint32_t dev_num,
-                                                  uint32_t addr) {
+static inline f76ret_t
+umka_sys_net_ipv4_set_addr(uint32_t dev_num, uint32_t addr) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1416,7 +1486,8 @@ static inline f76ret_t umka_sys_net_ipv4_set_addr(uint32_t dev_num,
     return r;
 }
 
-static inline f76ret_t umka_sys_net_ipv4_get_dns(uint32_t dev_num) {
+static inline f76ret_t
+umka_sys_net_ipv4_get_dns(uint32_t dev_num) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1428,8 +1499,8 @@ static inline f76ret_t umka_sys_net_ipv4_get_dns(uint32_t dev_num) {
     return r;
 }
 
-static inline f76ret_t umka_sys_net_ipv4_set_dns(uint32_t dev_num,
-                                                 uint32_t dns) {
+static inline f76ret_t
+umka_sys_net_ipv4_set_dns(uint32_t dev_num, uint32_t dns) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1442,7 +1513,8 @@ static inline f76ret_t umka_sys_net_ipv4_set_dns(uint32_t dev_num,
     return r;
 }
 
-static inline f76ret_t umka_sys_net_ipv4_get_subnet(uint32_t dev_num) {
+static inline f76ret_t
+umka_sys_net_ipv4_get_subnet(uint32_t dev_num) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1454,8 +1526,8 @@ static inline f76ret_t umka_sys_net_ipv4_get_subnet(uint32_t dev_num) {
     return r;
 }
 
-static inline f76ret_t umka_sys_net_ipv4_set_subnet(uint32_t dev_num,
-                                                    uint32_t subnet) {
+static inline f76ret_t
+umka_sys_net_ipv4_set_subnet(uint32_t dev_num, uint32_t subnet) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1468,7 +1540,8 @@ static inline f76ret_t umka_sys_net_ipv4_set_subnet(uint32_t dev_num,
     return r;
 }
 
-static inline f76ret_t umka_sys_net_ipv4_get_gw(uint32_t dev_num) {
+static inline f76ret_t
+umka_sys_net_ipv4_get_gw(uint32_t dev_num) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1480,8 +1553,8 @@ static inline f76ret_t umka_sys_net_ipv4_get_gw(uint32_t dev_num) {
     return r;
 }
 
-static inline f76ret_t umka_sys_net_ipv4_set_gw(uint32_t dev_num,
-                                                uint32_t gw) {
+static inline f76ret_t
+umka_sys_net_ipv4_set_gw(uint32_t dev_num, uint32_t gw) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1502,7 +1575,8 @@ static inline f76ret_t umka_sys_net_ipv4_set_gw(uint32_t dev_num,
 // Function 76, Protocol 4 - TCP, Subfunction 1, Read # Packets rcvd ==
 // Function 76, Protocol 5 - ARP, Subfunction 0, Read # Packets sent ==
 // Function 76, Protocol 5 - ARP, Subfunction 1, Read # Packets rcvd ==
-static inline f76ret_t umka_sys_net_arp_get_count(uint32_t dev_num) {
+static inline f76ret_t
+umka_sys_net_arp_get_count(uint32_t dev_num) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1514,9 +1588,8 @@ static inline f76ret_t umka_sys_net_arp_get_count(uint32_t dev_num) {
     return r;
 }
 
-static inline f76ret_t umka_sys_net_arp_get_entry(uint32_t dev_num,
-                                                  uint32_t arp_num,
-                                                  void *buf) {
+static inline f76ret_t
+umka_sys_net_arp_get_entry(uint32_t dev_num, uint32_t arp_num, void *buf) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1530,8 +1603,8 @@ static inline f76ret_t umka_sys_net_arp_get_entry(uint32_t dev_num,
     return r;
 }
 
-static inline f76ret_t umka_sys_net_arp_add_entry(uint32_t dev_num,
-                                                  void *buf) {
+static inline f76ret_t
+umka_sys_net_arp_add_entry(uint32_t dev_num, void *buf) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1544,8 +1617,8 @@ static inline f76ret_t umka_sys_net_arp_add_entry(uint32_t dev_num,
     return r;
 }
 
-static inline f76ret_t umka_sys_net_arp_del_entry(uint32_t dev_num,
-                                                  int32_t arp_num) {
+static inline f76ret_t
+umka_sys_net_arp_del_entry(uint32_t dev_num, int32_t arp_num) {
     f76ret_t r;
     __asm__ __inline__ __volatile__ (
         "call   i40"

@@ -38,7 +38,6 @@
 #include <unistd.h>
 #include "shell.h"
 #include "umka.h"
-#include "trace.h"
 #include "vnet.h"
 
 uint8_t packet[4096] = {0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 'a','b',
@@ -46,7 +45,8 @@ uint8_t packet[4096] = {0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 'a','b',
                         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
                         'y', 'z', '0', '1', '2', '3', '4', '5'};
 
-int tap_alloc(char *dev) {
+static int
+tap_alloc(char *dev) {
     int flags = IFF_TAP | IFF_NO_PI;
     struct ifreq ifr;
     int fd, err;
@@ -79,21 +79,17 @@ int tap_alloc(char *dev) {
     return fd;
 }
 
-int tapfd;
-_Atomic int go_ping = 0;
+int go_ping = 0;
 
-int umka_thread_ping(void) {
+void
+umka_thread_ping(void) {
     umka_sti();
     while (!go_ping) { /* wait until initialized */ }
-    fprintf(stderr, "[ping] tapfd is %i\n", tapfd);
-
-    if (coverage)
-        trace_begin();
 
     f75ret_t r75;
     r75 = umka_sys_net_open_socket(AF_INET4, SOCK_STREAM, IPPROTO_TCP);
-    if (r75.errorcode == (uint32_t)-1) {
-        fprintf(stderr, "[ping] error\n");
+    if (r75.value == (uint32_t)-1) {
+        fprintf(stderr, "[ping] open error %u\n", r75.errorcode);
         exit(1);
     }
     uint32_t sockfd = r75.value;
@@ -111,28 +107,27 @@ int umka_thread_ping(void) {
     sa.sin_addr.s_addr = addr;
 
     r75 = umka_sys_net_connect(sockfd, &sa, sizeof(struct sockaddr_in));
-    if (r75.errorcode == (uint32_t)-1) {
-        fprintf(stderr, "[ping] error %u\n", r75.errorcode);
-        exit(1);
+    if (r75.value == (uint32_t)-1) {
+        fprintf(stderr, "[ping] connect error %u\n", r75.errorcode);
+        return;
     }
 
     r75 = umka_sys_net_send(sockfd, packet, 128, 0);
-    if (r75.errorcode == (uint32_t)-1) {
-        fprintf(stderr, "[ping] error %u\n", r75.errorcode);
-        exit(1);
+    if (r75.value == (uint32_t)-1) {
+        fprintf(stderr, "[ping] send error %u\n", r75.errorcode);
+        return;
     }
-
-    if (coverage)
-        trace_end();
 
     while (true) {}
 
-    return 0;
+    return;
 }
 
-void umka_thread_net_drv(void) {
+void
+umka_thread_net_drv(void) {
     umka_sti();
     fprintf(stderr, "[net_drv] starting\n");
+    int tapfd;
     uint8_t buffer[2048];
     int plen = 0;
     char tapdev[IFNAMSIZ] = "tap0";
@@ -145,33 +140,33 @@ void umka_thread_net_drv(void) {
         umka_sys_net_dev_reset(i);
         umka_sys_net_get_dev_name(i, devname);
         uint32_t devtype = umka_sys_net_get_dev_type(i);
-        printf("[net_drv] device %i: %s %u\n", i, devname, devtype);
+        fprintf(stderr, "[net_drv] device %i: %s %u\n", i, devname, devtype);
     }
 
     f76ret_t r76;
     r76 = umka_sys_net_ipv4_set_subnet(1, inet_addr("255.255.255.0"));
     if (r76.eax == (uint32_t)-1) {
-        fprintf(stderr, "[net_drv] error\n");
-        exit(1);
+        fprintf(stderr, "[net_drv] set subnet error\n");
+        return;
     }
 
 //    r76 = umka_sys_net_ipv4_set_gw(1, inet_addr("192.168.1.1"));
     r76 = umka_sys_net_ipv4_set_gw(1, inet_addr("10.50.0.1"));
     if (r76.eax == (uint32_t)-1) {
-        fprintf(stderr, "error\n");
-        exit(1);
+        fprintf(stderr, "set gw error\n");
+        return;
     }
 
     r76 = umka_sys_net_ipv4_set_dns(1, inet_addr("217.10.36.5"));
     if (r76.eax == (uint32_t)-1) {
-        fprintf(stderr, "[net_drv] error\n");
-        exit(1);
+        fprintf(stderr, "[net_drv] set dns error\n");
+        return;
     }
 
     r76 = umka_sys_net_ipv4_set_addr(1, inet_addr("10.50.0.2"));
     if (r76.eax == (uint32_t)-1) {
-        fprintf(stderr, "[net_drv] error\n");
-        exit(1);
+        fprintf(stderr, "[net_drv] set ip addr error\n");
+        return;
     }
 
     go_ping = 1;

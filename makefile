@@ -81,7 +81,7 @@ umka_fuse.o: umka_fuse.c umka.h
 	$(CC) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $<
 
 umka_os.o: umka_os.c umka.h
-	$(CC) $(CFLAGS_32) -c $< -D_DEFAULT_SOURCE
+	$(CC) $(CFLAGS_32) -c $< -D_XOPEN_SOURCE=600
 
 umka_ping.o: umka_ping.c umka.h
 	$(CC) $(CFLAGS_32) -D_DEFAULT_SOURCE -c $<

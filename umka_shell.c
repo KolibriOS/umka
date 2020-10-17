@@ -29,7 +29,8 @@
 #include "umka.h"
 #include "trace.h"
 
-int main(int argc, char **argv) {
+int
+main(int argc, char **argv) {
     umka_tool = UMKA_SHELL;
     const char *usage = \
         "usage: umka_shell [test_file.t] [-c]\n"

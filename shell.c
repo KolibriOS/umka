@@ -31,7 +31,9 @@
 #include <fcntl.h>
 #include <assert.h>
 #include <time.h>
+#include <fcntl.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <errno.h>
@@ -60,6 +62,11 @@ bool cur_dir_changed = true;
 
 char cmd_buf[FGETS_BUF_LEN];
 
+typedef struct {
+    char *name;
+    void (*func) (int, char **);
+} func_table_t;
+
 const char *f70_status_name[] = {
                                  "success",
                                  "disk_base",
@@ -76,7 +83,8 @@ const char *f70_status_name[] = {
                                  "out_of_memory"
                                 };
 
-const char *get_f70_status_name(int s) {
+static const char *
+get_f70_status_name(int s) {
     switch (s) {
     case ERROR_SUCCESS:
 //        return "";
@@ -98,7 +106,8 @@ const char *get_f70_status_name(int s) {
     }
 }
 
-void convert_f70_file_attr(uint32_t attr, char s[KF_ATTR_CNT+1]) {
+static void
+convert_f70_file_attr(uint32_t attr, char s[KF_ATTR_CNT+1]) {
     s[0] = (attr & KF_READONLY) ? 'r' : '-';
     s[1] = (attr & KF_HIDDEN)   ? 'h' : '-';
     s[2] = (attr & KF_SYSTEM)   ? 's' : '-';
@@ -107,21 +116,24 @@ void convert_f70_file_attr(uint32_t attr, char s[KF_ATTR_CNT+1]) {
     s[5] = '\0';
 }
 
-void print_f70_status(f7080ret_t *r, int use_ebx) {
+static void
+print_f70_status(f7080ret_t *r, int use_ebx) {
     fprintf(fout, "status = %d %s", r->status, get_f70_status_name(r->status));
     if (use_ebx && (r->status == ERROR_SUCCESS || r->status == ERROR_END_OF_FILE))
         fprintf(fout, ", count = %d", r->count);
     fputc('\n', fout);
 }
 
-bool parse_uintmax(const char *str, uintmax_t *res) {
+static bool
+parse_uintmax(const char *str, uintmax_t *res) {
     char *endptr;
     *res = strtoumax(str, &endptr, 0);
     bool ok = (str != endptr) && (*endptr == '\0');
     return ok;
 }
 
-bool parse_uint32(const char *str, uint32_t *res) {
+static bool
+parse_uint32(const char *str, uint32_t *res) {
     uintmax_t x;
     if (parse_uintmax(str, &x) && x <= UINT32_MAX) {
         *res = (uint32_t)x;
@@ -132,7 +144,8 @@ bool parse_uint32(const char *str, uint32_t *res) {
     }
 }
 
-bool parse_uint64(const char *str, uint64_t *res) {
+static bool
+parse_uint64(const char *str, uint64_t *res) {
     uintmax_t x;
     if (parse_uintmax(str, &x) && x <= UINT64_MAX) {
         *res = x;
@@ -143,7 +156,8 @@ bool parse_uint64(const char *str, uint64_t *res) {
     }
 }
 
-void print_bytes(uint8_t *x, size_t len) {
+static void
+print_bytes(uint8_t *x, size_t len) {
     for (size_t i = 0; i < len; i++) {
         if (i % PRINT_BYTES_PER_LINE == 0 && i != 0) {
             fputc('\n', fout);
@@ -153,7 +167,8 @@ void print_bytes(uint8_t *x, size_t len) {
     fputc('\n', fout);
 }
 
-void print_hash(uint8_t *x, size_t len) {
+static void
+print_hash(uint8_t *x, size_t len) {
     hash_context ctx;
     hash_oneshot(&ctx, x, len);
     for (size_t i = 0; i < HASH_SIZE; i++) {
@@ -162,7 +177,8 @@ void print_hash(uint8_t *x, size_t len) {
     fputc('\n', fout);
 }
 
-const char *get_last_dir(const char *path) {
+static const char *
+get_last_dir(const char *path) {
     const char *last = strrchr(path, '/');
     if (!last) {
         last = path;
@@ -172,7 +188,8 @@ const char *get_last_dir(const char *path) {
     return last;
 }
 
-void prompt() {
+static void
+prompt() {
     if (cur_dir_changed) {
         COVERAGE_ON();
         umka_sys_get_cwd(cur_dir, PATH_MAX);
@@ -184,20 +201,8 @@ void prompt() {
     fflush(fout);
 }
 
-/*
-# define __FD_ZERO(fdsp) \
-  do {									      \
-    int __d0, __d1;							      \
-    __asm__ __volatile__ ("cld; rep; stosd" 		      \
-			  : "=c" (__d0), "=D" (__d1)			      \
-			  : "a" (0), "0" (sizeof (fd_set)		      \
-					  / sizeof (__fd_mask)),	      \
-			    "1" (&__FDS_BITS (fdsp)[0])			      \
-			  : "memory");					      \
-  } while (0)
-*/
-
-int next_line(int is_tty, int block) {
+static int
+next_line(int is_tty, int block) {
     if (is_tty) {
         prompt();
     }
@@ -222,17 +227,19 @@ int next_line(int is_tty, int block) {
     }
 }
 
-int split_args(char *s, char **argv) {
+static int
+split_args(char *s, char **argv) {
     int argc = -1;
-    for (; (argv[++argc] = strtok(s, " \t\n")) != NULL; s = NULL);
+    for (; (argv[++argc] = strtok(s, " \t\n\r")) != NULL; s = NULL);
     return argc;
 }
 
-void shell_i40(int argc, char **argv) {
+static void
+shell_i40(int argc, char **argv) {
     const char *usage = \
         "usage: i40 <eax> [ebx [ecx [edx [esi [edi [ebp]]]]]]...\n"
         "  see '/kernel/docs/sysfuncs.txt' for details";
-    if (argc == 1 || argc > 8) {
+    if (argc < 2 || argc > 8) {
         fputs(usage, fout);
         return;
     }
@@ -253,7 +260,8 @@ void shell_i40(int argc, char **argv) {
            regs.ebx, regs.ebx, (int32_t)regs.ebx);
 }
 
-void shell_disk_list_partitions(disk_t *d) {
+static void
+disk_list_partitions(disk_t *d) {
     for (size_t i = 0; i < d->num_partitions; i++) {
         fprintf(fout, "/%s/%d: ", d->name, i+1);
         if (d->partitions[i]->fs_user_functions == xfs_user_functions) {
@@ -270,7 +278,8 @@ void shell_disk_list_partitions(disk_t *d) {
     }
 }
 
-void shell_ramdisk_init(int argc, char **argv) {
+static void
+shell_ramdisk_init(int argc, char **argv) {
     const char *usage = \
         "usage: ramdisk_init <file>\n"
         "  <file>           absolute or relative path";
@@ -297,10 +306,11 @@ void shell_ramdisk_init(int argc, char **argv) {
     COVERAGE_ON();
     void *ramdisk = kos_ramdisk_init();
     COVERAGE_OFF();
-    shell_disk_list_partitions(ramdisk);
+    disk_list_partitions(ramdisk);
 }
 
-void shell_disk_add(int argc, char **argv) {
+static void
+shell_disk_add(int argc, char **argv) {
     const char *usage = \
         "usage: disk_add <file> <name> [option]...\n"
         "  <file>           absolute or relative path\n"
@@ -337,7 +347,7 @@ void shell_disk_add(int argc, char **argv) {
             COVERAGE_ON();
             disk_media_changed(vdisk, 1);
             COVERAGE_OFF();
-            shell_disk_list_partitions(vdisk);
+            disk_list_partitions(vdisk);
             return;
         }
     }
@@ -346,7 +356,8 @@ void shell_disk_add(int argc, char **argv) {
     return;
 }
 
-void shell_disk_del_by_name(const char *name) {
+static void
+disk_del_by_name(const char *name) {
     for(disk_t *d = disk_list.next; d != &disk_list; d = d->next) {
         if (!strcmp(d->name, name)) {
             COVERAGE_ON();
@@ -358,15 +369,28 @@ void shell_disk_del_by_name(const char *name) {
     fprintf(fout, "umka: can't find disk '%s'\n", name);
 }
 
-void shell_disk_del(int argc, char **argv) {
-    (void)argc;
+static void
+shell_disk_del(int argc, char **argv) {
+    const char *usage = \
+        "usage: disk_del <name>\n"
+        "  name             disk name, i.e. rd or hd0";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
     const char *name = argv[1];
-    shell_disk_del_by_name(name);
+    disk_del_by_name(name);
     return;
 }
 
-void shell_pwd(int argc, char **argv) {
-    (void)argc;
+static void
+shell_pwd(int argc, char **argv) {
+    const char *usage = \
+        "usage: pwd";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     (void)argv;
     bool quoted = false;
     const char *quote = quoted ? "'" : "";
@@ -376,7 +400,18 @@ void shell_pwd(int argc, char **argv) {
     fprintf(fout, "%s%s%s\n", quote, cur_dir, quote);
 }
 
-void shell_set_pixel(int argc, char **argv) {
+static void
+shell_set_pixel(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_pixel <x> <y> <color> [-i]\n"
+        "  x                x window coordinate\n"
+        "  y                y window coordinate\n"
+        "  color            argb in hex\n"
+        "  -i               inverted color";
+    if (argc < 4) {
+        fputs(usage, fout);
+        return;
+    }
     size_t x = strtoul(argv[1], NULL, 0);
     size_t y = strtoul(argv[2], NULL, 0);
     uint32_t color = strtoul(argv[3], NULL, 16);
@@ -386,8 +421,26 @@ void shell_set_pixel(int argc, char **argv) {
     COVERAGE_OFF();
 }
 
-void shell_write_text(int argc, char **argv) {
-    (void)argc;
+static void
+shell_write_text(int argc, char **argv) {
+    const char *usage = \
+        "usage: write_text <x> <y> <color> <string> <asciiz> <fill_bg>"
+            " <font_and_enc> <draw_to_buf> <scale_factor> <length>"
+            " <bg_color_or_buf>\n"
+        "  x                x window coordinate\n"
+        "  y                y window coordinate\n"
+        "  color            argb in hex\n"
+        "  string           escape spaces\n"
+        "  asciiz           1 if the string is zero-terminated\n"
+        "  fill_bg          fill text background with specified color\n"
+        "  font_and_enc     font size and string encoding\n"
+        "  draw_to_buf      draw to the buffer pointed to by the next param\n"
+        "  length           length of the string if it is non-asciiz\n"
+        "  bg_color_or_buf  argb or pointer";
+    if (argc != 12) {
+        fputs(usage, fout);
+        return;
+    }
     size_t x = strtoul(argv[1], NULL, 0);
     size_t y = strtoul(argv[2], NULL, 0);
     uint32_t color = strtoul(argv[3], NULL, 16);
@@ -400,11 +453,21 @@ void shell_write_text(int argc, char **argv) {
     int length = strtoul(argv[10], NULL, 0);
     int background_color_or_buffer = strtoul(argv[11], NULL, 0);
     COVERAGE_ON();
-    umka_sys_write_text(x, y, color, asciiz, fill_background, font_and_encoding, draw_to_buffer, scale_factor, string, length, background_color_or_buffer);
+    umka_sys_write_text(x, y, color, asciiz, fill_background, font_and_encoding,
+                        draw_to_buffer, scale_factor, string, length,
+                        background_color_or_buffer);
     COVERAGE_OFF();
 }
 
-void shell_dump_win_stack(int argc, char **argv) {
+static void
+shell_dump_win_stack(int argc, char **argv) {
+    const char *usage = \
+        "usage: dump_win_stack [count]\n"
+        "  count            how many items to dump";
+    if (argc < 1) {
+        fputs(usage, fout);
+        return;
+    }
     int depth = 5;
     if (argc > 1) {
         depth = strtol(argv[1], NULL, 0);
@@ -414,7 +477,15 @@ void shell_dump_win_stack(int argc, char **argv) {
     }
 }
 
-void shell_dump_win_pos(int argc, char **argv) {
+static void
+shell_dump_win_pos(int argc, char **argv) {
+    const char *usage = \
+        "usage: dump_win_pos [count]\n"
+        "  count            how many items to dump";
+    if (argc < 1) {
+        fputs(usage, fout);
+        return;
+    }
     int depth = 5;
     if (argc > 1) {
         depth = strtol(argv[1], NULL, 0);
@@ -424,13 +495,18 @@ void shell_dump_win_pos(int argc, char **argv) {
     }
 }
 
-void shell_dump_appdata(int argc, char **argv) {
-    // TODO: usage
-    int idx;
-    int show_pointers = 0;
-    if (argc > 1) {
-        idx = strtol(argv[1], NULL, 0);
+static void
+shell_dump_appdata(int argc, char **argv) {
+    const char *usage = \
+        "usage: dump_appdata <index> [-p]\n"
+        "  index            index into appdata array to dump\n"
+        "  -p               print fields that are pointers";
+    if (argc < 2) {
+        fputs(usage, fout);
+        return;
     }
+    int show_pointers = 0;
+    int idx = strtol(argv[1], NULL, 0);
     if (argc > 2 && !strcmp(argv[2], "-p")) {
         show_pointers = 1;
     }
@@ -480,12 +556,16 @@ void shell_dump_appdata(int argc, char **argv) {
             (appdata_t*)a->in_schedule.next - kos_slot_base);
 }
 
-void shell_dump_taskdata(int argc, char **argv) {
-    // TODO: usage
-    int idx;
-    if (argc > 1) {
-        idx = strtol(argv[1], NULL, 0);
+static void
+shell_dump_taskdata(int argc, char **argv) {
+    const char *usage = \
+        "usage: dump_taskdata <index>\n"
+        "  index            index into taskdata array to dump";
+    if (argc < 2) {
+        fputs(usage, fout);
+        return;
     }
+    int idx = strtol(argv[1], NULL, 0);
     taskdata_t *t = kos_task_data + idx;
     fprintf(fout, "event_mask: %" PRIx32 "\n", t->event_mask);
     fprintf(fout, "pid: %" PRId32 "\n", t->pid);
@@ -496,7 +576,8 @@ void shell_dump_taskdata(int argc, char **argv) {
     fprintf(fout, "cpu_usage: %" PRIu32 "\n", t->cpu_usage);
 }
 
-void shell_mouse_move(int argc, char **argv) {
+static void
+shell_mouse_move(int argc, char **argv) {
     const char *usage = \
         "usage: mouse_move [-l] [-m] [-r] [-x {+|-|=}<value>]"
             "[-y {+|-|=}<value>] [-h {+|-}<value>] [-v {+|-}<value>]\n"
@@ -507,7 +588,10 @@ void shell_mouse_move(int argc, char **argv) {
         "  -y             increase, decrease or set y coordinate\n"
         "  -h             scroll horizontally\n"
         "  -v             scroll vertically\n";
-
+    if (!argc) {
+        fputs(usage, fout);
+        return;
+    }
     int lbheld = 0, mbheld = 0, rbheld = 0, xabs = 0, yabs = 0;
     int32_t xmoving = 0, ymoving = 0, hscroll = 0, vscroll = 0;
     int opt;
@@ -580,8 +664,15 @@ void shell_mouse_move(int argc, char **argv) {
     COVERAGE_OFF();
 }
 
-void shell_process_info(int argc, char **argv) {
-    (void)argc;
+static void
+shell_process_info(int argc, char **argv) {
+    const char *usage = \
+        "usage: process_info <pid>\n"
+        "  pid              process id to dump, -1 for self";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
     process_information_t info;
     int32_t pid = strtol(argv[1], NULL, 0);
     COVERAGE_ON();
@@ -592,16 +683,41 @@ void shell_process_info(int argc, char **argv) {
     fprintf(fout, "window_stack_value: %u\n", info.window_stack_value);
     fprintf(fout, "process_name: %s\n", info.process_name);
     fprintf(fout, "memory_start: 0x%.8" PRIx32 "\n", info.memory_start);
-    fprintf(fout, "used_memory: %u (0x%x)\n", info.used_memory, info.used_memory);
+    fprintf(fout, "used_memory: %u (0x%x)\n", info.used_memory,
+            info.used_memory);
     fprintf(fout, "pid: %u\n", info.pid);
-    fprintf(fout, "box: %u %u %u %u\n", info.box.left, info.box.top, info.box.width, info.box.height);
+    fprintf(fout, "box: %u %u %u %u\n", info.box.left, info.box.top,
+            info.box.width, info.box.height);
     fprintf(fout, "slot_state: %u\n", info.slot_state);
-    fprintf(fout, "client_box: %u %u %u %u\n", info.client_box.left, info.client_box.top, info.client_box.width, info.client_box.height);
+    fprintf(fout, "client_box: %u %u %u %u\n", info.client_box.left,
+            info.client_box.top, info.client_box.width, info.client_box.height);
     fprintf(fout, "wnd_state: 0x%.2" PRIx8 "\n", info.wnd_state);
 }
 
-void shell_display_number(int argc, char **argv) {
-    (void)argc;
+static void
+shell_display_number(int argc, char **argv) {
+    const char *usage = \
+        "usage: display_number <is_pointer> <base> <num_digits> <is_qword>"
+            " <show_lead_zeros> <num_or_ptr> <x> <y> <color> <fill_bg> <font>"
+            " <draw_to_buf> <scale_factor> <bg_color_or_buf>\n"
+        "  is_pointer       if num_or_ptr argument is a pointer\n"
+        "  base             0 - dec, 1 - hex, 2 - bin\n"
+        "  num_digits       how many digits to print\n"
+        "  is_qword         if 1, is_pointer = 1 and num_or_ptr is pointer\n"
+        "  show_lead_zeros  0/1\n"
+        "  num_or_ptr       number itself or a pointer to it\n"
+        "  x                x window coord\n"
+        "  y                y window coord\n"
+        "  color            argb in hex\n"
+        "  fill_bg          0/1\n"
+        "  font             0 = 6x9, 1 = 8x16\n"
+        "  draw_to_buf      0/1\n"
+        "  scale_factor     0 = x1, ..., 7 = x8\n"
+        "  bg_color_or_buf  depending on flags fill_bg and draw_to_buf";
+    if (argc != 15) {
+        fputs(usage, fout);
+        return;
+    }
     int is_pointer = strtoul(argv[1], NULL, 0);
     int base = strtoul(argv[2], NULL, 0);
     if (base == 10) base = 0;
@@ -621,13 +737,22 @@ void shell_display_number(int argc, char **argv) {
     int scale_factor = strtoul(argv[13], NULL, 0);
     uintptr_t background_color_or_buffer = strtoul(argv[14], NULL, 16);
     COVERAGE_ON();
-    umka_sys_display_number(is_pointer, base, digits_to_display, is_qword, show_leading_zeros, number_or_pointer, x, y, color, fill_background, font, draw_to_buffer, scale_factor, background_color_or_buffer);
+    umka_sys_display_number(is_pointer, base, digits_to_display, is_qword,
+                            show_leading_zeros, number_or_pointer, x, y, color,
+                            fill_background, font, draw_to_buffer, scale_factor,
+                            background_color_or_buffer);
     COVERAGE_OFF();
 }
 
-void shell_set_window_colors(int argc, char **argv) {
+static void
+shell_set_window_colors(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_window_colors <frame> <grab> <work_3d_dark> <work_3d_light>"
+            " <grab_text> <work> <work_button> <work_button_text> <work_text>"
+            " <work_graph>\n"
+        "  *                all colors are in hex";
     if (argc != (1 + sizeof(system_colors_t)/4)) {
-        fprintf(fout, "10 colors required\n");
+        fputs(usage, fout);
         return;
     }
     system_colors_t colors;
@@ -646,8 +771,14 @@ void shell_set_window_colors(int argc, char **argv) {
     COVERAGE_OFF();
 }
 
-void shell_get_window_colors(int argc, char **argv) {
-    (void)argc;
+static void
+shell_get_window_colors(int argc, char **argv) {
+    const char *usage = \
+        "usage: get_window_colors";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     (void)argv;
     system_colors_t colors;
     COVERAGE_ON();
@@ -665,8 +796,14 @@ void shell_get_window_colors(int argc, char **argv) {
     fprintf(fout, "0x%.8" PRIx32 " work_graph\n", colors.work_graph);
 }
 
-void shell_get_skin_height(int argc, char **argv) {
-    (void)argc;
+static void
+shell_get_skin_height(int argc, char **argv) {
+    const char *usage = \
+        "usage: get_skin_height";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     (void)argv;
     COVERAGE_ON();
     uint32_t skin_height = umka_sys_get_skin_height();
@@ -674,8 +811,14 @@ void shell_get_skin_height(int argc, char **argv) {
     fprintf(fout, "%" PRIu32 "\n", skin_height);
 }
 
-void shell_get_screen_area(int argc, char **argv) {
-    (void)argc;
+static void
+shell_get_screen_area(int argc, char **argv) {
+    const char *usage = \
+        "usage: get_screen_area";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     (void)argv;
     rect_t wa;
     COVERAGE_ON();
@@ -687,9 +830,16 @@ void shell_get_screen_area(int argc, char **argv) {
     fprintf(fout, "%" PRIu32 " bottom\n", wa.bottom);
 }
 
-void shell_set_screen_area(int argc, char **argv) {
+static void
+shell_set_screen_area(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_screen_area <left> <top> <right> <bottom>\n"
+        "  left             left x coord\n"
+        "  top              top y coord\n"
+        "  right            right x coord (not length!)\n"
+        "  bottom           bottom y coord";
     if (argc != 5) {
-        fprintf(fout, "left top right bottom\n");
+        fputs(usage, fout);
         return;
     }
     rect_t wa;
@@ -702,8 +852,14 @@ void shell_set_screen_area(int argc, char **argv) {
     COVERAGE_OFF();
 }
 
-void shell_get_skin_margins(int argc, char **argv) {
-    (void)argc;
+static void
+shell_get_skin_margins(int argc, char **argv) {
+    const char *usage = \
+        "usage: get_skin_margins";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     (void)argv;
     rect_t wa;
     COVERAGE_ON();
@@ -715,16 +871,30 @@ void shell_get_skin_margins(int argc, char **argv) {
     fprintf(fout, "%" PRIu32 " bottom\n", wa.bottom);
 }
 
-void shell_set_button_style(int argc, char **argv) {
-    (void)argc;
+static void
+shell_set_button_style(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_button_style <style>\n"
+        "  style            0 - flat, 1 - 3d";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
     uint32_t style = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     umka_sys_set_button_style(style);
     COVERAGE_OFF();
 }
 
-void shell_set_skin(int argc, char **argv) {
-    (void)argc;
+static void
+shell_set_skin(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_skin <path>\n"
+        "  path             i.e. /rd/1/DEFAULT.SKN";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
     const char *path = argv[1];
     COVERAGE_ON();
     int32_t status = umka_sys_set_skin(path);
@@ -732,8 +902,14 @@ void shell_set_skin(int argc, char **argv) {
     fprintf(fout, "status: %" PRIi32 "\n", status);
 }
 
-void shell_get_font_smoothing(int argc, char **argv) {
-    (void)argc;
+static void
+shell_get_font_smoothing(int argc, char **argv) {
+    const char *usage = \
+        "usage: get_font_smoothing";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     (void)argv;
     const char *names[] = {"off", "anti-aliasing", "subpixel"};
     COVERAGE_ON();
@@ -742,16 +918,29 @@ void shell_get_font_smoothing(int argc, char **argv) {
     fprintf(fout, "font smoothing: %i - %s\n", type, names[type]);
 }
 
-void shell_set_font_smoothing(int argc, char **argv) {
-    (void)argc;
+static void
+shell_set_font_smoothing(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_font_smoothing <mode>\n"
+        "  mode             0 - off, 1 - gray AA, 2 - subpixel AA";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
     int type = strtol(argv[1], NULL, 0);
     COVERAGE_ON();
     umka_sys_set_font_smoothing(type);
     COVERAGE_OFF();
 }
 
-void shell_get_font_size(int argc, char **argv) {
-    (void)argc;
+static void
+shell_get_font_size(int argc, char **argv) {
+    const char *usage = \
+        "usage: get_font_size";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     (void)argv;
     COVERAGE_ON();
     size_t size = umka_sys_get_font_size();
@@ -759,16 +948,38 @@ void shell_get_font_size(int argc, char **argv) {
     fprintf(fout, "%upx\n", size);
 }
 
-void shell_set_font_size(int argc, char **argv) {
-    (void)argc;
+static void
+shell_set_font_size(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_font_size <size>\n"
+        "  size             in pixels";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
     uint32_t size = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     umka_sys_set_font_size(size);
     COVERAGE_OFF();
 }
 
-void shell_button(int argc, char **argv) {
-    (void)argc;
+static void
+shell_button(int argc, char **argv) {
+    const char *usage = \
+        "usage: button <x> <xsize> <y> <ysize> <id> <color> <draw_button>"
+            " <draw_frame>\n"
+        "  x                x\n"
+        "  xsize            may be size-1, check it\n"
+        "  y                y\n"
+        "  ysize            may be size-1, check it\n"
+        "  id               24-bit\n"
+        "  color            hex\n"
+        "  draw_button      0/1\n"
+        "  draw_frame       0/1";
+    if (argc != 9) {
+        fputs(usage, fout);
+        return;
+    }
     size_t x     = strtoul(argv[1], NULL, 0);
     size_t xsize = strtoul(argv[2], NULL, 0);
     size_t y     = strtoul(argv[3], NULL, 0);
@@ -778,12 +989,24 @@ void shell_button(int argc, char **argv) {
     int draw_button = strtoul(argv[7], NULL, 0);
     int draw_frame = strtoul(argv[8], NULL, 0);
     COVERAGE_ON();
-    umka_sys_button(x, xsize, y, ysize, button_id, draw_button, draw_frame, color);
+    umka_sys_button(x, xsize, y, ysize, button_id, draw_button, draw_frame,
+                    color);
     COVERAGE_OFF();
 }
 
-void shell_put_image(int argc, char **argv) {
-    (void)argc;
+static void
+shell_put_image(int argc, char **argv) {
+    const char *usage = \
+        "usage: put_image <file> <xsize> <ysize> <x> <y>\n"
+        "  file             file with rgb triplets\n"
+        "  xsize            x size\n"
+        "  ysize            y size\n"
+        "  x                x coord\n"
+        "  y                y coord";
+    if (argc != 6) {
+        fputs(usage, fout);
+        return;
+    }
     FILE *f = fopen(argv[1], "r");
     fseek(f, 0, SEEK_END);
     size_t fsize = ftell(f);
@@ -801,8 +1024,22 @@ void shell_put_image(int argc, char **argv) {
     free(image);
 }
 
-void shell_put_image_palette(int argc, char **argv) {
-    (void)argc;
+static void
+shell_put_image_palette(int argc, char **argv) {
+    const char *usage = \
+        "usage: put_image_palette <file> <xsize> <ysize> <x> <y> <bpp>"
+            " <row_offset>\n"
+        "  file             path/to/file, contents according tp bpp argument\n"
+        "  xsize            x size\n"
+        "  ysize            y size\n"
+        "  x                x coord\n"
+        "  y                y coord\n"
+        "  bpp              bits per pixel\n"
+        "  row_offset       in bytes";
+    if (argc != 8) {
+        fputs(usage, fout);
+        return;
+    }
     FILE *f = fopen(argv[1], "r");
     fseek(f, 0, SEEK_END);
     size_t fsize = ftell(f);
@@ -818,12 +1055,26 @@ void shell_put_image_palette(int argc, char **argv) {
     void *palette = NULL;
     size_t row_offset = strtoul(argv[7], NULL, 0);
     COVERAGE_ON();
-    umka_sys_put_image_palette(image, xsize, ysize, x, y, bpp, palette, row_offset);
+    umka_sys_put_image_palette(image, xsize, ysize, x, y, bpp, palette,
+                               row_offset);
     COVERAGE_OFF();
     free(image);
 }
 
-void shell_draw_rect(int argc, char **argv) {
+static void
+shell_draw_rect(int argc, char **argv) {
+    const char *usage = \
+        "usage: draw_rect <x> <xsize> <y> <ysize> <color> [-g]\n"
+        "  x                x coord\n"
+        "  xsize            x size\n"
+        "  y                y coord\n"
+        "  ysize            y size\n"
+        "  color            in hex\n"
+        "  -g               0/1 - gradient";
+    if (argc < 6) {
+        fputs(usage, fout);
+        return;
+    }
     size_t x     = strtoul(argv[1], NULL, 0);
     size_t xsize = strtoul(argv[2], NULL, 0);
     size_t y     = strtoul(argv[3], NULL, 0);
@@ -835,8 +1086,14 @@ void shell_draw_rect(int argc, char **argv) {
     COVERAGE_OFF();
 }
 
-void shell_get_screen_size(int argc, char **argv) {
-    (void)argc;
+static void
+shell_get_screen_size(int argc, char **argv) {
+    const char *usage = \
+        "usage: get_screen_size";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     (void)argv;
     uint32_t xsize, ysize;
     COVERAGE_ON();
@@ -845,7 +1102,20 @@ void shell_get_screen_size(int argc, char **argv) {
     fprintf(fout, "%" PRIu32 "x%" PRIu32 "\n", xsize, ysize);
 }
 
-void shell_draw_line(int argc, char **argv) {
+static void
+shell_draw_line(int argc, char **argv) {
+    const char *usage = \
+        "usage: draw_line <xbegin> <xend> <ybegin> <yend> <color> [-i]\n"
+        "  xbegin           x left coord\n"
+        "  xend             x right coord\n"
+        "  ybegin           y top coord\n"
+        "  yend             y bottom coord\n"
+        "  color            hex\n"
+        "  -i               inverted color";
+    if (argc < 6) {
+        fputs(usage, fout);
+        return;
+    }
     size_t x    = strtoul(argv[1], NULL, 0);
     size_t xend = strtoul(argv[2], NULL, 0);
     size_t y    = strtoul(argv[3], NULL, 0);
@@ -857,8 +1127,16 @@ void shell_draw_line(int argc, char **argv) {
     COVERAGE_OFF();
 }
 
-void shell_set_window_caption(int argc, char **argv) {
-    (void)argc;
+static void
+shell_set_window_caption(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_window_caption <caption> <encoding>\n"
+        "  caption          asciiz string\n"
+        "  encoding         1 = cp866, 2 = UTF-16LE, 3 = UTF-8";
+    if (argc != 3) {
+        fputs(usage, fout);
+        return;
+    }
     const char *caption = argv[1];
     int encoding = strtoul(argv[2], NULL, 0);
     COVERAGE_ON();
@@ -866,9 +1144,28 @@ void shell_set_window_caption(int argc, char **argv) {
     COVERAGE_OFF();
 }
 
-
-void shell_draw_window(int argc, char **argv) {
-    (void)argc;
+static void
+shell_draw_window(int argc, char **argv) {
+    const char *usage = \
+        "usage: draw_window <x> <xsize> <y> <ysize> <color> <has_caption>"
+            " <client_relative> <fill_workarea> <gradient_fill> <movable>"
+            " <style> <caption>\n"
+        "  x                x coord\n"
+        "  xsize            x size\n"
+        "  y                y coord\n"
+        "  ysize            y size\n"
+        "  color            hex\n"
+        "  has_caption      0/1\n"
+        "  client_relative  0/1\n"
+        "  fill_workarea    0/1\n"
+        "  gradient_fill    0/1\n"
+        "  movable          0/1\n"
+        "  style            1 - draw nothing, 3 - skinned, 4 - skinned fixed\n"
+        "  caption          asciiz";
+    if (argc != 13) {
+        fputs(usage, fout);
+        return;
+    }
     size_t x     = strtoul(argv[1], NULL, 0);
     size_t xsize = strtoul(argv[2], NULL, 0);
     size_t y     = strtoul(argv[3], NULL, 0);
@@ -882,20 +1179,40 @@ void shell_draw_window(int argc, char **argv) {
     int style = strtoul(argv[11], NULL, 0);
     const char *caption = argv[12];
     COVERAGE_ON();
-    umka_sys_draw_window(x, xsize, y, ysize, color, has_caption, client_relative, fill_workarea, gradient_fill, movable, style, caption);
+    umka_sys_draw_window(x, xsize, y, ysize, color, has_caption,
+                         client_relative, fill_workarea, gradient_fill, movable,
+                         style, caption);
     COVERAGE_OFF();
 }
 
-void shell_window_redraw(int argc, char **argv) {
-    (void)argc;
+static void
+shell_window_redraw(int argc, char **argv) {
+    const char *usage = \
+        "usage: window_redraw <1|2>\n"
+        "  1                begin\n"
+        "  2                end";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
     int begin_end = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     umka_sys_window_redraw(begin_end);
     COVERAGE_OFF();
 }
 
-void shell_move_window(int argc, char **argv) {
-    (void)argc;
+static void
+shell_move_window(int argc, char **argv) {
+    const char *usage = \
+        "usage: move_window <x> <y> <xsize> <ysize>\n"
+        "  x                new x coord\n"
+        "  y                new y coord\n"
+        "  xsize            x size -1\n"
+        "  ysize            y size -1";
+    if (argc != 5) {
+        fputs(usage, fout);
+        return;
+    }
     size_t x      = strtoul(argv[1], NULL, 0);
     size_t y      = strtoul(argv[2], NULL, 0);
     ssize_t xsize = strtol(argv[3], NULL, 0);
@@ -905,8 +1222,29 @@ void shell_move_window(int argc, char **argv) {
     COVERAGE_OFF();
 }
 
-void shell_blit_bitmap(int argc, char **argv) {
-    (void)argc;
+static void
+shell_blit_bitmap(int argc, char **argv) {
+    const char *usage = \
+        "usage: blit_bitmap <dstx> <dsty> <dstxsize> <dstysize> <srcx> <srcy>"
+            " <srcxsize> <srcysize> <operation> <background> <transparent>"
+            " <client_relative> <row_length>\n"
+        "  dstx             dst rect x offset, window-relative\n"
+        "  dsty             dst rect y offset, window-relative\n"
+        "  dstxsize         dst rect width\n"
+        "  dstysize         dst rect height\n"
+        "  srcx             src rect x offset, window-relative\n"
+        "  srcy             src rect y offset, window-relative\n"
+        "  srcxsize         src rect width\n"
+        "  srcysize         src rect height\n"
+        "  operation        0 - copy\n"
+        "  background       0/1 - blit into background surface\n"
+        "  transparent      0/1\n"
+        "  client_relative  0/1\n"
+        "  row_length       in bytes";
+    if (argc != 15) {
+        fputs(usage, fout);
+        return;
+    }
     FILE *f = fopen(argv[1], "r");
     fseek(f, 0, SEEK_END);
     size_t fsize = ftell(f);
@@ -927,40 +1265,57 @@ void shell_blit_bitmap(int argc, char **argv) {
     int transparent = strtoul(argv[12], NULL, 0);
     int client_relative = strtoul(argv[13], NULL, 0);
     int row_length = strtoul(argv[14], NULL, 0);
-    uint32_t params[] = {dstx, dsty, dstxsize, dstysize, srcx, srcy, srcxsize, srcysize, (uintptr_t)image, row_length};
+    uint32_t params[] = {dstx, dsty, dstxsize, dstysize, srcx, srcy, srcxsize,
+                         srcysize, (uintptr_t)image, row_length};
     COVERAGE_ON();
-    umka_sys_blit_bitmap(operation, background, transparent, client_relative, params);
+    umka_sys_blit_bitmap(operation, background, transparent, client_relative,
+                         params);
     COVERAGE_OFF();
     free(image);
 }
 
-void shell_scrot(int argc, char **argv) {
-    (void)argc;
+static void
+shell_scrot(int argc, char **argv) {
+    const char *usage = \
+        "usage: scrot <file>\n"
+        "  file             path/to/file in png format";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
     uint32_t xsize, ysize;
     COVERAGE_ON();
     umka_sys_get_screen_size(&xsize, &ysize);
     COVERAGE_OFF();
 
-    uint32_t *lfb = kos_lfb_base;
+    uint32_t *lfb = (uint32_t*)kos_lfb_base;    // assume 32bpp
     for (size_t y = 0; y < ysize; y++) {
         for (size_t x = 0; x < xsize; x++) {
             *lfb++ |= 0xff000000;
         }
     }
 
-    unsigned error = lodepng_encode32_file(argv[1], (const unsigned char *)kos_lfb_base, xsize, ysize);
+    unsigned error = lodepng_encode32_file(argv[1], kos_lfb_base, xsize, ysize);
     if(error) fprintf(fout, "error %u: %s\n", error, lodepng_error_text(error));
 }
 
-void shell_cd(int argc, char **argv) {
-    (void)argc;
+static void
+shell_cd(int argc, char **argv) {
+    const char *usage = \
+        "usage: cd <path>\n"
+        "  path             path/to/dir";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
     COVERAGE_ON();
     umka_sys_set_cwd(argv[1]);
     COVERAGE_OFF();
     cur_dir_changed = true;
 }
 
-void ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
+static void
+ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
     f7080ret_t r;
     size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 : BDFE_LEN_UNICODE;
     uint32_t requested = fX0->size;
@@ -997,9 +1352,11 @@ void ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
     }
 }
 
-void ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
+static void
+ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
     f7080ret_t r;
-    size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 : BDFE_LEN_UNICODE;
+    size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 :
+                                                 BDFE_LEN_UNICODE;
     while (true) {
         COVERAGE_ON();
         umka_sys_lfn(fX0, &r, f70or80);
@@ -1030,7 +1387,8 @@ void ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
     }
 }
 
-fs_enc_t parse_encoding(const char *str) {
+static fs_enc_t
+parse_encoding(const char *str) {
     fs_enc_t enc;
     if (!strcmp(str, "default")) {
         enc = DEFAULT_ENCODING;
@@ -1046,8 +1404,15 @@ fs_enc_t parse_encoding(const char *str) {
     return enc;
 }
 
-void shell_exec(int argc, char **argv) {
-    (void)argc;
+static void
+shell_exec(int argc, char **argv) {
+    const char *usage = \
+        "usage: exec <file>\n"
+        "  file           executable to run";
+    if (!argc) {
+        fputs(usage, fout);
+        return;
+    }
     f7080s7arg_t fX0 = {.sf = 7};
     f7080ret_t r;
     int opt = 1;
@@ -1068,7 +1433,12 @@ void shell_exec(int argc, char **argv) {
     print_f70_status(&r, 1);
 }
 
-void shell_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
+static void
+shell_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
+    if (!argc) {
+        fputs(usage, fout);
+        return;
+    }
     int opt;
     optind = 1;
     const char *optstring = (f70or80 == F70) ? "f:c:e:" : "f:c:e:p:";
@@ -1100,8 +1470,10 @@ void shell_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
     }
 
     size_t bdfe_len = (readdir_enc <= CP866) ? BDFE_LEN_CP866 : BDFE_LEN_UNICODE;
-    f7080s1info_t *dir = (f7080s1info_t*)malloc(sizeof(f7080s1info_t) + bdfe_len * MAX_DIRENTS_TO_READ);
-    f7080s1arg_t fX0 = {.sf = 1, .offset = from_idx, .encoding = readdir_enc, .size = count, .buf = dir};
+    f7080s1info_t *dir = (f7080s1info_t*)malloc(sizeof(f7080s1info_t) +
+                                                bdfe_len * MAX_DIRENTS_TO_READ);
+    f7080s1arg_t fX0 = {.sf = 1, .offset = from_idx, .encoding = readdir_enc,
+                        .size = count, .buf = dir};
     if (f70or80 == F70) {
         fX0.u.f70.zero = 0;
         fX0.u.f70.path = path;
@@ -1118,7 +1490,8 @@ void shell_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
     return;
 }
 
-void shell_ls70(int argc, char **argv) {
+static void
+shell_ls70(int argc, char **argv) {
     const char *usage = \
         "usage: ls70 [dir] [option]...\n"
         "  -f number        index of the first dir entry to read\n"
@@ -1128,7 +1501,8 @@ void shell_ls70(int argc, char **argv) {
     shell_ls(argc, argv, usage, F70);
 }
 
-void shell_ls80(int argc, char **argv) {
+static void
+shell_ls80(int argc, char **argv) {
     const char *usage = \
         "usage: ls80 [dir] [option]...\n"
         "  -f number        index of the first dir entry to read\n"
@@ -1140,8 +1514,15 @@ void shell_ls80(int argc, char **argv) {
     shell_ls(argc, argv, usage, F80);
 }
 
-void shell_stat(int argc, char **argv, f70or80_t f70or80) {
-    (void)argc;
+static void
+shell_stat(int argc, char **argv, f70or80_t f70or80) {
+    const char *usage = \
+        "usage: stat <file>\n"
+        "  file             path/to/file";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
     f7080s5arg_t fX0 = {.sf = 5, .flags = 0};
     f7080ret_t r;
     bdfe_t file;
@@ -1166,7 +1547,7 @@ void shell_stat(int argc, char **argv, f70or80_t f70or80) {
         fprintf(fout, "size: %llu\n", file.size);
     }
 
-#if PRINT_DATE_TIME == 1
+#if PRINT_DATE_TIME == 1    // TODO: runtime, argv flag
     time_t time;
     struct tm *t;
     time = kos_time_to_epoch(&file.ctime);
@@ -1188,23 +1569,25 @@ void shell_stat(int argc, char **argv, f70or80_t f70or80) {
     return;
 }
 
-void shell_stat70(int argc, char **argv) {
+static void
+shell_stat70(int argc, char **argv) {
     shell_stat(argc, argv, F70);
 }
 
-void shell_stat80(int argc, char **argv) {
+static void
+shell_stat80(int argc, char **argv) {
     shell_stat(argc, argv, F80);
 }
 
-void shell_read(int argc, char **argv, f70or80_t f70or80) {
-    (void)argc;
+static void
+shell_read(int argc, char **argv, f70or80_t f70or80, const char *usage) {
+    if (argc < 3) {
+        fputs(usage, fout);
+        return;
+    }
     f7080s0arg_t fX0 = {.sf = 0};
     f7080ret_t r;
     bool dump_bytes = false, dump_hash = false;
-    if (argc < 4) {
-        fprintf(fout, "usage: %s <offset> <length> [-b] [-h] [-e cp866|utf8|utf16]\n", argv[0]);
-        return;
-    }
     int opt = 1;
     if (f70or80 == F70) {
         fX0.u.f70.zero = 0;
@@ -1224,7 +1607,8 @@ void shell_read(int argc, char **argv, f70or80_t f70or80) {
             dump_hash = true;
         } else if (!strcmp(argv[opt], "-e")) {
             if (f70or80 == F70) {
-                fprintf(fout, "f70 doesn't accept encoding parameter, use f80\n");
+                fprintf(fout, "f70 doesn't accept encoding parameter,"
+                        " use f80\n");
                 return;
             }
         } else {
@@ -1250,16 +1634,42 @@ void shell_read(int argc, char **argv, f70or80_t f70or80) {
     return;
 }
 
-void shell_read70(int argc, char **argv) {
-    shell_read(argc, argv, F70);
+static void
+shell_read70(int argc, char **argv) {
+    const char *usage = \
+        "usage: read70 <file> <offset> <length> [-b] [-h]\n"
+        "  file             path/to/file\n"
+        "  offset           in bytes\n"
+        "  length           in bytes\n"
+        "  -b               dump bytes in hex\n"
+        "  -h               print hash of data read";
+
+    shell_read(argc, argv, F70, usage);
 }
 
-void shell_read80(int argc, char **argv) {
-    shell_read(argc, argv, F80);
+static void
+shell_read80(int argc, char **argv) {
+    const char *usage = \
+        "usage: read80 <file> <offset> <length> [-b] [-h]"
+            " [-e cp866|utf8|utf16]\n"
+        "  file             path/to/file\n"
+        "  offset           in bytes\n"
+        "  length           in bytes\n"
+        "  -b               dump bytes in hex\n"
+        "  -h               print hash of data read\n"
+        "  -e               encoding";
+    shell_read(argc, argv, F80, usage);
 }
 
-void shell_acpi_preload_table(int argc, char **argv) {
-    (void)argc;
+static void
+shell_acpi_preload_table(int argc, char **argv) {
+    const char *usage = \
+        "usage: acpi_preload_table <file>\n"
+        "  file             path/to/local/file.aml";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
     FILE *f = fopen(argv[1], "r");
     if (!f) {
         fprintf(fout, "[umka] can't open file: %s\n", argv[1]);
@@ -1277,18 +1687,25 @@ void shell_acpi_preload_table(int argc, char **argv) {
     kos_acpi_ssdt_cnt++;
 }
 
-void shell_acpi_enable(int argc, char **argv) {
-    (void)argc;
+static void
+shell_acpi_enable(int argc, char **argv) {
+    const char *usage = \
+        "usage: acpi_enable";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     (void)argv;
     COVERAGE_ON();
     kos_enable_acpi();
     COVERAGE_OFF();
 }
 
-void shell_acpi_set_usage(int argc, char **argv) {
+static void
+shell_acpi_set_usage(int argc, char **argv) {
     const char *usage = \
         "usage: acpi_set_usage <num>\n"
-        "  num            one of ACPI_USAGE_*";
+        "  num            one of ACPI_USAGE_* constants";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1297,7 +1714,8 @@ void shell_acpi_set_usage(int argc, char **argv) {
     kos_acpi_usage = acpi_usage;
 }
 
-void shell_acpi_get_usage(int argc, char **argv) {
+static void
+shell_acpi_get_usage(int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: acpi_get_usage";
@@ -1308,7 +1726,8 @@ void shell_acpi_get_usage(int argc, char **argv) {
     fprintf(fout, "ACPI usage: %" PRIu32 "\n", kos_acpi_usage);
 }
 
-void shell_acpi_call(int argc, char **argv) {
+static void
+shell_acpi_call(int argc, char **argv) {
     const char *usage = \
         "usage: acpi_call <method> [args...]\n"
         "  method         name of acpi method to call, e.g. \\_SB_PCI0_PRT";
@@ -1329,7 +1748,8 @@ void shell_acpi_call(int argc, char **argv) {
     fprintf(fout, "acpi method returned\n");
 }
 
-void shell_pci_set_path(int argc, char **argv) {
+static void
+shell_pci_set_path(int argc, char **argv) {
     const char *usage = \
         "usage: pci_set_path <path>\n"
         "  path           where aaaa:bb:cc.d dirs are";
@@ -1340,7 +1760,8 @@ void shell_pci_set_path(int argc, char **argv) {
     strcpy(pci_path, argv[1]);
 }
 
-void shell_pci_get_path(int argc, char **argv) {
+static void
+shell_pci_get_path(int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: pci_get_path";
@@ -1351,28 +1772,47 @@ void shell_pci_get_path(int argc, char **argv) {
     fprintf(fout, "pci path: %s\n", pci_path);
 }
 
-void shell_stack_init(int argc, char **argv) {
-    (void)argc;
+static void
+shell_stack_init(int argc, char **argv) {
+    const char *usage = \
+        "usage: stack_init";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     (void)argv;
     umka_stack_init();
 }
 
-void shell_net_add_device(int argc, char **argv) {
-    (void)argc;
+static void
+shell_net_add_device(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_add_device";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     (void)argv;
     net_device_t *vnet = vnet_init(42);   // FIXME: tap & list like block devices
     int32_t dev_num = kos_net_add_device(vnet);
     fprintf(fout, "device number: %" PRIi32 "\n", dev_num);
 }
 
-void shell_net_get_dev_count(int argc, char **argv) {
-    (void)argc;
+static void
+shell_net_get_dev_count(int argc, char **argv) {
+    const char *usage = \
+        "usage: net_get_dev_count";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     (void)argv;
     uint32_t count = umka_sys_net_get_dev_count();
     fprintf(fout, "active network devices: %u\n", count);
 }
 
-void shell_net_get_dev_type(int argc, char **argv) {
+static void
+shell_net_get_dev_type(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev_type <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1384,11 +1824,13 @@ void shell_net_get_dev_type(int argc, char **argv) {
     int32_t dev_type = umka_sys_net_get_dev_type(dev_num);
     fprintf(fout, "status: %s\n", dev_type == -1 ? "fail" : "ok");
     if (dev_type != -1) {
-        fprintf(fout, "type of network device #%" PRIu8 ": %i\n", dev_num, dev_type);
+        fprintf(fout, "type of network device #%" PRIu8 ": %i\n",
+                dev_num, dev_type);
     }
 }
 
-void shell_net_get_dev_name(int argc, char **argv) {
+static void
+shell_net_get_dev_name(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev_name <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1401,11 +1843,13 @@ void shell_net_get_dev_name(int argc, char **argv) {
     int32_t status = umka_sys_net_get_dev_name(dev_num, dev_name);
     fprintf(fout, "status: %s\n", status == -1 ? "fail" : "ok");
     if (status != -1) {
-        fprintf(fout, "name of network device #%" PRIu8 ": %s\n", dev_num, dev_name);
+        fprintf(fout, "name of network device #%" PRIu8 ": %s\n",
+                dev_num, dev_name);
     }
 }
 
-void shell_net_dev_reset(int argc, char **argv) {
+static void
+shell_net_dev_reset(int argc, char **argv) {
     const char *usage = \
         "usage: net_dev_reset <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1418,7 +1862,8 @@ void shell_net_dev_reset(int argc, char **argv) {
     fprintf(fout, "status: %s\n", status == -1 ? "fail" : "ok");
 }
 
-void shell_net_dev_stop(int argc, char **argv) {
+static void
+shell_net_dev_stop(int argc, char **argv) {
     const char *usage = \
         "usage: net_dev_stop <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1431,7 +1876,8 @@ void shell_net_dev_stop(int argc, char **argv) {
     fprintf(fout, "status: %s\n", status == -1 ? "fail" : "ok");
 }
 
-void shell_net_get_dev(int argc, char **argv) {
+static void
+shell_net_get_dev(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1447,7 +1893,8 @@ void shell_net_get_dev(int argc, char **argv) {
     }
 }
 
-void shell_net_get_packet_tx_count(int argc, char **argv) {
+static void
+shell_net_get_packet_tx_count(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_packet_tx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1464,7 +1911,8 @@ void shell_net_get_packet_tx_count(int argc, char **argv) {
     }
 }
 
-void shell_net_get_packet_rx_count(int argc, char **argv) {
+static void
+shell_net_get_packet_rx_count(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_packet_rx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1481,7 +1929,8 @@ void shell_net_get_packet_rx_count(int argc, char **argv) {
     }
 }
 
-void shell_net_get_byte_tx_count(int argc, char **argv) {
+static void
+shell_net_get_byte_tx_count(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_byte_tx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1498,7 +1947,8 @@ void shell_net_get_byte_tx_count(int argc, char **argv) {
     }
 }
 
-void shell_net_get_byte_rx_count(int argc, char **argv) {
+static void
+shell_net_get_byte_rx_count(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_byte_rx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1515,7 +1965,8 @@ void shell_net_get_byte_rx_count(int argc, char **argv) {
     }
 }
 
-void print_link_status_names(uint32_t status) {
+static void
+print_link_status_names(uint32_t status) {
     switch (status & 0x3) {
     case ETH_LINK_DOWN:
         fprintf(fout, "ETH_LINK_DOWN");
@@ -1547,7 +1998,8 @@ void print_link_status_names(uint32_t status) {
     }
 }
 
-void shell_net_get_link_status(int argc, char **argv) {
+static void
+shell_net_get_link_status(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_link_status <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1566,7 +2018,8 @@ void shell_net_get_link_status(int argc, char **argv) {
     }
 }
 
-void shell_net_open_socket(int argc, char **argv) {
+static void
+shell_net_open_socket(int argc, char **argv) {
     const char *usage = \
         "usage: net_open_socket <domain> <type> <protocol>\n"
         "  domain         domain\n"
@@ -1585,7 +2038,8 @@ void shell_net_open_socket(int argc, char **argv) {
 // UINT32_MAX
 }
 
-void shell_net_close_socket(int argc, char **argv) {
+static void
+shell_net_close_socket(int argc, char **argv) {
     const char *usage = \
         "usage: net_close_socket <socket number>\n"
         "  socket number  socket number";
@@ -1599,7 +2053,8 @@ void shell_net_close_socket(int argc, char **argv) {
     fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
-void shell_net_bind(int argc, char **argv) {
+static void
+shell_net_bind(int argc, char **argv) {
     const char *usage = \
         "usage: net_bind <fd> <port> <ip>\n"
         "  fd             socket number\n"
@@ -1624,7 +2079,8 @@ void shell_net_bind(int argc, char **argv) {
     fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
-void shell_net_listen(int argc, char **argv) {
+static void
+shell_net_listen(int argc, char **argv) {
     const char *usage = \
         "usage: net_listen <fd> <backlog>\n"
         "  fd             socket number\n"
@@ -1640,7 +2096,8 @@ void shell_net_listen(int argc, char **argv) {
     fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
-void shell_net_connect(int argc, char **argv) {
+static void
+shell_net_connect(int argc, char **argv) {
     const char *usage = \
         "usage: net_connect <fd> <port> <ip>\n"
         "  fd             socket number\n"
@@ -1665,7 +2122,8 @@ void shell_net_connect(int argc, char **argv) {
     fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
-void shell_net_accept(int argc, char **argv) {
+static void
+shell_net_accept(int argc, char **argv) {
     const char *usage = \
         "usage: net_accept <fd> <port> <ip>\n"
         "  fd             socket number\n"
@@ -1690,7 +2148,8 @@ void shell_net_accept(int argc, char **argv) {
     fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
-void shell_net_eth_read_mac(int argc, char **argv) {
+static void
+shell_net_eth_read_mac(int argc, char **argv) {
     const char *usage = \
         "usage: net_eth_read_mac <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1710,7 +2169,8 @@ void shell_net_eth_read_mac(int argc, char **argv) {
     }
 }
 
-void shell_net_ipv4_get_addr(int argc, char **argv) {
+static void
+shell_net_ipv4_get_addr(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_addr <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1729,7 +2189,8 @@ void shell_net_ipv4_get_addr(int argc, char **argv) {
     }
 }
 
-void shell_net_ipv4_set_addr(int argc, char **argv) {
+static void
+shell_net_ipv4_set_addr(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_addr <dev_num> <addr>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -1749,7 +2210,8 @@ void shell_net_ipv4_set_addr(int argc, char **argv) {
     }
 }
 
-void shell_net_ipv4_get_dns(int argc, char **argv) {
+static void
+shell_net_ipv4_get_dns(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_dns <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1768,7 +2230,8 @@ void shell_net_ipv4_get_dns(int argc, char **argv) {
     }
 }
 
-void shell_net_ipv4_set_dns(int argc, char **argv) {
+static void
+shell_net_ipv4_set_dns(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_dns <dev_num> <dns>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -1787,7 +2250,8 @@ void shell_net_ipv4_set_dns(int argc, char **argv) {
     }
 }
 
-void shell_net_ipv4_get_subnet(int argc, char **argv) {
+static void
+shell_net_ipv4_get_subnet(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_subnet <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1806,7 +2270,8 @@ void shell_net_ipv4_get_subnet(int argc, char **argv) {
     }
 }
 
-void shell_net_ipv4_set_subnet(int argc, char **argv) {
+static void
+shell_net_ipv4_set_subnet(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_subnet <dev_num> <subnet>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -1826,7 +2291,8 @@ void shell_net_ipv4_set_subnet(int argc, char **argv) {
     }
 }
 
-void shell_net_ipv4_get_gw(int argc, char **argv) {
+static void
+shell_net_ipv4_get_gw(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_gw <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1845,7 +2311,8 @@ void shell_net_ipv4_get_gw(int argc, char **argv) {
     }
 }
 
-void shell_net_ipv4_set_gw(int argc, char **argv) {
+static void
+shell_net_ipv4_set_gw(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_gw <dev_num> <gw>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -1865,7 +2332,8 @@ void shell_net_ipv4_set_gw(int argc, char **argv) {
     }
 }
 
-void shell_net_arp_get_count(int argc, char **argv) {
+static void
+shell_net_arp_get_count(int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_get_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
@@ -1882,7 +2350,8 @@ void shell_net_arp_get_count(int argc, char **argv) {
     }
 }
 
-void shell_net_arp_get_entry(int argc, char **argv) {
+static void
+shell_net_arp_get_entry(int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_get_entry <dev_num> <arp_num>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -1912,7 +2381,8 @@ void shell_net_arp_get_entry(int argc, char **argv) {
     }
 }
 
-void shell_net_arp_add_entry(int argc, char **argv) {
+static void
+shell_net_arp_add_entry(int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_add_entry <dev_num> <addr> <mac> <status> <ttl>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -1939,7 +2409,8 @@ void shell_net_arp_add_entry(int argc, char **argv) {
     }
 }
 
-void shell_net_arp_del_entry(int argc, char **argv) {
+static void
+shell_net_arp_del_entry(int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_del_entry <dev_num> <arp_num>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -1956,7 +2427,8 @@ void shell_net_arp_del_entry(int argc, char **argv) {
     }
 }
 
-void shell_bg_set_size(int argc, char **argv) {
+static void
+shell_bg_set_size(int argc, char **argv) {
     const char *usage = \
         "usage: bg_set_size <xsize> <ysize>\n"
         "  xsize          in pixels\n"
@@ -1970,7 +2442,8 @@ void shell_bg_set_size(int argc, char **argv) {
     umka_sys_bg_set_size(xsize, ysize);
 }
 
-void shell_bg_put_pixel(int argc, char **argv) {
+static void
+shell_bg_put_pixel(int argc, char **argv) {
     const char *usage = \
         "usage: bg_put_pixel <offset> <color>\n"
         "  offset         in bytes, (x+y*xsize)*3\n"
@@ -1984,7 +2457,8 @@ void shell_bg_put_pixel(int argc, char **argv) {
     umka_sys_bg_put_pixel(offset, color);
 }
 
-void shell_bg_redraw(int argc, char **argv) {
+static void
+shell_bg_redraw(int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: bg_redraw";
@@ -1995,7 +2469,8 @@ void shell_bg_redraw(int argc, char **argv) {
     umka_sys_bg_redraw();
 }
 
-void shell_bg_set_mode(int argc, char **argv) {
+static void
+shell_bg_set_mode(int argc, char **argv) {
     const char *usage = \
         "usage: bg_set_mode <mode>\n"
         "  mode           1 = tile, 2 = stretch";
@@ -2007,7 +2482,8 @@ void shell_bg_set_mode(int argc, char **argv) {
     umka_sys_bg_set_mode(mode);
 }
 
-void shell_bg_put_img(int argc, char **argv) {
+static void
+shell_bg_put_img(int argc, char **argv) {
     const char *usage = \
         "usage: bg_put_img <image> <offset>\n"
         "  image          file\n"
@@ -2027,7 +2503,8 @@ void shell_bg_put_img(int argc, char **argv) {
     umka_sys_bg_put_img(image, offset, fsize);
 }
 
-void shell_bg_map(int argc, char **argv) {
+static void
+shell_bg_map(int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: bg_map";
@@ -2039,7 +2516,8 @@ void shell_bg_map(int argc, char **argv) {
     fprintf(fout, "%p\n", addr);
 }
 
-void shell_bg_unmap(int argc, char **argv) {
+static void
+shell_bg_unmap(int argc, char **argv) {
     const char *usage = \
         "usage: bg_unmap <addr>\n"
         "  addr           return value of bg_map";
@@ -2052,115 +2530,147 @@ void shell_bg_unmap(int argc, char **argv) {
     fprintf(fout, "status = %d\n", status);
 }
 
-typedef struct {
-    char *name;
-    void (*func) (int, char **);
-} func_table_t;
+static void shell_help(int argc, char **argv);
 
-func_table_t funcs[] = {
-    { "i40",                     shell_i40 },
-    { "ramdisk_init",            shell_ramdisk_init },
-    { "disk_add",                shell_disk_add },
-    { "disk_del",                shell_disk_del },
-    { "ls70",                    shell_ls70 },
-    { "ls80",                    shell_ls80 },
-    { "stat70",                  shell_stat70 },
-    { "stat80",                  shell_stat80 },
-    { "read70",                  shell_read70 },
-    { "read80",                  shell_read80 },
-    { "pwd",                     shell_pwd },
-    { "cd",                      shell_cd },
-    { "set_cwd",                 shell_cd },
-    { "draw_window",             shell_draw_window },
-    { "set_pixel",               shell_set_pixel },
-    { "write_text",              shell_write_text },
-    { "put_image",               shell_put_image },
-    { "button",                  shell_button },
-    { "process_info",            shell_process_info },
-    { "window_redraw",           shell_window_redraw },
-    { "draw_rect",               shell_draw_rect },
-    { "get_screen_size",         shell_get_screen_size },
-    { "draw_line",               shell_draw_line },
-    { "display_number",          shell_display_number },
-    { "set_button_style",        shell_set_button_style },
-    { "set_window_colors",       shell_set_window_colors },
-    { "get_window_colors",       shell_get_window_colors },
-    { "get_skin_height",         shell_get_skin_height },
-    { "get_screen_area",         shell_get_screen_area },
-    { "set_screen_area",         shell_set_screen_area },
-    { "get_skin_margins",        shell_get_skin_margins },
-    { "set_skin",                shell_set_skin },
-    { "get_font_smoothing",      shell_get_font_smoothing },
-    { "set_font_smoothing",      shell_set_font_smoothing },
-    { "get_font_size",           shell_get_font_size },
-    { "set_font_size",           shell_set_font_size },
-    { "put_image_palette",       shell_put_image_palette },
-    { "move_window",             shell_move_window },
-    { "set_window_caption",      shell_set_window_caption },
-    { "blit_bitmap",             shell_blit_bitmap },
-    { "scrot",                   shell_scrot },
-    { "dump_win_stack",          shell_dump_win_stack },
-    { "dump_win_pos",            shell_dump_win_pos },
-    { "dump_appdata",            shell_dump_appdata },
-    { "dump_taskdata",           shell_dump_taskdata },
-    { "acpi_set_usage",          shell_acpi_set_usage },
-    { "acpi_get_usage",          shell_acpi_get_usage },
-    { "acpi_enable",             shell_acpi_enable },
-    { "acpi_preload_table",      shell_acpi_preload_table },
+func_table_t shell_cmds[] = {
     { "acpi_call",               shell_acpi_call },
-    { "stack_init",              shell_stack_init },
-    { "net_add_device",          shell_net_add_device },
-    { "net_get_dev_count",       shell_net_get_dev_count },
-    { "net_get_dev_type",        shell_net_get_dev_type },
-    { "net_get_dev_name",        shell_net_get_dev_name },
-    { "net_dev_reset",           shell_net_dev_reset },
-    { "net_dev_stop",            shell_net_dev_stop },
-    { "net_get_dev",             shell_net_get_dev },
-    { "net_get_packet_tx_count", shell_net_get_packet_tx_count },
-    { "net_get_packet_rx_count", shell_net_get_packet_rx_count },
-    { "net_get_byte_tx_count",   shell_net_get_byte_tx_count },
-    { "net_get_byte_rx_count",   shell_net_get_byte_rx_count },
-    { "net_get_link_status",     shell_net_get_link_status },
-    { "net_open_socket",         shell_net_open_socket },
-    { "net_close_socket",        shell_net_close_socket },
-    { "net_bind",                shell_net_bind },
-    { "net_listen",              shell_net_listen },
-    { "net_connect",             shell_net_connect },
-    { "net_accept",              shell_net_accept },
-    { "net_eth_read_mac",        shell_net_eth_read_mac },
-    { "net_ipv4_get_addr",       shell_net_ipv4_get_addr },
-    { "net_ipv4_set_addr",       shell_net_ipv4_set_addr },
-    { "net_ipv4_get_dns",        shell_net_ipv4_get_dns },
-    { "net_ipv4_set_dns",        shell_net_ipv4_set_dns },
-    { "net_ipv4_get_subnet",     shell_net_ipv4_get_subnet },
-    { "net_ipv4_set_subnet",     shell_net_ipv4_set_subnet },
-    { "net_ipv4_get_gw",         shell_net_ipv4_get_gw },
-    { "net_ipv4_set_gw",         shell_net_ipv4_set_gw },
-    { "net_arp_get_count",       shell_net_arp_get_count },
-    { "net_arp_get_entry",       shell_net_arp_get_entry },
-    { "net_arp_add_entry",       shell_net_arp_add_entry },
-    { "net_arp_del_entry",       shell_net_arp_del_entry },
-    { "bg_set_size",             shell_bg_set_size },
+    { "acpi_enable",             shell_acpi_enable },
+    { "acpi_get_usage",          shell_acpi_get_usage },
+    { "acpi_preload_table",      shell_acpi_preload_table },
+    { "acpi_set_usage",          shell_acpi_set_usage },
+    { "bg_map",                  shell_bg_map },
+    { "bg_put_img",              shell_bg_put_img },
     { "bg_put_pixel",            shell_bg_put_pixel },
     { "bg_redraw",               shell_bg_redraw },
     { "bg_set_mode",             shell_bg_set_mode },
-    { "bg_put_img",              shell_bg_put_img },
-    { "bg_map",                  shell_bg_map },
+    { "bg_set_size",             shell_bg_set_size },
     { "bg_unmap",                shell_bg_unmap },
-    { "pci_set_path",            shell_pci_set_path },
-    { "pci_get_path",            shell_pci_get_path },
-    { "mouse_move",              shell_mouse_move },
+    { "blit_bitmap",             shell_blit_bitmap },
+    { "button",                  shell_button },
+    { "cd",                      shell_cd },
+    { "disk_add",                shell_disk_add },
+    { "disk_del",                shell_disk_del },
+    { "display_number",          shell_display_number },
+    { "draw_line",               shell_draw_line },
+    { "draw_rect",               shell_draw_rect },
+    { "draw_window",             shell_draw_window },
+    { "dump_appdata",            shell_dump_appdata },
+    { "dump_taskdata",           shell_dump_taskdata },
+    { "dump_win_pos",            shell_dump_win_pos },
+    { "dump_win_stack",          shell_dump_win_stack },
     { "exec",                    shell_exec },
-    { NULL,                      NULL },
+    { "get_font_size",           shell_get_font_size },
+    { "get_font_smoothing",      shell_get_font_smoothing },
+    { "get_screen_area",         shell_get_screen_area },
+    { "get_screen_size",         shell_get_screen_size },
+    { "get_skin_height",         shell_get_skin_height },
+    { "get_skin_margins",        shell_get_skin_margins },
+    { "get_window_colors",       shell_get_window_colors },
+    { "help",                    shell_help },
+    { "i40",                     shell_i40 },
+    { "ls70",                    shell_ls70 },
+    { "ls80",                    shell_ls80 },
+    { "move_window",             shell_move_window },
+    { "mouse_move",              shell_mouse_move },
+    { "net_accept",              shell_net_accept },
+    { "net_add_device",          shell_net_add_device },
+    { "net_arp_add_entry",       shell_net_arp_add_entry },
+    { "net_arp_del_entry",       shell_net_arp_del_entry },
+    { "net_arp_get_count",       shell_net_arp_get_count },
+    { "net_arp_get_entry",       shell_net_arp_get_entry },
+    { "net_bind",                shell_net_bind },
+    { "net_close_socket",        shell_net_close_socket },
+    { "net_connect",             shell_net_connect },
+    { "net_dev_reset",           shell_net_dev_reset },
+    { "net_dev_stop",            shell_net_dev_stop },
+    { "net_eth_read_mac",        shell_net_eth_read_mac },
+    { "net_get_byte_rx_count",   shell_net_get_byte_rx_count },
+    { "net_get_byte_tx_count",   shell_net_get_byte_tx_count },
+    { "net_get_dev",             shell_net_get_dev },
+    { "net_get_dev_count",       shell_net_get_dev_count },
+    { "net_get_dev_name",        shell_net_get_dev_name },
+    { "net_get_dev_type",        shell_net_get_dev_type },
+    { "net_get_link_status",     shell_net_get_link_status },
+    { "net_get_packet_rx_count", shell_net_get_packet_rx_count },
+    { "net_get_packet_tx_count", shell_net_get_packet_tx_count },
+    { "net_ipv4_get_addr",       shell_net_ipv4_get_addr },
+    { "net_ipv4_get_dns",        shell_net_ipv4_get_dns },
+    { "net_ipv4_get_gw",         shell_net_ipv4_get_gw },
+    { "net_ipv4_get_subnet",     shell_net_ipv4_get_subnet },
+    { "net_ipv4_set_addr",       shell_net_ipv4_set_addr },
+    { "net_ipv4_set_dns",        shell_net_ipv4_set_dns },
+    { "net_ipv4_set_gw",         shell_net_ipv4_set_gw },
+    { "net_ipv4_set_subnet",     shell_net_ipv4_set_subnet },
+    { "net_listen",              shell_net_listen },
+    { "net_open_socket",         shell_net_open_socket },
+    { "pci_get_path",            shell_pci_get_path },
+    { "pci_set_path",            shell_pci_set_path },
+    { "process_info",            shell_process_info },
+    { "put_image",               shell_put_image },
+    { "put_image_palette",       shell_put_image_palette },
+    { "pwd",                     shell_pwd },
+    { "ramdisk_init",            shell_ramdisk_init },
+    { "read70",                  shell_read70 },
+    { "read80",                  shell_read80 },
+    { "scrot",                   shell_scrot },
+    { "set_button_style",        shell_set_button_style },
+    { "set_cwd",                 shell_cd },
+    { "set_font_size",           shell_set_font_size },
+    { "set_font_smoothing",      shell_set_font_smoothing },
+    { "set_pixel",               shell_set_pixel },
+    { "set_screen_area",         shell_set_screen_area },
+    { "set_skin",                shell_set_skin },
+    { "set_window_caption",      shell_set_window_caption },
+    { "set_window_colors",       shell_set_window_colors },
+    { "stack_init",              shell_stack_init },
+    { "stat70",                  shell_stat70 },
+    { "stat80",                  shell_stat80 },
+    { "window_redraw",           shell_window_redraw },
+    { "write_text",              shell_write_text },
 };
 
-void *run_test(FILE *in, FILE *out, int block) {
+static void
+shell_help(int argc, char **argv) {
+    const char *usage = \
+        "usage: help [command]\n"
+        "  command        help on this command usage";
+    switch (argc) {
+    case 1:
+        fputs(usage, fout);
+        fputs("\navailable commands:\n", fout);
+        for (func_table_t *ft = shell_cmds;
+             ft < shell_cmds + sizeof(shell_cmds) / sizeof(*shell_cmds);
+             ft++) {
+            fprintf(fout, "  %s\n", ft->name);
+        }
+        break;
+    case 2: {
+        const char *cmd_name = argv[1];
+        size_t i;
+        for (i = 0; i < sizeof(shell_cmds) / sizeof(*shell_cmds); i++) {
+            if (!strcmp(shell_cmds[i].name, cmd_name)) {
+                shell_cmds[i].func(0, NULL);
+                return;
+            }
+        }
+        fprintf(fout, "no such command: %s\n", cmd_name);
+        break;
+    }
+    default:
+        fputs(usage, fout);
+        return;
+    }
+}
+
+void *
+run_test(FILE *in, FILE *out, int block) {
     fin = in;
     fout = out;
     int is_tty = isatty(fileno(fin));
     char **argv = (char**)malloc(sizeof(char*) * (MAX_COMMAND_ARGS + 1));
     while(next_line(is_tty, block)) {
-        if (cmd_buf[0] == '#' || cmd_buf[0] == '\n' || cmd_buf[0] == '\0') {
+        if (cmd_buf[0] == '#' || cmd_buf[0] == '\n' || cmd_buf[0] == '\0' ||
+            cmd_buf[0] == '\r') {
             fprintf(fout, "%s", cmd_buf);
             continue;
         }
@@ -2172,7 +2682,9 @@ void *run_test(FILE *in, FILE *out, int block) {
         }
         int argc = split_args(cmd_buf, argv);
         func_table_t *ft;
-        for (ft = funcs; ft->name != NULL; ft++) {
+        for (ft = shell_cmds;
+             ft < shell_cmds + sizeof(shell_cmds) / sizeof(*shell_cmds);
+             ft++) {
             if (!strcmp(argv[0], ft->name)) {
                 break;
             }

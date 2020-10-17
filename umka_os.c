@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,14 +11,14 @@
 #include <sys/types.h>
 #include "umka.h"
 #include "shell.h"
+#include "trace.h"
 
-#define MONITOR_THREAD_STACK_SIZE 0x100000
+#define THREAD_STACK_SIZE 0x100000
 
-void monitor() {
+static void
+monitor(void) {
     umka_sti();
     fprintf(stderr, "Start monitor thread\n");
-//    mkfifo("/tmp/umka.fifo.2u", 0644);
-//    mkfifo("/tmp/umka.fifo.4u", 0644);
     FILE *fin = fopen("/tmp/umka.fifo.2u", "r");
     FILE *fout = fopen("/tmp/umka.fifo.4u", "w");
     if (!fin || !fout) {
@@ -26,16 +28,60 @@ void monitor() {
     run_test(fin, fout, 0);
 }
 
-void restart_timer(void);
 void umka_thread_ping(void);
 void umka_thread_net_drv(void);
 
 struct itimerval timeout = {.it_value = {.tv_sec = 0, .tv_usec = 10000},
                             .it_interval = {.tv_sec = 0, .tv_usec = 10000}};
 
-int main() {
+static void
+thread_start(int is_kernel, void (*entry)(void), size_t stack_size) {
+    uint8_t *stack = malloc(stack_size);
+    umka_new_sys_threads(is_kernel, entry, stack + stack_size);
+}
+
+/*
+can't get pty working
+may be because of my custom threads and blocking, don't know
+void new_monitor(void) {
     umka_sti();
+    fprintf(stderr, "Start monitor thread\n");
+
+    int mpty = posix_openpt(O_RDWR | O_NOCTTY);
+    if (mpty == -1) {
+        perror("open master pty");
+        return;
+    }
+    if (grantpt(mpty) == -1) {
+        perror("grantpt");
+        return;
+    }
+    if (unlockpt(mpty) == -1) {
+        perror("unlockpt");
+        return;
+    }
+    char *spty_name = ptsname(mpty);
+    if (spty_name == NULL) {
+        perror("open slave pty");
+        return;
+    }
+    fprintf(stderr, "[os] pty=%s\n", spty_name);
+    FILE *fmpty = fdopen(mpty, "r+");
+    if (fmpty == NULL) {
+        perror("fdopen mpty");
+        return;
+    }
+    run_test(fmpty, fmpty, 0);
+}
+*/
+
+int
+main() {
+    if (coverage)
+        trace_begin();
+
     umka_tool = UMKA_OS;
+    umka_sti();
 
     struct sigaction sa;
     sa.sa_sigaction = irq0;
@@ -58,18 +104,17 @@ int main() {
 
     umka_init();
     umka_stack_init();
-    uint8_t *monitor_stack = malloc(MONITOR_THREAD_STACK_SIZE);
-    umka_new_sys_threads(0, monitor, monitor_stack + MONITOR_THREAD_STACK_SIZE);
 
-    uint8_t *net_drv_stack = malloc(MONITOR_THREAD_STACK_SIZE);
-    umka_new_sys_threads(0, umka_thread_net_drv, net_drv_stack + MONITOR_THREAD_STACK_SIZE);
-
-    uint8_t *ping_stack = malloc(MONITOR_THREAD_STACK_SIZE);
-    umka_new_sys_threads(0, umka_thread_ping, ping_stack + MONITOR_THREAD_STACK_SIZE);
+    thread_start(0, monitor, THREAD_STACK_SIZE);
+    thread_start(0, umka_thread_net_drv, THREAD_STACK_SIZE);
+//    thread_start(0, umka_thread_ping, THREAD_STACK_SIZE);
 
     setitimer(ITIMER_PROF, &timeout, NULL);
 
     kos_osloop();   // doesn't return
+
+    if (coverage)
+        trace_end();
 
     return 0;
 }
