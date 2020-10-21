@@ -1,5 +1,6 @@
 /*
-    umka_shell: User-Mode KolibriOS developer tools, the shell
+    UMKa - User-Mode KolibriOS developer tools
+    umka_shell - interactive shell
     Copyright (C) 2018--2020  Ivan Baravy <dunkaist@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
@@ -119,7 +120,8 @@ convert_f70_file_attr(uint32_t attr, char s[KF_ATTR_CNT+1]) {
 static void
 print_f70_status(f7080ret_t *r, int use_ebx) {
     fprintf(fout, "status = %d %s", r->status, get_f70_status_name(r->status));
-    if (use_ebx && (r->status == ERROR_SUCCESS || r->status == ERROR_END_OF_FILE))
+    if (use_ebx &&
+        (r->status == ERROR_SUCCESS || r->status == ERROR_END_OF_FILE))
         fprintf(fout, ", count = %d", r->count);
     fputc('\n', fout);
 }
@@ -791,7 +793,8 @@ shell_get_window_colors(int argc, char **argv) {
     fprintf(fout, "0x%.8" PRIx32 " grab_text\n", colors.grab_text);
     fprintf(fout, "0x%.8" PRIx32 " work\n", colors.work);
     fprintf(fout, "0x%.8" PRIx32 " work_button\n", colors.work_button);
-    fprintf(fout, "0x%.8" PRIx32 " work_button_text\n", colors.work_button_text);
+    fprintf(fout, "0x%.8" PRIx32 " work_button_text\n",
+            colors.work_button_text);
     fprintf(fout, "0x%.8" PRIx32 " work_text\n", colors.work_text);
     fprintf(fout, "0x%.8" PRIx32 " work_graph\n", colors.work_graph);
 }
@@ -1317,7 +1320,8 @@ shell_cd(int argc, char **argv) {
 static void
 ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
     f7080ret_t r;
-    size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 : BDFE_LEN_UNICODE;
+    size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 :
+                                                 BDFE_LEN_UNICODE;
     uint32_t requested = fX0->size;
     if (fX0->size > MAX_DIRENTS_TO_READ) {
         fX0->size = MAX_DIRENTS_TO_READ;
@@ -1469,7 +1473,8 @@ shell_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
         }
     }
 
-    size_t bdfe_len = (readdir_enc <= CP866) ? BDFE_LEN_CP866 : BDFE_LEN_UNICODE;
+    size_t bdfe_len = (readdir_enc <= CP866) ? BDFE_LEN_CP866 :
+                                               BDFE_LEN_UNICODE;
     f7080s1info_t *dir = (f7080s1info_t*)malloc(sizeof(f7080s1info_t) +
                                                 bdfe_len * MAX_DIRENTS_TO_READ);
     f7080s1arg_t fX0 = {.sf = 1, .offset = from_idx, .encoding = readdir_enc,

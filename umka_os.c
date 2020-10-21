@@ -94,7 +94,9 @@ main() {
     }
 
 /*
-    void *app_base = mmap((void*)0x000000, 16*0x100000, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    void *app_base = mmap((void*)0x000000, 16*0x100000, PROT_READ | PROT_WRITE |
+                          PROT_EXEC, MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
+                          -1, 0);
     if (app_base == MAP_FAILED) {
         perror("mmap failed");
         exit(1);

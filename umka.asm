@@ -67,6 +67,8 @@ public scheduler_current as 'kos_scheduler_current'
 public eth_input as 'kos_eth_input'
 public net_buff_alloc as 'kos_net_buff_alloc'
 
+public mem_block_list
+
 macro cli {
         pushfd
         bts     dword[esp], 21
@@ -91,10 +93,6 @@ macro int n {
   end if
 }
 
-MAX_PRIORITY      = 0   ; highest, used for kernel tasks
-USER_PRIORITY     = 1   ; default
-IDLE_PRIORITY     = 2   ; lowest, only IDLE thread goes here
-
 section '.text' executable align 32
 
 coverage_begin:
@@ -109,17 +107,29 @@ include 'proc32.inc'
 include 'struct.inc'
 macro BOOT_LO a {}
 macro BOOT a {}
-window_data equ twer
-CURRENT_TASK equ twer2
-TASK_BASE equ twer3
-TASK_DATA equ twer4
-TASK_EVENT equ twer5
-CDDataBuf equ twer6
-idts equ twer7
-WIN_STACK equ twer8
-WIN_POS equ twer9
-TASK_COUNT equ gyads
-SLOT_BASE equ gfdskh
+window_data equ __pew01
+CURRENT_TASK equ __pew02
+TASK_BASE equ __pew03
+TASK_DATA equ __pew04
+TASK_EVENT equ __pew05
+CDDataBuf equ __pew06
+idts equ __pew07
+WIN_STACK equ __pew08
+WIN_POS equ __pew09
+FDD_BUFF equ __pew10
+WIN_TEMP_XY equ __pew11
+KEY_COUNT equ __pew12
+KEY_BUFF equ __pew13
+BTN_COUNT equ __pew14
+BTN_BUFF equ __pew15
+BTN_ADDR equ __pew16
+MEM_AMOUNT equ __pew17
+SYS_SHUTDOWN equ __pew18
+TASK_COUNT equ __pew19
+SLOT_BASE equ __pew20
+sys_proc equ __pew21
+VGABasePtr equ __pew22
+;HEAP_BASE equ __pew01
 ;macro OS_BASE [x] {
 ;  OS_BASE equ os_base
 ;}
@@ -127,36 +137,14 @@ include 'const.inc'
 restore window_data
 restore CURRENT_TASK
 restore TASK_BASE,TASK_DATA,TASK_EVENT,CDDataBuf,idts,WIN_STACK,WIN_POS
+restore FDD_BUFF,WIN_TEMP_XY,KEY_COUNT,KEY_BUFF,BTN_COUNT,BTN_BUFF,BTN_ADDR
+restore MEM_AMOUNT,SYS_SHUTDOWN,SLOT_BASE,sys_proc,VGABasePtr
+;restore HEAP_BASE
 restore TASK_COUNT
-restore SLOT_BASE
 purge BOOT_LO,BOOT
 
 LFB_BASE = lfb_base
 
-;window_data        = os_base + 0x00001000
-;CURRENT_TASK       = os_base + 0x00003000
-;TASK_COUNT         = os_base + 0x00003004
-;TASK_BASE          = os_base + 0x00003010
-;TASK_DATA          = os_base + 0x00003020
-;TASK_EVENT         = os_base + 0x00003020
-;CDDataBuf          = os_base + 0x00005000
-;idts               = os_base + 0x0000B100
-;WIN_STACK          = os_base + 0x0000C000
-;WIN_POS            = os_base + 0x0000C400
-FDD_BUFF           = os_base + 0x0000D000
-WIN_TEMP_XY        = os_base + 0x0000F300
-KEY_COUNT          = os_base + 0x0000F400
-KEY_BUFF           = os_base + 0x0000F401 ; 120*2 + 2*2 = 244 bytes, actually 255 bytes
-BTN_COUNT          = os_base + 0x0000F500
-BTN_BUFF           = os_base + 0x0000F501
-BTN_ADDR           = os_base + 0x0000FE88
-MEM_AMOUNT         = os_base + 0x0000FE8C
-SYS_SHUTDOWN       = os_base + 0x0000FF00
-TASK_ACTIVATE      = os_base + 0x0000FF01
-sys_proc           = os_base + 0x0006F000
-SLOT_BASE          = os_base + 0x00080000
-VGABasePtr         = os_base + 0x000A0000
-UPPER_KERNEL_PAGES = os_base + 0x00400000
 HEAP_BASE          = os_base + 0x00800000
 
 macro save_ring3_context {
@@ -223,6 +211,7 @@ include 'core/string.inc'
 ;include 'core/v86.inc'
 include 'core/irq.inc'
 include 'core/apic.inc'
+include 'core/hpet.inc'
 include 'core/timers.inc'
 include 'core/clipboard.inc'
 include 'core/slab.inc'
@@ -340,6 +329,11 @@ proc umka_init c uses ebx esi edi ebp
         list_init eax
         add     eax, PROC.thr_list
         list_init eax
+
+;        xor     eax, eax
+;        mov     edi, lfb_base
+;        mov     ecx, MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
+;        rep stosd
 
         mov     [BOOT.bpp], 32
         mov     [BOOT.x_res], UMKA_DISPLAY_WIDTH
@@ -648,6 +642,12 @@ pci_api:
 sys_resize_app_memory:
 f68:
 v86_irq:
+test_cpu:
+acpi_locate:
+init_BIOS32:
+mem_test:
+init_mem:
+init_page_map:
         ret
 
 alloc_pages:
@@ -660,10 +660,8 @@ map_memEx:
         ret     20
 
 
-HEAP_BASE equ
-include 'init.inc'
-sys_msg_board equ __pew
-delay_ms equ __pew8
+sys_msg_board equ __pew8
+delay_ms equ __pew9
 
 include fix pew
 macro pew x {}
@@ -734,9 +732,25 @@ CDDataBuf:      rd 0x1840
 idts            rd 0x3c0
 WIN_STACK       rw 0x200
 WIN_POS         rw 0x600
+FDD_BUFF        rb 0x2300
+WIN_TEMP_XY     rb 0x100
+KEY_COUNT       db ?
+KEY_BUFF        rb 255  ; 120*2 + 2*2 = 244 bytes, actually 255 bytes
+BTN_COUNT       db ?
+BTN_BUFF        rd 0x261
+BTN_ADDR        dd ?
+MEM_AMOUNT      rd 0x1d
+SYS_SHUTDOWN    db ?
+sys_proc        rd 0x800
+SLOT_BASE:      rd 0x8000
+VGABasePtr      rb 640*480
+UPPER_KERNEL_PAGES = os_base + 0x00400000
+;HEAP_BASE       rb UMKA_MEMORY_BYTES - (HEAP_BASE-os_base+4096*sizeof.MEM_BLOCK)
                 rb 0x1000000
-BOOT_LO boot_data
 BOOT boot_data
+virtual at BOOT
+BOOT_LO boot_data
+end virtual
 align 4096
 lfb_base rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
 align 4096

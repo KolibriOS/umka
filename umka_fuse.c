@@ -1,5 +1,6 @@
 /*
-    umka_fuse: User-Mode KolibriOS developer tools, the filesystem
+    UMKa - User-Mode KolibriOS developer tools
+    umka_fuse - FUSE <-> KolibriOS FS calls converter
     Copyright (C) 2018--2020  Ivan Baravy <dunkaist@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
