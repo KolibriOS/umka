@@ -55473,7 +55473,7 @@ aml._.term_obj end
 \OSSP Integer        = 0x0000000000000000
 \LINX Integer        = 0x0000000000000000
 \TPOS Integer        = 0x0000000000000000
-\OSTB Integer        = 0x00000000FFFFFFFF
+\OSTB Integer        = 0xFFFFFFFFFFFFFFFF
 \_WAK Method         length:0x00000057 Args:1 serialize:0 sync_level:0
 \_PTS Method         length:0x00000032 Args:1 serialize:0 sync_level:0
 \_S5_ Package        elements:4
@@ -55523,7 +55523,7 @@ aml._.term_obj end
 \ACMA RegionField    Rgn [\ACMS] Off:00000008 Len:00000008 Acc:1
 \ACMX RegionField    Rgn [\ACMS] Off:00000000 Len:00000008 Acc:1
 \ACMS OpRegion       [SystemIO] Len:00000002
-\OSTY Integer        = 0x00000000FFFFFFFF
+\OSTY Integer        = 0xFFFFFFFFFFFFFFFF
 \P80H RegionField    Rgn [\DEB2] Off:00000000 Len:00000010 Acc:2
 \DEB2 OpRegion       [SystemIO] Len:00000002
 \VGAF Integer        = 0x0000000000000001
@@ -55548,7 +55548,7 @@ aml._.term_obj end
      Integer        = 0x0000000000000000
 \MCTH Method         length:0x00000047 Args:2 serialize:0 sync_level:0
 \OSFL Method         length:0x0000027E Args:0 serialize:0 sync_level:0
-\OSVR Integer        = 0x00000000FFFFFFFF
+\OSVR Integer        = 0xFFFFFFFFFFFFFFFF
 \_PIC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RBAL Integer        = 0x000000000000000A
@@ -55684,18 +55684,18 @@ aml._.term_obj end
 \_SB_\BAT0\PBIX Package        elements:20
      Integer        = 0x0000000000000000
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
      Integer        = 0x0000000000000075
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000017318
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000007D0
      Integer        = 0x00000000000001F4
      String         Len:0x00000004 value:BAT1
@@ -55704,10 +55704,10 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBIF Package        elements:13
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
@@ -55718,9 +55718,9 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBST Package        elements:4
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\BAT0\_PCL Package        elements:1
      Deferred       _SB_PBST
 \_SB_\BAT0\_HID Integer        = 0x000000000A0CD041
@@ -73435,7 +73435,7 @@ aml._.term_obj end
 \OSSP Integer        = 0x0000000000000000
 \LINX Integer        = 0x0000000000000000
 \TPOS Integer        = 0x0000000000000000
-\OSTB Integer        = 0x00000000FFFFFFFF
+\OSTB Integer        = 0xFFFFFFFFFFFFFFFF
 \_WAK Method         length:0x00000057 Args:1 serialize:0 sync_level:0
 \_PTS Method         length:0x00000032 Args:1 serialize:0 sync_level:0
 \_S5_ Package        elements:4
@@ -73485,7 +73485,7 @@ aml._.term_obj end
 \ACMA RegionField    Rgn [\ACMS] Off:00000008 Len:00000008 Acc:1
 \ACMX RegionField    Rgn [\ACMS] Off:00000000 Len:00000008 Acc:1
 \ACMS OpRegion       [SystemIO] Len:00000002
-\OSTY Integer        = 0x00000000FFFFFFFF
+\OSTY Integer        = 0xFFFFFFFFFFFFFFFF
 \P80H RegionField    Rgn [\DEB2] Off:00000000 Len:00000010 Acc:2
 \DEB2 OpRegion       [SystemIO] Len:00000002
 \VGAF Integer        = 0x0000000000000001
@@ -73510,7 +73510,7 @@ aml._.term_obj end
      Integer        = 0x0000000000000000
 \MCTH Method         length:0x00000047 Args:2 serialize:0 sync_level:0
 \OSFL Method         length:0x0000027E Args:0 serialize:0 sync_level:0
-\OSVR Integer        = 0x00000000FFFFFFFF
+\OSVR Integer        = 0xFFFFFFFFFFFFFFFF
 \_PIC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RBAL Integer        = 0x000000000000000A
@@ -74125,18 +74125,18 @@ aml._.term_obj end
 \_SB_\BAT0\PBIX Package        elements:20
      Integer        = 0x0000000000000000
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
      Integer        = 0x0000000000000075
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000017318
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000007D0
      Integer        = 0x00000000000001F4
      String         Len:0x00000004 value:BAT1
@@ -74145,10 +74145,10 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBIF Package        elements:13
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
@@ -74159,9 +74159,9 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBST Package        elements:4
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\BAT0\_PCL Package        elements:1
      Deferred       _SB_PBST
 \_SB_\BAT0\_HID Integer        = 0x000000000A0CD041
@@ -86685,7 +86685,7 @@ aml._.term_obj end
 \OSSP Integer        = 0x0000000000000000
 \LINX Integer        = 0x0000000000000000
 \TPOS Integer        = 0x0000000000000000
-\OSTB Integer        = 0x00000000FFFFFFFF
+\OSTB Integer        = 0xFFFFFFFFFFFFFFFF
 \_WAK Method         length:0x00000057 Args:1 serialize:0 sync_level:0
 \_PTS Method         length:0x00000032 Args:1 serialize:0 sync_level:0
 \_S5_ Package        elements:4
@@ -86735,7 +86735,7 @@ aml._.term_obj end
 \ACMA RegionField    Rgn [\ACMS] Off:00000008 Len:00000008 Acc:1
 \ACMX RegionField    Rgn [\ACMS] Off:00000000 Len:00000008 Acc:1
 \ACMS OpRegion       [SystemIO] Len:00000002
-\OSTY Integer        = 0x00000000FFFFFFFF
+\OSTY Integer        = 0xFFFFFFFFFFFFFFFF
 \P80H RegionField    Rgn [\DEB2] Off:00000000 Len:00000010 Acc:2
 \DEB2 OpRegion       [SystemIO] Len:00000002
 \VGAF Integer        = 0x0000000000000001
@@ -86760,7 +86760,7 @@ aml._.term_obj end
      Integer        = 0x0000000000000000
 \MCTH Method         length:0x00000047 Args:2 serialize:0 sync_level:0
 \OSFL Method         length:0x0000027E Args:0 serialize:0 sync_level:0
-\OSVR Integer        = 0x00000000FFFFFFFF
+\OSVR Integer        = 0xFFFFFFFFFFFFFFFF
 \_PIC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RBAL Integer        = 0x000000000000000A
@@ -87375,18 +87375,18 @@ aml._.term_obj end
 \_SB_\BAT0\PBIX Package        elements:20
      Integer        = 0x0000000000000000
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
      Integer        = 0x0000000000000075
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000017318
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000007D0
      Integer        = 0x00000000000001F4
      String         Len:0x00000004 value:BAT1
@@ -87395,10 +87395,10 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBIF Package        elements:13
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
@@ -87409,9 +87409,9 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBST Package        elements:4
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\BAT0\_PCL Package        elements:1
      Deferred       _SB_PBST
 \_SB_\BAT0\_HID Integer        = 0x000000000A0CD041
@@ -92326,7 +92326,7 @@ aml._.term_obj end
 \OSSP Integer        = 0x0000000000000000
 \LINX Integer        = 0x0000000000000000
 \TPOS Integer        = 0x0000000000000000
-\OSTB Integer        = 0x00000000FFFFFFFF
+\OSTB Integer        = 0xFFFFFFFFFFFFFFFF
 \_WAK Method         length:0x00000057 Args:1 serialize:0 sync_level:0
 \_PTS Method         length:0x00000032 Args:1 serialize:0 sync_level:0
 \_S5_ Package        elements:4
@@ -92376,7 +92376,7 @@ aml._.term_obj end
 \ACMA RegionField    Rgn [\ACMS] Off:00000008 Len:00000008 Acc:1
 \ACMX RegionField    Rgn [\ACMS] Off:00000000 Len:00000008 Acc:1
 \ACMS OpRegion       [SystemIO] Len:00000002
-\OSTY Integer        = 0x00000000FFFFFFFF
+\OSTY Integer        = 0xFFFFFFFFFFFFFFFF
 \P80H RegionField    Rgn [\DEB2] Off:00000000 Len:00000010 Acc:2
 \DEB2 OpRegion       [SystemIO] Len:00000002
 \VGAF Integer        = 0x0000000000000001
@@ -92401,7 +92401,7 @@ aml._.term_obj end
      Integer        = 0x0000000000000000
 \MCTH Method         length:0x00000047 Args:2 serialize:0 sync_level:0
 \OSFL Method         length:0x0000027E Args:0 serialize:0 sync_level:0
-\OSVR Integer        = 0x00000000FFFFFFFF
+\OSVR Integer        = 0xFFFFFFFFFFFFFFFF
 \_PIC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RBAL Integer        = 0x000000000000000A
@@ -93016,18 +93016,18 @@ aml._.term_obj end
 \_SB_\BAT0\PBIX Package        elements:20
      Integer        = 0x0000000000000000
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
      Integer        = 0x0000000000000075
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000017318
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000007D0
      Integer        = 0x00000000000001F4
      String         Len:0x00000004 value:BAT1
@@ -93036,10 +93036,10 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBIF Package        elements:13
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
@@ -93050,9 +93050,9 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBST Package        elements:4
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\BAT0\_PCL Package        elements:1
      Deferred       _SB_PBST
 \_SB_\BAT0\_HID Integer        = 0x000000000A0CD041
@@ -98455,7 +98455,7 @@ aml._.term_obj end
 \OSSP Integer        = 0x0000000000000000
 \LINX Integer        = 0x0000000000000000
 \TPOS Integer        = 0x0000000000000000
-\OSTB Integer        = 0x00000000FFFFFFFF
+\OSTB Integer        = 0xFFFFFFFFFFFFFFFF
 \_WAK Method         length:0x00000057 Args:1 serialize:0 sync_level:0
 \_PTS Method         length:0x00000032 Args:1 serialize:0 sync_level:0
 \_S5_ Package        elements:4
@@ -98505,7 +98505,7 @@ aml._.term_obj end
 \ACMA RegionField    Rgn [\ACMS] Off:00000008 Len:00000008 Acc:1
 \ACMX RegionField    Rgn [\ACMS] Off:00000000 Len:00000008 Acc:1
 \ACMS OpRegion       [SystemIO] Len:00000002
-\OSTY Integer        = 0x00000000FFFFFFFF
+\OSTY Integer        = 0xFFFFFFFFFFFFFFFF
 \P80H RegionField    Rgn [\DEB2] Off:00000000 Len:00000010 Acc:2
 \DEB2 OpRegion       [SystemIO] Len:00000002
 \VGAF Integer        = 0x0000000000000001
@@ -98530,7 +98530,7 @@ aml._.term_obj end
      Integer        = 0x0000000000000000
 \MCTH Method         length:0x00000047 Args:2 serialize:0 sync_level:0
 \OSFL Method         length:0x0000027E Args:0 serialize:0 sync_level:0
-\OSVR Integer        = 0x00000000FFFFFFFF
+\OSVR Integer        = 0xFFFFFFFFFFFFFFFF
 \_PIC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RBAL Integer        = 0x000000000000000A
@@ -99145,18 +99145,18 @@ aml._.term_obj end
 \_SB_\BAT0\PBIX Package        elements:20
      Integer        = 0x0000000000000000
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
      Integer        = 0x0000000000000075
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000017318
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000007D0
      Integer        = 0x00000000000001F4
      String         Len:0x00000004 value:BAT1
@@ -99165,10 +99165,10 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBIF Package        elements:13
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
@@ -99179,9 +99179,9 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBST Package        elements:4
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\BAT0\_PCL Package        elements:1
      Deferred       _SB_PBST
 \_SB_\BAT0\_HID Integer        = 0x000000000A0CD041
@@ -105133,7 +105133,7 @@ aml._.term_obj end
 \OSSP Integer        = 0x0000000000000000
 \LINX Integer        = 0x0000000000000000
 \TPOS Integer        = 0x0000000000000000
-\OSTB Integer        = 0x00000000FFFFFFFF
+\OSTB Integer        = 0xFFFFFFFFFFFFFFFF
 \_WAK Method         length:0x00000057 Args:1 serialize:0 sync_level:0
 \_PTS Method         length:0x00000032 Args:1 serialize:0 sync_level:0
 \_S5_ Package        elements:4
@@ -105183,7 +105183,7 @@ aml._.term_obj end
 \ACMA RegionField    Rgn [\ACMS] Off:00000008 Len:00000008 Acc:1
 \ACMX RegionField    Rgn [\ACMS] Off:00000000 Len:00000008 Acc:1
 \ACMS OpRegion       [SystemIO] Len:00000002
-\OSTY Integer        = 0x00000000FFFFFFFF
+\OSTY Integer        = 0xFFFFFFFFFFFFFFFF
 \P80H RegionField    Rgn [\DEB2] Off:00000000 Len:00000010 Acc:2
 \DEB2 OpRegion       [SystemIO] Len:00000002
 \VGAF Integer        = 0x0000000000000001
@@ -105208,7 +105208,7 @@ aml._.term_obj end
      Integer        = 0x0000000000000000
 \MCTH Method         length:0x00000047 Args:2 serialize:0 sync_level:0
 \OSFL Method         length:0x0000027E Args:0 serialize:0 sync_level:0
-\OSVR Integer        = 0x00000000FFFFFFFF
+\OSVR Integer        = 0xFFFFFFFFFFFFFFFF
 \_PIC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RBAL Integer        = 0x000000000000000A
@@ -105824,18 +105824,18 @@ aml._.term_obj end
 \_SB_\BAT0\PBIX Package        elements:20
      Integer        = 0x0000000000000000
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
      Integer        = 0x0000000000000075
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000017318
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000007D0
      Integer        = 0x00000000000001F4
      String         Len:0x00000004 value:BAT1
@@ -105844,10 +105844,10 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBIF Package        elements:13
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
@@ -105858,9 +105858,9 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBST Package        elements:4
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\BAT0\_PCL Package        elements:1
      Deferred       _SB_PBST
 \_SB_\BAT0\_HID Integer        = 0x000000000A0CD041
@@ -108986,8 +108986,8 @@ aml._.term_obj end
 \_SB_\PCI0\GP17\VGA_\PX01 Method         length:0x0000003F Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GP17\VGA_\PX00 Method         length:0x00000094 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GP17\VGA_\ATPX Method         length:0x000000CA Args:2 serialize:1 sync_level:0
-\_SB_\PCI0\GP17\VGA_\M191 Integer        = 0x00000000FFFFFFFF
-\_SB_\PCI0\GP17\VGA_\M190 Integer        = 0x00000000FFFFFFFF
+\_SB_\PCI0\GP17\VGA_\M191 Integer        = 0xFFFFFFFFFFFFFFFF
+\_SB_\PCI0\GP17\VGA_\M190 Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\PCI0\GP17\VGA_\M189 Buffer         Len:0x00000100
 \_SB_\PCI0\GP17\VGA_\XTRM Method         length:0x000000A9 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\GP17\VGA_\M202 Buffer         Len:0x00010000
@@ -112426,7 +112426,7 @@ aml._.term_obj end
 \M230 Mutex          sync_level:0
 \M049 Method         length:0x00000016 Args:2 serialize:1 sync_level:0
 \M045 Method         length:0x000000B7 Args:0 serialize:1 sync_level:0
-\M047 Integer        = 0x00000000FFFFFFFF
+\M047 Integer        = 0xFFFFFFFFFFFFFFFF
 \M046 Integer        = 0x0000000000000000
 \M252 Method         length:0x00000065 Args:2 serialize:1 sync_level:0
 \M114 Method         length:0x00000146 Args:0 serialize:1 sync_level:0
@@ -112822,7 +112822,7 @@ aml._.term_obj end
 \OSSP Integer        = 0x0000000000000000
 \LINX Integer        = 0x0000000000000000
 \TPOS Integer        = 0x0000000000000000
-\OSTB Integer        = 0x00000000FFFFFFFF
+\OSTB Integer        = 0xFFFFFFFFFFFFFFFF
 \_WAK Method         length:0x00000057 Args:1 serialize:0 sync_level:0
 \_PTS Method         length:0x00000032 Args:1 serialize:0 sync_level:0
 \_S5_ Package        elements:4
@@ -112872,7 +112872,7 @@ aml._.term_obj end
 \ACMA RegionField    Rgn [\ACMS] Off:00000008 Len:00000008 Acc:1
 \ACMX RegionField    Rgn [\ACMS] Off:00000000 Len:00000008 Acc:1
 \ACMS OpRegion       [SystemIO] Len:00000002
-\OSTY Integer        = 0x00000000FFFFFFFF
+\OSTY Integer        = 0xFFFFFFFFFFFFFFFF
 \P80H RegionField    Rgn [\DEB2] Off:00000000 Len:00000010 Acc:2
 \DEB2 OpRegion       [SystemIO] Len:00000002
 \VGAF Integer        = 0x0000000000000001
@@ -112897,7 +112897,7 @@ aml._.term_obj end
      Integer        = 0x0000000000000000
 \MCTH Method         length:0x00000047 Args:2 serialize:0 sync_level:0
 \OSFL Method         length:0x0000027E Args:0 serialize:0 sync_level:0
-\OSVR Integer        = 0x00000000FFFFFFFF
+\OSVR Integer        = 0xFFFFFFFFFFFFFFFF
 \_PIC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RBAL Integer        = 0x000000000000000A
@@ -113513,18 +113513,18 @@ aml._.term_obj end
 \_SB_\BAT0\PBIX Package        elements:20
      Integer        = 0x0000000000000000
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
      Integer        = 0x0000000000000075
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000017318
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000007D0
      Integer        = 0x00000000000001F4
      String         Len:0x00000004 value:BAT1
@@ -113533,10 +113533,10 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBIF Package        elements:13
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
@@ -113547,9 +113547,9 @@ aml._.term_obj end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBST Package        elements:4
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\BAT0\_PCL Package        elements:1
      Deferred       _SB_PBST
 \_SB_\BAT0\_HID Integer        = 0x000000000A0CD041
@@ -116675,8 +116675,8 @@ aml._.term_obj end
 \_SB_\PCI0\GP17\VGA_\PX01 Method         length:0x0000003F Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GP17\VGA_\PX00 Method         length:0x00000094 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GP17\VGA_\ATPX Method         length:0x000000CA Args:2 serialize:1 sync_level:0
-\_SB_\PCI0\GP17\VGA_\M191 Integer        = 0x00000000FFFFFFFF
-\_SB_\PCI0\GP17\VGA_\M190 Integer        = 0x00000000FFFFFFFF
+\_SB_\PCI0\GP17\VGA_\M191 Integer        = 0xFFFFFFFFFFFFFFFF
+\_SB_\PCI0\GP17\VGA_\M190 Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\PCI0\GP17\VGA_\M189 Buffer         Len:0x00000100
 \_SB_\PCI0\GP17\VGA_\XTRM Method         length:0x000000A9 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\GP17\VGA_\M202 Buffer         Len:0x00010000
@@ -118622,7 +118622,7 @@ aml._.get_node_by_name end
 \M230 Mutex          sync_level:0
 \M049 Method         length:0x00000016 Args:2 serialize:1 sync_level:0
 \M045 Method         length:0x000000B7 Args:0 serialize:1 sync_level:0
-\M047 Integer        = 0x00000000FFFFFFFF
+\M047 Integer        = 0xFFFFFFFFFFFFFFFF
 \M046 Integer        = 0x0000000000000000
 \M252 Method         length:0x00000065 Args:2 serialize:1 sync_level:0
 \M114 Method         length:0x00000146 Args:0 serialize:1 sync_level:0
@@ -119018,7 +119018,7 @@ aml._.get_node_by_name end
 \OSSP Integer        = 0x0000000000000000
 \LINX Integer        = 0x0000000000000000
 \TPOS Integer        = 0x0000000000000000
-\OSTB Integer        = 0x00000000FFFFFFFF
+\OSTB Integer        = 0xFFFFFFFFFFFFFFFF
 \_WAK Method         length:0x00000057 Args:1 serialize:0 sync_level:0
 \_PTS Method         length:0x00000032 Args:1 serialize:0 sync_level:0
 \_S5_ Package        elements:4
@@ -119068,7 +119068,7 @@ aml._.get_node_by_name end
 \ACMA RegionField    Rgn [\ACMS] Off:00000008 Len:00000008 Acc:1
 \ACMX RegionField    Rgn [\ACMS] Off:00000000 Len:00000008 Acc:1
 \ACMS OpRegion       [SystemIO] Len:00000002
-\OSTY Integer        = 0x00000000FFFFFFFF
+\OSTY Integer        = 0xFFFFFFFFFFFFFFFF
 \P80H RegionField    Rgn [\DEB2] Off:00000000 Len:00000010 Acc:2
 \DEB2 OpRegion       [SystemIO] Len:00000002
 \VGAF Integer        = 0x0000000000000001
@@ -119093,7 +119093,7 @@ aml._.get_node_by_name end
      Integer        = 0x0000000000000000
 \MCTH Method         length:0x00000047 Args:2 serialize:0 sync_level:0
 \OSFL Method         length:0x0000027E Args:0 serialize:0 sync_level:0
-\OSVR Integer        = 0x00000000FFFFFFFF
+\OSVR Integer        = 0xFFFFFFFFFFFFFFFF
 \_PIC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RBAL Integer        = 0x000000000000000A
@@ -119708,18 +119708,18 @@ aml._.get_node_by_name end
 \_SB_\BAT0\PBIX Package        elements:20
      Integer        = 0x0000000000000000
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
      Integer        = 0x0000000000000075
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000017318
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000007D0
      Integer        = 0x00000000000001F4
      String         Len:0x00000004 value:BAT1
@@ -119728,10 +119728,10 @@ aml._.get_node_by_name end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBIF Package        elements:13
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000000001
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x00000000000019B4
      Integer        = 0x0000000000001086
      Integer        = 0x00000000000001A7
@@ -119742,9 +119742,9 @@ aml._.get_node_by_name end
      String         Len:0x00000001 value: 
 \_SB_\BAT0\PBST Package        elements:4
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\BAT0\_PCL Package        elements:1
      Reference      Target: \_SB_
 \_SB_\BAT0\_HID Integer        = 0x000000000A0CD041
@@ -122870,8 +122870,8 @@ aml._.get_node_by_name end
 \_SB_\PCI0\GP17\VGA_\PX01 Method         length:0x0000003F Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GP17\VGA_\PX00 Method         length:0x00000094 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GP17\VGA_\ATPX Method         length:0x000000CA Args:2 serialize:1 sync_level:0
-\_SB_\PCI0\GP17\VGA_\M191 Integer        = 0x00000000FFFFFFFF
-\_SB_\PCI0\GP17\VGA_\M190 Integer        = 0x00000000FFFFFFFF
+\_SB_\PCI0\GP17\VGA_\M191 Integer        = 0xFFFFFFFFFFFFFFFF
+\_SB_\PCI0\GP17\VGA_\M190 Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\PCI0\GP17\VGA_\M189 Buffer         Len:0x00000100
 \_SB_\PCI0\GP17\VGA_\XTRM Method         length:0x000000A9 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\GP17\VGA_\M202 Buffer         Len:0x00010000

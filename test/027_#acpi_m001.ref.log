@@ -44590,7 +44590,7 @@ aml._.term_obj end
 \OSSP Integer        = 0x0000000000000000
 \LINX Integer        = 0x0000000000000000
 \TPOS Integer        = 0x0000000000000000
-\OSTB Integer        = 0x00000000FFFFFFFF
+\OSTB Integer        = 0xFFFFFFFFFFFFFFFF
 \HTTS Integer        = 0x0000000000000000
 \MYOS Integer        = 0x0000000000000000
 \WNOS Integer        = 0x0000000000000000
@@ -44834,8 +44834,8 @@ _CRT
 \_SB_\BAT1\ERRC Integer        = 0x0000000000000000
 \_SB_\BAT1\PBST Package        elements:4
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000002710
 \_SB_\BAT1\PBIF Package        elements:13
      Integer        = 0x0000000000000001
@@ -47025,8 +47025,8 @@ _CRT
 \_SB_\PCI0\VGA_\CNT2 Buffer         Len:0x00000005
 \_SB_\PCI0\VGA_\CNT1 Buffer         Len:0x00000005
 \_SB_\PCI0\VGA_\CNT0 Buffer         Len:0x00000005
-\_SB_\PCI0\VGA_\HSID Integer        = 0x00000000FFFFFFFF
-\_SB_\PCI0\VGA_\DSID Integer        = 0x00000000FFFFFFFF
+\_SB_\PCI0\VGA_\HSID Integer        = 0xFFFFFFFFFFFFFFFF
+\_SB_\PCI0\VGA_\DSID Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\PCI0\VGA_\ATPB Buffer         Len:0x00000100
 \_SB_\PCI0\VGA_\XTRM Method         length:0x00000099 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\VGA_\TVGA Buffer         Len:0x00000004
@@ -52167,7 +52167,7 @@ aml._.term_obj end
 \OSSP Integer        = 0x0000000000000000
 \LINX Integer        = 0x0000000000000000
 \TPOS Integer        = 0x0000000000000000
-\OSTB Integer        = 0x00000000FFFFFFFF
+\OSTB Integer        = 0xFFFFFFFFFFFFFFFF
 \HTTS Integer        = 0x0000000000000000
 \MYOS Integer        = 0x0000000000000000
 \WNOS Integer        = 0x0000000000000000
@@ -52411,8 +52411,8 @@ _CRT
 \_SB_\BAT1\ERRC Integer        = 0x0000000000000000
 \_SB_\BAT1\PBST Package        elements:4
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000002710
 \_SB_\BAT1\PBIF Package        elements:13
      Integer        = 0x0000000000000001
@@ -54602,8 +54602,8 @@ _CRT
 \_SB_\PCI0\VGA_\CNT2 Buffer         Len:0x00000005
 \_SB_\PCI0\VGA_\CNT1 Buffer         Len:0x00000005
 \_SB_\PCI0\VGA_\CNT0 Buffer         Len:0x00000005
-\_SB_\PCI0\VGA_\HSID Integer        = 0x00000000FFFFFFFF
-\_SB_\PCI0\VGA_\DSID Integer        = 0x00000000FFFFFFFF
+\_SB_\PCI0\VGA_\HSID Integer        = 0xFFFFFFFFFFFFFFFF
+\_SB_\PCI0\VGA_\DSID Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\PCI0\VGA_\ATPB Buffer         Len:0x00000100
 \_SB_\PCI0\VGA_\XTRM Method         length:0x00000099 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\VGA_\TVGA Buffer         Len:0x00000004
@@ -58914,7 +58914,7 @@ aml._.term_obj end
 \OSSP Integer        = 0x0000000000000000
 \LINX Integer        = 0x0000000000000000
 \TPOS Integer        = 0x0000000000000000
-\OSTB Integer        = 0x00000000FFFFFFFF
+\OSTB Integer        = 0xFFFFFFFFFFFFFFFF
 \HTTS Integer        = 0x0000000000000000
 \MYOS Integer        = 0x0000000000000000
 \WNOS Integer        = 0x0000000000000000
@@ -59356,8 +59356,8 @@ _CRT
 \_SB_\BAT1\ERRC Integer        = 0x0000000000000000
 \_SB_\BAT1\PBST Package        elements:4
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000002710
 \_SB_\BAT1\PBIF Package        elements:13
      Integer        = 0x0000000000000001
@@ -61547,8 +61547,8 @@ _CRT
 \_SB_\PCI0\VGA_\CNT2 Buffer         Len:0x00000005
 \_SB_\PCI0\VGA_\CNT1 Buffer         Len:0x00000005
 \_SB_\PCI0\VGA_\CNT0 Buffer         Len:0x00000005
-\_SB_\PCI0\VGA_\HSID Integer        = 0x00000000FFFFFFFF
-\_SB_\PCI0\VGA_\DSID Integer        = 0x00000000FFFFFFFF
+\_SB_\PCI0\VGA_\HSID Integer        = 0xFFFFFFFFFFFFFFFF
+\_SB_\PCI0\VGA_\DSID Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\PCI0\VGA_\ATPB Buffer         Len:0x00000100
 \_SB_\PCI0\VGA_\XTRM Method         length:0x00000099 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\VGA_\TVGA Buffer         Len:0x00000004
@@ -63103,7 +63103,7 @@ aml._.get_node_by_name end
 \OSSP Integer        = 0x0000000000000000
 \LINX Integer        = 0x0000000000000000
 \TPOS Integer        = 0x0000000000000000
-\OSTB Integer        = 0x00000000FFFFFFFF
+\OSTB Integer        = 0xFFFFFFFFFFFFFFFF
 \HTTS Integer        = 0x0000000000000000
 \MYOS Integer        = 0x0000000000000000
 \WNOS Integer        = 0x0000000000000000
@@ -63541,8 +63541,8 @@ aml._.get_node_by_name end
 \_SB_\BAT1\ERRC Integer        = 0x0000000000000000
 \_SB_\BAT1\PBST Package        elements:4
      Integer        = 0x0000000000000000
-     Integer        = 0x00000000FFFFFFFF
-     Integer        = 0x00000000FFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
+     Integer        = 0xFFFFFFFFFFFFFFFF
      Integer        = 0x0000000000002710
 \_SB_\BAT1\PBIF Package        elements:13
      Integer        = 0x0000000000000001
@@ -65732,8 +65732,8 @@ aml._.get_node_by_name end
 \_SB_\PCI0\VGA_\CNT2 Buffer         Len:0x00000005
 \_SB_\PCI0\VGA_\CNT1 Buffer         Len:0x00000005
 \_SB_\PCI0\VGA_\CNT0 Buffer         Len:0x00000005
-\_SB_\PCI0\VGA_\HSID Integer        = 0x00000000FFFFFFFF
-\_SB_\PCI0\VGA_\DSID Integer        = 0x00000000FFFFFFFF
+\_SB_\PCI0\VGA_\HSID Integer        = 0xFFFFFFFFFFFFFFFF
+\_SB_\PCI0\VGA_\DSID Integer        = 0xFFFFFFFFFFFFFFFF
 \_SB_\PCI0\VGA_\ATPB Buffer         Len:0x00000100
 \_SB_\PCI0\VGA_\XTRM Method         length:0x00000099 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\VGA_\TVGA Buffer         Len:0x00000004

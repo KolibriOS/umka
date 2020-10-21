@@ -25486,7 +25486,7 @@ aml._.term_obj end
      Integer        = 0x0000000000000000
 \MCTH Method         length:0x00000048 Args:2 serialize:0 sync_level:0
 \OSFL Method         length:0x000000A9 Args:0 serialize:0 sync_level:0
-\OSVR Integer        = 0x00000000FFFFFFFF
+\OSVR Integer        = 0xFFFFFFFFFFFFFFFF
 \_PIC Method         length:0x000000CB Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RDMA Method         length:0x00000009 Args:3 serialize:0 sync_level:0
@@ -27518,7 +27518,7 @@ aml._.get_node_by_name end
      Integer        = 0x0000000000000000
 \MCTH Method         length:0x00000048 Args:2 serialize:0 sync_level:0
 \OSFL Method         length:0x000000A9 Args:0 serialize:0 sync_level:0
-\OSVR Integer        = 0x00000000FFFFFFFF
+\OSVR Integer        = 0xFFFFFFFFFFFFFFFF
 \_PIC Method         length:0x000000CB Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RDMA Method         length:0x00000009 Args:3 serialize:0 sync_level:0

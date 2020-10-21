@@ -129,7 +129,7 @@ TASK_COUNT equ __pew19
 SLOT_BASE equ __pew20
 sys_proc equ __pew21
 VGABasePtr equ __pew22
-;HEAP_BASE equ __pew01
+HEAP_BASE equ __pew23
 ;macro OS_BASE [x] {
 ;  OS_BASE equ os_base
 ;}
@@ -139,13 +139,11 @@ restore CURRENT_TASK
 restore TASK_BASE,TASK_DATA,TASK_EVENT,CDDataBuf,idts,WIN_STACK,WIN_POS
 restore FDD_BUFF,WIN_TEMP_XY,KEY_COUNT,KEY_BUFF,BTN_COUNT,BTN_BUFF,BTN_ADDR
 restore MEM_AMOUNT,SYS_SHUTDOWN,SLOT_BASE,sys_proc,VGABasePtr
-;restore HEAP_BASE
+restore HEAP_BASE
 restore TASK_COUNT
 purge BOOT_LO,BOOT
 
 LFB_BASE = lfb_base
-
-HEAP_BASE          = os_base + 0x00800000
 
 macro save_ring3_context {
         pushad
@@ -183,18 +181,7 @@ macro call target {
 }
 do_change_task equ hjk
 irq0 equ jhg
-macro mov r, v {
-  if r eq [CURRENT_TASK] & v eq bh
-        push    ebx
-        sub     ebx, SLOT_BASE
-        mov     [CURRENT_TASK], bh
-        pop     ebx
-  else
-        mov     r, v
-  end if
-}
 include 'core/sched.inc'
-purge mov
 purge call
 restore irq0
 include 'core/syscall.inc'
@@ -277,7 +264,31 @@ proc kos_time_to_epoch c uses ebx esi edi ebp, _time
         ret
 endp
 
+proc umka._.check_alignment
+        mov     eax, SLOT_BASE
+        and     eax, 0xffff     ; 65k
+        jz      @f
+        neg     eax
+        add     eax, 0x10000
+        DEBUGF 4, "SLOT_BASE must be aligned on 0x10000: 0x%x, add 0x%x\n", \
+                SLOT_BASE, eax
+        int3
+@@:
+        mov     eax, HEAP_BASE
+        and     eax, 0xfff      ; page
+        jz      @f
+        neg     eax
+        add     eax, 0x1000
+        DEBUGF 4, "HEAP_BASE must be aligned on 0x1000: 0x%x\n, add 0x%x", \
+                HEAP_BASE, eax
+        int3
+@@:
+        ret
+endp
+
 proc umka_init c uses ebx esi edi ebp
+        call    umka._.check_alignment
+
         mov     edi, endofcode
         mov     ecx, uglobals_size
         xor     eax, eax
@@ -329,11 +340,6 @@ proc umka_init c uses ebx esi edi ebp
         list_init eax
         add     eax, PROC.thr_list
         list_init eax
-
-;        xor     eax, eax
-;        mov     edi, lfb_base
-;        mov     ecx, MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
-;        rep stosd
 
         mov     [BOOT.bpp], 32
         mov     [BOOT.x_res], UMKA_DISPLAY_WIDTH
@@ -691,12 +697,12 @@ include 'kernel.asm'
 
 purge lea,add,org,mov
 restore lea,add,org,mov
-purge sys_msg_board,HEAP_BASE,__pew8
+purge sys_msg_board,__pew8
 
 coverage_end:
 
-
-section '.data' writeable align 4096
+; fasm doesn't align on 65536, but ld script does
+section '.data.aligned65k' writeable align 65536
 public umka_tool
 umka_tool dd ?
 fpu_owner dd ?
@@ -742,17 +748,17 @@ BTN_ADDR        dd ?
 MEM_AMOUNT      rd 0x1d
 SYS_SHUTDOWN    db ?
 sys_proc        rd 0x800
+rb 0x8e02       ; align SLOT_BASE on 0x10000
 SLOT_BASE:      rd 0x8000
 VGABasePtr      rb 640*480
-UPPER_KERNEL_PAGES = os_base + 0x00400000
-;HEAP_BASE       rb UMKA_MEMORY_BYTES - (HEAP_BASE-os_base+4096*sizeof.MEM_BLOCK)
-                rb 0x1000000
+;rb 0x582        ; align HEAP_BASE on page boundary
+HEAP_BASE       rb UMKA_MEMORY_BYTES - (HEAP_BASE-os_base+4096*sizeof.MEM_BLOCK)
+lfb_base        rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
+
 BOOT boot_data
 virtual at BOOT
 BOOT_LO boot_data
 end virtual
-align 4096
-lfb_base rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
 align 4096
 cur_dir:
 .encoding rb 1
