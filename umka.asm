@@ -748,7 +748,7 @@ BTN_ADDR        dd ?
 MEM_AMOUNT      rd 0x1d
 SYS_SHUTDOWN    db ?
 sys_proc        rd 0x800
-rb 0x8e02       ; align SLOT_BASE on 0x10000
+rb 0x8dc2       ; align SLOT_BASE on 0x10000
 SLOT_BASE:      rd 0x8000
 VGABasePtr      rb 640*480
 ;rb 0x582        ; align HEAP_BASE on page boundary

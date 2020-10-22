@@ -2698,11 +2698,11 @@ aml._.dword_const begin
 aml._.dword_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -2711,11 +2711,11 @@ aml._.word_const begin
 aml._.word_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000001D1
 aml._.op_region end
 aml._.named_obj end
@@ -14064,11 +14064,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -14513,11 +14513,11 @@ aml._.const_obj begin
 aml._.const_obj end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -14526,11 +14526,11 @@ aml._.word_const begin
 aml._.word_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000100
 aml._.op_region end
 aml._.named_obj end
@@ -14921,11 +14921,11 @@ aml._.dword_const begin
 aml._.dword_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -14934,11 +14934,11 @@ aml._.word_const begin
 aml._.word_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00001100
 aml._.op_region end
 aml._.named_obj end
@@ -14995,11 +14995,11 @@ aml._.word_const begin
 aml._.word_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -15058,11 +15058,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -15958,11 +15958,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -16109,11 +16109,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -16122,11 +16122,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -17817,11 +17817,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -17830,11 +17830,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -17975,11 +17975,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -18063,11 +18063,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -18176,11 +18176,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -18312,11 +18312,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -18425,11 +18425,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -18513,11 +18513,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -18601,11 +18601,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -18714,11 +18714,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -18875,11 +18875,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -19236,11 +19236,11 @@ aml._.get_node_by_name begin
 name: 'SP1O'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -19249,11 +19249,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000002
 aml._.op_region end
 aml._.named_obj end
@@ -19785,11 +19785,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -19828,11 +19828,11 @@ aml._.get_node_by_name begin
 name: 'CRS1'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -19841,11 +19841,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002A3B
@@ -19893,11 +19893,11 @@ aml._.get_node_by_name begin
 name: 'CRS1'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -19906,11 +19906,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002A46
@@ -19958,11 +19958,11 @@ aml._.get_node_by_name begin
 name: 'CRS1'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -19971,11 +19971,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002A51
@@ -20023,11 +20023,11 @@ aml._.get_node_by_name begin
 name: 'CRS1'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -20036,11 +20036,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002A5C
@@ -20088,11 +20088,11 @@ aml._.get_node_by_name begin
 name: 'CRS1'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -20101,11 +20101,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002A67
@@ -20149,11 +20149,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -20192,11 +20192,11 @@ aml._.get_node_by_name begin
 name: 'CRS2'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -20205,11 +20205,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002A93
@@ -20257,11 +20257,11 @@ aml._.get_node_by_name begin
 name: 'CRS2'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -20270,11 +20270,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002A9E
@@ -20322,11 +20322,11 @@ aml._.get_node_by_name begin
 name: 'CRS2'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -20335,11 +20335,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002AA9
@@ -20387,11 +20387,11 @@ aml._.get_node_by_name begin
 name: 'CRS2'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -20400,11 +20400,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002AB4
@@ -20452,11 +20452,11 @@ aml._.get_node_by_name begin
 name: 'CRS2'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -20465,11 +20465,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002ABF
@@ -20517,11 +20517,11 @@ aml._.get_node_by_name begin
 name: 'CRS2'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -20530,11 +20530,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002ACA
@@ -20582,11 +20582,11 @@ aml._.get_node_by_name begin
 name: 'CRS2'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -20595,11 +20595,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002AD5
@@ -20647,11 +20647,11 @@ aml._.get_node_by_name begin
 name: 'CRS2'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -20660,11 +20660,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00002AE0
@@ -20975,11 +20975,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -21014,11 +21014,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -21126,11 +21126,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -21263,11 +21263,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -21302,11 +21302,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -21530,11 +21530,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -21569,11 +21569,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -21632,11 +21632,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -21931,11 +21931,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -22012,11 +22012,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -22260,11 +22260,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -22273,11 +22273,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -22772,11 +22772,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -22785,11 +22785,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -23284,11 +23284,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -23297,11 +23297,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -23796,11 +23796,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -23809,11 +23809,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -24308,11 +24308,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -24321,11 +24321,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -24820,11 +24820,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -24833,11 +24833,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -25722,11 +25722,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -25735,11 +25735,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -26234,11 +26234,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -26247,11 +26247,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -26912,11 +26912,11 @@ aml._.word_const begin
 aml._.word_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -26925,11 +26925,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000010
 aml._.op_region end
 aml._.named_obj end
@@ -27049,11 +27049,11 @@ aml._.word_const begin
 aml._.word_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -27062,11 +27062,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000004
 aml._.op_region end
 aml._.named_obj end
@@ -27130,11 +27130,11 @@ aml._.word_const begin
 aml._.word_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -27143,11 +27143,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000004
 aml._.op_region end
 aml._.named_obj end
@@ -27227,11 +27227,11 @@ aml._.get_node_by_name begin
 name: 'PMBS'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -27240,11 +27240,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000080
 aml._.op_region end
 aml._.named_obj end
@@ -27437,11 +27437,11 @@ aml._.get_node_by_name begin
 name: 'GPBS'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -27450,11 +27450,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000064
 aml._.op_region end
 aml._.named_obj end
@@ -27834,11 +27834,11 @@ aml._.get_node_by_name begin
 name: 'SRCB'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -27847,11 +27847,11 @@ aml._.word_const begin
 aml._.word_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00004000
 aml._.op_region end
 aml._.named_obj end
@@ -28262,11 +28262,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -28275,11 +28275,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000004
 aml._.op_region end
 aml._.named_obj end
@@ -29635,11 +29635,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -29648,11 +29648,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000004
 aml._.op_region end
 aml._.named_obj end
@@ -30704,11 +30704,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -30717,11 +30717,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x0000006C
 aml._.op_region end
 aml._.named_obj end
@@ -31921,11 +31921,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -31934,11 +31934,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000010
 aml._.op_region end
 aml._.named_obj end
@@ -32211,11 +32211,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -32224,11 +32224,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -32297,11 +32297,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -32310,11 +32310,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000004
 aml._.op_region end
 aml._.named_obj end
@@ -32401,11 +32401,11 @@ aml._.get_node_by_name begin
 name: 'SBAR'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 6 to 2
-aml._.cast.op_region_field_to_integer begin
-aml._.cast.op_region_field_to_integer end
-aml._.cast end
+aml._.convert.op_region_field_to_integer begin
+aml._.convert.op_region_field_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -32414,11 +32414,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
  eax SHL ecx: 0xDEADBEEF SHL 0x00000005
 shift_left value: 0xD5B7DDE0
 aml._.target begin
@@ -32438,11 +32438,11 @@ aml._.store_table.integer_to_integer end
 aml._.store_table end
 aml._.shift_left end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -32451,11 +32451,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000010
 aml._.op_region end
 aml._.named_obj end
@@ -32864,11 +32864,11 @@ aml._.dword_const begin
 aml._.dword_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -32877,11 +32877,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000010
 aml._.op_region end
 aml._.named_obj end
@@ -33105,11 +33105,11 @@ aml._.get_node_by_name begin
 name: 'PMBS'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -33118,11 +33118,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000004
 aml._.op_region end
 aml._.named_obj end
@@ -33240,11 +33240,11 @@ aml._.get_node_by_name begin
 name: 'SMCR'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -33253,11 +33253,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000008
 aml._.op_region end
 aml._.named_obj end
@@ -33680,11 +33680,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -33693,11 +33693,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000004
 aml._.op_region end
 aml._.named_obj end
@@ -34238,11 +34238,11 @@ aml._.const_obj begin
 aml._.const_obj end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -34251,11 +34251,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000F0
 aml._.op_region end
 aml._.named_obj end
@@ -35753,11 +35753,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -35766,11 +35766,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -35848,11 +35848,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -35861,11 +35861,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x000000C0
 aml._.op_region end
 aml._.named_obj end
@@ -36064,11 +36064,11 @@ aml._.get_node_by_name begin
 name: 'ASLB'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 6 to 2
-aml._.cast.op_region_field_to_integer begin
-aml._.cast.op_region_field_to_integer end
-aml._.cast end
+aml._.convert.op_region_field_to_integer begin
+aml._.convert.op_region_field_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -36077,11 +36077,11 @@ aml._.word_const begin
 aml._.word_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00002000
 aml._.op_region end
 aml._.named_obj end
@@ -37373,11 +37373,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -37412,11 +37412,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -37771,11 +37771,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -37784,11 +37784,11 @@ aml._.const_obj begin
 aml._.const_obj end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000001
 aml._.op_region end
 aml._.named_obj end
@@ -37852,11 +37852,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -37865,11 +37865,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000002
 aml._.op_region end
 aml._.named_obj end
@@ -37933,11 +37933,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -37946,11 +37946,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000004
 aml._.op_region end
 aml._.named_obj end
@@ -38038,11 +38038,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -38051,11 +38051,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000002
 aml._.op_region end
 aml._.named_obj end
@@ -38547,11 +38547,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -40681,11 +40681,11 @@ aml._.get_node_by_name begin
 name: 'RAMB'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -40694,11 +40694,11 @@ aml._.dword_const begin
 aml._.dword_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00010000
 aml._.op_region end
 aml._.named_obj end
@@ -40814,11 +40814,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -40857,11 +40857,11 @@ aml._.get_node_by_name begin
 name: 'ARBF'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -40870,11 +40870,11 @@ aml._.const_obj begin
 aml._.const_obj end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x0000924F
@@ -40922,11 +40922,11 @@ aml._.get_node_by_name begin
 name: 'ARBF'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -40935,11 +40935,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x0000925A
@@ -40987,11 +40987,11 @@ aml._.get_node_by_name begin
 name: 'ARBF'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -41000,11 +41000,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00009265
@@ -41052,11 +41052,11 @@ aml._.get_node_by_name begin
 name: 'ARBF'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -41065,11 +41065,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00009270
@@ -41130,11 +41130,11 @@ aml._.get_node_by_name begin
 name: 'SMIP'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -41143,11 +41143,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000002
 aml._.op_region end
 aml._.named_obj end
@@ -41594,11 +41594,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -41996,11 +41996,11 @@ aml._.word_const begin
 aml._.word_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -43688,11 +43688,11 @@ aml._.get_node_by_name begin
 name: 'SS1_'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.if 0x000000A0 end
 aml._.term_obj end
 table/position: [0x0000AA6C]
@@ -43729,11 +43729,11 @@ aml._.get_node_by_name begin
 name: 'SS3_'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 if branch taken
 table/position: [0x0000AA72]
 aml._.term_obj begin
@@ -43829,11 +43829,11 @@ aml._.get_node_by_name begin
 name: 'SS4_'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 if branch taken
 table/position: [0x0000AA85]
 aml._.term_obj begin
@@ -46878,11 +46878,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -46917,11 +46917,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -46956,11 +46956,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -46995,11 +46995,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -47034,11 +47034,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -47191,11 +47191,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.buffer end
 aml._.data_object end
 aml._.data_ref_object end
@@ -47234,11 +47234,11 @@ aml._.get_node_by_name begin
 name: 'TMD0'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -47247,11 +47247,11 @@ aml._.const_obj begin
 aml._.const_obj end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x000000F5
@@ -47299,11 +47299,11 @@ aml._.get_node_by_name begin
 name: 'TMD0'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -47312,11 +47312,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00000100
@@ -47364,11 +47364,11 @@ aml._.get_node_by_name begin
 name: 'TMD0'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -47377,11 +47377,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x0000010B
@@ -47429,11 +47429,11 @@ aml._.get_node_by_name begin
 name: 'TMD0'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -47442,11 +47442,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00000116
@@ -47494,11 +47494,11 @@ aml._.get_node_by_name begin
 name: 'TMD0'
 aml._.get_node_by_name end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 4 to 4
-aml._.cast.buffer_to_buffer begin
-aml._.cast.buffer_to_buffer end
-aml._.cast end
+aml._.convert.buffer_to_buffer begin
+aml._.convert.buffer_to_buffer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -47507,11 +47507,11 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x00000121
@@ -58525,11 +58525,11 @@ aml._.dword_const begin
 aml._.dword_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
@@ -58538,11 +58538,11 @@ aml._.word_const begin
 aml._.word_const end
 aml._.data_object end
 aml._.term_arg end
-aml._.cast begin
+aml._.convert begin
 types 2 to 2
-aml._.cast.integer_to_integer begin
-aml._.cast.integer_to_integer end
-aml._.cast end
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
 RegionLength: 0x00000029
 aml._.op_region end
 aml._.named_obj end
