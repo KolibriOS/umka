@@ -8481,6 +8481,8 @@ aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string end
 aml._.simple_name end
+aml._.name_string begin
+aml._.name_string end
 aml._.super_name end
 aml._.null_name begin
 aml._.null_name end

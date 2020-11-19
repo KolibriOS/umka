@@ -9,7 +9,7 @@ table length 0x00000184
 Table signature: 'DSDT'
 Table length (with header): 0x00000184
 Revision: 0x01
-Checksum: 0xD3
+Checksum: 0xC3
 OEM ID: 'UMKA '
 OEM Table ID: 'UMKADSDT'
 OEM Table Revision: 0x00000001
@@ -1711,6 +1711,8 @@ aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string end
 aml._.simple_name end
+aml._.name_string begin
+aml._.name_string end
 aml._.super_name end
 aml._.null_name begin
 aml._.null_name end
@@ -1737,6 +1739,8 @@ aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string end
 aml._.simple_name end
+aml._.name_string begin
+aml._.name_string end
 aml._.super_name end
 aml._.null_name begin
 aml._.null_name end
@@ -1901,6 +1905,8 @@ aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string end
 aml._.simple_name end
+aml._.name_string begin
+aml._.name_string end
 aml._.super_name end
 aml._.null_name begin
 aml._.null_name end
@@ -1927,6 +1933,8 @@ aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string end
 aml._.simple_name end
+aml._.name_string begin
+aml._.name_string end
 aml._.super_name end
 aml._.null_name begin
 aml._.null_name end

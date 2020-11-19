@@ -1,5 +1,6 @@
 *.swp
 .vim
+.umka
 .exrc
 *.o
 umka_shell
@@ -29,3 +30,4 @@ covpreproc
 *.skn
 *.dsl
 *.aml
+ignore.*

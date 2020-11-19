@@ -98,6 +98,37 @@ section '.text' executable align 32
 coverage_begin:
 
 include 'macros.inc'
+
+uglobal
+align 64
+os_base:        rb 0x1000
+window_data:    rb 0x2000
+CURRENT_TASK:   rb 4
+TASK_COUNT:     rb 12
+TASK_BASE       rd 4
+TASK_DATA       rd 0x7f8
+TASK_EVENT = TASK_DATA
+CDDataBuf:      rd 0x1840
+idts            rd 0x3c0
+WIN_STACK       rw 0x200
+WIN_POS         rw 0x600
+FDD_BUFF        rb 0x2300
+WIN_TEMP_XY     rb 0x100
+KEY_COUNT       db ?
+KEY_BUFF        rb 255  ; 120*2 + 2*2 = 244 bytes, actually 255 bytes
+BTN_COUNT       db ?
+BTN_BUFF        rd 0x261
+BTN_ADDR        dd ?
+MEM_AMOUNT      rd 0x1d
+SYS_SHUTDOWN    db ?
+sys_proc        rd 0x800
+rb 0xe5c2       ; align SLOT_BASE on 0x10000
+SLOT_BASE:      rd 0x8000
+VGABasePtr      rb 640*480
+;rb 0x582        ; align HEAP_BASE on page boundary
+HEAP_BASE       rb UMKA_MEMORY_BYTES - (HEAP_BASE-os_base+4096*sizeof.MEM_BLOCK)
+endg
+
 macro diff16 msg,blah2,blah3 {
   if msg eq "end of .data segment"
     section '.bss' writeable align 64
@@ -268,19 +299,19 @@ proc umka._.check_alignment
         mov     eax, SLOT_BASE
         and     eax, 0xffff     ; 65k
         jz      @f
-        neg     eax
-        add     eax, 0x10000
-        DEBUGF 4, "SLOT_BASE must be aligned on 0x10000: 0x%x, add 0x%x\n", \
-                SLOT_BASE, eax
+        mov     ecx, 0x10000
+        sub     ecx, eax
+        DEBUGF 4, "SLOT_BASE must be aligned on 0x10000: 0x%x", SLOT_BASE
+        DEBUGF 4, ", add 0x%x or sub 0x%x\n", ecx, eax
         int3
 @@:
         mov     eax, HEAP_BASE
         and     eax, 0xfff      ; page
         jz      @f
-        neg     eax
-        add     eax, 0x1000
-        DEBUGF 4, "HEAP_BASE must be aligned on 0x1000: 0x%x\n, add 0x%x", \
-                HEAP_BASE, eax
+        mov     ecx, 0x1000
+        sub     ecx, eax
+        DEBUGF 4, "HEAP_BASE must be aligned on 0x1000: 0x%x", HEAP_BASE
+        DEBUGF 4, ", add 0x%x or sub 0x%x\n", ecx, eax
         int3
 @@:
         ret
@@ -726,33 +757,7 @@ ide_channel5_mutex MUTEX
 ide_channel6_mutex MUTEX
 ide_channel7_mutex MUTEX
 ide_channel8_mutex MUTEX
-align 64
-os_base:        rb 0x1000
-window_data:    rb 0x2000
-CURRENT_TASK:   rb 4
-TASK_COUNT:     rb 12
-TASK_BASE       rd 4
-TASK_DATA       rd 0x7f8
-TASK_EVENT = TASK_DATA
-CDDataBuf:      rd 0x1840
-idts            rd 0x3c0
-WIN_STACK       rw 0x200
-WIN_POS         rw 0x600
-FDD_BUFF        rb 0x2300
-WIN_TEMP_XY     rb 0x100
-KEY_COUNT       db ?
-KEY_BUFF        rb 255  ; 120*2 + 2*2 = 244 bytes, actually 255 bytes
-BTN_COUNT       db ?
-BTN_BUFF        rd 0x261
-BTN_ADDR        dd ?
-MEM_AMOUNT      rd 0x1d
-SYS_SHUTDOWN    db ?
-sys_proc        rd 0x800
-rb 0x8dc2       ; align SLOT_BASE on 0x10000
-SLOT_BASE:      rd 0x8000
-VGABasePtr      rb 640*480
-;rb 0x582        ; align HEAP_BASE on page boundary
-HEAP_BASE       rb UMKA_MEMORY_BYTES - (HEAP_BASE-os_base+4096*sizeof.MEM_BLOCK)
+
 lfb_base        rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
 
 BOOT boot_data
