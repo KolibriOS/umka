@@ -1,3 +1,5 @@
+; TODO: SPDX
+
 format ELF
 
 __DEBUG__ = 1
@@ -696,9 +698,15 @@ map_page:
 map_memEx:
         ret     20
 
-
-sys_msg_board equ __pew8
-delay_ms equ __pew9
+sys_msg_board equ __pex0
+delay_ms equ __pex1
+macro stdcall target, [args] {
+  if target eq is_region_userspace
+        test    esp, esp        ; clear zf
+  else
+        stdcall target, args
+  end if
+}
 
 include fix pew
 macro pew x {}
@@ -728,7 +736,8 @@ include 'kernel.asm'
 
 purge lea,add,org,mov
 restore lea,add,org,mov
-purge sys_msg_board,__pew8
+purge sys_msg_board,delay_ms
+restore sys_msg_board,delay_ms
 
 coverage_end:
 

@@ -3526,26 +3526,140 @@ aml._.object end
 aml._.term_obj end
 ==========ACPI_TREE==========
 \PKG0 Package        elements:7
-     Deferred       DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AHDV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       .PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AHDV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       /PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AHDV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       \DV0A\.PCI0DV0A\/PCI0DV00DV0AHDV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       \.PCI0DV0A\/PCI0DV00DV0AHDV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       \/PCI0DV00DV0AHDV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000486
+aml._.name_path begin
+aml._.name_path end
+name_string: DV0A
+aml._.name_string end
+ Deferred       DV0A
+    aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: PCI0DV0A
+aml._.name_string end
+ Deferred       PCI0DV0A
+    aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: PCI0DV00DV0A
+aml._.name_string end
+ Deferred       PCI0DV00DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000004A1
+aml._.name_path begin
+aml._.name_path end
+name_string: \DV0A
+aml._.name_string end
+ Deferred       \DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000004A6
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV0A
+aml._.name_string end
+ Deferred       \PCI0DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000004B0
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV00DV0A
+aml._.name_string end
+ Deferred       \PCI0DV00DV0A
      Package        elements:7
-         Deferred       DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       .PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       /PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       \DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       \.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       \/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000004C3
+aml._.name_path begin
+aml._.name_path end
+name_string: DV0A
+aml._.name_string end
+ Deferred       DV0A
+        aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: PCI0DV0A
+aml._.name_string end
+ Deferred       PCI0DV0A
+        aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: PCI0DV00DV0A
+aml._.name_string end
+ Deferred       PCI0DV00DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000004DE
+aml._.name_path begin
+aml._.name_path end
+name_string: \DV0A
+aml._.name_string end
+ Deferred       \DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000004E3
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV0A
+aml._.name_string end
+ Deferred       \PCI0DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000004ED
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV00DV0A
+aml._.name_string end
+ Deferred       \PCI0DV00DV0A
          Package        elements:6
-             Deferred       DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       .PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       /PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       \DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       \.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       \/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000004FF
+aml._.name_path begin
+aml._.name_path end
+name_string: DV0A
+aml._.name_string end
+ Deferred       DV0A
+            aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: PCI0DV0A
+aml._.name_string end
+ Deferred       PCI0DV0A
+            aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: PCI0DV00DV0A
+aml._.name_string end
+ Deferred       PCI0DV00DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000051A
+aml._.name_path begin
+aml._.name_path end
+name_string: \DV0A
+aml._.name_string end
+ Deferred       \DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000051F
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV0A
+aml._.name_string end
+ Deferred       \PCI0DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000529
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV00DV0A
+aml._.name_string end
+ Deferred       \PCI0DV00DV0A
 \DV0H Device        
 \DV0H\_ADR Integer        = 0x0000000000000000
 \DV0F Device        
@@ -3581,32 +3695,194 @@ aml._.term_obj end
 \PCI0\M001 Method         length:0x00000006 Args:0 serialize:0 sync_level:0
 \PCI0\M000 Method         length:0x00000000 Args:0 serialize:0 sync_level:0
 \PCI0\PKG1 Package        elements:9
-     Deferred       DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       .DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       \DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       \.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       \/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       ^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       ^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       ^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000549
+aml._.name_path begin
+aml._.name_path end
+name_string: DV0A
+aml._.name_string end
+ Deferred       DV0A
+    aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: DV00DV0A
+aml._.name_string end
+ Deferred       DV00DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000556
+aml._.name_path begin
+aml._.name_path end
+name_string: \DV0A
+aml._.name_string end
+ Deferred       \DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000055B
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV0A
+aml._.name_string end
+ Deferred       \PCI0DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000565
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV00DV0A
+aml._.name_string end
+ Deferred       \PCI0DV00DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000574
+aml._.name_path begin
+aml._.name_path end
+name_string: ^DV0A
+aml._.name_string end
+ Deferred       ^DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000579
+aml._.name_path begin
+aml._.name_path end
+name_string: ^PCI0DV0A
+aml._.name_string end
+ Deferred       ^PCI0DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000583
+aml._.name_path begin
+aml._.name_path end
+name_string: ^PCI0DV00DV0A
+aml._.name_string end
+ Deferred       ^PCI0DV00DV0A
      Package        elements:9
-         Deferred       DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       .DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       \DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       \.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       \/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       ^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       ^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       ^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000596
+aml._.name_path begin
+aml._.name_path end
+name_string: DV0A
+aml._.name_string end
+ Deferred       DV0A
+        aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: DV00DV0A
+aml._.name_string end
+ Deferred       DV00DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005A3
+aml._.name_path begin
+aml._.name_path end
+name_string: \DV0A
+aml._.name_string end
+ Deferred       \DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005A8
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV0A
+aml._.name_string end
+ Deferred       \PCI0DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005B2
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV00DV0A
+aml._.name_string end
+ Deferred       \PCI0DV00DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005C1
+aml._.name_path begin
+aml._.name_path end
+name_string: ^DV0A
+aml._.name_string end
+ Deferred       ^DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005C6
+aml._.name_path begin
+aml._.name_path end
+name_string: ^PCI0DV0A
+aml._.name_string end
+ Deferred       ^PCI0DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005D0
+aml._.name_path begin
+aml._.name_path end
+name_string: ^PCI0DV00DV0A
+aml._.name_string end
+ Deferred       ^PCI0DV00DV0A
          Package        elements:8
-             Deferred       DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       .DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       \DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       \.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       \/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       ^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       ^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       ^/PCI0DV00DV0AM000
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005E3
+aml._.name_path begin
+aml._.name_path end
+name_string: DV0A
+aml._.name_string end
+ Deferred       DV0A
+            aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: DV00DV0A
+aml._.name_string end
+ Deferred       DV00DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005F0
+aml._.name_path begin
+aml._.name_path end
+name_string: \DV0A
+aml._.name_string end
+ Deferred       \DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005F5
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV0A
+aml._.name_string end
+ Deferred       \PCI0DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005FF
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV00DV0A
+aml._.name_string end
+ Deferred       \PCI0DV00DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000060E
+aml._.name_path begin
+aml._.name_path end
+name_string: ^DV0A
+aml._.name_string end
+ Deferred       ^DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000613
+aml._.name_path begin
+aml._.name_path end
+name_string: ^PCI0DV0A
+aml._.name_string end
+ Deferred       ^PCI0DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000061D
+aml._.name_path begin
+aml._.name_path end
+name_string: ^PCI0DV00DV0A
+aml._.name_string end
+ Deferred       ^PCI0DV00DV0A
 \PCI0\DV0H Device        
 \PCI0\DV0H\_ADR Integer        = 0x0000000000000000
 \PCI0\DV0G Device        
@@ -3717,26 +3993,140 @@ aml._.term_obj end
 ==========ACPI_TREE==========
 \A001 Integer        = 0x000000000000A001
 \PKG0 Package        elements:7
-     Deferred       DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AHDV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       .PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AHDV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       /PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AHDV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       \DV0A\.PCI0DV0A\/PCI0DV00DV0AHDV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       \.PCI0DV0A\/PCI0DV00DV0AHDV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       \/PCI0DV00DV0AHDV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFDF6
+aml._.name_path begin
+aml._.name_path end
+name_string: DV0A
+aml._.name_string end
+ Deferred       DV0A
+    aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: PCI0DV0A
+aml._.name_string end
+ Deferred       PCI0DV0A
+    aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: PCI0DV00DV0A
+aml._.name_string end
+ Deferred       PCI0DV00DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFE11
+aml._.name_path begin
+aml._.name_path end
+name_string: \DV0A
+aml._.name_string end
+ Deferred       \DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFE16
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV0A
+aml._.name_string end
+ Deferred       \PCI0DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFE20
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV00DV0A
+aml._.name_string end
+ Deferred       \PCI0DV00DV0A
      Package        elements:7
-         Deferred       DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       .PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       /PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       \DV0A\.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       \.PCI0DV0A\/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       \/PCI0DV00DV0A;DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFE33
+aml._.name_path begin
+aml._.name_path end
+name_string: DV0A
+aml._.name_string end
+ Deferred       DV0A
+        aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: PCI0DV0A
+aml._.name_string end
+ Deferred       PCI0DV0A
+        aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: PCI0DV00DV0A
+aml._.name_string end
+ Deferred       PCI0DV00DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFE4E
+aml._.name_path begin
+aml._.name_path end
+name_string: \DV0A
+aml._.name_string end
+ Deferred       \DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFE53
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV0A
+aml._.name_string end
+ Deferred       \PCI0DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFE5D
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV00DV0A
+aml._.name_string end
+ Deferred       \PCI0DV00DV0A
          Package        elements:6
-             Deferred       DV0A.PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       .PCI0DV0A/PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       /PCI0DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       \DV0A\.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       \.PCI0DV0A\/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       \/PCI0DV00DV0AC\PCI0PKG1F	DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFE6F
+aml._.name_path begin
+aml._.name_path end
+name_string: DV0A
+aml._.name_string end
+ Deferred       DV0A
+            aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: PCI0DV0A
+aml._.name_string end
+ Deferred       PCI0DV0A
+            aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: PCI0DV00DV0A
+aml._.name_string end
+ Deferred       PCI0DV00DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFE8A
+aml._.name_path begin
+aml._.name_path end
+name_string: \DV0A
+aml._.name_string end
+ Deferred       \DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFE8F
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV0A
+aml._.name_string end
+ Deferred       \PCI0DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFE99
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV00DV0A
+aml._.name_string end
+ Deferred       \PCI0DV00DV0A
 \DV0H Device        
 \DV0H\_ADR Integer        = 0x0000000000000000
 \DV0F Device        
@@ -3772,32 +4162,194 @@ aml._.term_obj end
 \PCI0\M001 Method         length:0x00000006 Args:0 serialize:0 sync_level:0
 \PCI0\M000 Method         length:0x00000000 Args:0 serialize:0 sync_level:0
 \PCI0\PKG1 Package        elements:9
-     Deferred       DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       .DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       \DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       \.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       \/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       ^DV0A^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       ^.PCI0DV0A^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-     Deferred       ^/PCI0DV00DV0AI		DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFEB9
+aml._.name_path begin
+aml._.name_path end
+name_string: DV0A
+aml._.name_string end
+ Deferred       DV0A
+    aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: DV00DV0A
+aml._.name_string end
+ Deferred       DV00DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFEC6
+aml._.name_path begin
+aml._.name_path end
+name_string: \DV0A
+aml._.name_string end
+ Deferred       \DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFECB
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV0A
+aml._.name_string end
+ Deferred       \PCI0DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFED5
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV00DV0A
+aml._.name_string end
+ Deferred       \PCI0DV00DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFEE4
+aml._.name_path begin
+aml._.name_path end
+name_string: ^DV0A
+aml._.name_string end
+ Deferred       ^DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFEE9
+aml._.name_path begin
+aml._.name_path end
+name_string: ^PCI0DV0A
+aml._.name_string end
+ Deferred       ^PCI0DV0A
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFEF3
+aml._.name_path begin
+aml._.name_path end
+name_string: ^PCI0DV00DV0A
+aml._.name_string end
+ Deferred       ^PCI0DV00DV0A
      Package        elements:9
-         Deferred       DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       .DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       \DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       \.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       \/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       ^DV0A^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       ^.PCI0DV0A^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-         Deferred       ^/PCI0DV00DV0ALDV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF06
+aml._.name_path begin
+aml._.name_path end
+name_string: DV0A
+aml._.name_string end
+ Deferred       DV0A
+        aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: DV00DV0A
+aml._.name_string end
+ Deferred       DV00DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF13
+aml._.name_path begin
+aml._.name_path end
+name_string: \DV0A
+aml._.name_string end
+ Deferred       \DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF18
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV0A
+aml._.name_string end
+ Deferred       \PCI0DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF22
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV00DV0A
+aml._.name_string end
+ Deferred       \PCI0DV00DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF31
+aml._.name_path begin
+aml._.name_path end
+name_string: ^DV0A
+aml._.name_string end
+ Deferred       ^DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF36
+aml._.name_path begin
+aml._.name_path end
+name_string: ^PCI0DV0A
+aml._.name_string end
+ Deferred       ^PCI0DV0A
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF40
+aml._.name_path begin
+aml._.name_path end
+name_string: ^PCI0DV00DV0A
+aml._.name_string end
+ Deferred       ^PCI0DV00DV0A
          Package        elements:8
-             Deferred       DV0A.DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       .DV00DV0A\DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       \DV0A\.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       \.PCI0DV0A\/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       \/PCI0DV00DV0A^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       ^DV0A^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       ^.PCI0DV0A^/PCI0DV00DV0AM000
-             Deferred       ^/PCI0DV00DV0AM000
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF53
+aml._.name_path begin
+aml._.name_path end
+name_string: DV0A
+aml._.name_string end
+ Deferred       DV0A
+            aml._.name_string begin
+aml._.name_path begin
+aml._.name_path end
+name_string: DV00DV0A
+aml._.name_string end
+ Deferred       DV00DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF60
+aml._.name_path begin
+aml._.name_path end
+name_string: \DV0A
+aml._.name_string end
+ Deferred       \DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF65
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV0A
+aml._.name_string end
+ Deferred       \PCI0DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF6F
+aml._.name_path begin
+aml._.name_path end
+name_string: \PCI0DV00DV0A
+aml._.name_string end
+ Deferred       \PCI0DV00DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF7E
+aml._.name_path begin
+aml._.name_path end
+name_string: ^DV0A
+aml._.name_string end
+ Deferred       ^DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF83
+aml._.name_path begin
+aml._.name_path end
+name_string: ^PCI0DV0A
+aml._.name_string end
+ Deferred       ^PCI0DV0A
+            aml._.name_string begin
+aml._.name_string begin again
+offset: 0xFFFFFF8D
+aml._.name_path begin
+aml._.name_path end
+name_string: ^PCI0DV00DV0A
+aml._.name_string end
+ Deferred       ^PCI0DV00DV0A
 \PCI0\DV0H Device        
 \PCI0\DV0H\_ADR Integer        = 0x0000000000000000
 \PCI0\DV0G Device        

@@ -26132,12 +26132,30 @@ aml._.term_obj end
 \_SB_\PCI0\SBRG\ASOC\FGET Method         length:0x00000036 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\ASOC\FBUF Package        elements:4
      Integer        = 0x0000000000000003
-     Deferred       CPUFCHAFPWRF<FGET “h
-
-     Deferred       CHAFPWRF<FGET “h
-
-     Deferred       PWRF<FGET “h
-
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000553D
+aml._.name_path begin
+aml._.name_path end
+name_string: CPUF
+aml._.name_string end
+ Deferred       CPUF
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00005541
+aml._.name_path begin
+aml._.name_path end
+name_string: CHAF
+aml._.name_string end
+ Deferred       CHAF
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00005545
+aml._.name_path begin
+aml._.name_path end
+name_string: PWRF
+aml._.name_string end
+ Deferred       PWRF
 \_SB_\PCI0\SBRG\ASOC\PWRF Package        elements:5
      Integer        = 0x0000000006040002
      String         Len:0x0000000F value:POWER FAN Speed
@@ -26159,10 +26177,22 @@ aml._.term_obj end
 \_SB_\PCI0\SBRG\ASOC\TGET Method         length:0x00000024 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\ASOC\TBUF Package        elements:3
      Integer        = 0x0000000000000002
-     Deferred       CPUTMBTP*TGET “h
-
-     Deferred       MBTP*TGET “h
-
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00005485
+aml._.name_path begin
+aml._.name_path end
+name_string: CPUT
+aml._.name_string end
+ Deferred       CPUT
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00005489
+aml._.name_path begin
+aml._.name_path end
+name_string: MBTP
+aml._.name_string end
+ Deferred       MBTP
 \_SB_\PCI0\SBRG\ASOC\MBTP Package        elements:5
      Integer        = 0x0000000006030001
      String         Len:0x0000000E value:MB Temperature
@@ -26178,14 +26208,38 @@ aml._.term_obj end
 \_SB_\PCI0\SBRG\ASOC\VGET Method         length:0x00000048 Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\ASOC\VBUF Package        elements:5
      Integer        = 0x0000000000000004
-     Deferred       CORVV3VVV5VVVV12OVGET “h
-
-     Deferred       V3VVV5VVVV12OVGET “h
-
-     Deferred       V5VVVV12OVGET “h
-
-     Deferred       VV12OVGET “h
-
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000053CA
+aml._.name_path begin
+aml._.name_path end
+name_string: CORV
+aml._.name_string end
+ Deferred       CORV
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000053CE
+aml._.name_path begin
+aml._.name_path end
+name_string: V3VV
+aml._.name_string end
+ Deferred       V3VV
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000053D2
+aml._.name_path begin
+aml._.name_path end
+name_string: V5VV
+aml._.name_string end
+ Deferred       V5VV
+    aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000053D6
+aml._.name_path begin
+aml._.name_path end
+name_string: VV12
+aml._.name_string end
+ Deferred       VV12
 \_SB_\PCI0\SBRG\ASOC\VPAR Package        elements:4
      Package        elements:3
          Integer        = 0x0000000000000000
@@ -26447,86 +26501,170 @@ aml._.term_obj end
      Package        elements:4
          Integer        = 0x000000000010FFFF
          Integer        = 0x0000000000000000
-         Deferred       LNKB
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000727
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKB
+aml._.name_string end
+ Deferred       LNKB
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000010FFFF
          Integer        = 0x0000000000000001
-         Deferred       LNKC
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000737
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKC
+aml._.name_string end
+ Deferred       LNKC
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000010FFFF
          Integer        = 0x0000000000000002
-         Deferred       LNKD
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000747
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKD
+aml._.name_string end
+ Deferred       LNKD
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000010FFFF
          Integer        = 0x0000000000000003
-         Deferred       LNKE
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000757
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKE
+aml._.name_string end
+ Deferred       LNKE
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000011FFFF
          Integer        = 0x0000000000000000
-         Deferred       LNKC
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000767
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKC
+aml._.name_string end
+ Deferred       LNKC
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000011FFFF
          Integer        = 0x0000000000000001
-         Deferred       LNKD
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000777
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKD
+aml._.name_string end
+ Deferred       LNKD
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000011FFFF
          Integer        = 0x0000000000000002
-         Deferred       LNKE
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000787
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKE
+aml._.name_string end
+ Deferred       LNKE
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000011FFFF
          Integer        = 0x0000000000000003
-         Deferred       LNKF
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000797
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKF
+aml._.name_string end
+ Deferred       LNKF
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000012FFFF
          Integer        = 0x0000000000000000
-         Deferred       LNKD
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000007A7
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKD
+aml._.name_string end
+ Deferred       LNKD
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000012FFFF
          Integer        = 0x0000000000000001
-         Deferred       LNKE
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000007B7
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKE
+aml._.name_string end
+ Deferred       LNKE
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000012FFFF
          Integer        = 0x0000000000000002
-         Deferred       LNKF
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000007C7
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKF
+aml._.name_string end
+ Deferred       LNKF
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000012FFFF
          Integer        = 0x0000000000000003
-         Deferred       LNKG
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000007D7
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKG
+aml._.name_string end
+ Deferred       LNKG
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000013FFFF
          Integer        = 0x0000000000000000
-         Deferred       LNKE
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000007E7
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKE
+aml._.name_string end
+ Deferred       LNKE
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000014FFFF
          Integer        = 0x0000000000000000
-         Deferred       LNKF
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000007F7
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKF
+aml._.name_string end
+ Deferred       LNKF
          Integer        = 0x0000000000000000
 \_SB_\AR05 Package        elements:4
      Package        elements:4
@@ -26553,26 +26691,50 @@ aml._.term_obj end
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000000
-         Deferred       LNKB
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000006AC
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKB
+aml._.name_string end
+ Deferred       LNKB
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000001
-         Deferred       LNKC
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000006BA
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKC
+aml._.name_string end
+ Deferred       LNKC
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000002
-         Deferred       LNKD
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000006C8
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKD
+aml._.name_string end
+ Deferred       LNKD
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000003
-         Deferred       LNKA
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000006D6
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKA
+aml._.name_string end
+ Deferred       LNKA
          Integer        = 0x0000000000000000
 \_SB_\AR04 Package        elements:4
      Package        elements:4
@@ -26599,26 +26761,50 @@ aml._.term_obj end
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000000
-         Deferred       LNKA
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000634
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKA
+aml._.name_string end
+ Deferred       LNKA
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000001
-         Deferred       LNKB
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000642
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKB
+aml._.name_string end
+ Deferred       LNKB
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000002
-         Deferred       LNKC
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000650
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKC
+aml._.name_string end
+ Deferred       LNKC
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000003
-         Deferred       LNKD
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000065E
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKD
+aml._.name_string end
+ Deferred       LNKD
          Integer        = 0x0000000000000000
 \_SB_\AR03 Package        elements:4
      Package        elements:4
@@ -26645,26 +26831,50 @@ aml._.term_obj end
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000000
-         Deferred       LNKD
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005BC
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKD
+aml._.name_string end
+ Deferred       LNKD
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000001
-         Deferred       LNKA
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005CA
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKA
+aml._.name_string end
+ Deferred       LNKA
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000002
-         Deferred       LNKB
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005D8
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKB
+aml._.name_string end
+ Deferred       LNKB
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000003
-         Deferred       LNKC
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000005E6
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKC
+aml._.name_string end
+ Deferred       LNKC
          Integer        = 0x0000000000000000
 \_SB_\AR02 Package        elements:4
      Package        elements:4
@@ -26691,26 +26901,50 @@ aml._.term_obj end
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000000
-         Deferred       LNKC
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000544
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKC
+aml._.name_string end
+ Deferred       LNKC
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000001
-         Deferred       LNKD
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000552
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKD
+aml._.name_string end
+ Deferred       LNKD
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000002
-         Deferred       LNKA
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000560
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKA
+aml._.name_string end
+ Deferred       LNKA
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x000000000000FFFF
          Integer        = 0x0000000000000003
-         Deferred       LNKB
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000056E
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKB
+aml._.name_string end
+ Deferred       LNKB
          Integer        = 0x0000000000000000
 \_SB_\AR00 Package        elements:8
      Package        elements:4
@@ -26757,50 +26991,98 @@ aml._.term_obj end
      Package        elements:4
          Integer        = 0x00000000001CFFFF
          Integer        = 0x0000000000000000
-         Deferred       LNKB
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000445
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKB
+aml._.name_string end
+ Deferred       LNKB
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x00000000001CFFFF
          Integer        = 0x0000000000000001
-         Deferred       LNKC
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000455
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKC
+aml._.name_string end
+ Deferred       LNKC
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x00000000001CFFFF
          Integer        = 0x0000000000000002
-         Deferred       LNKD
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000465
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKD
+aml._.name_string end
+ Deferred       LNKD
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x00000000001CFFFF
          Integer        = 0x0000000000000003
-         Deferred       LNKP
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000475
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKP
+aml._.name_string end
+ Deferred       LNKP
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x00000000001DFFFF
          Integer        = 0x0000000000000000
-         Deferred       LNKH
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000485
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKH
+aml._.name_string end
+ Deferred       LNKH
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x00000000001DFFFF
          Integer        = 0x0000000000000001
-         Deferred       LNKG
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000495
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKG
+aml._.name_string end
+ Deferred       LNKG
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x00000000001DFFFF
          Integer        = 0x0000000000000002
-         Deferred       LNKG
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000004A5
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKG
+aml._.name_string end
+ Deferred       LNKG
          Integer        = 0x0000000000000000
      Package        elements:4
          Integer        = 0x00000000001FFFFF
          Integer        = 0x0000000000000000
-         Deferred       LNKD
-
+        aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000004B5
+aml._.name_path begin
+aml._.name_path end
+name_string: LNKD
+aml._.name_string end
+ Deferred       LNKD
          Integer        = 0x0000000000000000
 \_PR_ Scope         
 \_PR_\CPU2 Processor      ID:0x02 Addr:0x00000000 Len:0x00000000
