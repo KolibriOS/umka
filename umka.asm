@@ -70,6 +70,7 @@ public eth_input as 'kos_eth_input'
 public net_buff_alloc as 'kos_net_buff_alloc'
 
 public mem_block_list
+public pci_root
 
 macro cli {
         pushfd
@@ -100,36 +101,6 @@ section '.text' executable align 32
 coverage_begin:
 
 include 'macros.inc'
-
-uglobal
-align 64
-os_base:        rb 0x1000
-window_data:    rb 0x2000
-CURRENT_TASK:   rb 4
-TASK_COUNT:     rb 12
-TASK_BASE       rd 4
-TASK_DATA       rd 0x7f8
-TASK_EVENT = TASK_DATA
-CDDataBuf:      rd 0x1840
-idts            rd 0x3c0
-WIN_STACK       rw 0x200
-WIN_POS         rw 0x600
-FDD_BUFF        rb 0x2300
-WIN_TEMP_XY     rb 0x100
-KEY_COUNT       db ?
-KEY_BUFF        rb 255  ; 120*2 + 2*2 = 244 bytes, actually 255 bytes
-BTN_COUNT       db ?
-BTN_BUFF        rd 0x261
-BTN_ADDR        dd ?
-MEM_AMOUNT      rd 0x1d
-SYS_SHUTDOWN    db ?
-sys_proc        rd 0x800
-rb 0xe5c2       ; align SLOT_BASE on 0x10000
-SLOT_BASE:      rd 0x8000
-VGABasePtr      rb 640*480
-;rb 0x582        ; align HEAP_BASE on page boundary
-HEAP_BASE       rb UMKA_MEMORY_BYTES - (HEAP_BASE-os_base+4096*sizeof.MEM_BLOCK)
-endg
 
 macro diff16 msg,blah2,blah3 {
   if msg eq "end of .data segment"
@@ -746,6 +717,36 @@ section '.data.aligned65k' writeable align 65536
 public umka_tool
 umka_tool dd ?
 fpu_owner dd ?
+
+uglobal
+align 64
+os_base:        rb 0x1000
+window_data:    rb 0x2000
+CURRENT_TASK:   rb 4
+TASK_COUNT:     rb 12
+TASK_BASE       rd 4
+TASK_DATA       rd 0x7f8
+TASK_EVENT = TASK_DATA
+CDDataBuf:      rd 0x1840
+idts            rd 0x3c0
+WIN_STACK       rw 0x200
+WIN_POS         rw 0x600
+FDD_BUFF        rb 0x2300
+WIN_TEMP_XY     rb 0x100
+KEY_COUNT       db ?
+KEY_BUFF        rb 255  ; 120*2 + 2*2 = 244 bytes, actually 255 bytes
+BTN_COUNT       db ?
+BTN_BUFF        rd 0x261
+BTN_ADDR        dd ?
+MEM_AMOUNT      rd 0x1d
+SYS_SHUTDOWN    db ?
+sys_proc        rd 0x800
+rb 0xb782       ; align SLOT_BASE on 0x10000
+SLOT_BASE:      rd 0x8000
+VGABasePtr      rb 640*480
+;rb 0x582        ; align HEAP_BASE on page boundary
+HEAP_BASE       rb UMKA_MEMORY_BYTES - (HEAP_BASE-os_base+4096*sizeof.MEM_BLOCK)
+endg
 
 uglobal
 v86_irqhooks rd IRQ_RESERVED*2
