@@ -10,7 +10,6 @@ table length 0x00001ECE
 Table signature: 'DSDT'
 Table length (with header): 0x00001ECE
 Revision: 0x01
-Checksum: 0xA0
 OEM ID: 'BOCHS '
 OEM Table ID: 'BXPCDSDT'
 OEM Table Revision: 0x00000001
@@ -18660,10 +18659,10 @@ aml._.term_obj end
 \_SB_\LNKA\_HID Integer        = 0x000000000F0CD041
 \_SB_\IQCR Method         length:0x0000002E Args:1 serialize:1 sync_level:0
 \_SB_\IQST Method         length:0x0000000D Args:1 serialize:0 sync_level:0
-\_SB_\PRQH RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000038 Len:00000008 Acc:1
-\_SB_\PRQG RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000030 Len:00000008 Acc:1
-\_SB_\PRQF RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000028 Len:00000008 Acc:1
-\_SB_\PRQE RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000020 Len:00000008 Acc:1
+\_SB_\PRQH RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000058 Len:00000008 Acc:1
+\_SB_\PRQG RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000050 Len:00000008 Acc:1
+\_SB_\PRQF RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000048 Len:00000008 Acc:1
+\_SB_\PRQE RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000040 Len:00000008 Acc:1
 \_SB_\PRQD RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000018 Len:00000008 Acc:1
 \_SB_\PRQC RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000010 Len:00000008 Acc:1
 \_SB_\PRQB RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000008 Len:00000008 Acc:1
@@ -18699,13 +18698,13 @@ aml._.term_obj end
 \_SB_\PCI0\_CRS Buffer         Len:0x000000B6
 \_SB_\PCI0\PRES Device        
 \_SB_\PCI0\PRES\_INI Method         length:0x00000006 Args:0 serialize:1 sync_level:0
-\_SB_\PCI0\PRES\CDAT RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000020 Len:00000020 Acc:3
+\_SB_\PCI0\PRES\CDAT RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000040 Len:00000020 Acc:3
 \_SB_\PCI0\PRES\CSEL RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000000 Len:00000020 Acc:3
-\_SB_\PCI0\PRES\CCMD RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000004 Len:00000008 Acc:1
-\_SB_\PCI0\PRES\CEJ0 RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000003 Len:00000001 Acc:1
-\_SB_\PCI0\PRES\CRMV RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000002 Len:00000001 Acc:1
-\_SB_\PCI0\PRES\CINS RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000001 Len:00000001 Acc:1
-\_SB_\PCI0\PRES\CPEN RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000000 Len:00000001 Acc:1
+\_SB_\PCI0\PRES\CCMD RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000028 Len:00000008 Acc:1
+\_SB_\PCI0\PRES\CEJ0 RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000023 Len:00000001 Acc:1
+\_SB_\PCI0\PRES\CRMV RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000022 Len:00000001 Acc:1
+\_SB_\PCI0\PRES\CINS RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000021 Len:00000001 Acc:1
+\_SB_\PCI0\PRES\CPEN RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000020 Len:00000001 Acc:1
 \_SB_\PCI0\PRES\PRST OpRegion       [SystemIO] Len:0000000C
 \_SB_\PCI0\PRES\_CRS Buffer         Len:0x0000000A
 \_SB_\PCI0\PRES\CPLK Mutex          sync_level:0
@@ -21818,8 +21817,8 @@ aml._.name_string end
 \_SB_\PCI0\ISA_\CBEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\ISA_\CAEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000000 Len:00000001 Acc:0
 \_SB_\PCI0\ISA_\LPCE OpRegion       [PCIConfig] Len:00000002
-\_SB_\PCI0\ISA_\LPTD RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000006 Len:00000002 Acc:0
-\_SB_\PCI0\ISA_\COMB RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000003 Len:00000003 Acc:0
+\_SB_\PCI0\ISA_\LPTD RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000008 Len:00000002 Acc:0
+\_SB_\PCI0\ISA_\COMB RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000004 Len:00000003 Acc:0
 \_SB_\PCI0\ISA_\COMA RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000000 Len:00000003 Acc:0
 \_SB_\PCI0\ISA_\LPCD OpRegion       [PCIConfig] Len:00000002
 \_SB_\PCI0\ISA_\PIRQ OpRegion       [PCIConfig] Len:0000000C
@@ -24553,10 +24552,10 @@ aml._.get_node_by_name end
 \_SB_\LNKA\_HID Integer        = 0x000000000F0CD041
 \_SB_\IQCR Method         length:0x0000002E Args:1 serialize:1 sync_level:0
 \_SB_\IQST Method         length:0x0000000D Args:1 serialize:0 sync_level:0
-\_SB_\PRQH RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000038 Len:00000008 Acc:1
-\_SB_\PRQG RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000030 Len:00000008 Acc:1
-\_SB_\PRQF RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000028 Len:00000008 Acc:1
-\_SB_\PRQE RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000020 Len:00000008 Acc:1
+\_SB_\PRQH RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000058 Len:00000008 Acc:1
+\_SB_\PRQG RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000050 Len:00000008 Acc:1
+\_SB_\PRQF RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000048 Len:00000008 Acc:1
+\_SB_\PRQE RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000040 Len:00000008 Acc:1
 \_SB_\PRQD RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000018 Len:00000008 Acc:1
 \_SB_\PRQC RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000010 Len:00000008 Acc:1
 \_SB_\PRQB RegionField    Rgn [\_SB_\PCI0\ISA_\PIRQ] Off:00000008 Len:00000008 Acc:1
@@ -24592,13 +24591,13 @@ aml._.get_node_by_name end
 \_SB_\PCI0\_CRS Buffer         Len:0x000000B6
 \_SB_\PCI0\PRES Device        
 \_SB_\PCI0\PRES\_INI Method         length:0x00000006 Args:0 serialize:1 sync_level:0
-\_SB_\PCI0\PRES\CDAT RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000020 Len:00000020 Acc:3
+\_SB_\PCI0\PRES\CDAT RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000040 Len:00000020 Acc:3
 \_SB_\PCI0\PRES\CSEL RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000000 Len:00000020 Acc:3
-\_SB_\PCI0\PRES\CCMD RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000004 Len:00000008 Acc:1
-\_SB_\PCI0\PRES\CEJ0 RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000003 Len:00000001 Acc:1
-\_SB_\PCI0\PRES\CRMV RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000002 Len:00000001 Acc:1
-\_SB_\PCI0\PRES\CINS RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000001 Len:00000001 Acc:1
-\_SB_\PCI0\PRES\CPEN RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000000 Len:00000001 Acc:1
+\_SB_\PCI0\PRES\CCMD RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000028 Len:00000008 Acc:1
+\_SB_\PCI0\PRES\CEJ0 RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000023 Len:00000001 Acc:1
+\_SB_\PCI0\PRES\CRMV RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000022 Len:00000001 Acc:1
+\_SB_\PCI0\PRES\CINS RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000021 Len:00000001 Acc:1
+\_SB_\PCI0\PRES\CPEN RegionField    Rgn [\_SB_\PCI0\PRES\PRST] Off:00000020 Len:00000001 Acc:1
 \_SB_\PCI0\PRES\PRST OpRegion       [SystemIO] Len:0000000C
 \_SB_\PCI0\PRES\_CRS Buffer         Len:0x0000000A
 \_SB_\PCI0\PRES\CPLK Mutex          sync_level:0
@@ -25919,8 +25918,8 @@ aml._.get_node_by_name end
 \_SB_\PCI0\ISA_\CBEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000001 Len:00000001 Acc:0
 \_SB_\PCI0\ISA_\CAEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000000 Len:00000001 Acc:0
 \_SB_\PCI0\ISA_\LPCE OpRegion       [PCIConfig] Len:00000002
-\_SB_\PCI0\ISA_\LPTD RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000006 Len:00000002 Acc:0
-\_SB_\PCI0\ISA_\COMB RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000003 Len:00000003 Acc:0
+\_SB_\PCI0\ISA_\LPTD RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000008 Len:00000002 Acc:0
+\_SB_\PCI0\ISA_\COMB RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000004 Len:00000003 Acc:0
 \_SB_\PCI0\ISA_\COMA RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000000 Len:00000003 Acc:0
 \_SB_\PCI0\ISA_\LPCD OpRegion       [PCIConfig] Len:00000002
 \_SB_\PCI0\ISA_\PIRQ OpRegion       [PCIConfig] Len:0000000C
