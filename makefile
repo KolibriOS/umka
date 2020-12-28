@@ -1,4 +1,4 @@
-FASM=fasm -dUEFI=1 -dextended_primary_loader=1
+FASM=fasm -dUEFI=1 -dextended_primary_loader=1 -dUMKA=1
 CC=gcc
 WARNINGS=-Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op \
          -Wrestrict -Wnull-dereference -Wjump-misses-init -Wshadow -Wformat=2 \

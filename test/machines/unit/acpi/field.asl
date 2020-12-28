@@ -30,6 +30,31 @@ DefinitionBlock ("", "DSDT", 1, "UMKA ", "UMKADSDT", 0x00000001)
         printf("### %o\n", INTX)
     }
 
+    Scope (\)
+    {
+            Name (TCBV, Zero)
+
+            Method (PCRR, 2, Serialized)
+            {
+                Local0 = ((Arg0 << 0x10) + Arg1)
+//                Local0 += SBRG
+                OperationRegion (PCR0, SystemMemory, Local0, 0x04)
+                Field (PCR0, DWordAcc, Lock, Preserve)
+                {
+                            DAT0,   32
+                }
+
+                Return (DAT0) /* \PCRR.DAT0 */
+            }
+
+            Method (TCBS) {
+                If ((TCBV == Zero)) {
+                    Local0 = PCRR (0xEF, 0x2778)
+                    TCBV = (Local0 & 0xFFE0)
+                }
+            }
+        }
+
     Method (MAIN, 0)
     {
 /*
@@ -62,5 +87,7 @@ DefinitionBlock ("", "DSDT", 1, "UMKA ", "UMKADSDT", 0x00000001)
 */
         PARG(5)
         PARG(INT5)
+
+//        TCBS()
     }
 }

@@ -5,9 +5,9 @@ table #0
 
 /> acpi_enable
 acpi.aml.process_table begin
-table length 0x00000184
+table length 0x000001DD
 Table signature: 'DSDT'
-Table length (with header): 0x00000184
+Table length (with header): 0x000001DD
 Revision: 0x01
 OEM ID: 'UMKA '
 OEM Table ID: 'UMKADSDT'
@@ -30,14 +30,17 @@ name: ''
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
+aml._.computational_data begin
 aml._.buffer begin
 pkg_length: 0x00000017
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -46,6 +49,7 @@ aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
 aml._.buffer end
+aml._.computational_data end
 aml._.data_object end
 aml._.data_ref_object end
 aml._.name end
@@ -71,6 +75,8 @@ aml._.get_node_by_name begin
 name: 'BUFZ'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -92,8 +98,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -105,8 +113,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -147,14 +157,17 @@ name: ''
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
+aml._.computational_data begin
 aml._.buffer begin
 pkg_length: 0x0000000B
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -163,6 +176,7 @@ aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
 aml._.buffer end
+aml._.computational_data end
 aml._.data_object end
 aml._.data_ref_object end
 aml._.name end
@@ -188,6 +202,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -209,8 +225,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -222,8 +240,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -266,6 +286,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -287,8 +309,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -300,8 +324,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -344,6 +370,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -365,8 +393,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -378,8 +408,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -422,6 +454,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -443,8 +477,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -456,8 +492,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -500,6 +538,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -521,8 +561,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -534,8 +576,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -578,6 +622,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -599,8 +645,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -612,8 +660,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -656,6 +706,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -677,8 +729,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -690,8 +744,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -734,6 +790,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -755,8 +813,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -768,8 +828,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -812,6 +874,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -833,8 +897,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -846,8 +912,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -890,6 +958,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -911,8 +981,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -924,8 +996,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -968,6 +1042,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -989,8 +1065,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -1002,8 +1080,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -1046,6 +1126,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1067,8 +1149,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -1080,8 +1164,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -1124,6 +1210,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1145,8 +1233,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -1158,8 +1248,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -1202,6 +1294,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1223,8 +1317,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -1236,8 +1332,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -1280,6 +1378,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1301,8 +1401,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -1314,8 +1416,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -1358,6 +1462,8 @@ aml._.get_node_by_name begin
 name: 'B000'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1379,8 +1485,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -1392,8 +1500,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -1434,8 +1544,10 @@ name: ''
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.data_ref_object end
 aml._.name end
@@ -1459,8 +1571,10 @@ name: ''
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.data_ref_object end
 aml._.name end
@@ -1495,13 +1609,108 @@ table/position: [0x0000016F]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
+aml._.scope begin
+pkg_length: 0x00000058
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000172
+aml._.name_path begin
+aml._.name_path end
+name_string: \
+aml._.name_string end
+aml._.get_node_by_name begin
+name: '\'
+aml._.get_node_by_name end
+table/position: [0x00000174]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.name begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000175
+aml._.name_path begin
+aml._.name_path end
+name_string: TCBV
+aml._.name_string end
+aml._.get_node_by_name begin
+name: ''
+aml._.get_node_by_name end
+aml._.data_ref_object begin
+aml._.data_object begin
+aml._.computational_data begin
+aml._.const_obj begin
+aml._.const_obj end
+aml._.computational_data end
+aml._.data_object end
+aml._.data_ref_object end
+aml._.name end
+aml._.namespace_modifier_obj end
+aml._.object end
+aml._.term_obj end
+table/position: [0x0000017A]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.method begin
+pkg_length: 0x0000002A
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000017C
+aml._.name_path begin
+aml._.name_path end
+name_string: PCRR
+aml._.name_string end
+aml._.attach_node begin
+aml._.get_node_by_name begin
+name: ''
+aml._.get_node_by_name end
+aml._.attach_node end
+aml._.method end
+aml._.named_obj end
+aml._.object end
+aml._.term_obj end
+table/position: [0x000001A5]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.method begin
+pkg_length: 0x00000022
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000001A7
+aml._.name_path begin
+aml._.name_path end
+name_string: TCBS
+aml._.name_string end
+aml._.attach_node begin
+aml._.get_node_by_name begin
+name: ''
+aml._.get_node_by_name end
+aml._.attach_node end
+aml._.method end
+aml._.named_obj end
+aml._.object end
+aml._.term_obj end
+aml._.scope end
+aml._.namespace_modifier_obj end
+aml._.object end
+aml._.term_obj end
+table/position: [0x000001C8]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
 aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.method begin
 pkg_length: 0x00000014
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0x00000171
+offset: 0x000001CA
 aml._.name_path begin
 aml._.name_path end
 name_string: MAIN
@@ -1517,6 +1726,9 @@ aml._.object end
 aml._.term_obj end
 ==========ACPI_TREE==========
 \MAIN Method         length:0x0000000E Args:0 serialize:0 sync_level:0
+\TCBS Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\PCRR Method         length:0x00000024 Args:2 serialize:1 sync_level:0
+\TCBV Integer        = 0x0000000000000000
 \PARG Method         length:0x0000001A Args:1 serialize:0 sync_level:0
 \INTX Integer        = 0x0000000000000000
 \INT5 Integer        = 0x0000000000000005
@@ -1548,6 +1760,9 @@ aml._.term_obj end
 acpi.aml.process_table end
 ==========ACPI_TREE==========
 \MAIN Method         length:0x0000000E Args:0 serialize:0 sync_level:0
+\TCBS Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\PCRR Method         length:0x00000024 Args:2 serialize:1 sync_level:0
+\TCBV Integer        = 0x0000000000000000
 \PARG Method         length:0x0000001A Args:1 serialize:0 sync_level:0
 \INTX Integer        = 0x0000000000000000
 \INT5 Integer        = 0x0000000000000005
@@ -1587,7 +1802,7 @@ acpi.call_node begin
 # bytes 0x47524150
 # bytes 0x4150050A
 # bytes 0x4E494752
-table/position: [0x00000176]
+table/position: [0x000001CF]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1597,7 +1812,7 @@ aml._.named_obj end
 aml._.object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0x00000176
+offset: 0x000001CF
 aml._.name_path begin
 aml._.name_path end
 name_string: PARG
@@ -1611,8 +1826,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 table/position: [0x00000155]
@@ -1628,6 +1845,8 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.arg_obj begin
 aml._.arg_obj end
@@ -1670,8 +1889,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.string begin
 aml._.string end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.term_arg begin
@@ -1686,6 +1907,8 @@ aml._.get_node_by_name begin
 name: 'INTX'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1722,8 +1945,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.string begin
 aml._.string end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 concat 00000003 and 00000003
@@ -1765,7 +1990,7 @@ aml._.store end
 aml._.term_obj end
 aml._.method_invocation end
 aml._.term_obj end
-table/position: [0x0000017C]
+table/position: [0x000001D5]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1775,7 +2000,7 @@ aml._.named_obj end
 aml._.object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0x0000017C
+offset: 0x000001D5
 aml._.name_path begin
 aml._.name_path end
 name_string: PARG
@@ -1788,7 +2013,7 @@ arg_count: 1
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0x00000180
+offset: 0x000001D9
 aml._.name_path begin
 aml._.name_path end
 name_string: INT5
@@ -1797,10 +2022,12 @@ aml._.get_node_by_name begin
 name: 'INT5'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0x00000180
+offset: 0x000001D9
 aml._.name_path begin
 aml._.name_path end
 name_string: INT5
@@ -1822,6 +2049,8 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.arg_obj begin
 aml._.arg_obj end
@@ -1864,8 +2093,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.string begin
 aml._.string end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.term_arg begin
@@ -1880,6 +2111,8 @@ aml._.get_node_by_name begin
 name: 'INTX'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -1916,8 +2149,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.string begin
 aml._.string end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 concat 00000003 and 00000003

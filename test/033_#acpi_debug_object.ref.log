@@ -30,14 +30,17 @@ name: ''
 aml._.get_node_by_name end
 aml._.data_ref_object begin
 aml._.data_object begin
+aml._.computational_data begin
 aml._.buffer begin
 pkg_length: 0x00000007
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.convert begin
@@ -46,6 +49,7 @@ aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
 aml._.buffer end
+aml._.computational_data end
 aml._.data_object end
 aml._.data_ref_object end
 aml._.name end
@@ -119,8 +123,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.string begin
 aml._.string end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.super_name begin
@@ -152,8 +158,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.super_name begin
@@ -185,8 +193,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.string begin
 aml._.string end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.super_name begin
@@ -222,16 +232,20 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.string begin
 aml._.string end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.byte_const begin
 aml._.byte_const end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 concat 00000003 and 00000002
@@ -258,8 +272,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.string begin
 aml._.string end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 concat 00000003 and 00000003
@@ -315,8 +331,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.string begin
 aml._.string end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 aml._.term_arg begin
@@ -331,6 +349,8 @@ aml._.get_node_by_name begin
 name: 'BUFF'
 aml._.get_node_by_name end
 aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
@@ -368,8 +388,10 @@ aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string end
 aml._.data_object begin
+aml._.computational_data begin
 aml._.string begin
 aml._.string end
+aml._.computational_data end
 aml._.data_object end
 aml._.term_arg end
 concat 00000003 and 00000003
