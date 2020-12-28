@@ -47528,7 +47528,7 @@ aml._.term_obj end
 \DEB0 OpRegion       [SystemIO] Len:00000001
 \MUTX Mutex          sync_level:0
 \RDMA Method         length:0x00000000 Args:3 serialize:0 sync_level:0
-\RRIO Method         length:0x0000021B Args:0 serialize:0 sync_level:0
+\RRIO Method         length:0x0000021B Args:4 serialize:0 sync_level:0
 \UXDV Method         length:0x00000094 Args:1 serialize:0 sync_level:0
 \C2LE RegionField    Rgn [\_SB_\PCI0\LPCB\LPCR] Off:0000001D Len:00000001 Acc:1
 \C1LE RegionField    Rgn [\_SB_\PCI0\LPCB\LPCR] Off:0000001C Len:00000001 Acc:1
@@ -48225,7 +48225,7 @@ aml._.name_string end
 \_SB_\PCI0\TASM RegionField    Rgn [\_SB_\PCI0\MCHP] Off:00000300 Len:0000000A Acc:0
 \_SB_\PCI0\MCHP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0 Device        
-\_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\GFX0\SCIP Method         length:0x00000011 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\AINT Method         length:0x00000123 Args:2 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\PARD Method         length:0x00000013 Args:0 serialize:0 sync_level:0
@@ -48430,7 +48430,7 @@ aml._.name_string end
 \_SB_\PCI0\SBUS\COMP Method         length:0x00000027 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\STRT Method         length:0x00000048 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SBLR Method         length:0x000000C9 Args:3 serialize:1 sync_level:0
-\_SB_\PCI0\SBUS\SBLW Method         length:0x00000093 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\SBUS\SBLW Method         length:0x00000093 Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SRDW Method         length:0x00000053 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SWRW Method         length:0x00000051 Args:3 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SRDB Method         length:0x00000047 Args:2 serialize:1 sync_level:0
@@ -48534,13 +48534,13 @@ aml._.name_string end
 \_SB_\PCI0\EHC2\HUBN\PR01\PR14\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR14\_ADR Integer        = 0x0000000000000004
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13 Device        
-\_SB_\PCI0\EHC2\HUBN\PR01\PR13\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC2\HUBN\PR01\PR13\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_ADR Integer        = 0x0000000000000003
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12 Device        
-\_SB_\PCI0\EHC2\HUBN\PR01\PR12\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC2\HUBN\PR01\PR12\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
@@ -48568,25 +48568,25 @@ aml._.name_string end
 \_SB_\PCI0\EHC1\HUBN\PR01\PR18\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR18\_ADR Integer        = 0x0000000000000008
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR17\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR17\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_ADR Integer        = 0x0000000000000007
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR16\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR16\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_ADR Integer        = 0x0000000000000006
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR15\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR15\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_ADR Integer        = 0x0000000000000005
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR14\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR14\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
@@ -49151,7 +49151,7 @@ aml._.name_string end
 \_SB_\PCI0\AR01 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PR00 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\AR00 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
-\_SB_\PCI0\_OSC Method         length:0x0000010A Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\_OSC Method         length:0x0000010A Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\XCNT Integer        = 0x0000000000000000
 \_SB_\PCI0\CTRL Integer        = 0x0000000000000000
 \_SB_\PCI0\SUPP Integer        = 0x0000000000000000
@@ -52399,7 +52399,7 @@ aml._.term_obj end
 \DEB0 OpRegion       [SystemIO] Len:00000001
 \MUTX Mutex          sync_level:0
 \RDMA Method         length:0x00000000 Args:3 serialize:0 sync_level:0
-\RRIO Method         length:0x0000021B Args:0 serialize:0 sync_level:0
+\RRIO Method         length:0x0000021B Args:4 serialize:0 sync_level:0
 \UXDV Method         length:0x00000094 Args:1 serialize:0 sync_level:0
 \C2LE RegionField    Rgn [\_SB_\PCI0\LPCB\LPCR] Off:0000001D Len:00000001 Acc:1
 \C1LE RegionField    Rgn [\_SB_\PCI0\LPCB\LPCR] Off:0000001C Len:00000001 Acc:1
@@ -53096,7 +53096,7 @@ aml._.name_string end
 \_SB_\PCI0\TASM RegionField    Rgn [\_SB_\PCI0\MCHP] Off:00000300 Len:0000000A Acc:0
 \_SB_\PCI0\MCHP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0 Device        
-\_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\GFX0\SCIP Method         length:0x00000011 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\AINT Method         length:0x00000123 Args:2 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\PARD Method         length:0x00000013 Args:0 serialize:0 sync_level:0
@@ -53301,7 +53301,7 @@ aml._.name_string end
 \_SB_\PCI0\SBUS\COMP Method         length:0x00000027 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\STRT Method         length:0x00000048 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SBLR Method         length:0x000000C9 Args:3 serialize:1 sync_level:0
-\_SB_\PCI0\SBUS\SBLW Method         length:0x00000093 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\SBUS\SBLW Method         length:0x00000093 Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SRDW Method         length:0x00000053 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SWRW Method         length:0x00000051 Args:3 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SRDB Method         length:0x00000047 Args:2 serialize:1 sync_level:0
@@ -53433,13 +53433,13 @@ aml._.name_string end
 \_SB_\PCI0\EHC2\HUBN\PR01\PR14\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR14\_ADR Integer        = 0x0000000000000004
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13 Device        
-\_SB_\PCI0\EHC2\HUBN\PR01\PR13\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC2\HUBN\PR01\PR13\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_ADR Integer        = 0x0000000000000003
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12 Device        
-\_SB_\PCI0\EHC2\HUBN\PR01\PR12\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC2\HUBN\PR01\PR12\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
@@ -53467,25 +53467,25 @@ aml._.name_string end
 \_SB_\PCI0\EHC1\HUBN\PR01\PR18\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR18\_ADR Integer        = 0x0000000000000008
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR17\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR17\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_ADR Integer        = 0x0000000000000007
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR16\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR16\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_ADR Integer        = 0x0000000000000006
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR15\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR15\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_ADR Integer        = 0x0000000000000005
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR14\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR14\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
@@ -54050,7 +54050,7 @@ aml._.name_string end
 \_SB_\PCI0\AR01 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PR00 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\AR00 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
-\_SB_\PCI0\_OSC Method         length:0x0000010A Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\_OSC Method         length:0x0000010A Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\XCNT Integer        = 0x0000000000000000
 \_SB_\PCI0\CTRL Integer        = 0x0000000000000000
 \_SB_\PCI0\SUPP Integer        = 0x0000000000000000
@@ -61011,7 +61011,7 @@ aml._.term_obj end
 \DEB0 OpRegion       [SystemIO] Len:00000001
 \MUTX Mutex          sync_level:0
 \RDMA Method         length:0x00000000 Args:3 serialize:0 sync_level:0
-\RRIO Method         length:0x0000021B Args:0 serialize:0 sync_level:0
+\RRIO Method         length:0x0000021B Args:4 serialize:0 sync_level:0
 \UXDV Method         length:0x00000094 Args:1 serialize:0 sync_level:0
 \C2LE RegionField    Rgn [\_SB_\PCI0\LPCB\LPCR] Off:0000001D Len:00000001 Acc:1
 \C1LE RegionField    Rgn [\_SB_\PCI0\LPCB\LPCR] Off:0000001C Len:00000001 Acc:1
@@ -61708,7 +61708,7 @@ aml._.name_string end
 \_SB_\PCI0\TASM RegionField    Rgn [\_SB_\PCI0\MCHP] Off:00000300 Len:0000000A Acc:0
 \_SB_\PCI0\MCHP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0 Device        
-\_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\GFX0\SCIP Method         length:0x00000011 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\AINT Method         length:0x00000123 Args:2 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\PARD Method         length:0x00000013 Args:0 serialize:0 sync_level:0
@@ -61913,7 +61913,7 @@ aml._.name_string end
 \_SB_\PCI0\SBUS\COMP Method         length:0x00000027 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\STRT Method         length:0x00000048 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SBLR Method         length:0x000000C9 Args:3 serialize:1 sync_level:0
-\_SB_\PCI0\SBUS\SBLW Method         length:0x00000093 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\SBUS\SBLW Method         length:0x00000093 Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SRDW Method         length:0x00000053 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SWRW Method         length:0x00000051 Args:3 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SRDB Method         length:0x00000047 Args:2 serialize:1 sync_level:0
@@ -62045,13 +62045,13 @@ aml._.name_string end
 \_SB_\PCI0\EHC2\HUBN\PR01\PR14\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR14\_ADR Integer        = 0x0000000000000004
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13 Device        
-\_SB_\PCI0\EHC2\HUBN\PR01\PR13\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC2\HUBN\PR01\PR13\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_ADR Integer        = 0x0000000000000003
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12 Device        
-\_SB_\PCI0\EHC2\HUBN\PR01\PR12\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC2\HUBN\PR01\PR12\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
@@ -62079,25 +62079,25 @@ aml._.name_string end
 \_SB_\PCI0\EHC1\HUBN\PR01\PR18\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR18\_ADR Integer        = 0x0000000000000008
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR17\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR17\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_ADR Integer        = 0x0000000000000007
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR16\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR16\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_ADR Integer        = 0x0000000000000006
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR15\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR15\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_ADR Integer        = 0x0000000000000005
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR14\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR14\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
@@ -62662,7 +62662,7 @@ aml._.name_string end
 \_SB_\PCI0\AR01 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PR00 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\AR00 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
-\_SB_\PCI0\_OSC Method         length:0x0000010A Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\_OSC Method         length:0x0000010A Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\XCNT Integer        = 0x0000000000000000
 \_SB_\PCI0\CTRL Integer        = 0x0000000000000000
 \_SB_\PCI0\SUPP Integer        = 0x0000000000000000
@@ -66579,7 +66579,7 @@ aml._.term_obj end
 \DEB0 OpRegion       [SystemIO] Len:00000001
 \MUTX Mutex          sync_level:0
 \RDMA Method         length:0x00000000 Args:3 serialize:0 sync_level:0
-\RRIO Method         length:0x0000021B Args:0 serialize:0 sync_level:0
+\RRIO Method         length:0x0000021B Args:4 serialize:0 sync_level:0
 \UXDV Method         length:0x00000094 Args:1 serialize:0 sync_level:0
 \C2LE RegionField    Rgn [\_SB_\PCI0\LPCB\LPCR] Off:0000001D Len:00000001 Acc:1
 \C1LE RegionField    Rgn [\_SB_\PCI0\LPCB\LPCR] Off:0000001C Len:00000001 Acc:1
@@ -67276,7 +67276,7 @@ aml._.name_string end
 \_SB_\PCI0\TASM RegionField    Rgn [\_SB_\PCI0\MCHP] Off:00000300 Len:0000000A Acc:0
 \_SB_\PCI0\MCHP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0 Device        
-\_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\GFX0\SCIP Method         length:0x00000011 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\AINT Method         length:0x00000123 Args:2 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\PARD Method         length:0x00000013 Args:0 serialize:0 sync_level:0
@@ -67481,7 +67481,7 @@ aml._.name_string end
 \_SB_\PCI0\SBUS\COMP Method         length:0x00000027 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\STRT Method         length:0x00000048 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SBLR Method         length:0x000000C9 Args:3 serialize:1 sync_level:0
-\_SB_\PCI0\SBUS\SBLW Method         length:0x00000093 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\SBUS\SBLW Method         length:0x00000093 Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SRDW Method         length:0x00000053 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SWRW Method         length:0x00000051 Args:3 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SRDB Method         length:0x00000047 Args:2 serialize:1 sync_level:0
@@ -67613,13 +67613,13 @@ aml._.name_string end
 \_SB_\PCI0\EHC2\HUBN\PR01\PR14\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR14\_ADR Integer        = 0x0000000000000004
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13 Device        
-\_SB_\PCI0\EHC2\HUBN\PR01\PR13\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC2\HUBN\PR01\PR13\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_ADR Integer        = 0x0000000000000003
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12 Device        
-\_SB_\PCI0\EHC2\HUBN\PR01\PR12\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC2\HUBN\PR01\PR12\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
@@ -67647,25 +67647,25 @@ aml._.name_string end
 \_SB_\PCI0\EHC1\HUBN\PR01\PR18\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR18\_ADR Integer        = 0x0000000000000008
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR17\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR17\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_ADR Integer        = 0x0000000000000007
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR16\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR16\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_ADR Integer        = 0x0000000000000006
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR15\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR15\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_ADR Integer        = 0x0000000000000005
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR14\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR14\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
@@ -68230,7 +68230,7 @@ aml._.name_string end
 \_SB_\PCI0\AR01 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PR00 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\AR00 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
-\_SB_\PCI0\_OSC Method         length:0x0000010A Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\_OSC Method         length:0x0000010A Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\XCNT Integer        = 0x0000000000000000
 \_SB_\PCI0\CTRL Integer        = 0x0000000000000000
 \_SB_\PCI0\SUPP Integer        = 0x0000000000000000
@@ -70144,41 +70144,41 @@ aml._.name_string end
 \_PR_\PPMT OpRegion       [SystemMemory] Len:00000029
 \_PR_\CPU7 Processor      ID:0x08 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU7\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
-\_PR_\CPU7\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU7\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU7\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU6 Processor      ID:0x07 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU6\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
-\_PR_\CPU6\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU6\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU6\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU5 Processor      ID:0x06 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU5\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
-\_PR_\CPU5\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU5\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU5\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU4 Processor      ID:0x05 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU4\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
-\_PR_\CPU4\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU4\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU4\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU3 Processor      ID:0x04 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU3\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
-\_PR_\CPU3\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU3\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU3\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU2 Processor      ID:0x03 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU2\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
-\_PR_\CPU2\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU2\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU2\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU1 Processor      ID:0x02 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU1\APPT Method         length:0x00000042 Args:0 serialize:0 sync_level:0
 \_PR_\CPU1\APCT Method         length:0x00000043 Args:0 serialize:0 sync_level:0
 \_PR_\CPU1\GCAP Method         length:0x00000077 Args:1 serialize:0 sync_level:0
-\_PR_\CPU1\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU1\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU1\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU1\HC1_ Integer        = 0x0000000000000000
 \_PR_\CPU1\HI1_ Integer        = 0x0000000000000000
 \_PR_\CPU0 Processor      ID:0x01 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU0\GCAP Method         length:0x000000A7 Args:1 serialize:0 sync_level:0
-\_PR_\CPU0\COSC Method         length:0x000000B6 Args:0 serialize:0 sync_level:0
+\_PR_\CPU0\COSC Method         length:0x000000B6 Args:4 serialize:0 sync_level:0
 \_PR_\CPU0\CPDC Method         length:0x00000061 Args:1 serialize:0 sync_level:0
-\_PR_\CPU0\_OSC Method         length:0x00000011 Args:0 serialize:0 sync_level:0
+\_PR_\CPU0\_OSC Method         length:0x00000011 Args:4 serialize:0 sync_level:0
 \_PR_\CPU0\_PDC Method         length:0x00000022 Args:1 serialize:0 sync_level:0
 \_PR_\CPU0\HC0_ Integer        = 0x0000000000000000
 \_PR_\CPU0\HI0_ Integer        = 0x0000000000000000
@@ -71714,7 +71714,7 @@ aml._.get_node_by_name end
 \DEB0 OpRegion       [SystemIO] Len:00000001
 \MUTX Mutex          sync_level:0
 \RDMA Method         length:0x00000000 Args:3 serialize:0 sync_level:0
-\RRIO Method         length:0x0000021B Args:0 serialize:0 sync_level:0
+\RRIO Method         length:0x0000021B Args:4 serialize:0 sync_level:0
 \UXDV Method         length:0x00000094 Args:1 serialize:0 sync_level:0
 \C2LE RegionField    Rgn [\_SB_\PCI0\LPCB\LPCR] Off:0000001D Len:00000001 Acc:1
 \C1LE RegionField    Rgn [\_SB_\PCI0\LPCB\LPCR] Off:0000001C Len:00000001 Acc:1
@@ -72341,7 +72341,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\TASM RegionField    Rgn [\_SB_\PCI0\MCHP] Off:00000300 Len:0000000A Acc:0
 \_SB_\PCI0\MCHP OpRegion       [PCIConfig] Len:000000C0
 \_SB_\PCI0\GFX0 Device        
-\_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\_DSM Method         length:0x00000061 Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\GFX0\SCIP Method         length:0x00000011 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\AINT Method         length:0x00000123 Args:2 serialize:0 sync_level:0
 \_SB_\PCI0\GFX0\PARD Method         length:0x00000013 Args:0 serialize:0 sync_level:0
@@ -72546,7 +72546,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\SBUS\COMP Method         length:0x00000027 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\STRT Method         length:0x00000048 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SBLR Method         length:0x000000C9 Args:3 serialize:1 sync_level:0
-\_SB_\PCI0\SBUS\SBLW Method         length:0x00000093 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\SBUS\SBLW Method         length:0x00000093 Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SRDW Method         length:0x00000053 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SWRW Method         length:0x00000051 Args:3 serialize:1 sync_level:0
 \_SB_\PCI0\SBUS\SRDB Method         length:0x00000047 Args:2 serialize:1 sync_level:0
@@ -72678,13 +72678,13 @@ aml._.get_node_by_name end
 \_SB_\PCI0\EHC2\HUBN\PR01\PR14\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR14\_ADR Integer        = 0x0000000000000004
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13 Device        
-\_SB_\PCI0\EHC2\HUBN\PR01\PR13\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC2\HUBN\PR01\PR13\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR13\_ADR Integer        = 0x0000000000000003
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12 Device        
-\_SB_\PCI0\EHC2\HUBN\PR01\PR12\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC2\HUBN\PR01\PR12\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC2\HUBN\PR01\PR12\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
@@ -72712,25 +72712,25 @@ aml._.get_node_by_name end
 \_SB_\PCI0\EHC1\HUBN\PR01\PR18\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR18\_ADR Integer        = 0x0000000000000008
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR17\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR17\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR17\_ADR Integer        = 0x0000000000000007
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR16\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR16\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR16\_ADR Integer        = 0x0000000000000006
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR15\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR15\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\SDGV Alias          Source: \SBV2
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR15\_ADR Integer        = 0x0000000000000005
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14 Device        
-\_SB_\PCI0\EHC1\HUBN\PR01\PR14\_DSM Method         length:0x0000006B Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\EHC1\HUBN\PR01\PR14\_DSM Method         length:0x0000006B Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\SDGV Alias          Source: \SBV1
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\_PLD Method         length:0x00000021 Args:0 serialize:1 sync_level:0
 \_SB_\PCI0\EHC1\HUBN\PR01\PR14\_UPC Method         length:0x00000013 Args:0 serialize:1 sync_level:0
@@ -73295,7 +73295,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\AR01 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\PR00 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\AR00 Method         length:0x00000007 Args:0 serialize:0 sync_level:0
-\_SB_\PCI0\_OSC Method         length:0x0000010A Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\_OSC Method         length:0x0000010A Args:4 serialize:1 sync_level:0
 \_SB_\PCI0\XCNT Integer        = 0x0000000000000000
 \_SB_\PCI0\CTRL Integer        = 0x0000000000000000
 \_SB_\PCI0\SUPP Integer        = 0x0000000000000000
@@ -74467,41 +74467,41 @@ aml._.get_node_by_name end
 \_PR_\PPMT OpRegion       [SystemMemory] Len:00000029
 \_PR_\CPU7 Processor      ID:0x08 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU7\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
-\_PR_\CPU7\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU7\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU7\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU6 Processor      ID:0x07 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU6\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
-\_PR_\CPU6\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU6\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU6\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU5 Processor      ID:0x06 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU5\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
-\_PR_\CPU5\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU5\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU5\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU4 Processor      ID:0x05 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU4\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
-\_PR_\CPU4\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU4\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU4\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU3 Processor      ID:0x04 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU3\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
-\_PR_\CPU3\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU3\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU3\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU2 Processor      ID:0x03 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU2\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
-\_PR_\CPU2\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU2\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU2\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU1 Processor      ID:0x02 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU1\APPT Method         length:0x00000042 Args:0 serialize:0 sync_level:0
 \_PR_\CPU1\APCT Method         length:0x00000043 Args:0 serialize:0 sync_level:0
 \_PR_\CPU1\GCAP Method         length:0x00000077 Args:1 serialize:0 sync_level:0
-\_PR_\CPU1\_OSC Method         length:0x0000001C Args:0 serialize:0 sync_level:0
+\_PR_\CPU1\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
 \_PR_\CPU1\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \_PR_\CPU1\HC1_ Integer        = 0x0000000000000000
 \_PR_\CPU1\HI1_ Integer        = 0x0000000000000000
 \_PR_\CPU0 Processor      ID:0x01 Addr:0x00000410 Len:0x00000006
 \_PR_\CPU0\GCAP Method         length:0x000000A7 Args:1 serialize:0 sync_level:0
-\_PR_\CPU0\COSC Method         length:0x000000B6 Args:0 serialize:0 sync_level:0
+\_PR_\CPU0\COSC Method         length:0x000000B6 Args:4 serialize:0 sync_level:0
 \_PR_\CPU0\CPDC Method         length:0x00000061 Args:1 serialize:0 sync_level:0
-\_PR_\CPU0\_OSC Method         length:0x00000011 Args:0 serialize:0 sync_level:0
+\_PR_\CPU0\_OSC Method         length:0x00000011 Args:4 serialize:0 sync_level:0
 \_PR_\CPU0\_PDC Method         length:0x00000022 Args:1 serialize:0 sync_level:0
 \_PR_\CPU0\HC0_ Integer        = 0x0000000000000000
 \_PR_\CPU0\HI0_ Integer        = 0x0000000000000000

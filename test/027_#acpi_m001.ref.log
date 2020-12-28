@@ -48499,7 +48499,7 @@ aml._.name_string end
 \_SB_\PCI0\LPC0\PSMX Mutex          sync_level:0
 \_SB_\PCI0\LPC0\_ADR Integer        = 0x0000000000140003
 \_SB_\PCI0\SMBS Device        
-\_SB_\PCI0\SMBS\SBW0 Method         length:0x00000153 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\SMBS\SBW0 Method         length:0x00000153 Args:5 serialize:0 sync_level:0
 \_SB_\PCI0\SMBS\SBR0 Method         length:0x000001DB Args:3 serialize:0 sync_level:0
 \_SB_\PCI0\SMBS\WTC0 Method         length:0x0000005D Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\SMBS\WBD0 Method         length:0x00000059 Args:1 serialize:0 sync_level:0
@@ -50694,7 +50694,7 @@ aml._.name_string end
 \_SB_\PCI0\_CRS Method         length:0x00000064 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\CRES Buffer         Len:0x000001EC
 \_SB_\PCI0\TOM_ Method         length:0x0000001C Args:0 serialize:0 sync_level:0
-\_SB_\PCI0\XOSC Method         length:0x000000C6 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\XOSC Method         length:0x000000C6 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\AMHP Integer        = 0x0000000000000000
 \_SB_\PCI0\CTRL Integer        = 0x0000000000000000
 \_SB_\PCI0\SUPP Integer        = 0x0000000000000000
@@ -57505,7 +57505,7 @@ aml._.name_string end
 \_SB_\PCI0\LPC0\PSMX Mutex          sync_level:0
 \_SB_\PCI0\LPC0\_ADR Integer        = 0x0000000000140003
 \_SB_\PCI0\SMBS Device        
-\_SB_\PCI0\SMBS\SBW0 Method         length:0x00000153 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\SMBS\SBW0 Method         length:0x00000153 Args:5 serialize:0 sync_level:0
 \_SB_\PCI0\SMBS\SBR0 Method         length:0x000001DB Args:3 serialize:0 sync_level:0
 \_SB_\PCI0\SMBS\WTC0 Method         length:0x0000005D Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\SMBS\WBD0 Method         length:0x00000059 Args:1 serialize:0 sync_level:0
@@ -59700,7 +59700,7 @@ aml._.name_string end
 \_SB_\PCI0\_CRS Method         length:0x00000064 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\CRES Buffer         Len:0x000001EC
 \_SB_\PCI0\TOM_ Method         length:0x0000001C Args:0 serialize:0 sync_level:0
-\_SB_\PCI0\XOSC Method         length:0x000000C6 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\XOSC Method         length:0x000000C6 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\AMHP Integer        = 0x0000000000000000
 \_SB_\PCI0\CTRL Integer        = 0x0000000000000000
 \_SB_\PCI0\SUPP Integer        = 0x0000000000000000
@@ -64163,15 +64163,15 @@ aml._.name_string end
 \_SB_\A101 Buffer         Len:0x00000100
 \_SB_\A073 Method         length:0x00000090 Args:2 serialize:1 sync_level:0
 \_SB_\A074 Method         length:0x0000004B Args:2 serialize:0 sync_level:0
-\_SB_\A004 Method         length:0x00000018 Args:1 serialize:0 sync_level:0
-\_SB_\A006 Method         length:0x00000020 Args:0 serialize:0 sync_level:0
+\_SB_\A004 Method         length:0x00000018 Args:5 serialize:0 sync_level:0
+\_SB_\A006 Method         length:0x00000020 Args:4 serialize:0 sync_level:0
 \_SB_\A007 Method         length:0x00000023 Args:3 serialize:0 sync_level:0
 \_SB_\A100 Mutex          sync_level:0
-\_SB_\A062 Method         length:0x00000016 Args:0 serialize:0 sync_level:0
+\_SB_\A062 Method         length:0x00000016 Args:4 serialize:0 sync_level:0
 \_SB_\A064 Method         length:0x00000029 Args:3 serialize:0 sync_level:0
 \_SB_\A063 Method         length:0x0000002C Args:2 serialize:0 sync_level:0
 \_SB_\A099 Mutex          sync_level:0
-\_SB_\A066 Method         length:0x00000016 Args:0 serialize:1 sync_level:0
+\_SB_\A066 Method         length:0x00000016 Args:4 serialize:1 sync_level:0
 \_SB_\A026 Method         length:0x0000002C Args:3 serialize:1 sync_level:0
 \_SB_\A012 Method         length:0x0000002B Args:2 serialize:1 sync_level:0
 \_SB_\A018 Method         length:0x00000009 Args:1 serialize:0 sync_level:0
@@ -64194,7 +64194,7 @@ aml._.name_string end
      Package        elements:2
          Integer        = 0x0000000010831969
          Integer        = 0x0000000000000000
-\_SB_\A091 Method         length:0x00000095 Args:0 serialize:1 sync_level:0
+\_SB_\A091 Method         length:0x00000095 Args:4 serialize:1 sync_level:0
 \_SB_\A080 Method         length:0x00000064 Args:2 serialize:0 sync_level:0
 \_SB_\A093 Buffer         Len:0x00000007
 \_SB_\A086 Method         length:0x00000052 Args:2 serialize:0 sync_level:0
@@ -65287,7 +65287,7 @@ aml._.name_string end
 \_SB_\PCI0\LPC0\PSMX Mutex          sync_level:0
 \_SB_\PCI0\LPC0\_ADR Integer        = 0x0000000000140003
 \_SB_\PCI0\SMBS Device        
-\_SB_\PCI0\SMBS\SBW0 Method         length:0x00000153 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\SMBS\SBW0 Method         length:0x00000153 Args:5 serialize:0 sync_level:0
 \_SB_\PCI0\SMBS\SBR0 Method         length:0x000001DB Args:3 serialize:0 sync_level:0
 \_SB_\PCI0\SMBS\WTC0 Method         length:0x0000005D Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\SMBS\WBD0 Method         length:0x00000059 Args:1 serialize:0 sync_level:0
@@ -67482,7 +67482,7 @@ aml._.name_string end
 \_SB_\PCI0\_CRS Method         length:0x00000064 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\CRES Buffer         Len:0x000001EC
 \_SB_\PCI0\TOM_ Method         length:0x0000001C Args:0 serialize:0 sync_level:0
-\_SB_\PCI0\XOSC Method         length:0x000000C6 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\XOSC Method         length:0x000000C6 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\AMHP Integer        = 0x0000000000000000
 \_SB_\PCI0\CTRL Integer        = 0x0000000000000000
 \_SB_\PCI0\SUPP Integer        = 0x0000000000000000
@@ -68887,15 +68887,15 @@ aml._.get_node_by_name end
 \_SB_\A101 Buffer         Len:0x00000100
 \_SB_\A073 Method         length:0x00000090 Args:2 serialize:1 sync_level:0
 \_SB_\A074 Method         length:0x0000004B Args:2 serialize:0 sync_level:0
-\_SB_\A004 Method         length:0x00000018 Args:1 serialize:0 sync_level:0
-\_SB_\A006 Method         length:0x00000020 Args:0 serialize:0 sync_level:0
+\_SB_\A004 Method         length:0x00000018 Args:5 serialize:0 sync_level:0
+\_SB_\A006 Method         length:0x00000020 Args:4 serialize:0 sync_level:0
 \_SB_\A007 Method         length:0x00000023 Args:3 serialize:0 sync_level:0
 \_SB_\A100 Mutex          sync_level:0
-\_SB_\A062 Method         length:0x00000016 Args:0 serialize:0 sync_level:0
+\_SB_\A062 Method         length:0x00000016 Args:4 serialize:0 sync_level:0
 \_SB_\A064 Method         length:0x00000029 Args:3 serialize:0 sync_level:0
 \_SB_\A063 Method         length:0x0000002C Args:2 serialize:0 sync_level:0
 \_SB_\A099 Mutex          sync_level:0
-\_SB_\A066 Method         length:0x00000016 Args:0 serialize:1 sync_level:0
+\_SB_\A066 Method         length:0x00000016 Args:4 serialize:1 sync_level:0
 \_SB_\A026 Method         length:0x0000002C Args:3 serialize:1 sync_level:0
 \_SB_\A012 Method         length:0x0000002B Args:2 serialize:1 sync_level:0
 \_SB_\A018 Method         length:0x00000009 Args:1 serialize:0 sync_level:0
@@ -68918,7 +68918,7 @@ aml._.get_node_by_name end
      Package        elements:2
          Integer        = 0x0000000010831969
          Integer        = 0x0000000000000000
-\_SB_\A091 Method         length:0x00000095 Args:0 serialize:1 sync_level:0
+\_SB_\A091 Method         length:0x00000095 Args:4 serialize:1 sync_level:0
 \_SB_\A080 Method         length:0x00000064 Args:2 serialize:0 sync_level:0
 \_SB_\A093 Buffer         Len:0x00000007
 \_SB_\A086 Method         length:0x00000052 Args:2 serialize:0 sync_level:0
@@ -69941,7 +69941,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\LPC0\PSMX Mutex          sync_level:0
 \_SB_\PCI0\LPC0\_ADR Integer        = 0x0000000000140003
 \_SB_\PCI0\SMBS Device        
-\_SB_\PCI0\SMBS\SBW0 Method         length:0x00000153 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\SMBS\SBW0 Method         length:0x00000153 Args:5 serialize:0 sync_level:0
 \_SB_\PCI0\SMBS\SBR0 Method         length:0x000001DB Args:3 serialize:0 sync_level:0
 \_SB_\PCI0\SMBS\WTC0 Method         length:0x0000005D Args:1 serialize:0 sync_level:0
 \_SB_\PCI0\SMBS\WBD0 Method         length:0x00000059 Args:1 serialize:0 sync_level:0
@@ -71667,7 +71667,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\_CRS Method         length:0x00000064 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\CRES Buffer         Len:0x000001EC
 \_SB_\PCI0\TOM_ Method         length:0x0000001C Args:0 serialize:0 sync_level:0
-\_SB_\PCI0\XOSC Method         length:0x000000C6 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\XOSC Method         length:0x000000C6 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\AMHP Integer        = 0x0000000000000000
 \_SB_\PCI0\CTRL Integer        = 0x0000000000000000
 \_SB_\PCI0\SUPP Integer        = 0x0000000000000000

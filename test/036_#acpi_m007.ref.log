@@ -42729,7 +42729,7 @@ aml._.term_obj end
 \_PIC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RDMA Method         length:0x00000009 Args:3 serialize:0 sync_level:0
-\RRIO Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\RRIO Method         length:0x00000009 Args:4 serialize:0 sync_level:0
 \B0IL RegionField    Rgn [\BIOS] Off:000002A0 Len:00000010 Acc:1
 \B0IB RegionField    Rgn [\BIOS] Off:00000290 Len:00000010 Acc:1
 \B0SU RegionField    Rgn [\BIOS] Off:00000288 Len:00000008 Acc:1
@@ -42909,7 +42909,7 @@ aml._.term_obj end
 \_SB_\BN00 Method         length:0x00000002 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0 Device        
 \_SB_\PCI0\ITPM Device        
-\_SB_\PCI0\ITPM\_DSM Method         length:0x00000304 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\ITPM\_DSM Method         length:0x00000304 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\ITPM\BUF3 BufferField    Buf:[\_SB_\PCI0\ITPM\MBUF] Off:00000003 Len:00000008
 \_SB_\PCI0\ITPM\BUF2 BufferField    Buf:[\_SB_\PCI0\ITPM\MBUF] Off:00000002 Len:00000008
 \_SB_\PCI0\ITPM\BUF1 BufferField    Buf:[\_SB_\PCI0\ITPM\MBUF] Off:00000001 Len:00000008
@@ -42943,7 +42943,7 @@ aml._.term_obj end
 \_SB_\PCI0\MAX5 BufferField    Buf:[\_SB_\PCI0\CRS_] Off:00000060 Len:00000020
 \_SB_\PCI0\MIN5 BufferField    Buf:[\_SB_\PCI0\CRS_] Off:0000005C Len:00000020
 \_SB_\PCI0\CRS_ Buffer         Len:0x000000A2
-\_SB_\PCI0\_OSC Method         length:0x00000136 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\_OSC Method         length:0x00000136 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\NPE7 Device        
 \_SB_\PCI0\NPE7\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\NPE7\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -43226,7 +43226,7 @@ aml._.term_obj end
 \_SB_\PCI0\SAT1\AT02 Buffer         Len:0x00000007
 \_SB_\PCI0\SAT1\AT01 Buffer         Len:0x00000007
 \_SB_\PCI0\SAT1\STM_ Method         length:0x0000020D Args:0 serialize:1 sync_level:0
-\_SB_\PCI0\SAT1\GTM_ Method         length:0x0000012E Args:3 serialize:1 sync_level:0
+\_SB_\PCI0\SAT1\GTM_ Method         length:0x0000012E Args:7 serialize:1 sync_level:0
 \_SB_\PCI0\SAT1\CHN1 Device        
 \_SB_\PCI0\SAT1\CHN1\DRV1 Device        
 \_SB_\PCI0\SAT1\CHN1\DRV1\_GTF Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -43357,7 +43357,7 @@ aml._.term_obj end
 \_SB_\PCI0\SATA\AT02 Buffer         Len:0x00000007
 \_SB_\PCI0\SATA\AT01 Buffer         Len:0x00000007
 \_SB_\PCI0\SATA\STM_ Method         length:0x0000020D Args:0 serialize:1 sync_level:0
-\_SB_\PCI0\SATA\GTM_ Method         length:0x0000012E Args:3 serialize:1 sync_level:0
+\_SB_\PCI0\SATA\GTM_ Method         length:0x0000012E Args:7 serialize:1 sync_level:0
 \_SB_\PCI0\SATA\CHN1 Device        
 \_SB_\PCI0\SATA\CHN1\DRV1 Device        
 \_SB_\PCI0\SATA\CHN1\DRV1\_GTF Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -43484,7 +43484,7 @@ aml._.term_obj end
 \_SB_\PCI0\PCIE\_HID Integer        = 0x00000000020CD041
 \_SB_\PCI0\SBRG Device        
 \_SB_\PCI0\SBRG\TPM_ Device        
-\_SB_\PCI0\SBRG\TPM_\_DSM Method         length:0x00000304 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\SBRG\TPM_\_DSM Method         length:0x00000304 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\TPM_\BUF3 BufferField    Buf:[\_SB_\PCI0\SBRG\TPM_\MBUF] Off:00000003 Len:00000008
 \_SB_\PCI0\SBRG\TPM_\BUF2 BufferField    Buf:[\_SB_\PCI0\SBRG\TPM_\MBUF] Off:00000002 Len:00000008
 \_SB_\PCI0\SBRG\TPM_\BUF1 BufferField    Buf:[\_SB_\PCI0\SBRG\TPM_\MBUF] Off:00000001 Len:00000008
@@ -43514,7 +43514,7 @@ aml._.term_obj end
 \_SB_\PCI0\SBRG\OMSC\_HID Integer        = 0x00000000020CD041
 \_SB_\PCI0\SBRG\RDMA Method         length:0x00000000 Args:3 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\WX82 Method         length:0x00000020 Args:2 serialize:0 sync_level:0
-\_SB_\PCI0\SBRG\RRIO Method         length:0x00000094 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\SBRG\RRIO Method         length:0x00000094 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\DDLT Package        elements:4
      Package        elements:2
          Integer        = 0x0000000000000000
@@ -46969,7 +46969,7 @@ aml._.term_obj end
 \_PIC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RDMA Method         length:0x00000009 Args:3 serialize:0 sync_level:0
-\RRIO Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\RRIO Method         length:0x00000009 Args:4 serialize:0 sync_level:0
 \B0IL RegionField    Rgn [\BIOS] Off:000002A0 Len:00000010 Acc:1
 \B0IB RegionField    Rgn [\BIOS] Off:00000290 Len:00000010 Acc:1
 \B0SU RegionField    Rgn [\BIOS] Off:00000288 Len:00000008 Acc:1
@@ -47149,7 +47149,7 @@ aml._.term_obj end
 \_SB_\BN00 Method         length:0x00000002 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0 Device        
 \_SB_\PCI0\ITPM Device        
-\_SB_\PCI0\ITPM\_DSM Method         length:0x00000304 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\ITPM\_DSM Method         length:0x00000304 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\ITPM\BUF3 BufferField    Buf:[\_SB_\PCI0\ITPM\MBUF] Off:00000003 Len:00000008
 \_SB_\PCI0\ITPM\BUF2 BufferField    Buf:[\_SB_\PCI0\ITPM\MBUF] Off:00000002 Len:00000008
 \_SB_\PCI0\ITPM\BUF1 BufferField    Buf:[\_SB_\PCI0\ITPM\MBUF] Off:00000001 Len:00000008
@@ -47183,7 +47183,7 @@ aml._.term_obj end
 \_SB_\PCI0\MAX5 BufferField    Buf:[\_SB_\PCI0\CRS_] Off:00000060 Len:00000020
 \_SB_\PCI0\MIN5 BufferField    Buf:[\_SB_\PCI0\CRS_] Off:0000005C Len:00000020
 \_SB_\PCI0\CRS_ Buffer         Len:0x000000A2
-\_SB_\PCI0\_OSC Method         length:0x00000136 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\_OSC Method         length:0x00000136 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\NPE7 Device        
 \_SB_\PCI0\NPE7\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\NPE7\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -47466,7 +47466,7 @@ aml._.term_obj end
 \_SB_\PCI0\SAT1\AT02 Buffer         Len:0x00000007
 \_SB_\PCI0\SAT1\AT01 Buffer         Len:0x00000007
 \_SB_\PCI0\SAT1\STM_ Method         length:0x0000020D Args:0 serialize:1 sync_level:0
-\_SB_\PCI0\SAT1\GTM_ Method         length:0x0000012E Args:3 serialize:1 sync_level:0
+\_SB_\PCI0\SAT1\GTM_ Method         length:0x0000012E Args:7 serialize:1 sync_level:0
 \_SB_\PCI0\SAT1\CHN1 Device        
 \_SB_\PCI0\SAT1\CHN1\DRV1 Device        
 \_SB_\PCI0\SAT1\CHN1\DRV1\_GTF Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -47597,7 +47597,7 @@ aml._.term_obj end
 \_SB_\PCI0\SATA\AT02 Buffer         Len:0x00000007
 \_SB_\PCI0\SATA\AT01 Buffer         Len:0x00000007
 \_SB_\PCI0\SATA\STM_ Method         length:0x0000020D Args:0 serialize:1 sync_level:0
-\_SB_\PCI0\SATA\GTM_ Method         length:0x0000012E Args:3 serialize:1 sync_level:0
+\_SB_\PCI0\SATA\GTM_ Method         length:0x0000012E Args:7 serialize:1 sync_level:0
 \_SB_\PCI0\SATA\CHN1 Device        
 \_SB_\PCI0\SATA\CHN1\DRV1 Device        
 \_SB_\PCI0\SATA\CHN1\DRV1\_GTF Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -47724,7 +47724,7 @@ aml._.term_obj end
 \_SB_\PCI0\PCIE\_HID Integer        = 0x00000000020CD041
 \_SB_\PCI0\SBRG Device        
 \_SB_\PCI0\SBRG\TPM_ Device        
-\_SB_\PCI0\SBRG\TPM_\_DSM Method         length:0x00000304 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\SBRG\TPM_\_DSM Method         length:0x00000304 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\TPM_\BUF3 BufferField    Buf:[\_SB_\PCI0\SBRG\TPM_\MBUF] Off:00000003 Len:00000008
 \_SB_\PCI0\SBRG\TPM_\BUF2 BufferField    Buf:[\_SB_\PCI0\SBRG\TPM_\MBUF] Off:00000002 Len:00000008
 \_SB_\PCI0\SBRG\TPM_\BUF1 BufferField    Buf:[\_SB_\PCI0\SBRG\TPM_\MBUF] Off:00000001 Len:00000008
@@ -47754,7 +47754,7 @@ aml._.term_obj end
 \_SB_\PCI0\SBRG\OMSC\_HID Integer        = 0x00000000020CD041
 \_SB_\PCI0\SBRG\RDMA Method         length:0x00000000 Args:3 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\WX82 Method         length:0x00000020 Args:2 serialize:0 sync_level:0
-\_SB_\PCI0\SBRG\RRIO Method         length:0x00000094 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\SBRG\RRIO Method         length:0x00000094 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\DDLT Package        elements:4
      Package        elements:2
          Integer        = 0x0000000000000000
@@ -50376,7 +50376,7 @@ aml._.name_string end
 \_PR_\P002 Processor      ID:0x02 Addr:0x00000000 Len:0x00000000
 \_PR_\CPU1 Alias          Source: \_PR_\P001
 \_PR_\P001 Processor      ID:0x01 Addr:0x00000810 Len:0x00000006
-\_PR_\P001\_OSC Method         length:0x000001C9 Args:0 serialize:0 sync_level:0
+\_PR_\P001\_OSC Method         length:0x000001C9 Args:4 serialize:0 sync_level:0
 \_PR_\P001\_PDC Method         length:0x00000061 Args:1 serialize:0 sync_level:0
 \_PR_\P001\HT0_ Integer        = 0x0000000000000000
 \_PR_\P001\HC0_ Integer        = 0x0000000000000000
@@ -51857,7 +51857,7 @@ aml._.get_node_by_name end
 \_PIC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RDMA Method         length:0x00000009 Args:3 serialize:0 sync_level:0
-\RRIO Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\RRIO Method         length:0x00000009 Args:4 serialize:0 sync_level:0
 \B0IL RegionField    Rgn [\BIOS] Off:000002A0 Len:00000010 Acc:1
 \B0IB RegionField    Rgn [\BIOS] Off:00000290 Len:00000010 Acc:1
 \B0SU RegionField    Rgn [\BIOS] Off:00000288 Len:00000008 Acc:1
@@ -52037,7 +52037,7 @@ aml._.get_node_by_name end
 \_SB_\BN00 Method         length:0x00000002 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0 Device        
 \_SB_\PCI0\ITPM Device        
-\_SB_\PCI0\ITPM\_DSM Method         length:0x00000304 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\ITPM\_DSM Method         length:0x00000304 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\ITPM\BUF3 BufferField    Buf:[\_SB_\PCI0\ITPM\MBUF] Off:00000003 Len:00000008
 \_SB_\PCI0\ITPM\BUF2 BufferField    Buf:[\_SB_\PCI0\ITPM\MBUF] Off:00000002 Len:00000008
 \_SB_\PCI0\ITPM\BUF1 BufferField    Buf:[\_SB_\PCI0\ITPM\MBUF] Off:00000001 Len:00000008
@@ -52071,7 +52071,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\MAX5 BufferField    Buf:[\_SB_\PCI0\CRS_] Off:00000060 Len:00000020
 \_SB_\PCI0\MIN5 BufferField    Buf:[\_SB_\PCI0\CRS_] Off:0000005C Len:00000020
 \_SB_\PCI0\CRS_ Buffer         Len:0x000000A2
-\_SB_\PCI0\_OSC Method         length:0x00000136 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\_OSC Method         length:0x00000136 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\NPE7 Device        
 \_SB_\PCI0\NPE7\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
 \_SB_\PCI0\NPE7\_PRW Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -52354,7 +52354,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\SAT1\AT02 Buffer         Len:0x00000007
 \_SB_\PCI0\SAT1\AT01 Buffer         Len:0x00000007
 \_SB_\PCI0\SAT1\STM_ Method         length:0x0000020D Args:0 serialize:1 sync_level:0
-\_SB_\PCI0\SAT1\GTM_ Method         length:0x0000012E Args:3 serialize:1 sync_level:0
+\_SB_\PCI0\SAT1\GTM_ Method         length:0x0000012E Args:7 serialize:1 sync_level:0
 \_SB_\PCI0\SAT1\CHN1 Device        
 \_SB_\PCI0\SAT1\CHN1\DRV1 Device        
 \_SB_\PCI0\SAT1\CHN1\DRV1\_GTF Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -52485,7 +52485,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\SATA\AT02 Buffer         Len:0x00000007
 \_SB_\PCI0\SATA\AT01 Buffer         Len:0x00000007
 \_SB_\PCI0\SATA\STM_ Method         length:0x0000020D Args:0 serialize:1 sync_level:0
-\_SB_\PCI0\SATA\GTM_ Method         length:0x0000012E Args:3 serialize:1 sync_level:0
+\_SB_\PCI0\SATA\GTM_ Method         length:0x0000012E Args:7 serialize:1 sync_level:0
 \_SB_\PCI0\SATA\CHN1 Device        
 \_SB_\PCI0\SATA\CHN1\DRV1 Device        
 \_SB_\PCI0\SATA\CHN1\DRV1\_GTF Method         length:0x00000009 Args:0 serialize:0 sync_level:0
@@ -52612,7 +52612,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\PCIE\_HID Integer        = 0x00000000020CD041
 \_SB_\PCI0\SBRG Device        
 \_SB_\PCI0\SBRG\TPM_ Device        
-\_SB_\PCI0\SBRG\TPM_\_DSM Method         length:0x00000304 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\SBRG\TPM_\_DSM Method         length:0x00000304 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\TPM_\BUF3 BufferField    Buf:[\_SB_\PCI0\SBRG\TPM_\MBUF] Off:00000003 Len:00000008
 \_SB_\PCI0\SBRG\TPM_\BUF2 BufferField    Buf:[\_SB_\PCI0\SBRG\TPM_\MBUF] Off:00000002 Len:00000008
 \_SB_\PCI0\SBRG\TPM_\BUF1 BufferField    Buf:[\_SB_\PCI0\SBRG\TPM_\MBUF] Off:00000001 Len:00000008
@@ -52642,7 +52642,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\SBRG\OMSC\_HID Integer        = 0x00000000020CD041
 \_SB_\PCI0\SBRG\RDMA Method         length:0x00000000 Args:3 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\WX82 Method         length:0x00000020 Args:2 serialize:0 sync_level:0
-\_SB_\PCI0\SBRG\RRIO Method         length:0x00000094 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\SBRG\RRIO Method         length:0x00000094 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\DDLT Package        elements:4
      Package        elements:2
          Integer        = 0x0000000000000000
@@ -54305,7 +54305,7 @@ aml._.get_node_by_name end
 \_PR_\P002 Processor      ID:0x02 Addr:0x00000000 Len:0x00000000
 \_PR_\CPU1 Alias          Source: \_PR_\P001
 \_PR_\P001 Processor      ID:0x01 Addr:0x00000810 Len:0x00000006
-\_PR_\P001\_OSC Method         length:0x000001C9 Args:0 serialize:0 sync_level:0
+\_PR_\P001\_OSC Method         length:0x000001C9 Args:4 serialize:0 sync_level:0
 \_PR_\P001\_PDC Method         length:0x00000061 Args:1 serialize:0 sync_level:0
 \_PR_\P001\HT0_ Integer        = 0x0000000000000000
 \_PR_\P001\HC0_ Integer        = 0x0000000000000000

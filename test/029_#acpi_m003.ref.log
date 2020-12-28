@@ -21416,7 +21416,7 @@ aml._.term_obj end
 \_SB_\CPUS\C000\_OST Method         length:0x00000008 Args:3 serialize:1 sync_level:0
 \_SB_\CPUS\C000\_MAT Buffer         Len:0x00000008
 \_SB_\CPUS\C000\_STA Method         length:0x00000006 Args:0 serialize:1 sync_level:0
-\_SB_\CPUS\COST Method         length:0x00000096 Args:0 serialize:1 sync_level:0
+\_SB_\CPUS\COST Method         length:0x00000096 Args:4 serialize:1 sync_level:0
 \_SB_\CPUS\CSCN Method         length:0x000000E1 Args:0 serialize:1 sync_level:0
 \_SB_\CPUS\CEJ0 Method         length:0x00000056 Args:1 serialize:1 sync_level:0
 \_SB_\CPUS\CSTA Method         length:0x00000061 Args:1 serialize:1 sync_level:0
@@ -24709,7 +24709,7 @@ aml._.name_string end
 \_SB_\PCI0\ISA_\LPCD OpRegion       [PCIConfig] Len:00000002
 \_SB_\PCI0\ISA_\PIRQ OpRegion       [PCIConfig] Len:0000000C
 \_SB_\PCI0\ISA_\_ADR Integer        = 0x00000000001F0000
-\_SB_\PCI0\_OSC Method         length:0x00000075 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\_OSC Method         length:0x00000075 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\_UID Integer        = 0x0000000000000001
 \_SB_\PCI0\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\_CID Integer        = 0x00000000030AD041
@@ -27309,7 +27309,7 @@ aml._.get_node_by_name end
 \_SB_\CPUS\C000\_OST Method         length:0x00000008 Args:3 serialize:1 sync_level:0
 \_SB_\CPUS\C000\_MAT Buffer         Len:0x00000008
 \_SB_\CPUS\C000\_STA Method         length:0x00000006 Args:0 serialize:1 sync_level:0
-\_SB_\CPUS\COST Method         length:0x00000096 Args:0 serialize:1 sync_level:0
+\_SB_\CPUS\COST Method         length:0x00000096 Args:4 serialize:1 sync_level:0
 \_SB_\CPUS\CSCN Method         length:0x000000E1 Args:0 serialize:1 sync_level:0
 \_SB_\CPUS\CEJ0 Method         length:0x00000056 Args:1 serialize:1 sync_level:0
 \_SB_\CPUS\CSTA Method         length:0x00000061 Args:1 serialize:1 sync_level:0
@@ -28810,7 +28810,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\ISA_\LPCD OpRegion       [PCIConfig] Len:00000002
 \_SB_\PCI0\ISA_\PIRQ OpRegion       [PCIConfig] Len:0000000C
 \_SB_\PCI0\ISA_\_ADR Integer        = 0x00000000001F0000
-\_SB_\PCI0\_OSC Method         length:0x00000075 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\_OSC Method         length:0x00000075 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\_UID Integer        = 0x0000000000000001
 \_SB_\PCI0\_ADR Integer        = 0x0000000000000000
 \_SB_\PCI0\_CID Integer        = 0x00000000030AD041

@@ -27669,7 +27669,7 @@ aml._.term_obj end
 \HLBA Integer        = 0x0000000000000000
 \HBAS Integer        = 0x0000000000000000
 \RBLK Method         length:0x00000006 Args:3 serialize:0 sync_level:0
-\WBLK Method         length:0x00000000 Args:0 serialize:0 sync_level:0
+\WBLK Method         length:0x00000000 Args:4 serialize:0 sync_level:0
 \RWRD Method         length:0x00000006 Args:2 serialize:0 sync_level:0
 \SMRB Method         length:0x00000066 Args:2 serialize:1 sync_level:0
 \RBYT Method         length:0x00000007 Args:2 serialize:1 sync_level:0
@@ -27713,7 +27713,7 @@ aml._.term_obj end
 \_PIC Method         length:0x000000CB Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RDMA Method         length:0x00000009 Args:3 serialize:0 sync_level:0
-\RRIO Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\RRIO Method         length:0x00000009 Args:4 serialize:0 sync_level:0
 \MSC8 RegionField    Rgn [\BIOS] Off:00000218 Len:00000020 Acc:1
 \MSC7 RegionField    Rgn [\BIOS] Off:000001F8 Len:00000020 Acc:1
 \MSC6 RegionField    Rgn [\BIOS] Off:000001D8 Len:00000020 Acc:1
@@ -28506,7 +28506,7 @@ aml._.name_string end
 \_SB_\PCI0\SBRG\ASOC\_UID Integer        = 0x0000000001010110
 \_SB_\PCI0\SBRG\ASOC\_HID String         Len:0x00000007 value:ATK0110
 \_SB_\PCI0\SBRG\RBLK Method         length:0x00000006 Args:3 serialize:0 sync_level:0
-\_SB_\PCI0\SBRG\WBLK Method         length:0x00000000 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\SBRG\WBLK Method         length:0x00000000 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\RWRD Method         length:0x00000006 Args:2 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\SMRB Method         length:0x00000066 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\SBRG\RBYT Method         length:0x00000007 Args:2 serialize:1 sync_level:0
@@ -29983,7 +29983,7 @@ aml._.get_node_by_name end
 \HLBA Integer        = 0x0000000000000000
 \HBAS Integer        = 0x0000000000000000
 \RBLK Method         length:0x00000006 Args:3 serialize:0 sync_level:0
-\WBLK Method         length:0x00000000 Args:0 serialize:0 sync_level:0
+\WBLK Method         length:0x00000000 Args:4 serialize:0 sync_level:0
 \RWRD Method         length:0x00000006 Args:2 serialize:0 sync_level:0
 \SMRB Method         length:0x00000066 Args:2 serialize:1 sync_level:0
 \RBYT Method         length:0x00000007 Args:2 serialize:1 sync_level:0
@@ -30027,7 +30027,7 @@ aml._.get_node_by_name end
 \_PIC Method         length:0x000000CB Args:1 serialize:0 sync_level:0
 \PICM Integer        = 0x0000000000000000
 \RDMA Method         length:0x00000009 Args:3 serialize:0 sync_level:0
-\RRIO Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\RRIO Method         length:0x00000009 Args:4 serialize:0 sync_level:0
 \MSC8 RegionField    Rgn [\BIOS] Off:00000218 Len:00000020 Acc:1
 \MSC7 RegionField    Rgn [\BIOS] Off:000001F8 Len:00000020 Acc:1
 \MSC6 RegionField    Rgn [\BIOS] Off:000001D8 Len:00000020 Acc:1
@@ -30757,7 +30757,7 @@ aml._.get_node_by_name end
 \_SB_\PCI0\SBRG\ASOC\_UID Integer        = 0x0000000001010110
 \_SB_\PCI0\SBRG\ASOC\_HID String         Len:0x00000007 value:ATK0110
 \_SB_\PCI0\SBRG\RBLK Method         length:0x00000006 Args:3 serialize:0 sync_level:0
-\_SB_\PCI0\SBRG\WBLK Method         length:0x00000000 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\SBRG\WBLK Method         length:0x00000000 Args:4 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\RWRD Method         length:0x00000006 Args:2 serialize:0 sync_level:0
 \_SB_\PCI0\SBRG\SMRB Method         length:0x00000066 Args:2 serialize:1 sync_level:0
 \_SB_\PCI0\SBRG\RBYT Method         length:0x00000007 Args:2 serialize:1 sync_level:0
