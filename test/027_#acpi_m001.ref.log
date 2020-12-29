@@ -73202,9 +73202,6 @@ aml._.local_obj end
 aml._.simple_name end
 aml._.super_name end
 aml._.store_table begin
-types 6 to 1
-aml._.store_table.op_region_field_to_uninitialized begin
-aml._.store_table.op_region_field_to_uninitialized end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
