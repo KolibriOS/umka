@@ -47069,6 +47069,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x00000011
 aml._.term_arg begin
@@ -47102,7 +47103,8 @@ types 2 to 2
 aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
-aml._.if 0x000000A0 end
+aml._.if end
+aml._.type1opcode end
 aml._.term_obj end
 table/position: [0x0000AA6C]
 aml._.term_obj begin
@@ -47112,6 +47114,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x00000012
 aml._.term_arg begin
@@ -47214,7 +47217,8 @@ aml._.name end
 aml._.namespace_modifier_obj end
 aml._.object end
 aml._.term_obj end
-aml._.if 0x000000A0 end
+aml._.if end
+aml._.type1opcode end
 aml._.term_obj end
 table/position: [0x0000AA7F]
 aml._.term_obj begin
@@ -47224,6 +47228,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x00000012
 aml._.term_arg begin
@@ -47326,7 +47331,8 @@ aml._.name end
 aml._.namespace_modifier_obj end
 aml._.object end
 aml._.term_obj end
-aml._.if 0x00000008 end
+aml._.if end
+aml._.type1opcode end
 aml._.term_obj end
 table/position: [0x0000AA92]
 aml._.term_obj begin
@@ -57227,6 +57233,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -57299,6 +57307,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -57371,6 +57381,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -57443,6 +57455,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -57515,6 +57529,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -57587,6 +57603,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -57659,6 +57677,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -57731,6 +57751,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -57803,6 +57825,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -57875,6 +57899,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -57947,6 +57973,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -58019,6 +58047,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -58091,6 +58121,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -58163,6 +58195,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -58235,6 +58269,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -58307,6 +58343,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -59543,6 +59581,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -59615,6 +59655,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -59687,6 +59729,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -59759,6 +59803,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -59831,6 +59877,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -59903,6 +59951,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -59975,6 +60025,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -60047,6 +60099,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -60119,6 +60173,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -60191,6 +60247,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -60263,6 +60321,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -60335,6 +60395,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -60407,6 +60469,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -60479,6 +60543,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -60551,6 +60617,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin
@@ -60623,6 +60691,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.package begin
 pkg_length: 0x00000020
 aml._.package_element_list_defer begin

@@ -28837,6 +28837,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.store begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -28893,6 +28895,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x0000000C
 aml._.term_arg begin
@@ -28951,6 +28954,19 @@ types 2 to 2
 aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
+aml._.if end
+aml._.type1opcode end
+aml._.term_obj end
+table/position: [0x00001242]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.type1opcode begin
+aml._.else begin
 pkg_length: 0x00000006
 else branch taken
 table/position: [0x00001244]
@@ -28961,6 +28977,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -29018,6 +29035,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x0000000C
 aml._.term_arg begin
@@ -29076,6 +29094,19 @@ types 2 to 2
 aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
+aml._.if end
+aml._.type1opcode end
+aml._.term_obj end
+table/position: [0x00001242]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.type1opcode begin
+aml._.else begin
 pkg_length: 0x00000006
 else branch taken
 table/position: [0x00001244]
@@ -29086,6 +29117,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -29161,6 +29193,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x0000000C
 aml._.term_arg begin
@@ -29219,6 +29252,19 @@ types 2 to 2
 aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
+aml._.if end
+aml._.type1opcode end
+aml._.term_obj end
+table/position: [0x00001242]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.type1opcode begin
+aml._.else begin
 pkg_length: 0x00000006
 else branch taken
 table/position: [0x00001244]
@@ -29229,6 +29275,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin

@@ -42224,6 +42224,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x00000011
 aml._.term_arg begin
@@ -42326,7 +42327,8 @@ aml._.name end
 aml._.namespace_modifier_obj end
 aml._.object end
 aml._.term_obj end
-aml._.if 0x000000A0 end
+aml._.if end
+aml._.type1opcode end
 aml._.term_obj end
 table/position: [0x00006DCD]
 aml._.term_obj begin
@@ -42336,6 +42338,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x00000012
 aml._.term_arg begin
@@ -42438,7 +42441,8 @@ aml._.name end
 aml._.namespace_modifier_obj end
 aml._.object end
 aml._.term_obj end
-aml._.if 0x000000A0 end
+aml._.if end
+aml._.type1opcode end
 aml._.term_obj end
 table/position: [0x00006DE0]
 aml._.term_obj begin
@@ -42448,6 +42452,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x00000012
 aml._.term_arg begin
@@ -42550,7 +42555,8 @@ aml._.name end
 aml._.namespace_modifier_obj end
 aml._.object end
 aml._.term_obj end
-aml._.if 0x00000008 end
+aml._.if end
+aml._.type1opcode end
 aml._.term_obj end
 table/position: [0x00006DF3]
 aml._.term_obj begin
@@ -54341,6 +54347,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x00000009
 aml._.term_arg begin
@@ -54367,6 +54374,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.store begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -54399,8 +54408,22 @@ aml._.store_table.integer_to_op_region_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
+aml._.if end
+aml._.type1opcode end
+aml._.term_obj end
+table/position: [0xFFFF94AE]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.type1opcode begin
+aml._.else begin
 pkg_length: 0x00000008
-aml._.if 0x00000000 end
+aml._.else end
+aml._.type1opcode end
 aml._.term_obj end
 table/position: [0xFFFF94B7]
 aml._.term_obj begin
@@ -54410,6 +54433,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
 aml._.store begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -54466,6 +54491,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x0000000A
 aml._.term_arg begin
@@ -54508,6 +54534,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -54601,6 +54628,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x0000000A
 aml._.term_arg begin
@@ -54643,6 +54671,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -54700,6 +54729,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x0000000A
 aml._.term_arg begin
@@ -54742,6 +54772,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -54799,6 +54830,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x0000000A
 aml._.term_arg begin
@@ -54841,6 +54873,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -54922,6 +54955,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x0000000A
 aml._.term_arg begin
@@ -54964,6 +54998,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -55030,6 +55065,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x0000000A
 aml._.term_arg begin
@@ -55072,6 +55108,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -55174,6 +55211,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x0000000A
 aml._.term_arg begin
@@ -55216,6 +55254,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -55561,6 +55600,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.if begin
 pkg_length: 0x0000000A
 aml._.term_arg begin
@@ -55603,6 +55643,7 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
+aml._.type1opcode begin
 aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
