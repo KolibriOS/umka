@@ -171,6 +171,15 @@ macro add r, v {
   end if
 }
 
+macro stdcall target, [args] {
+common
+  if target eq is_region_userspace
+        test    esp, esp        ; clear zf
+  else
+        stdcall target, args
+  end if
+}
+
 include 'system.inc'
 include 'fdo.inc'
 
@@ -671,13 +680,6 @@ map_memEx:
 
 sys_msg_board equ __pex0
 delay_ms equ __pex1
-macro stdcall target, [args] {
-  if target eq is_region_userspace
-        test    esp, esp        ; clear zf
-  else
-        stdcall target, args
-  end if
-}
 
 include fix pew
 macro pew x {}
@@ -741,7 +743,7 @@ BTN_ADDR        dd ?
 MEM_AMOUNT      rd 0x1d
 SYS_SHUTDOWN    db ?
 sys_proc        rd 0x800
-rb 0xb242       ; align SLOT_BASE on 0x10000
+rb 0xb202       ; align SLOT_BASE on 0x10000
 SLOT_BASE:      rd 0x8000
 VGABasePtr      rb 640*480
 ;rb 0x582        ; align HEAP_BASE on page boundary

@@ -783,6 +783,7 @@ shell_get_window_colors(int argc, char **argv) {
     }
     (void)argv;
     system_colors_t colors;
+    memset(&colors, 0xaa, sizeof(colors));
     COVERAGE_ON();
     umka_sys_get_window_colors(&colors);
     COVERAGE_OFF();

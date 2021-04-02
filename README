@@ -53,7 +53,7 @@ lfbviewx
 BUILD
 -----
 
-$ KOLIBRI=/path/to/kolibrios make
+$ KOLIBRIOS=/path/to/kolibrios make
 
 /path/to/kolibrios is where you checked out 'svn co svn://kolibrios.org'.
 

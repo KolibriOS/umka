@@ -32,8 +32,8 @@ font smoothing: 0 - off
 /> get_window_colors
 0x00586786 frame
 0x00fefefe grab
-0x00aea6a6 work_3d_dark
-0x00fbfbfb work_3d_light
+0x00c5bdb9 work_3d_dark
+0x00ece9e5 work_3d_light
 0x00333333 grab_text
 0x00ddd7cf work
 0x007887a6 work_button
