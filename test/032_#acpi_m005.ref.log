@@ -32882,3 +32882,10 @@ aml._.get_node_by_name end
   00:1D.2  FFFF:FFFF  00  0  \_SB_\PCI0\AZAL
   00:1F.0  10B9:5229  13  0  \_SB_\PCI0\IDEC
   00:1F.1  10B9:5288  13  0  \_SB_\PCI0\SATA
+
+/> acpi_get_node_alloc_cnt
+nodes allocated: 1844
+/> acpi_get_node_free_cnt
+nodes freed: 46
+/> acpi_get_node_cnt
+nodes in namespace: 777

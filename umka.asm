@@ -53,6 +53,9 @@ public acpi_ssdt_base as 'kos_acpi_ssdt_base'
 public acpi_ssdt_size as 'kos_acpi_ssdt_size'
 public acpi_ctx
 public acpi_usage as 'kos_acpi_usage'
+public acpi_node_alloc_cnt as 'kos_acpi_node_alloc_cnt'
+public acpi_node_free_cnt as 'kos_acpi_node_free_cnt'
+public acpi.count_nodes as 'kos_acpi_count_nodes'
 
 public stack_init as 'kos_stack_init'
 public net_add_device
@@ -743,7 +746,7 @@ BTN_ADDR        dd ?
 MEM_AMOUNT      rd 0x1d
 SYS_SHUTDOWN    db ?
 sys_proc        rd 0x800
-rb 0xb202       ; align SLOT_BASE on 0x10000
+rb 0xb142       ; align SLOT_BASE on 0x10000
 SLOT_BASE:      rd 0x8000
 VGABasePtr      rb 640*480
 ;rb 0x582        ; align HEAP_BASE on page boundary

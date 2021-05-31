@@ -5130,3 +5130,10 @@ aml._.get_node_by_name end
 \_PR_ Scope         
 \_GPE Scope         
 -----------------------------
+
+/> acpi_get_node_alloc_cnt
+nodes allocated: 197
+/> acpi_get_node_free_cnt
+nodes freed: 0
+/> acpi_get_node_cnt
+nodes in namespace: 109

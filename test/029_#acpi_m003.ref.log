@@ -29380,3 +29380,10 @@ aml._.get_node_by_name end
   00:00.0  0000:0000  00  1  \_SB_\PCI0\S00_
   00:01.0  1234:1111  00  0  \_SB_\PCI0\S08_
   00:02.0  8086:10D3  16  0  \_SB_\PCI0\S10_
+
+/> acpi_get_node_alloc_cnt
+nodes allocated: 1917
+/> acpi_get_node_free_cnt
+nodes freed: 6
+/> acpi_get_node_cnt
+nodes in namespace: 248

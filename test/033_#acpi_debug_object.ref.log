@@ -100,6 +100,13 @@ acpi.aml.process_table end
 \_GPE Scope         
 -----------------------------
 
+/> acpi_get_node_alloc_cnt
+nodes allocated: 11
+/> acpi_get_node_free_cnt
+nodes freed: 0
+/> acpi_get_node_cnt
+nodes in namespace: 9
+
 /> acpi_call \MAIN
 acpi.call_name begin
 aml._.get_node_by_name begin
@@ -444,3 +451,10 @@ acpi.call_node end
 acpi.call_name end
 calling acpi method: '\MAIN'
 acpi method returned
+
+/> acpi_get_node_alloc_cnt
+nodes allocated: 29
+/> acpi_get_node_free_cnt
+nodes freed: 0
+/> acpi_get_node_cnt
+nodes in namespace: 9

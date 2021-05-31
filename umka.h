@@ -636,6 +636,9 @@ extern uint8_t *kos_acpi_ssdt_base[];
 extern size_t kos_acpi_ssdt_size[];
 extern void *acpi_ctx;
 extern uint32_t kos_acpi_usage;
+extern uint32_t kos_acpi_node_alloc_cnt;
+extern uint32_t kos_acpi_node_free_cnt;
+extern uint32_t kos_acpi_count_nodes(void *ctx) __attribute__((__stdcall__));
 extern disk_t disk_list;
 
 static inline void

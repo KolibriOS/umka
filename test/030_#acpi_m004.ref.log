@@ -74832,3 +74832,10 @@ aml._.get_node_by_name end
 \_GPE\_L1D Method         length:0x00000020 Args:0 serialize:0 sync_level:0
 \_GPE\_L1F Method         length:0x00000020 Args:0 serialize:0 sync_level:0
 -----------------------------
+
+/> acpi_get_node_alloc_cnt
+nodes allocated: 4097
+/> acpi_get_node_free_cnt
+nodes freed: 311
+/> acpi_get_node_cnt
+nodes in namespace: 1727

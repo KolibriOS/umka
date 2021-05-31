@@ -74423,3 +74423,10 @@ aml._.get_node_by_name end
   00:11.0  1022:7801  13  0  \_SB_\PCI0\SATA
   00:14.1  FFFF:FFFF  00  0  \_SB_\PCI0\IDE_
   00:18.3  0000:0000  00  1  \_SB_\PCI0\G3F3
+
+/> acpi_get_node_alloc_cnt
+nodes allocated: 4695
+/> acpi_get_node_free_cnt
+nodes freed: 530
+/> acpi_get_node_cnt
+nodes in namespace: 2128

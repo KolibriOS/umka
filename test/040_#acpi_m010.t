@@ -10,3 +10,7 @@ acpi_preload_table machines/010/acpi/ssdt5.dat
 acpi_preload_table machines/010/acpi/ssdt6.dat
 
 acpi_enable
+
+acpi_get_node_alloc_cnt
+acpi_get_node_free_cnt
+acpi_get_node_cnt

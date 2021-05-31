@@ -1708,6 +1708,43 @@ shell_acpi_enable(int argc, char **argv) {
 }
 
 static void
+shell_acpi_get_node_cnt(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: acpi_get_node_cnt";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
+    uint32_t cnt = kos_acpi_count_nodes(acpi_ctx);
+    fprintf(fout, "nodes in namespace: %" PRIu32 "\n", cnt);
+}
+
+static void
+shell_acpi_get_node_alloc_cnt(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: acpi_get_node_alloc_cnt";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
+    fprintf(fout, "nodes allocated: %" PRIu32 "\n", kos_acpi_node_alloc_cnt);
+}
+
+static void
+shell_acpi_get_node_free_cnt(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: acpi_get_node_free_cnt";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
+    fprintf(fout, "nodes freed: %" PRIu32 "\n", kos_acpi_node_free_cnt);
+}
+
+static void
 shell_acpi_set_usage(int argc, char **argv) {
     const char *usage = \
         "usage: acpi_set_usage <num>\n"
@@ -2544,6 +2581,9 @@ func_table_t shell_cmds[] = {
     { "acpi_get_usage",          shell_acpi_get_usage },
     { "acpi_preload_table",      shell_acpi_preload_table },
     { "acpi_set_usage",          shell_acpi_set_usage },
+    { "acpi_get_node_alloc_cnt", shell_acpi_get_node_alloc_cnt },
+    { "acpi_get_node_free_cnt",  shell_acpi_get_node_free_cnt },
+    { "acpi_get_node_cnt",       shell_acpi_get_node_cnt },
     { "bg_map",                  shell_bg_map },
     { "bg_put_img",              shell_bg_put_img },
     { "bg_put_pixel",            shell_bg_put_pixel },

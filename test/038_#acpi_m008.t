@@ -11,3 +11,7 @@ acpi_preload_table machines/008/acpi/ssdt7.dat
 acpi_preload_table machines/008/acpi/ssdt8.dat
 
 acpi_enable
+
+acpi_get_node_alloc_cnt
+acpi_get_node_free_cnt
+acpi_get_node_cnt

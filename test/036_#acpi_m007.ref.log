@@ -55739,3 +55739,10 @@ aml._.get_node_by_name end
   00:01.0  0000:0000  00  1  \_SB_\PCI0\NPE1
   00:03.0  0000:0000  00  1  \_SB_\PCI0\NPE3
   00:07.0  0000:0000  00  1  \_SB_\PCI0\NPE7
+
+/> acpi_get_node_alloc_cnt
+nodes allocated: 3096
+/> acpi_get_node_free_cnt
+nodes freed: 68
+/> acpi_get_node_cnt
+nodes in namespace: 968

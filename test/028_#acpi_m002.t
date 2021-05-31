@@ -19,3 +19,7 @@ acpi_preload_table machines/002/acpi/SSDT11
 acpi_preload_table machines/002/acpi/SSDT12
 
 acpi_enable
+
+acpi_get_node_alloc_cnt
+acpi_get_node_free_cnt
+acpi_get_node_cnt
