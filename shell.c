@@ -531,7 +531,6 @@ shell_dump_appdata(int argc, char **argv) {
     }
     fprintf(fout, "dbg_state: %u\n", a->dbg_state);
     fprintf(fout, "cur_dir: %s\n", a->cur_dir);
-    fprintf(fout, "event_filter: %" PRIx32 "\n", a->event_filter);
     fprintf(fout, "draw_bgr_x: %u\n", a->draw_bgr_x);
     fprintf(fout, "draw_bgr_y: %u\n", a->draw_bgr_y);
     fprintf(fout, "event_mask: %" PRIx32 "\n", a->event_mask);

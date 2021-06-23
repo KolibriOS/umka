@@ -32,9 +32,7 @@ public sha3_256_oneshot as 'hash_oneshot'
 public kos_time_to_epoch
 public umka_init
 
-public CURRENT_TASK as 'kos_current_task'
-public current_slot as 'kos_current_slot'
-public TASK_COUNT as 'kos_task_count'
+public thread_count as 'kos_thread_count'
 public TASK_BASE as 'kos_task_base'
 public TASK_DATA as 'kos_task_data'
 public SLOT_BASE as 'kos_slot_base'
@@ -115,7 +113,7 @@ include 'struct.inc'
 macro BOOT_LO a {}
 macro BOOT a {}
 window_data equ __pew01
-CURRENT_TASK equ __pew02
+TASK_TABLE equ __pew02
 TASK_BASE equ __pew03
 TASK_DATA equ __pew04
 TASK_EVENT equ __pew05
@@ -132,7 +130,7 @@ BTN_BUFF equ __pew15
 BTN_ADDR equ __pew16
 MEM_AMOUNT equ __pew17
 SYS_SHUTDOWN equ __pew18
-TASK_COUNT equ __pew19
+;TASK_COUNT equ __pew19
 SLOT_BASE equ __pew20
 sys_proc equ __pew21
 VGABasePtr equ __pew22
@@ -142,12 +140,12 @@ HEAP_BASE equ __pew23
 ;}
 include 'const.inc'
 restore window_data
-restore CURRENT_TASK
+restore TASK_TABLE
 restore TASK_BASE,TASK_DATA,TASK_EVENT,CDDataBuf,idts,WIN_STACK,WIN_POS
 restore FDD_BUFF,WIN_TEMP_XY,KEY_COUNT,KEY_BUFF,BTN_COUNT,BTN_BUFF,BTN_ADDR
 restore MEM_AMOUNT,SYS_SHUTDOWN,SLOT_BASE,sys_proc,VGABasePtr
 restore HEAP_BASE
-restore TASK_COUNT
+;restore TASK_COUNT
 purge BOOT_LO,BOOT
 
 LFB_BASE = lfb_base
@@ -161,12 +159,12 @@ macro restore_ring3_context {
 }
 
 macro add r, v {
-  if v eq CURRENT_TASK - (SLOT_BASE shr 3)
+  if v eq TASK_TABLE - (SLOT_BASE shr 3)
         push    r
         mov     r, SLOT_BASE
         shr     r, 3
         neg     r
-        add     r, CURRENT_TASK
+        add     r, TASK_TABLE
         add     esp, 4
         add     r, [esp-4]
   else
@@ -445,8 +443,8 @@ proc umka_init c uses ebx esi edi ebp
 
         mov     [current_process], sys_proc
 
-        mov     dword[CURRENT_TASK], 0
-        mov     dword[TASK_COUNT], 0
+        mov     [current_slot_idx], 0
+        mov     [thread_count], 0
 
         mov     eax, [xsave_area_size]
         add     eax, RING0_STACK_SIZE
@@ -474,11 +472,11 @@ proc umka_init c uses ebx esi edi ebp
         xor     ecx, ecx
         call    scheduler_add_thread
 
-        mov     dword[CURRENT_TASK], 2
-        mov     dword[TASK_COUNT], 2
-        mov     dword[TASK_BASE], CURRENT_TASK + 2*sizeof.TASKDATA
+        mov     [current_slot_idx], 2
+        mov     [thread_count], 2
+        mov     dword[TASK_BASE], TASK_TABLE + 2*sizeof.TASKDATA
         mov     [current_slot], SLOT_BASE+2*sizeof.APPDATA
-        mov     [CURRENT_TASK + 2*sizeof.TASKDATA + TASKDATA.pid], 2
+        mov     [TASK_TABLE + 2*sizeof.TASKDATA + TASKDATA.pid], 2
 
         call    set_window_defaults
         call    init_background
@@ -691,22 +689,22 @@ macro org x {}
 macro format [x] {}
 
 macro lea r, v {
-  if v eq [(ecx-(CURRENT_TASK and 1FFFFFFFh)-TASKDATA.state)*8+SLOT_BASE]
+  if v eq [(ecx-(TASK_TABLE and 1FFFFFFFh)-TASKDATA.state)*8+SLOT_BASE]
         int3
-  else if v eq [(edx-(CURRENT_TASK and 1FFFFFFFh))*8+SLOT_BASE]
+  else if v eq [(edx-(TASK_TABLE and 1FFFFFFFh))*8+SLOT_BASE]
         int3
   else
         lea     r, v
   end if
 }
 
-macro mov r, v {
-  if v eq (HEAP_BASE-OS_BASE-CLEAN_ZONE) / 4
-        int3
-  else
-        mov     r, v
-  end if
-}
+;macro mov r, v {
+;  if v eq (HEAP_BASE-OS_BASE-CLEAN_ZONE) / 4
+;        int3
+;  else
+;        mov     r, v
+;  end if
+;}
 
 include 'kernel.asm'
 
@@ -727,8 +725,8 @@ uglobal
 align 64
 os_base:        rb 0x1000
 window_data:    rb 0x2000
-CURRENT_TASK:   rb 4
-TASK_COUNT:     rb 12
+TASK_TABLE:     rb 4
+                rb 12
 TASK_BASE       rd 4
 TASK_DATA       rd 0x7f8
 TASK_EVENT = TASK_DATA
@@ -746,7 +744,7 @@ BTN_ADDR        dd ?
 MEM_AMOUNT      rd 0x1d
 SYS_SHUTDOWN    db ?
 sys_proc        rd 0x800
-rb 0xb142       ; align SLOT_BASE on 0x10000
+rb 0xb182       ; align SLOT_BASE on 0x10000
 SLOT_BASE:      rd 0x8000
 VGABasePtr      rb 640*480
 ;rb 0x582        ; align HEAP_BASE on page boundary

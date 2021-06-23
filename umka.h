@@ -560,24 +560,25 @@ typedef struct {
     int (*wait_test)(void);        // +96
     void *wait_param;              // +100
     void *tls_base;                // +104
-    uint32_t pad2;                 // +108
-    uint32_t event_filter;         // +112
+    uint32_t event_mask;           // +108
+    uint32_t tid;                  // +112
     uint32_t draw_bgr_x;           // +116
     uint32_t draw_bgr_y;           // +120
-    uint32_t pad3;                 // +124
+    uint8_t state;                 // +124
+    uint8_t pad2[3];               // +125
     uint8_t *wnd_shape;            // +128
     uint32_t wnd_shape_scale;      // +132
-    uint32_t pad4;                 // +136
-    uint32_t pad5;                 // +140
+    uint32_t mem_start;            // +136
+    uint32_t counter_sum;          // +140
     box_t saved_box;               // +144
     uint32_t *ipc_start;           // +160
     size_t ipc_size;               // +164
-    uint32_t event_mask;           // +168
+    uint32_t occurred_events;      // +168
     uint32_t debugger_slot;        // +172
     uint32_t terminate_protection; // +176
     uint8_t keyboard_mode;         // +180
     uint8_t captionEncoding;       // +181
-    uint8_t pad6[2];               // +182
+    uint8_t pad3[2];               // +182
     char *exec_params;             // +184
     void *dbg_event_mem;           // +188
     dbg_regs_t dbg_regs;           // +192
@@ -585,7 +586,9 @@ typedef struct {
     box_t wnd_clientbox;           // +216
     uint32_t priority;             // +232
     lhead_t in_schedule;           // +236
-    uint32_t pad8[3];              // +244
+    uint32_t counter_add;          // +244
+    uint32_t cpu_usage;            // +248
+    uint32_t pad4;                 // +252
 } appdata_t;
 
 _Static_assert(sizeof(appdata_t) == 256, "must be 0x100 bytes long");
@@ -619,8 +622,6 @@ _Static_assert(sizeof(taskdata_t) == 32, "must be 0x20 bytes long");
 extern appdata_t *kos_scheduler_current[NR_SCHED_QUEUES];
 
 extern uint32_t umka_tool;
-extern uint32_t kos_current_task;
-extern appdata_t *kos_current_slot;
 extern size_t kos_task_count;
 extern taskdata_t *kos_task_base;
 extern taskdata_t kos_task_data[];
