@@ -130,7 +130,6 @@ BTN_BUFF equ __pew15
 BTN_ADDR equ __pew16
 MEM_AMOUNT equ __pew17
 SYS_SHUTDOWN equ __pew18
-;TASK_COUNT equ __pew19
 SLOT_BASE equ __pew20
 sys_proc equ __pew21
 VGABasePtr equ __pew22
@@ -145,7 +144,6 @@ restore TASK_BASE,TASK_DATA,TASK_EVENT,CDDataBuf,idts,WIN_STACK,WIN_POS
 restore FDD_BUFF,WIN_TEMP_XY,KEY_COUNT,KEY_BUFF,BTN_COUNT,BTN_BUFF,BTN_ADDR
 restore MEM_AMOUNT,SYS_SHUTDOWN,SLOT_BASE,sys_proc,VGABasePtr
 restore HEAP_BASE
-;restore TASK_COUNT
 purge BOOT_LO,BOOT
 
 LFB_BASE = lfb_base
@@ -697,14 +695,6 @@ macro lea r, v {
         lea     r, v
   end if
 }
-
-;macro mov r, v {
-;  if v eq (HEAP_BASE-OS_BASE-CLEAN_ZONE) / 4
-;        int3
-;  else
-;        mov     r, v
-;  end if
-;}
 
 include 'kernel.asm'
 

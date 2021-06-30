@@ -1248,7 +1248,12 @@ shell_blit_bitmap(int argc, char **argv) {
         fputs(usage, fout);
         return;
     }
-    FILE *f = fopen(argv[1], "r");
+    const char *fname = argv[1];
+    FILE *f = fopen(fname, "r");
+    if (!f) {
+        fprintf(fout, "[!] can't open file '%s': %s\n", fname, strerror(errno));
+        return;
+    }
     fseek(f, 0, SEEK_END);
     size_t fsize = ftell(f);
     rewind(f);
