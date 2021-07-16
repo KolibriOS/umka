@@ -97,7 +97,7 @@ macro int n {
   end if
 }
 
-section '.text' executable align 32
+section '.text' executable align 64
 
 coverage_begin:
 
@@ -105,7 +105,9 @@ include 'macros.inc'
 
 macro diff16 msg,blah2,blah3 {
   if msg eq "end of .data segment"
-    section '.bss' writeable align 64
+; fasm doesn't align on 65536, but ld script does
+section '.bss.aligned65k' writeable align 65536
+bss_base:
   end if
 }
 include 'proc32.inc'
@@ -191,10 +193,22 @@ macro call target {
         call    target
   end if
 }
+macro mov r, v {
+  if r eq byte [current_slot_idx] & v eq bh
+        push    eax
+        mov     eax, ebx
+        sub     eax, SLOT_BASE
+        shr     eax, BSF sizeof.APPDATA
+        mov     [current_slot_idx], eax
+        pop     eax
+  else
+        mov     r, v
+  end if
+}
 do_change_task equ hjk
 irq0 equ jhg
 include 'core/sched.inc'
-purge call
+purge call, mov
 restore irq0
 include 'core/syscall.inc'
 ;include 'core/fpu.inc'
@@ -277,21 +291,12 @@ proc kos_time_to_epoch c uses ebx esi edi ebp, _time
 endp
 
 proc umka._.check_alignment
-        mov     eax, SLOT_BASE
-        and     eax, 0xffff     ; 65k
-        jz      @f
-        mov     ecx, 0x10000
-        sub     ecx, eax
-        DEBUGF 4, "SLOT_BASE must be aligned on 0x10000: 0x%x", SLOT_BASE
-        DEBUGF 4, ", add 0x%x or sub 0x%x\n", ecx, eax
-        int3
-@@:
         mov     eax, HEAP_BASE
-        and     eax, 0xfff      ; page
+        and     eax, PAGE_SIZE - 1
         jz      @f
-        mov     ecx, 0x1000
+        mov     ecx, PAGE_SIZE
         sub     ecx, eax
-        DEBUGF 4, "HEAP_BASE must be aligned on 0x1000: 0x%x", HEAP_BASE
+        DEBUGF 4, "HEAP_BASE must be aligned on PAGE_SIZE: 0x%x", HEAP_BASE
         DEBUGF 4, ", add 0x%x or sub 0x%x\n", ecx, eax
         int3
 @@:
@@ -734,11 +739,11 @@ BTN_ADDR        dd ?
 MEM_AMOUNT      rd 0x1d
 SYS_SHUTDOWN    db ?
 sys_proc        rd 0x800
-rb 0xb102       ; align SLOT_BASE on 0x10000
 SLOT_BASE:      rd 0x8000
 VGABasePtr      rb 640*480
-;rb 0x582        ; align HEAP_BASE on page boundary
-HEAP_BASE       rb UMKA_MEMORY_BYTES - (HEAP_BASE-os_base+4096*sizeof.MEM_BLOCK)
+                rb PAGE_SIZE - (($-bss_base) AND (PAGE_SIZE-1)) ; align on page
+HEAP_BASE       rb UMKA_MEMORY_BYTES - (HEAP_BASE - os_base + \
+                                        PAGE_SIZE * sizeof.MEM_BLOCK)
 endg
 
 uglobal
