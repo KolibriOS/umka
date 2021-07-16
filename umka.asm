@@ -173,7 +173,7 @@ macro add r, v {
 macro stdcall target, [args] {
 common
   if target eq is_region_userspace
-        test    esp, esp        ; clear zf
+        cmp     esp, esp        ; ZF
   else
         stdcall target, args
   end if
@@ -734,7 +734,7 @@ BTN_ADDR        dd ?
 MEM_AMOUNT      rd 0x1d
 SYS_SHUTDOWN    db ?
 sys_proc        rd 0x800
-rb 0xb182       ; align SLOT_BASE on 0x10000
+rb 0xb102       ; align SLOT_BASE on 0x10000
 SLOT_BASE:      rd 0x8000
 VGABasePtr      rb 640*480
 ;rb 0x582        ; align HEAP_BASE on page boundary
