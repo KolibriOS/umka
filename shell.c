@@ -567,7 +567,7 @@ shell_dump_taskdata(int argc, char **argv) {
         return;
     }
     int idx = strtol(argv[1], NULL, 0);
-    taskdata_t *t = kos_task_data + idx;
+    taskdata_t *t = kos_task_table + idx;
     fprintf(fout, "event_mask: %" PRIx32 "\n", t->event_mask);
     fprintf(fout, "pid: %" PRId32 "\n", t->pid);
     fprintf(fout, "state: 0x%" PRIx8 "\n", t->state);

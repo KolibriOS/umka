@@ -32,7 +32,12 @@ public sha3_256_oneshot as 'hash_oneshot'
 public kos_time_to_epoch
 public umka_init
 
+public current_process as 'kos_current_process'
+public current_slot as 'kos_current_slot'
+public current_slot_idx as 'kos_current_slot_idx'
+
 public thread_count as 'kos_thread_count'
+public TASK_TABLE as 'kos_task_table'
 public TASK_BASE as 'kos_task_base'
 public TASK_DATA as 'kos_task_data'
 public SLOT_BASE as 'kos_slot_base'
@@ -192,18 +197,18 @@ macro call target {
         call    target
   end if
 }
-macro mov r, v {
-  if r eq byte [current_slot_idx] & v eq bh
-        push    eax
-        mov     eax, ebx
-        sub     eax, SLOT_BASE
-        shr     eax, BSF sizeof.APPDATA
-        mov     [current_slot_idx], eax
-        pop     eax
-  else
-        mov     r, v
-  end if
-}
+;macro mov r, v {
+;  if r eq byte [current_slot_idx] & v eq bh
+;        push    eax
+;        mov     eax, ebx
+;        sub     eax, SLOT_BASE
+;        shr     eax, BSF sizeof.APPDATA
+;        mov     [current_slot_idx], eax
+;        pop     eax
+;  else
+;        mov     r, v
+;  end if
+;}
 do_change_task equ hjk
 irq0 equ jhg
 include 'core/sched.inc'
@@ -719,15 +724,14 @@ uglobal
 align 64
 os_base:        rb PAGE_SIZE
 window_data:    rb sizeof.WDATA * 256
-TASK_TABLE:     rb 4
-                rb 12
-TASK_BASE       rd 4
-TASK_DATA       rd 0x7f8
-CDDataBuf:      rd 0x1840
-idts            rd 0x3c0
-WIN_STACK       rw 0x200
-WIN_POS         rw 0x600
-FDD_BUFF        rb 0x2300
+TASK_TABLE:     rb 16
+TASK_BASE:      rd 4
+TASK_DATA:      rd sizeof.TASKDATA * 255 / 4
+CDDataBuf:      rb 0x1000
+idts            rb IRQ_RESERVED * 8     ; IDT descriptor is 8 bytes long
+WIN_STACK       rw 0x200        ; why not 0x100?
+WIN_POS         rw 0x200
+FDD_BUFF:       rb 0x400
 WIN_TEMP_XY     rb 0x100
 KEY_COUNT       db ?
 KEY_BUFF        rb 255  ; 120*2 + 2*2 = 244 bytes, actually 255 bytes
@@ -736,7 +740,8 @@ BTN_BUFF        rd 0x261
 BTN_ADDR        dd ?
 MEM_AMOUNT      rd 0x1d
 SYS_SHUTDOWN    db ?
-sys_proc:       rb sizeof.TASKDATA * 256
+sys_proc:       rb sizeof.PROC * 256
+                rb 0x10000 - (($-bss_base) AND (0x10000-1)) ; align on 0x10000
 SLOT_BASE:      rb sizeof.APPDATA * 256
 VGABasePtr      rb 640*480
                 rb PAGE_SIZE - (($-bss_base) AND (PAGE_SIZE-1)) ; align on page

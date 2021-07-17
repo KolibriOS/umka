@@ -624,7 +624,7 @@ extern appdata_t *kos_scheduler_current[NR_SCHED_QUEUES];
 extern uint32_t umka_tool;
 extern size_t kos_task_count;
 extern taskdata_t *kos_task_base;
-extern taskdata_t kos_task_data[];
+extern taskdata_t kos_task_table[];
 extern appdata_t kos_slot_base[];
 extern void umka_do_change_task(appdata_t *new);
 extern void scheduler_add_thread(void);

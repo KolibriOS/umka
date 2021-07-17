@@ -42,42 +42,36 @@ font smoothing: 0 - off
 0x007e7e7e work_graph
 /> set_window_colors 0 0 0 0 0 0 0 0 0 0
 
-/> dump_win_stack 5
+/> dump_win_stack 2
   0:   0
   1:   1
-  2:   2
-  3:   3
-  4:   4
-/> dump_win_pos 5
+/> dump_win_pos 2
   0:   0
   1:   1
-  2:   2
-  3:   3
-  4:   4
-/> dump_taskdata 5
+/> dump_taskdata 2
 event_mask: 0
-pid: 0
+pid: 2
 state: 0x0
-wnd_number: 0
+wnd_number: 2
 counter_sum: 0
 counter_add: 0
 cpu_usage: 0
-/> dump_appdata 5
-app_name: 
+/> dump_appdata 2
+app_name: OS
 except_mask: 0
 dbg_state: 0
-cur_dir: (null)
+cur_dir: 
 draw_bgr_x: 0
 draw_bgr_y: 0
 event_mask: 0
-terminate_protection: 0
+terminate_protection: 1
 keyboard_mode: 0
 captionEncoding: 0
 exec_params: (null)
-wnd_caption: (null)
-wnd_clientbox (ltwh): 0 0 0 0
+wnd_caption: 
+wnd_clientbox (ltwh): 5 24 291 172
 priority: 0
-in_schedule: prev (4294306402), next (4294306402)
+in_schedule: prev (2), next (2)
 
 /> process_info -1
 cpu_usage: 0
