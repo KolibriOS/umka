@@ -30,6 +30,8 @@ set_window_colors 0 0 0 0 0 0 0 0 0 0
 
 dump_win_stack 5
 dump_win_pos 5
+dump_taskdata 5
+dump_appdata 5
 
 process_info -1
 get_skin_height

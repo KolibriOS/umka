@@ -54,6 +54,30 @@ font smoothing: 0 - off
   2:   2
   3:   3
   4:   4
+/> dump_taskdata 5
+event_mask: 0
+pid: 0
+state: 0x0
+wnd_number: 0
+counter_sum: 0
+counter_add: 0
+cpu_usage: 0
+/> dump_appdata 5
+app_name: 
+except_mask: 0
+dbg_state: 0
+cur_dir: (null)
+draw_bgr_x: 0
+draw_bgr_y: 0
+event_mask: 0
+terminate_protection: 0
+keyboard_mode: 0
+captionEncoding: 0
+exec_params: (null)
+wnd_caption: (null)
+wnd_clientbox (ltwh): 0 0 0 0
+priority: 0
+in_schedule: prev (4294306402), next (4294306402)
 
 /> process_info -1
 cpu_usage: 0

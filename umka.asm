@@ -118,7 +118,6 @@ window_data equ __pew01
 TASK_TABLE equ __pew02
 TASK_BASE equ __pew03
 TASK_DATA equ __pew04
-TASK_EVENT equ __pew05
 CDDataBuf equ __pew06
 idts equ __pew07
 WIN_STACK equ __pew08
@@ -142,7 +141,7 @@ HEAP_BASE equ __pew23
 include 'const.inc'
 restore window_data
 restore TASK_TABLE
-restore TASK_BASE,TASK_DATA,TASK_EVENT,CDDataBuf,idts,WIN_STACK,WIN_POS
+restore TASK_BASE,TASK_DATA,CDDataBuf,idts,WIN_STACK,WIN_POS
 restore FDD_BUFF,WIN_TEMP_XY,KEY_COUNT,KEY_BUFF,BTN_COUNT,BTN_BUFF,BTN_ADDR
 restore MEM_AMOUNT,SYS_SHUTDOWN,SLOT_BASE,sys_proc,VGABasePtr
 restore HEAP_BASE
@@ -718,13 +717,12 @@ fpu_owner dd ?
 
 uglobal
 align 64
-os_base:        rb 0x1000
-window_data:    rb 0x2000
+os_base:        rb PAGE_SIZE
+window_data:    rb sizeof.WDATA * 256
 TASK_TABLE:     rb 4
                 rb 12
 TASK_BASE       rd 4
 TASK_DATA       rd 0x7f8
-TASK_EVENT = TASK_DATA
 CDDataBuf:      rd 0x1840
 idts            rd 0x3c0
 WIN_STACK       rw 0x200
@@ -738,8 +736,8 @@ BTN_BUFF        rd 0x261
 BTN_ADDR        dd ?
 MEM_AMOUNT      rd 0x1d
 SYS_SHUTDOWN    db ?
-sys_proc        rd 0x800
-SLOT_BASE:      rd 0x8000
+sys_proc:       rb sizeof.TASKDATA * 256
+SLOT_BASE:      rb sizeof.APPDATA * 256
 VGABasePtr      rb 640*480
                 rb PAGE_SIZE - (($-bss_base) AND (PAGE_SIZE-1)) ; align on page
 HEAP_BASE       rb UMKA_MEMORY_BYTES - (HEAP_BASE - os_base + \
