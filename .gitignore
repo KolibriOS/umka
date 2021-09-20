@@ -31,3 +31,4 @@ covpreproc
 *.dsl
 *.aml
 ignore.*
+t.d

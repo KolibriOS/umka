@@ -1817,8 +1817,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
-aml._.type1opcode begin
-aml._.type1opcode end
+aml._.statement_opcode begin
+aml._.statement_opcode end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x000001CF
@@ -1849,8 +1849,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
-aml._.type1opcode begin
-aml._.type1opcode end
+aml._.statement_opcode begin
+aml._.statement_opcode end
 aml._.store begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -1891,8 +1891,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
-aml._.type1opcode begin
-aml._.type1opcode end
+aml._.statement_opcode begin
+aml._.statement_opcode end
 aml._.store begin
 aml._.term_arg begin
 aml._.concat begin
@@ -2011,8 +2011,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
-aml._.type1opcode begin
-aml._.type1opcode end
+aml._.statement_opcode begin
+aml._.statement_opcode end
 aml._.name_string begin
 aml._.name_string begin again
 offset: 0x000001D5
@@ -2059,8 +2059,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
-aml._.type1opcode begin
-aml._.type1opcode end
+aml._.statement_opcode begin
+aml._.statement_opcode end
 aml._.store begin
 aml._.term_arg begin
 aml._.name_string begin
@@ -2101,8 +2101,8 @@ aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.named_obj end
 aml._.object end
-aml._.type1opcode begin
-aml._.type1opcode end
+aml._.statement_opcode begin
+aml._.statement_opcode end
 aml._.store begin
 aml._.term_arg begin
 aml._.concat begin

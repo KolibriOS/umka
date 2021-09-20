@@ -675,6 +675,7 @@ init_BIOS32:
 mem_test:
 init_mem:
 init_page_map:
+ahci_init:
         ret
 
 alloc_pages:
