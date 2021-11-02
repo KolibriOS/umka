@@ -5,9 +5,9 @@ table #0
 
 /> acpi_enable
 acpi.aml.process_table begin
-table length 0x00000032
+table length 0x0000012C
 Table signature: 'DSDT'
-Table length (with header): 0x00000032
+Table length (with header): 0x0000012C
 Revision: 0x01
 OEM ID: 'UMKA '
 OEM Table ID: 'UMKADSDT'
@@ -44,13 +44,64 @@ table/position: [0x0000002B]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
+aml._.name begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000002C
+aml._.name_path begin
+aml._.name_path end
+name_string: REF5
+aml._.name_string end
+aml._.get_node_by_name begin
+name: ''
+aml._.get_node_by_name end
+aml._.data_ref_object begin
+aml._.data_object begin
+aml._.computational_data begin
+aml._.byte_const begin
+aml._.byte_const end
+aml._.computational_data end
+aml._.data_object end
+aml._.data_ref_object end
+aml._.name end
+aml._.namespace_modifier_obj end
+aml._.object end
+aml._.term_obj end
+table/position: [0x00000032]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
 aml._.namespace_modifier_obj end
 aml._.named_obj begin
 aml._.method begin
-pkg_length: 0x00000006
+pkg_length: 0x000000EA
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0x0000002D
+offset: 0x00000035
+aml._.name_path begin
+aml._.name_path end
+name_string: AREF
+aml._.name_string end
+aml._.attach_node begin
+aml._.get_node_by_name begin
+name: ''
+aml._.get_node_by_name end
+aml._.attach_node end
+aml._.method end
+aml._.named_obj end
+aml._.object end
+aml._.term_obj end
+table/position: [0x0000011D]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.method begin
+pkg_length: 0x0000000E
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000011F
 aml._.name_path begin
 aml._.name_path end
 name_string: MAIN
@@ -65,7 +116,9 @@ aml._.named_obj end
 aml._.object end
 aml._.term_obj end
 ==========ACPI_TREE==========
-\MAIN Method         length:0x00000000 Args:0 serialize:0 sync_level:0
+\MAIN Method         length:0x00000008 Args:0 serialize:0 sync_level:0
+\AREF Method         length:0x000000E3 Args:1 serialize:0 sync_level:0
+\REF5 Integer        = 0x0000000000000002
 \INT5 Integer        = 0x0000000000000005
 \_TZ_ Scope         
 \_SI_ Scope         
@@ -75,7 +128,9 @@ aml._.term_obj end
 -----------------------------
 acpi.aml.process_table end
 ==========ACPI_TREE==========
-\MAIN Method         length:0x00000000 Args:0 serialize:0 sync_level:0
+\MAIN Method         length:0x00000008 Args:0 serialize:0 sync_level:0
+\AREF Method         length:0x000000E3 Args:1 serialize:0 sync_level:0
+\REF5 Integer        = 0x0000000000000002
 \INT5 Integer        = 0x0000000000000005
 \_TZ_ Scope         
 \_SI_ Scope         
@@ -85,11 +140,11 @@ acpi.aml.process_table end
 -----------------------------
 
 /> acpi_get_node_alloc_cnt
-nodes allocated: 9
+nodes allocated: 11
 /> acpi_get_node_free_cnt
 nodes freed: 0
 /> acpi_get_node_cnt
-nodes in namespace: 9
+nodes in namespace: 11
 
 /> acpi_call \MAIN
 acpi.call_name begin
@@ -98,17 +153,270 @@ name: '\MAIN'
 aml._.get_node_by_name end
 acpi.call_node begin
 # func name MAIN
-# bytes 0x00000000
-# bytes 0x00000000
-# bytes 0xDF590000
-acpi.call_node end
-acpi.call_name end
-calling acpi method: '\MAIN'
-acpi method returned
+# bytes 0x46455241
+# bytes 0x35544E49
+# bytes 0x0001DE69
+table/position: [0x00000124]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000124
+aml._.name_path begin
+aml._.name_path end
+name_string: AREF
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'AREF'
+aml._.get_node_by_name end
+aml._.method_invocation begin
+arg_count: 1
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000128
+aml._.name_path begin
+aml._.name_path end
+name_string: INT5
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'INT5'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000128
+aml._.name_path begin
+aml._.name_path end
+name_string: INT5
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'INT5'
+aml._.get_node_by_name end
+aml._.term_arg end
+table/position: [0x0000003A]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000003B
+aml._.name_path begin
+aml._.name_path end
+name_string: INT5
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'INT5'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000003B
+aml._.name_path begin
+aml._.name_path end
+name_string: INT5
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'INT5'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.debug_obj begin
+aml._.debug_obj end
+aml._.super_name end
+aml._.store_table begin
+types 2 to 19
+aml._.store_table.integer_to_debug_object begin
+AML_DBG: 0x0000000000000005
+aml._.store_table.integer_to_debug_object end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+table/position: [0x00000041]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.arg_obj begin
+aml._.arg_obj end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.debug_obj begin
+aml._.debug_obj end
+aml._.super_name end
+aml._.store_table begin
+types 2 to 19
+aml._.store_table.integer_to_debug_object begin
+AML_DBG: 0x0000000000000005
+aml._.store_table.integer_to_debug_object end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+table/position: [0x00000045]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000046
+aml._.name_path begin
+aml._.name_path end
+name_string: REF5
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'REF5'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000046
+aml._.name_path begin
+aml._.name_path end
+name_string: REF5
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'REF5'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.debug_obj begin
+aml._.debug_obj end
+aml._.super_name end
+aml._.store_table begin
+types 2 to 19
+aml._.store_table.integer_to_debug_object begin
+AML_DBG: 0x0000000000000002
+aml._.store_table.integer_to_debug_object end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+table/position: [0x0000004C]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.string begin
+aml._.string end
+aml._.computational_data end
+aml._.data_object end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.debug_obj begin
+aml._.debug_obj end
+aml._.super_name end
+aml._.store_table begin
+types 3 to 19
+aml._.store_table.string_to_debug_object begin
+AML_DBG: 
 
-/> acpi_get_node_alloc_cnt
-nodes allocated: 9
-/> acpi_get_node_free_cnt
-nodes freed: 0
-/> acpi_get_node_cnt
-nodes in namespace: 9
+aml._.store_table.string_to_debug_object end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+table/position: [0x00000052]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.type1opcode begin
+aml._.type1opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string end
+error: unknown term_arg: 0x71
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.name_string begin
+aml._.name_string end
+aml._.super_name end
+aml._.store end
+aml._.name_string begin
+aml._.name_string end
+aml._.term_obj end
+error: unknown bytes: 0x7168

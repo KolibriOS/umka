@@ -1,3 +1,4 @@
+umka_init
 disk_add ../img/xfs_v4_btrees_l2.img hd0 -c 0
 
 ls80 /hd0/1/dir_btree_l2 -f 0 -c 1

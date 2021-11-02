@@ -1,3 +1,4 @@
+umka_init
 pci_set_path machines/002/pci
 
 # some _ADR's are methods with memory access

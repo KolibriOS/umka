@@ -10,8 +10,6 @@ UMKA_FUSE  = 2
 UMKA_OS    = 3
 
 UMKA_MEMORY_BYTES = 256 SHL 20
-UMKA_DISPLAY_WIDTH = 400
-UMKA_DISPLAY_HEIGHT = 300
 
 public disk_add
 public disk_del
@@ -41,6 +39,7 @@ public TASK_TABLE as 'kos_task_table'
 public TASK_BASE as 'kos_task_base'
 public TASK_DATA as 'kos_task_data'
 public SLOT_BASE as 'kos_slot_base'
+public window_data as 'kos_window_data'
 
 public WIN_STACK as 'kos_win_stack'
 public WIN_POS as 'kos_win_pos'
@@ -67,7 +66,7 @@ public draw_data
 public img_background
 public mem_BACKGROUND
 public sys_background
-public REDRAW_BACKGROUND
+public REDRAW_BACKGROUND as 'kos_redraw_background'
 public new_sys_threads as 'kos_new_sys_threads'
 public osloop as 'kos_osloop'
 public set_mouse_data as 'kos_set_mouse_data'
@@ -77,6 +76,11 @@ public net_buff_alloc as 'kos_net_buff_alloc'
 
 public mem_block_list
 public pci_root
+
+public window._.set_screen as 'kos_window_set_screen'
+public _display as 'kos_display'
+
+public BOOT as 'kos_boot'
 
 macro cli {
         pushfd
@@ -279,6 +283,7 @@ include 'acpi/acpi.inc'
 
 include 'unpacker.inc'
 
+LIBCRASH_CTX_LEN = 0x500   ; FIXME
 include 'sha3.asm'
 
 ; TODO: stdcall attribute in umka.h
@@ -308,6 +313,7 @@ proc umka._.check_alignment
 endp
 
 proc umka_init c uses ebx esi edi ebp
+        mov     [umka_initialized], 1
         call    umka._.check_alignment
 
         mov     edi, endofcode
@@ -362,10 +368,6 @@ proc umka_init c uses ebx esi edi ebp
         add     eax, PROC.thr_list
         list_init eax
 
-        mov     [BOOT.bpp], 32
-        mov     [BOOT.x_res], UMKA_DISPLAY_WIDTH
-        mov     [BOOT.y_res], UMKA_DISPLAY_HEIGHT
-        mov     [BOOT.pitch], UMKA_DISPLAY_WIDTH*4
         mov     [BOOT.lfb], LFB_BASE
         call    init_video
 
@@ -719,7 +721,14 @@ coverage_end:
 section '.data.aligned65k' writeable align 65536
 public umka_tool
 umka_tool dd ?
+public umka_initialized
+umka_initialized dd 0
 fpu_owner dd ?
+
+BOOT boot_data
+virtual at BOOT
+BOOT_LO boot_data
+end virtual
 
 uglobal
 align 64
@@ -772,10 +781,6 @@ ide_channel8_mutex MUTEX
 
 lfb_base        rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
 
-BOOT boot_data
-virtual at BOOT
-BOOT_LO boot_data
-end virtual
 align 4096
 cur_dir:
 .encoding rb 1

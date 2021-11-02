@@ -1,3 +1,4 @@
+umka_init
 #disk_add ../img/kolibri.img rd -c 0
 ramdisk_init ../img/kolibri.img
 set_skin /sys/DEFAULT.SKN

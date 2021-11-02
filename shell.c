@@ -193,9 +193,11 @@ get_last_dir(const char *path) {
 static void
 prompt() {
     if (cur_dir_changed) {
-        COVERAGE_ON();
-        umka_sys_get_cwd(cur_dir, PATH_MAX);
-        COVERAGE_OFF();
+        if (umka_initialized) {
+            COVERAGE_ON();
+            umka_sys_get_cwd(cur_dir, PATH_MAX);
+            COVERAGE_OFF();
+        }
         last_dir = get_last_dir(cur_dir);
         cur_dir_changed = false;
     }
@@ -234,6 +236,51 @@ split_args(char *s, char **argv) {
     int argc = -1;
     for (; (argv[++argc] = strtok(s, " \t\n\r")) != NULL; s = NULL);
     return argc;
+}
+
+static void
+shell_umka_init(int argc, char **argv) {
+    const char *usage = \
+        "usage: umka_init";
+    (void)argv;
+    if (argc < 0) {
+        fputs(usage, fout);
+        return;
+    }
+    COVERAGE_ON();
+    umka_init();
+    COVERAGE_OFF();
+}
+
+static void
+shell_umka_set_boot_params(int argc, char **argv) {
+    const char *usage = \
+        "usage: umka_set_boot_params [--x_res <num>] [--y_res <num>]\n"
+        "  --x_res <num>    screen width\n"
+        "  --y_res <num>    screen height";
+
+    argc -= 1;
+    argv += 1;
+
+    while (argc) {
+        if (!strcmp(argv[0], "--x_res") && argc > 1) {
+            kos_boot.x_res = strtoul(argv[1], NULL, 0);
+            kos_boot.pitch = kos_boot.x_res * 4;    // assume 32bpp
+            argc -= 2;
+            argv += 2;
+            continue;
+        } else if (!strcmp(argv[0], "--y_res") && argc > 1) {
+            kos_boot.y_res = strtoul(argv[1], NULL, 0);
+            argc -= 2;
+            argv += 2;
+            continue;
+        } else {
+            printf("bad option: %s\n", argv[0]);
+            puts(usage);
+            exit(1);
+        }
+    }
+
 }
 
 static void
@@ -498,6 +545,23 @@ shell_dump_win_pos(int argc, char **argv) {
 }
 
 static void
+shell_dump_win_map(int argc, char **argv) {
+    const char *usage = \
+        "usage: dump_win_map";
+    (void)argv;
+    if (argc < 0) {
+        fputs(usage, fout);
+        return;
+    }
+    for (size_t y = 0; y < kos_display.height; y++) {
+        for (size_t x = 0; x < kos_display.width; x++) {
+            fputc(kos_display.win_map[y * kos_display.width + x] + '0', fout);
+        }
+        fputc('\n', fout);
+    }
+}
+
+static void
 shell_dump_appdata(int argc, char **argv) {
     const char *usage = \
         "usage: dump_appdata <index> [-p]\n"
@@ -575,6 +639,55 @@ shell_dump_taskdata(int argc, char **argv) {
     fprintf(fout, "counter_sum: %" PRIu32 "\n", t->counter_sum);
     fprintf(fout, "counter_add: %" PRIu32 "\n", t->counter_add);
     fprintf(fout, "cpu_usage: %" PRIu32 "\n", t->cpu_usage);
+}
+
+static void
+shell_switch_to_thread(int argc, char **argv) {
+    const char *usage = \
+        "usage: switch_to_thread <tid>\n"
+        "  <tid>          thread id to switch to";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
+    uint8_t tid = strtoul(argv[1], NULL, 0);
+    kos_current_slot_idx = tid;
+    kos_task_base = kos_task_table + tid;
+    kos_current_slot = kos_slot_base + tid;
+}
+
+static void
+shell_set(int argc, char **argv) {
+    const char *usage = \
+        "usage: set <var> <value>\n"
+        "  <var>          variable to set\n"
+        "  <value>        decimal or hex value";
+    if (argc != 3) {
+        fputs(usage, fout);
+        return;
+    }
+    const char *var = argv[1];
+    size_t value = strtoul(argv[2], NULL, 0);
+    if (!strcmp(var, "redraw_background")) {
+        kos_redraw_background = value;
+    } else {
+        printf("bad option: %s\n", argv[0]);
+        puts(usage);
+        exit(1);
+    }
+}
+
+static void
+shell_new_sys_thread(int argc, char **argv) {
+    const char *usage = \
+        "usage: new_sys_thread";
+    if (!argc) {
+        fputs(usage, fout);
+        return;
+    }
+    (void)argv;
+    size_t tid = umka_new_sys_threads(0, NULL, NULL);
+    fprintf(fout, "tid: %u\n", tid);
 }
 
 static void
@@ -2580,6 +2693,8 @@ shell_bg_unmap(int argc, char **argv) {
 static void shell_help(int argc, char **argv);
 
 func_table_t shell_cmds[] = {
+    { "umka_init",               shell_umka_init },
+    { "umka_set_boot_params",    shell_umka_set_boot_params },
     { "acpi_call",               shell_acpi_call },
     { "acpi_enable",             shell_acpi_enable },
     { "acpi_get_usage",          shell_acpi_get_usage },
@@ -2598,6 +2713,7 @@ func_table_t shell_cmds[] = {
     { "blit_bitmap",             shell_blit_bitmap },
     { "button",                  shell_button },
     { "cd",                      shell_cd },
+    { "set",                     shell_set },
     { "disk_add",                shell_disk_add },
     { "disk_del",                shell_disk_del },
     { "display_number",          shell_display_number },
@@ -2608,6 +2724,7 @@ func_table_t shell_cmds[] = {
     { "dump_taskdata",           shell_dump_taskdata },
     { "dump_win_pos",            shell_dump_win_pos },
     { "dump_win_stack",          shell_dump_win_stack },
+    { "dump_win_map",            shell_dump_win_map },
     { "exec",                    shell_exec },
     { "get_font_size",           shell_get_font_size },
     { "get_font_smoothing",      shell_get_font_smoothing },
@@ -2677,6 +2794,8 @@ func_table_t shell_cmds[] = {
     { "stat80",                  shell_stat80 },
     { "window_redraw",           shell_window_redraw },
     { "write_text",              shell_write_text },
+    { "switch_to_thread",        shell_switch_to_thread },
+    { "new_sys_thread",          shell_new_sys_thread },
 };
 
 static void

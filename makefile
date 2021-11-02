@@ -29,7 +29,7 @@ umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o trace_lbr.o \
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static -T umka.ld
 
 umka.o umka.fas: umka.asm
-	INCLUDE="$(KOLIBRIOS)/kernel/trunk;$(KOLIBRIOS)/programs/develop/libraries/libcrash/trunk" \
+	INCLUDE="$(KOLIBRIOS)/kernel/trunk;$(KOLIBRIOS)/programs/develop/libraries/libcrash/hash" \
             $(FASM) $< umka.o -s umka.fas -m 1234567
 
 shell.o: shell.c

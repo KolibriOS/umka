@@ -1,3 +1,4 @@
+umka_init
 acpi_set_usage 1
 
 acpi_preload_table machines/008/acpi/dsdt.dat

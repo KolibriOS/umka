@@ -44,6 +44,20 @@ _Static_assert(sizeof(process_information_t) == 0x400,
                "must be 0x400 bytes long");
 
 typedef struct {
+    box_t box;
+    uint32_t cl_workarea;
+    uint32_t cl_titlebar;
+    uint32_t cl_frames;
+    uint8_t z_modif;
+    uint8_t fl_wstate;
+    uint8_t fl_wdrawn;
+    uint8_t fl_redraw;
+} __attribute__((packed)) wdata_t;
+
+_Static_assert(sizeof(wdata_t) == 0x20,
+               "must be 0x20 bytes long");
+
+typedef struct {
     uint32_t frame;
     uint32_t grab;
     uint32_t work_3d_dark;
@@ -96,6 +110,8 @@ typedef struct {
     lhead_t  wait_list;
     uint32_t count;
 } mutex_t;
+
+typedef mutex_t rwsem_t;
 
 typedef struct {
     uint32_t flags;
@@ -412,17 +428,23 @@ umka_mouse_move(int lbheld, int mbheld, int rbheld, int xabs, int32_t xmoving,
 __attribute__((__stdcall__)) net_buff_t *
 kos_net_buff_alloc(size_t size);
 
-static inline void
+static inline size_t
 umka_new_sys_threads(uint32_t flags, void (*entry)(), void *stack) {
+    size_t tid;
     __asm__ __inline__ __volatile__ (
-        "pushad;"
+        "push ebx;"
+        "push esi;"
+        "push edi;"
         "call   kos_new_sys_threads;"
-        "popad"
-        :
+        "pop edi;"
+        "pop esi;"
+        "pop ebx"
+        : "=a"(tid)
         : "b"(flags),
           "c"(entry),
           "d"(stack)
         : "memory", "cc");
+    return tid;
 }
 
 static inline void
@@ -481,6 +503,101 @@ kos_net_add_device(net_device_t *dev) {
 
     return dev_num;
 }
+
+__attribute__((__stdcall__)) void
+kos_window_set_screen(ssize_t left, ssize_t top, ssize_t right, ssize_t bottom,
+                      ssize_t proc);
+
+typedef struct {
+    int32_t x;
+    int32_t y;
+    size_t width;
+    size_t height;
+    size_t bits_per_pixel;
+    size_t vrefresh;
+    void *current_lfb;
+    size_t lfb_pitch;
+
+    rwsem_t win_map_lock;
+    uint8_t *win_map;
+    size_t win_map_pitch;
+    size_t win_map_size;
+
+    void *modes;
+    void *ddev;
+    void *connector;
+    void *crtc;
+
+    void *cr_list_next;
+    void *cr_list_prev;
+
+    void *cursor;
+
+    void *init_cursor;
+    void *select_cursor;
+    void *show_cursor;
+    void *move_cursor;
+    void *restore_cursor;
+    void *disable_mouse;
+    size_t mask_seqno;
+    void *check_mouse;
+    void *check_m_pixel;
+
+    size_t bytes_per_pixel;
+} __attribute__((packed)) display_t;
+
+extern display_t kos_display;
+
+typedef struct {
+    uint64_t addr;
+    uint64_t size;
+    uint32_t type;
+} e820entry_t;
+
+#define MAX_MEMMAP_BLOCKS 32
+
+typedef struct {
+    uint8_t bpp;    // bits per pixel
+    uint16_t pitch; // scanline length
+    uint8_t pad1[5];
+    uint16_t vesa_mode;
+    uint16_t x_res;
+    uint16_t y_res;
+    uint8_t pad2[6];
+    uint32_t bank_switch;   // Vesa 1.2 pm bank switch
+    void *lfb;  // Vesa 2.0 LFB address
+    uint8_t mtrr;   // 0 or 1: enable MTRR graphics acceleration
+    uint8_t launcher_start; // 0 or 1: start the first app (right now it's
+                            // LAUNCHER) after kernel is loaded
+    uint8_t debug_print;    // if nonzero, duplicates debug output to the screen
+    uint8_t dma;    // DMA write: 1=yes, 2=no
+    uint8_t pci_data[8];
+    uint8_t pad3[8];
+    uint8_t shutdown_type;  // see sysfn 18.9
+    uint8_t pad4[15];
+    uint32_t apm_entry; // entry point of APM BIOS
+    uint16_t apm_version;   // BCD
+    uint16_t apm_flags;
+    uint8_t pad5[8];
+    uint16_t apm_code_32;
+    uint16_t apm_code_16;
+    uint16_t apm_data_16;
+    uint8_t rd_load_from;   // Device to load ramdisk from, RD_LOAD_FROM_*
+    uint8_t pad6[1];
+    uint16_t kernel_restart;
+    uint16_t sys_disk;  // Device to mount on /sys/, see loader_doc.txt for details
+    void *acpi_rsdp;
+    char syspath[0x17];
+    void *devicesdat_data;
+    size_t devicesdat_size;
+    uint8_t bios_hd_cnt;    // number of BIOS hard disks
+    uint8_t bios_hd[0x80];  // BIOS hard disks
+    size_t memmap_block_cnt;    // available physical memory map: number of blocks
+    e820entry_t memmap_blocks[MAX_MEMMAP_BLOCKS];
+    uint8_t acpi_usage;
+} __attribute__((packed)) boot_data_t;
+
+extern boot_data_t kos_boot;
 
 void
 umka_cli(void);
@@ -622,10 +739,16 @@ _Static_assert(sizeof(taskdata_t) == 32, "must be 0x20 bytes long");
 extern appdata_t *kos_scheduler_current[NR_SCHED_QUEUES];
 
 extern uint32_t umka_tool;
+extern uint32_t umka_initialized;
+extern uint8_t kos_redraw_background;
 extern size_t kos_task_count;
 extern taskdata_t *kos_task_base;
+extern wdata_t kos_window_data[];
 extern taskdata_t kos_task_table[];
 extern appdata_t kos_slot_base[];
+extern uint32_t kos_current_process;
+extern appdata_t *kos_current_slot;
+extern uint32_t kos_current_slot_idx;
 extern void umka_do_change_task(appdata_t *new);
 extern void scheduler_add_thread(void);
 extern void find_next_task(void);

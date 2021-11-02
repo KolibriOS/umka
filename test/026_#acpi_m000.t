@@ -1,3 +1,4 @@
+umka_init
 pci_set_path machines/000/pci
 acpi_set_usage 2
 
