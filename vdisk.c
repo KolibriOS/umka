@@ -37,8 +37,8 @@ void *vdisk_init(const char *fname, int adjust_cache_size, size_t cache_size) {
     return vdisk;
 }
 
-__attribute__((__stdcall__))
-void vdisk_close(void *userdata) {
+STDCALL void
+vdisk_close(void *userdata) {
     COVERAGE_OFF();
     vdisk_t *vdisk = userdata;
     fclose(vdisk->file);
@@ -46,8 +46,8 @@ void vdisk_close(void *userdata) {
     COVERAGE_ON();
 }
 
-__attribute__((__stdcall__))
-int vdisk_read(void *userdata, void *buffer, off_t startsector,
+STDCALL int
+vdisk_read(void *userdata, void *buffer, off_t startsector,
                size_t *numsectors) {
     COVERAGE_OFF();
     vdisk_t *vdisk = userdata;
@@ -57,8 +57,8 @@ int vdisk_read(void *userdata, void *buffer, off_t startsector,
     return ERROR_SUCCESS;
 }
 
-__attribute__((__stdcall__))
-int vdisk_write(void *userdata, void *buffer, off_t startsector,
+STDCALL int
+vdisk_write(void *userdata, void *buffer, off_t startsector,
                 size_t *numsectors) {
     COVERAGE_OFF();
     vdisk_t *vdisk = userdata;
@@ -68,8 +68,8 @@ int vdisk_write(void *userdata, void *buffer, off_t startsector,
     return ERROR_SUCCESS;
 }
 
-__attribute__((__stdcall__))
-int vdisk_querymedia(void *userdata, diskmediainfo_t *minfo) {
+STDCALL int
+vdisk_querymedia(void *userdata, diskmediainfo_t *minfo) {
     COVERAGE_OFF();
     vdisk_t *vdisk = userdata;
     minfo->flags = 0u;
@@ -79,8 +79,8 @@ int vdisk_querymedia(void *userdata, diskmediainfo_t *minfo) {
     return ERROR_SUCCESS;
 }
 
-__attribute__((__stdcall__))
-size_t vdisk_adjust_cache_size(void *userdata, size_t suggested_size) {
+STDCALL size_t
+vdisk_adjust_cache_size(void *userdata, size_t suggested_size) {
     vdisk_t *vdisk = userdata;
     if (vdisk->adjust_cache_size) {
         return vdisk->cache_size;

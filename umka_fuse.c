@@ -35,6 +35,9 @@
 #include "vdisk.h"
 #include "umka.h"
 
+#define UMKA_DEFAULT_DISPLAY_WIDTH 400
+#define UMKA_DEFAULT_DISPLAY_HEIGHT 300
+
 #define DIRENTS_TO_READ 100
 
 static void
@@ -151,6 +154,12 @@ main(int argc, char *argv[]) {
         printf("usage: umka_fuse dir img\n");
         exit(1);
     }
+
+    kos_boot.bpp = 32;
+    kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
+    kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
+    kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
+
     umka_init();
     void *userdata = vdisk_init(argv[2], 1, 0u);
     void *vdisk = disk_add(&vdisk_functions, "hd0", userdata, 0);

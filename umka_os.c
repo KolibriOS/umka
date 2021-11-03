@@ -1,3 +1,22 @@
+/*
+    UMKa - User-Mode KolibriOS developer tools
+    umka_os - kind of KolibriOS rump kernel
+    Copyright (C) 2018--2021  Ivan Baravy <dunkaist@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include <stdlib.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -12,6 +31,9 @@
 #include "umka.h"
 #include "shell.h"
 #include "trace.h"
+
+#define UMKA_DEFAULT_DISPLAY_WIDTH 400
+#define UMKA_DEFAULT_DISPLAY_HEIGHT 300
 
 #define THREAD_STACK_SIZE 0x100000
 
@@ -103,6 +125,11 @@ main() {
     }
 */
     printf("pid=%d, kos_lfb_base=%p\n", getpid(), (void*)kos_lfb_base);
+
+    kos_boot.bpp = 32;
+    kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
+    kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
+    kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
 
     umka_init();
     umka_stack_init();

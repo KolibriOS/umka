@@ -77,6 +77,17 @@ public net_buff_alloc as 'kos_net_buff_alloc'
 public mem_block_list
 public pci_root
 
+public acpi.aml.init as "kos_acpi_aml_init"
+public acpi_root as "kos_acpi_root"
+public aml._.attach as "kos_aml_attach"
+public acpi.fill_pci_irqs as "kos_acpi_fill_pci_irqs"
+public acpi.aml.new_thread as "kos_acpi_aml_new_thread"
+public aml._.alloc_node as "kos_aml_alloc_node"
+public aml._.constructor.integer as "kos_aml_constructor_integer"
+public aml._.constructor.package as "kos_aml_constructor_package"
+public acpi._.lookup_node as "kos_acpi_lookup_node"
+public acpi._.print_tree as "kos_acpi_print_tree"
+
 public window._.set_screen as 'kos_window_set_screen'
 public _display as 'kos_display'
 

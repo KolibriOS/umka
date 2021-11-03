@@ -2,11 +2,10 @@
 #define UMKA_H_INCLUDED
 
 #include <inttypes.h>
-#include <setjmp.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <stddef.h>
-#include <signal.h>
+#include <signal.h> // for irq0: siginfo_t
+
+#define STDCALL __attribute__((__stdcall__))
 
 #define BDFE_LEN_CP866 304
 #define BDFE_LEN_UNICODE 560
@@ -139,19 +138,16 @@ typedef struct disk_t disk_t;
 
 typedef struct {
     uint32_t  strucsize;
-    __attribute__((__stdcall__)) void (*close)(void *userdata);
-    __attribute__((__stdcall__)) void (*closemedia)(void *userdata);
-    __attribute__((__stdcall__)) int (*querymedia)(void *userdata,
-                                                   diskmediainfo_t *info);
-    __attribute__((__stdcall__)) int (*read)(void *userdata, void *buffer,
-                                             off_t startsector,
-                                             size_t *numsectors);
-    __attribute__((__stdcall__)) int (*write)(void *userdata, void *buffer,
-                                              off_t startsector,
-                                              size_t *numsectors);
-    __attribute__((__stdcall__)) int (*flush)(void *userdata);
-    __attribute__((__stdcall__)) unsigned int
-        (*adjust_cache_size)(void *userdata, size_t suggested_size);
+    STDCALL void (*close)(void *userdata);
+    STDCALL void (*closemedia)(void *userdata);
+    STDCALL int (*querymedia)(void *userdata, diskmediainfo_t *info);
+    STDCALL int (*read)(void *userdata, void *buffer, off_t startsector,
+                        size_t *numsectors);
+    STDCALL int (*write)(void *userdata, void *buffer, off_t startsector,
+                         size_t *numsectors);
+    STDCALL int (*flush)(void *userdata);
+    STDCALL unsigned int (*adjust_cache_size)(void *userdata,
+                                              size_t suggested_size);
 } diskfunc_t;
 
 struct disk_t {
@@ -353,9 +349,9 @@ struct net_device_t {
     char *name;             // ptr to 0 terminated string
 
     // ptrs to driver functions
-    __attribute__((__stdcall__)) void (*unload) (void);
-    __attribute__((__stdcall__)) void (*reset) (void);
-    __attribute__((__stdcall__)) int (*transmit) (net_buff_t *);
+    STDCALL void (*unload) (void);
+    STDCALL void (*reset) (void);
+    STDCALL int (*transmit) (net_buff_t *);
 
     uint64_t bytes_tx;      // statistics, updated by the driver
     uint64_t bytes_rx;
@@ -376,6 +372,27 @@ typedef struct {
     uint16_t ttl;
 } arp_entry_t;
 
+typedef struct acpi_node acpi_node_t;
+struct acpi_node {
+    uint32_t name;
+    int32_t refcount;
+    acpi_node_t *parent;
+    acpi_node_t *children;
+    acpi_node_t *next;
+    int32_t type;
+};
+
+typedef struct {
+    acpi_node_t node;
+    uint64_t value;
+} kos_node_integer_t;
+
+typedef struct {
+    acpi_node_t node;
+    acpi_node_t **list;
+    size_t el_cnt;
+} kos_node_package_t;
+
 __attribute__((__noreturn__)) void
 kos_osloop(void);
 
@@ -391,13 +408,13 @@ i40(void);
 uint32_t
 kos_time_to_epoch(uint32_t *time);
 
-__attribute__((__stdcall__)) disk_t *
+STDCALL disk_t *
 disk_add(diskfunc_t *disk, const char *name, void *userdata, uint32_t flags);
 
-__attribute__((__stdcall__)) void *
+STDCALL void *
 disk_media_changed(diskfunc_t *disk, int inserted);
 
-__attribute__((__stdcall__)) void
+STDCALL void
 disk_del(disk_t *disk);
 
 void
@@ -413,7 +430,7 @@ extern uint8_t kos_ramdisk[2880*512];
 disk_t *
 kos_ramdisk_init(void);
 
-__attribute__((__stdcall__)) void
+STDCALL void
 kos_set_mouse_data(uint32_t btn_state, int32_t xmoving, int32_t ymoving,
                    int32_t vscroll, int32_t hscroll);
 
@@ -425,7 +442,7 @@ umka_mouse_move(int lbheld, int mbheld, int rbheld, int xabs, int32_t xmoving,
     kos_set_mouse_data(btn_state, xmoving, ymoving, vscroll, hscroll);
 }
 
-__attribute__((__stdcall__)) net_buff_t *
+STDCALL net_buff_t *
 kos_net_buff_alloc(size_t size);
 
 static inline size_t
@@ -471,6 +488,49 @@ kos_acpi_call_name(void *ctx, const char *name) {
         : "memory", "cc");
 }
 
+#define KOS_ACPI_NODE_Uninitialized 1
+#define KOS_ACPI_NODE_Integer       2
+#define KOS_ACPI_NODE_String        3
+#define KOS_ACPI_NODE_Buffer        4
+#define KOS_ACPI_NODE_Package       5
+#define KOS_ACPI_NODE_OpRegionField 6
+#define KOS_ACPI_NODE_IndexField    7
+#define KOS_ACPI_NODE_BankField     8
+#define KOS_ACPI_NODE_Device        9
+
+extern acpi_node_t *kos_acpi_root;
+
+typedef struct {
+    int pew[0x100];
+} amlctx_t;
+
+void
+kos_acpi_aml_init();
+
+STDCALL void
+kos_aml_attach(acpi_node_t *parent, acpi_node_t *node);
+
+STDCALL void
+kos_acpi_fill_pci_irqs(void *ctx);
+
+STDCALL amlctx_t*
+kos_acpi_aml_new_thread();
+
+STDCALL acpi_node_t*
+kos_aml_alloc_node(int32_t type);
+
+STDCALL acpi_node_t*
+kos_aml_constructor_integer(void);
+
+STDCALL acpi_node_t*
+kos_aml_constructor_package(size_t el_cnt);
+
+STDCALL acpi_node_t*
+kos_acpi_lookup_node(acpi_node_t *root, char *name);
+
+STDCALL void
+kos_acpi_print_tree(void *ctx);
+
 typedef struct {
     uint32_t value;
     uint32_t errorcode;
@@ -504,7 +564,7 @@ kos_net_add_device(net_device_t *dev) {
     return dev_num;
 }
 
-__attribute__((__stdcall__)) void
+STDCALL void
 kos_window_set_screen(ssize_t left, ssize_t top, ssize_t right, ssize_t bottom,
                       ssize_t proc);
 
@@ -762,7 +822,7 @@ extern void *acpi_ctx;
 extern uint32_t kos_acpi_usage;
 extern uint32_t kos_acpi_node_alloc_cnt;
 extern uint32_t kos_acpi_node_free_cnt;
-extern uint32_t kos_acpi_count_nodes(void *ctx) __attribute__((__stdcall__));
+extern uint32_t kos_acpi_count_nodes(void *ctx) STDCALL;
 extern disk_t disk_list;
 
 static inline void

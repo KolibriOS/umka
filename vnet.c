@@ -42,15 +42,15 @@ net_device_t *vnet_init(int fd) {
     return vnet;
 }
 
-__attribute__((__stdcall__))
-void vnet_unload() {
+STDCALL void
+vnet_unload() {
     printf("vnet_unload\n");
     COVERAGE_OFF();
     COVERAGE_ON();
 }
 
-__attribute__((__stdcall__))
-void vnet_reset() {
+STDCALL void
+vnet_reset() {
     printf("vnet_reset\n");
     COVERAGE_OFF();
     COVERAGE_ON();
@@ -63,8 +63,8 @@ static void dump_net_buff(net_buff_t *buf) {
     putchar('\n');
 }
 
-__attribute__((__stdcall__))
-int vnet_transmit(net_buff_t *buf) {
+STDCALL int
+vnet_transmit(net_buff_t *buf) {
     net_device_t *vnet;
     __asm__ __inline__ __volatile__ (
         "nop"

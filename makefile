@@ -11,8 +11,8 @@ CFLAGS_32=$(CFLAGS) -m32
 LDFLAGS=-no-pie
 LDFLAGS_32=$(LDFLAGS) -m32
 
-all: umka_shell umka_fuse umka_os umka.sym umka.prp umka.lst tags \
-     covpreproc default.skn skin.skn
+all: umka_shell umka_fuse umka_os umka_gen_devices_dat umka.sym umka.prp \
+     umka.lst tags covpreproc default.skn skin.skn
 
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
@@ -26,6 +26,9 @@ umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o trace_lbr.o \
          pci.o thread.o umka_ping.o
+	$(CC) $(LDFLAGS_32) $^ -o $@ -static -T umka.ld
+
+umka_gen_devices_dat: umka_gen_devices_dat.o umka.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static -T umka.ld
 
 umka.o umka.fas: umka.asm
@@ -83,11 +86,14 @@ umka_fuse.o: umka_fuse.c umka.h
 umka_os.o: umka_os.c umka.h
 	$(CC) $(CFLAGS_32) -c $< -D_XOPEN_SOURCE=600
 
+umka_gen_devices_dat.o: umka_gen_devices_dat.c umka.h
+	$(CC) $(CFLAGS_32) -c $<
+
 umka_ping.o: umka_ping.c umka.h
 	$(CC) $(CFLAGS_32) -D_DEFAULT_SOURCE -c $<
 
 .PHONY: all clean
 
 clean:
-	rm -f *.o umka_shell umka_fuse umka_os umka.fas umka.sym umka.lst umka.prp \
-          coverage
+	rm -f *.o umka_shell umka_fuse umka_os umka_gen_devices_dat umka.fas \
+          umka.sym umka.lst umka.prp coverage

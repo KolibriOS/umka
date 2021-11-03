@@ -7,6 +7,7 @@ umka_shell
 umka_fuse
 umka_os
 umka_ping
+umka_gen_devices_dat
 mkdirrange
 mkfilepattern
 lfbviewx
