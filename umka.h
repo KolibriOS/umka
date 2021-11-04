@@ -531,6 +531,15 @@ kos_acpi_lookup_node(acpi_node_t *root, char *name);
 STDCALL void
 kos_acpi_print_tree(void *ctx);
 
+#define MAX_PCI_DEVICES 256
+
+extern void *kos_acpi_dev_data;
+extern size_t kos_acpi_dev_size;
+extern void *kos_acpi_dev_next;
+
+STDCALL void*
+kos_kernel_alloc(size_t len);
+
 typedef struct {
     uint32_t value;
     uint32_t errorcode;

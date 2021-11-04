@@ -75,7 +75,7 @@ public eth_input as 'kos_eth_input'
 public net_buff_alloc as 'kos_net_buff_alloc'
 
 public mem_block_list
-public pci_root
+public pci_root as "kos_pci_root"
 
 public acpi.aml.init as "kos_acpi_aml_init"
 public acpi_root as "kos_acpi_root"
@@ -87,6 +87,10 @@ public aml._.constructor.integer as "kos_aml_constructor_integer"
 public aml._.constructor.package as "kos_aml_constructor_package"
 public acpi._.lookup_node as "kos_acpi_lookup_node"
 public acpi._.print_tree as "kos_acpi_print_tree"
+public acpi_dev_data as "kos_acpi_dev_data"
+public acpi_dev_size as "kos_acpi_dev_size"
+public acpi_dev_next as "kos_acpi_dev_next"
+public kernel_alloc as "kos_kernel_alloc"
 
 public window._.set_screen as 'kos_window_set_screen'
 public _display as 'kos_display'
