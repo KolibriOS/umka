@@ -58,4 +58,7 @@ collect_coverage:
 clean:
 	rm -f ???_*.out.{log,png} coverage.*
 
-.PHONY: clean collect_coverage
+update_logs:
+	for f in *ref.log; do cp $$(basename $$f .ref.log).out.log $$f; done
+
+.PHONY: clean collect_coverage update_logs

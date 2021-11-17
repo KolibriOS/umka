@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "umka.h"
+#include "util.h"
 #include <pci.h>
 
 #define UMKA_DEFAULT_DISPLAY_WIDTH 400
@@ -156,7 +157,7 @@ main () {
     kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
 
-    strcpy(pci_path, "/sys/bus/pci/devices");
+    strcpy(pci_path, PCI_BASE_DIR);
 
     umka_init();
     kos_acpi_aml_init();
@@ -193,9 +194,8 @@ main () {
     }
     closedir(pci_base_dir);
     kos_acpi_print_tree(ctx);
-
-
     kos_acpi_fill_pci_irqs(ctx);
+    dump_devices_dat("devices.dat");
 
     return 0;
 }

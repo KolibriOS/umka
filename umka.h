@@ -504,6 +504,24 @@ typedef struct {
     int pew[0x100];
 } amlctx_t;
 
+struct pci_dev {
+    struct pci_dev *next;
+    size_t bus;
+    size_t dev;
+    size_t fun;
+    void *acpi;
+    struct pci_dev *children;
+    struct pci_dev *parent;
+    void *prt;
+    size_t is_bridge;
+    size_t vendor_id;
+    size_t device_id;
+    size_t int_pin;
+    size_t gsi;
+};
+
+extern struct pci_dev *kos_pci_root;
+
 void
 kos_acpi_aml_init();
 
@@ -539,6 +557,12 @@ extern void *kos_acpi_dev_next;
 
 STDCALL void*
 kos_kernel_alloc(size_t len);
+
+STDCALL void
+kos_pci_walk_tree(struct pci_dev *node,
+                  STDCALL void* (*test)(struct pci_dev *node, void *arg),
+                  STDCALL void* (*clbk)(struct pci_dev *node, void *arg),
+                  void *arg);
 
 typedef struct {
     uint32_t value;

@@ -43,6 +43,7 @@
 #include "umka.h"
 #include "trace.h"
 #include "pci.h"
+#include "util.h"
 #include "lodepng.h"
 
 #define PATH_MAX 4096
@@ -1393,6 +1394,20 @@ shell_blit_bitmap(int argc, char **argv) {
                          params);
     COVERAGE_OFF();
     free(image);
+}
+
+static void
+shell_write_devices_dat(int argc, char **argv) {
+    const char *usage = \
+        "usage: write_devices_dat <file>\n"
+        "  file             path/to/devices.dat";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
+    COVERAGE_ON();
+    dump_devices_dat(argv[1]);
+    COVERAGE_OFF();
 }
 
 static void
@@ -2780,6 +2795,7 @@ func_table_t shell_cmds[] = {
     { "read70",                  shell_read70 },
     { "read80",                  shell_read80 },
     { "scrot",                   shell_scrot },
+    { "write_devices_dat",       shell_write_devices_dat },
     { "set_button_style",        shell_set_button_style },
     { "set_cwd",                 shell_cd },
     { "set_font_size",           shell_set_font_size },

@@ -105,7 +105,7 @@ nodes allocated: 11
 /> acpi_get_node_free_cnt
 nodes freed: 0
 /> acpi_get_node_cnt
-nodes in namespace: 9
+nodes in namespace: 10
 
 /> acpi_call \MAIN
 acpi.call_name begin
@@ -457,4 +457,4 @@ nodes allocated: 29
 /> acpi_get_node_free_cnt
 nodes freed: 0
 /> acpi_get_node_cnt
-nodes in namespace: 9
+nodes in namespace: 10

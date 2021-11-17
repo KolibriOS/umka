@@ -3069,15 +3069,12 @@ name_string: \PCI0DV00DV0A
 aml._.name_string end
 aml._.package_element_list_defer end
 aml._.package end
-aml._.data_object end
 aml._.data_ref_object end
 aml._.package_element_list_defer end
 aml._.package end
-aml._.data_object end
 aml._.data_ref_object end
 aml._.package_element_list_defer end
 aml._.package end
-aml._.data_object end
 aml._.data_ref_object end
 aml._.name end
 aml._.namespace_modifier_obj end
@@ -3489,15 +3486,12 @@ name_string: ^PCI0DV00DV0A
 aml._.name_string end
 aml._.package_element_list_defer end
 aml._.package end
-aml._.data_object end
 aml._.data_ref_object end
 aml._.package_element_list_defer end
 aml._.package end
-aml._.data_object end
 aml._.data_ref_object end
 aml._.package_element_list_defer end
 aml._.package end
-aml._.data_object end
 aml._.data_ref_object end
 aml._.name end
 aml._.namespace_modifier_obj end
@@ -5137,4 +5131,4 @@ nodes allocated: 197
 /> acpi_get_node_free_cnt
 nodes freed: 0
 /> acpi_get_node_cnt
-nodes in namespace: 109
+nodes in namespace: 110

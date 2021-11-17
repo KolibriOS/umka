@@ -18,22 +18,22 @@ covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o vnet.o \
-            lodepng.o pci.o thread.o
+            lodepng.o pci.o thread.o util.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static -T umka.ld
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs` -T umka.ld
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o trace_lbr.o \
-         pci.o thread.o umka_ping.o
+         pci.o thread.o umka_ping.o util.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static -T umka.ld
 
-umka_gen_devices_dat: umka_gen_devices_dat.o umka.o pci.o thread.o
+umka_gen_devices_dat: umka_gen_devices_dat.o umka.o pci.o thread.o util.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static -T umka.ld
 
 umka.o umka.fas: umka.asm
 	INCLUDE="$(KOLIBRIOS)/kernel/trunk;$(KOLIBRIOS)/programs/develop/libraries/libcrash/hash" \
-            $(FASM) $< umka.o -s umka.fas -m 1234567
+            $(FASM) $< umka.o -s umka.fas -m 2000000
 
 shell.o: shell.c
 	$(CC) $(CFLAGS_32) -c $<
@@ -45,6 +45,9 @@ pci.o: linux/pci.c
 	$(CC) $(CFLAGS_32) -c $<
 
 lodepng.o: lodepng.c lodepng.h
+	$(CC) $(CFLAGS_32) -c $<
+
+util.o: util.c util.h umka.h
 	$(CC) $(CFLAGS_32) -c $<
 
 default.skn: $(KOLIBRIOS)/skins/Leency/Shkvorka/default.asm
