@@ -694,6 +694,19 @@ mem_test:
 init_mem:
 init_page_map:
 ahci_init:
+enable_acpi:
+acpi.call_name:
+acpi.count_nodes:
+acpi.aml.init:
+aml._.attach:
+acpi.fill_pci_irqs:
+pci.walk_tree:
+acpi.aml.new_thread:
+aml._.alloc_node:
+aml._.constructor.integer:
+aml._.constructor.package:
+acpi._.lookup_node:
+acpi._.print_tree:
         ret
 
 alloc_pages:
@@ -704,6 +717,16 @@ map_page:
         ret     12
 map_memEx:
         ret     20
+
+uglobal
+acpi_ctx dd ?
+acpi_usage dd ?
+acpi_node_alloc_cnt dd ?
+acpi_node_free_cnt dd ?
+pci_root dd ?
+acpi_root dd ?
+acpi_dev_next dd ?
+endg
 
 sys_msg_board equ __pex0
 delay_ms equ __pex1
