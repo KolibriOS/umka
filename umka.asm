@@ -1051,19 +1051,6 @@ v86_irq:
 ;init_mem:
 ;init_page_map:
 ahci_init:
-enable_acpi:
-acpi.call_name:
-acpi.count_nodes:
-acpi.aml.init:
-aml._.attach:
-acpi.fill_pci_irqs:
-pci.walk_tree:
-acpi.aml.new_thread:
-aml._.alloc_node:
-aml._.constructor.integer:
-aml._.constructor.package:
-acpi._.lookup_node:
-acpi._.print_tree:
         ret
 
 load_PE:
@@ -1086,6 +1073,7 @@ acpi_root dd ?
 acpi_dev_next dd ?
 endg
 
+sys_msg_board equ __pex0
 delay_ms equ __pex1
 
 include fix pew
