@@ -449,13 +449,13 @@ static inline size_t
 umka_new_sys_threads(uint32_t flags, void (*entry)(), void *stack) {
     size_t tid;
     __asm__ __inline__ __volatile__ (
-        "push ebx;"
-        "push esi;"
-        "push edi;"
+        "push %%ebx;"
+        "push %%esi;"
+        "push %%edi;"
         "call   kos_new_sys_threads;"
-        "pop edi;"
-        "pop esi;"
-        "pop ebx"
+        "pop %%edi;"
+        "pop %%esi;"
+        "pop %%ebx"
         : "=a"(tid)
         : "b"(flags),
           "c"(entry),
@@ -467,9 +467,9 @@ umka_new_sys_threads(uint32_t flags, void (*entry)(), void *stack) {
 static inline void
 kos_enable_acpi() {
     __asm__ __inline__ __volatile__ (
-        "pushad;"
+        "pusha;"
         "call   enable_acpi;"
-        "popad"
+        "popa"
         :
         :
         : "memory", "cc");
@@ -478,11 +478,11 @@ kos_enable_acpi() {
 static inline void
 kos_acpi_call_name(void *ctx, const char *name) {
     __asm__ __inline__ __volatile__ (
-        "pushad;"
+        "pusha;"
         "push   %[name];"
         "push   %[ctx];"
         "call   acpi.call_name;"
-        "popad"
+        "popa"
         :
         : [ctx] "r"(ctx), [name] "r"(name)
         : "memory", "cc");
@@ -555,6 +555,8 @@ extern void *kos_acpi_dev_data;
 extern size_t kos_acpi_dev_size;
 extern void *kos_acpi_dev_next;
 
+void kos_eth_input(void *buf);
+
 STDCALL void*
 kos_kernel_alloc(size_t len);
 
@@ -577,9 +579,9 @@ typedef struct {
 static inline void
 umka_stack_init() {
     __asm__ __inline__ __volatile__ (
-        "pushad;"
+        "pusha;"
         "call   kos_stack_init;"
-        "popad"
+        "popa"
         :
         :
         : "memory", "cc");
@@ -888,8 +890,8 @@ umka_find_next_task(int32_t priority) {
     find_next_task_t fnt;
     __asm__ __inline__ __volatile__ (
         "call   find_next_task;"
-        "setz   al;"
-        "movzx  eax, al"
+        "setz   %%al;"
+        "movzx  %%eax, %%al"
         : "=b"(fnt.appdata),
           "=D"(fnt.taskdata),
           "=a"(fnt.same)
@@ -898,23 +900,27 @@ umka_find_next_task(int32_t priority) {
     return fnt;
 }
 
+void i40_asm(uint32_t eax,
+            uint32_t ebx,
+            uint32_t ecx,
+            uint32_t edx,
+            uint32_t esi,
+            uint32_t edi,
+            uint32_t ebp,
+            uint32_t *eax_out,
+            uint32_t *ebx_out);
+
 static inline void
 umka_i40(pushad_t *regs) {
-    __asm__ __inline__ __volatile__ (
-        "push   ebp;"
-        "mov    ebp, %[ebp];"
-        "call   i40;"
-        "pop    ebp"
-        : "=a"(regs->eax),
-          "=b"(regs->ebx)
-        : "a"(regs->eax),
-          "b"(regs->ebx),
-          "c"(regs->ecx),
-          "d"(regs->edx),
-          "S"(regs->esi),
-          "D"(regs->edi),
-          [ebp] "Rm"(regs->ebp)
-        : "memory");
+    i40_asm(regs->eax,
+            regs->ebx,
+            regs->ecx,
+            regs->edx,
+            regs->esi,
+            regs->edi,
+            regs->ebp,
+            &regs->eax,
+            &regs->ebx);
 }
 
 static inline void
@@ -1338,20 +1344,15 @@ static inline void
 umka_sys_put_image_palette(void *image, size_t xsize, size_t ysize,
                            size_t x, size_t y, size_t bpp, void *palette,
                            size_t row_offset) {
-    __asm__ __inline__ __volatile__ (
-        "push   ebp;"
-        "mov    ebp, %[row_offset];"
-        "call   i40;"
-        "pop    ebp"
-        :
-        : "a"(65),
-          "b"(image),
-          "c"((xsize << 16) + ysize),
-          "d"((x << 16) + y),
-          "S"(bpp),
-          "D"(palette),
-          [row_offset] "Rm"(row_offset)
-        : "memory");
+    pushad_t regs = { 0 };
+    regs.eax = 65;
+    regs.ebx = (uintptr_t)image;
+    regs.ecx = (xsize << 16) + ysize;
+    regs.edx = (x << 16) + y;
+    regs.esi = bpp;
+    regs.edi = (uintptr_t)palette;
+    regs.ebp = row_offset;
+    umka_i40(&regs);
 }
 
 static inline void

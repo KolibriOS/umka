@@ -71,7 +71,7 @@ public new_sys_threads as 'kos_new_sys_threads'
 public osloop as 'kos_osloop'
 public set_mouse_data as 'kos_set_mouse_data'
 public scheduler_current as 'kos_scheduler_current'
-public eth_input as 'kos_eth_input'
+public kos_eth_input
 public net_buff_alloc as 'kos_net_buff_alloc'
 
 public mem_block_list
@@ -325,6 +325,63 @@ proc umka._.check_alignment
         DEBUGF 4, ", add 0x%x or sub 0x%x\n", ecx, eax
         int3
 @@:
+        ret
+endp
+
+public i40_asm
+
+;void i40_asm(uint32_t _eax,
+;             uint32_t _ebx,
+;             uint32_t _ecx,
+;             uint32_t _edx,
+;             uint32_t _esi,
+;             uint32_t _edi,
+;             uint32_t _ebp,
+;             uint32_t *_eax_out,
+;             uint32_t _ebx_out)
+i40_asm:
+        ; Return address: esp
+        ; First argument: esp + 4
+        push    eax ebx ecx edx esi edi ebp
+        ; First argument: esp + 4 + 7 * sizeof(dword) = esp + 8 + 7 * 4 = esp + 4 + 28 = esp + 32
+        mov     eax, [esp + 32]
+        mov     ebx, [esp + 36]
+        mov     ecx, [esp + 40]
+        mov     edx, [esp + 44]
+        mov     esi, [esp + 48]
+        mov     edi, [esp + 52]
+        mov     ebp, [esp + 56]
+        call    i40
+        mov     edi, [esp + 60]
+        mov     [edi], eax
+        mov     edi, [esp + 64]
+        mov     [edi], ebx
+        pop     ebp edi esi edx ecx ebx eax
+        ret
+
+public set_eflags_tf
+
+proc set_eflags_tf c uses ebx esi edi ebp, tf
+        mov    ecx, [tf]
+        pushfd
+        pop    eax
+        ror    eax, 8
+        mov    edx, eax
+        and    edx, 1
+        and    eax, 0xfffffffe
+        or     eax, ecx
+        rol    eax, 8
+        push   eax
+        popfd
+        mov    eax, edx
+        ret
+endp
+
+proc kos_eth_input c uses ebx esi edi ebp, buffer_ptr
+        push    .retaddr
+        push    [buffer_ptr]
+        jmp     eth_input
+.retaddr:
         ret
 endp
 

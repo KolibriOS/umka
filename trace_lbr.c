@@ -57,24 +57,7 @@ void handle_sigtrap() {
     wrmsr(MSR_IA32_DEBUGCTLMSR, 3);
 }
 
-uint32_t set_eflags_tf(uint32_t tf) {
-    uint32_t prev;
-    __asm__ __inline__ __volatile__ (
-        "pushfd;"
-        "pop    eax;"
-        "ror    eax, 8;"
-        "mov    edx, eax;"
-        "and    edx, 1;"
-        "and    eax, ~1;"
-        "or     eax, ecx;"
-        "rol    eax, 8;"
-        "push   eax;"
-        "popfd"
-        : "=d"(prev)
-        : "c"(tf)
-        : "eax", "memory");
-    return prev;
-}
+uint32_t set_eflags_tf(uint32_t tf);
 
 void trace_lbr_begin() {
     struct sigaction action;

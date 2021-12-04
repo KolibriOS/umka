@@ -93,15 +93,5 @@ void vnet_receive_frame(net_device_t *dev, void *data, size_t size) {
     buf->device = dev;
     buf->offset = offsetof(net_buff_t, data);
     memcpy(buf->data, data, size);
-    __asm__ __inline__ __volatile__ (
-        "pushad;"
-        "lea    ecx, 1f;"
-        "push   ecx;"
-        "push   eax;"
-        "jmp    kos_eth_input;"
-        "1:"
-        "popad"
-        :
-        : "a"(buf)
-        : "memory", "ecx");
+    kos_eth_input(buf);
 }
