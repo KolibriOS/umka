@@ -14,11 +14,13 @@ LDFLAGS_32=$(LDFLAGS) -m32
 all: umka_shell umka_fuse umka_os umka_gen_devices_dat umka.sym umka.prp \
      umka.lst tags covpreproc default.skn skin.skn
 
+.PHONY: test
+
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o vnet.o \
-            lodepng.o pci.o thread.o util.o
+            lodepng.o pci.o thread.o util.o getopt.o isatty.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -static -T umka.ld
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
@@ -45,6 +47,12 @@ pci.o: linux/pci.c
 	$(CC) $(CFLAGS_32) -c $<
 
 lodepng.o: lodepng.c lodepng.h
+	$(CC) $(CFLAGS_32) -c $<
+
+getopt.o: getopt.c getopt.h
+	$(CC) $(CFLAGS_32) -c $<
+
+isatty.o: isatty.c isatty.h
 	$(CC) $(CFLAGS_32) -c $<
 
 util.o: util.c util.h umka.h

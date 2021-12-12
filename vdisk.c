@@ -7,6 +7,11 @@
 #include "trace.h"
 #include "vdisk.h"
 
+#ifdef _WIN32
+#define fseeko _fseeki64
+#define ftello _ftelli64
+#endif
+
 typedef struct {
     FILE *file;
     uint32_t sect_size;
@@ -16,7 +21,7 @@ typedef struct {
 } vdisk_t;
 
 void *vdisk_init(const char *fname, int adjust_cache_size, size_t cache_size) {
-    FILE *f = fopen(fname, "r+");
+    FILE *f = fopen(fname, "rb+");
     if (!f) {
         printf("vdisk: can't open file '%s': %s\n", fname, strerror(errno));
         return NULL;

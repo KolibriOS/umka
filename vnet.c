@@ -1,12 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <inttypes.h>
 #include <errno.h>
+#include <assert.h>
 #include "umka.h"
 #include "trace.h"
 #include "vnet.h"
+
+// TODO: Cleanup
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 
 typedef struct {
     int fd;
@@ -65,6 +70,10 @@ static void dump_net_buff(net_buff_t *buf) {
 
 STDCALL int
 vnet_transmit(net_buff_t *buf) {
+    // TODO: Separate implementations for win32 and linux
+#ifdef _WIN32
+    assert(!"Function is not implemented for win32");
+#else
     net_device_t *vnet;
     __asm__ __inline__ __volatile__ (
         "nop"
@@ -80,6 +89,7 @@ vnet_transmit(net_buff_t *buf) {
     COVERAGE_OFF();
     COVERAGE_ON();
     printf("vnet_transmit: done\n");
+#endif
     return 0;
 }
 

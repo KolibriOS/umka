@@ -25,19 +25,18 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/select.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <assert.h>
 #include <time.h>
-#include <fcntl.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <errno.h>
+
+// TODO: Cleanup
+#ifndef _WIN32
+#include <arpa/inet.h>
+#include <sys/select.h>
+#endif
+
+#include "isatty.h"
+#include "getopt.h"
 #include "vdisk.h"
 #include "vnet.h"
 #include "umka.h"
@@ -211,6 +210,10 @@ next_line(int is_tty, int block) {
     if (is_tty) {
         prompt();
     }
+// TODO: Cleanup
+#ifdef _WIN32
+    return fgets(cmd_buf, FGETS_BUF_LEN, fin) != NULL;
+#else
     if (block) {
         return fgets(cmd_buf, FGETS_BUF_LEN, fin) != NULL;
     } else {
@@ -230,6 +233,7 @@ next_line(int is_tty, int block) {
         }
         return 1;
     }
+#endif
 }
 
 static int
@@ -338,7 +342,7 @@ shell_ramdisk_init(int argc, char **argv) {
         return;
     }
     const char *fname = argv[1];
-    FILE *f = fopen(fname, "r");
+    FILE *f = fopen(fname, "rb");
     if (!f) {
         fprintf(fout, "[!] can't open file '%s': %s\n", fname, strerror(errno));
         return;
@@ -1124,7 +1128,7 @@ shell_put_image(int argc, char **argv) {
         fputs(usage, fout);
         return;
     }
-    FILE *f = fopen(argv[1], "r");
+    FILE *f = fopen(argv[1], "rb");
     fseek(f, 0, SEEK_END);
     size_t fsize = ftell(f);
     rewind(f);
@@ -1157,7 +1161,7 @@ shell_put_image_palette(int argc, char **argv) {
         fputs(usage, fout);
         return;
     }
-    FILE *f = fopen(argv[1], "r");
+    FILE *f = fopen(argv[1], "rb");
     fseek(f, 0, SEEK_END);
     size_t fsize = ftell(f);
     rewind(f);
@@ -1363,7 +1367,7 @@ shell_blit_bitmap(int argc, char **argv) {
         return;
     }
     const char *fname = argv[1];
-    FILE *f = fopen(fname, "r");
+    FILE *f = fopen(fname, "rb");
     if (!f) {
         fprintf(fout, "[!] can't open file '%s': %s\n", fname, strerror(errno));
         return;
@@ -1808,7 +1812,7 @@ shell_acpi_preload_table(int argc, char **argv) {
         fputs(usage, fout);
         return;
     }
-    FILE *f = fopen(argv[1], "r");
+    FILE *f = fopen(argv[1], "rb");
     if (!f) {
         fprintf(fout, "[umka] can't open file: %s\n", argv[1]);
         return;
@@ -1946,6 +1950,8 @@ shell_pci_get_path(int argc, char **argv) {
     }
     fprintf(fout, "pci path: %s\n", pci_path);
 }
+
+#ifndef _WIN32
 
 static void
 shell_stack_init(int argc, char **argv) {
@@ -2602,6 +2608,8 @@ shell_net_arp_del_entry(int argc, char **argv) {
     }
 }
 
+#endif // _WIN32
+
 static void
 shell_bg_set_size(int argc, char **argv) {
     const char *usage = \
@@ -2667,7 +2675,7 @@ shell_bg_put_img(int argc, char **argv) {
         fputs(usage, fout);
         return;
     }
-    FILE *f = fopen(argv[1], "r");
+    FILE *f = fopen(argv[1], "rb");
     fseek(f, 0, SEEK_END);
     size_t fsize = ftell(f);
     rewind(f);
@@ -2754,6 +2762,8 @@ func_table_t shell_cmds[] = {
     { "ls80",                    shell_ls80 },
     { "move_window",             shell_move_window },
     { "mouse_move",              shell_mouse_move },
+#ifndef _WIN32
+    { "stack_init",              shell_stack_init },
     { "net_accept",              shell_net_accept },
     { "net_add_device",          shell_net_add_device },
     { "net_arp_add_entry",       shell_net_arp_add_entry },
@@ -2785,6 +2795,7 @@ func_table_t shell_cmds[] = {
     { "net_ipv4_set_subnet",     shell_net_ipv4_set_subnet },
     { "net_listen",              shell_net_listen },
     { "net_open_socket",         shell_net_open_socket },
+#endif // _WIN32
     { "pci_get_path",            shell_pci_get_path },
     { "pci_set_path",            shell_pci_set_path },
     { "process_info",            shell_process_info },
@@ -2805,7 +2816,6 @@ func_table_t shell_cmds[] = {
     { "set_skin",                shell_set_skin },
     { "set_window_caption",      shell_set_window_caption },
     { "set_window_colors",       shell_set_window_colors },
-    { "stack_init",              shell_stack_init },
     { "stat70",                  shell_stat70 },
     { "stat80",                  shell_stat80 },
     { "window_redraw",           shell_window_redraw },
@@ -2852,7 +2862,7 @@ run_test(FILE *in, FILE *out, int block) {
     fin = in;
     fout = out;
     int is_tty = isatty(fileno(fin));
-    char **argv = (char**)malloc(sizeof(char*) * (MAX_COMMAND_ARGS + 1));
+    char **argv = (char**)calloc(sizeof(char*), (MAX_COMMAND_ARGS + 1));
     while(next_line(is_tty, block)) {
         if (cmd_buf[0] == '#' || cmd_buf[0] == '\n' || cmd_buf[0] == '\0' ||
             cmd_buf[0] == '\r') {

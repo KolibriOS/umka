@@ -1,6 +1,68 @@
 ; TODO: SPDX
 
-format ELF
+if defined WIN32
+    format MS COFF
+else
+    format ELF
+end if
+
+; win32:
+;   pubsym name                    -> public name as "_name"
+;   pubsym name, 20                -> public name as "_name@20"
+;   pubsym name, no_mangle         -> public name
+;   pubsym name, "name"            -> public name as "_name"
+;   pubsym name, "name", 20        -> public name as "_name@20"
+;   pubsym name, "name", no_mangle -> public name as "name"
+; linux:
+;   pubsym name                    -> public name
+;   pubsym name, 20                -> public name
+;   pubsym name, no_mangle         -> public name
+;   pubsym name, "name"            -> public name as "name"
+;   pubsym name, "name", 20        -> public name as "name"
+;   pubsym name, "name", no_mangle -> public name as "name"
+macro pubsym name, marg1, marg2 {
+    if defined WIN32
+        if marg1 eq no_mangle
+            public name
+        else if marg1 eqtype 20
+            public name as '_' # `name # '@' # `marg1
+        else if marg1 eqtype 'string'
+            if marg2 eq no_mangle
+                public name as marg1
+            else if marg2 eqtype 20
+                public name as '_' # marg1 # '@' # `marg2
+            else
+                public name as '_' # marg1
+            end if
+        else
+            public name as '_' # `name
+        end if
+    else
+        if marg1 eqtype 'string'
+            public name as marg1
+        else
+            public name
+        end if
+    end if
+}
+
+; win32:
+;   extrn name     -> extrn _name
+;   extrn name, 20 -> extrn _name@20
+; linux:
+;   extrn name     -> extrn name
+;   extrn name, 20 -> extrn name
+macro extrn name, [argsize] {
+    if defined WIN32
+        if argsize eqtype 20
+            extrn '_' # `name # '@' # `argsize as name
+        else
+            extrn '_' # `name as name
+        end if
+    else
+        extrn name
+    end if
+}
 
 __DEBUG__ = 1
 __DEBUG_LEVEL__ = 1
@@ -11,92 +73,92 @@ UMKA_OS    = 3
 
 UMKA_MEMORY_BYTES = 256 SHL 20
 
-public disk_add
-public disk_del
-public disk_list
-public disk_media_changed
+pubsym disk_add, 16
+pubsym disk_del, 4
+pubsym disk_list
+pubsym disk_media_changed, 8
 
-public xfs._.user_functions as 'xfs_user_functions'
-public ext_user_functions
-public fat_user_functions
-public ntfs_user_functions
+pubsym xfs._.user_functions, 'xfs_user_functions'
+pubsym ext_user_functions
+pubsym fat_user_functions
+pubsym ntfs_user_functions
 
-public i40
+pubsym i40, no_mangle
 
-public coverage_begin
-public coverage_end
+pubsym coverage_begin
+pubsym coverage_end
 
-public sha3_256_oneshot as 'hash_oneshot'
-public kos_time_to_epoch
-public umka_init
+pubsym sha3_256_oneshot, 'hash_oneshot'
+pubsym kos_time_to_epoch
+pubsym umka_init
 
-public current_process as 'kos_current_process'
-public current_slot as 'kos_current_slot'
-public current_slot_idx as 'kos_current_slot_idx'
+pubsym current_process, 'kos_current_process'
+pubsym current_slot, 'kos_current_slot'
+pubsym current_slot_idx, 'kos_current_slot_idx'
 
-public thread_count as 'kos_thread_count'
-public TASK_TABLE as 'kos_task_table'
-public TASK_BASE as 'kos_task_base'
-public TASK_DATA as 'kos_task_data'
-public SLOT_BASE as 'kos_slot_base'
-public window_data as 'kos_window_data'
+pubsym thread_count, 'kos_thread_count'
+pubsym TASK_TABLE, 'kos_task_table'
+pubsym TASK_BASE, 'kos_task_base'
+pubsym TASK_DATA, 'kos_task_data'
+pubsym SLOT_BASE, 'kos_slot_base'
+pubsym window_data, 'kos_window_data'
 
-public WIN_STACK as 'kos_win_stack'
-public WIN_POS as 'kos_win_pos'
-public lfb_base as 'kos_lfb_base'
+pubsym WIN_STACK, 'kos_win_stack'
+pubsym WIN_POS, 'kos_win_pos'
+pubsym lfb_base, 'kos_lfb_base'
 
-public RAMDISK as 'kos_ramdisk'
-public ramdisk_init as 'kos_ramdisk_init'
+pubsym RAMDISK, 'kos_ramdisk'
+pubsym ramdisk_init, 'kos_ramdisk_init'
 
-public enable_acpi
-public acpi.call_name
-public acpi_ssdt_cnt as 'kos_acpi_ssdt_cnt'
-public acpi_ssdt_base as 'kos_acpi_ssdt_base'
-public acpi_ssdt_size as 'kos_acpi_ssdt_size'
-public acpi_ctx
-public acpi_usage as 'kos_acpi_usage'
-public acpi_node_alloc_cnt as 'kos_acpi_node_alloc_cnt'
-public acpi_node_free_cnt as 'kos_acpi_node_free_cnt'
-public acpi.count_nodes as 'kos_acpi_count_nodes'
+pubsym enable_acpi, no_mangle
+pubsym acpi.call_name, no_mangle
+pubsym acpi_ssdt_cnt, 'kos_acpi_ssdt_cnt'
+pubsym acpi_ssdt_base, 'kos_acpi_ssdt_base'
+pubsym acpi_ssdt_size, 'kos_acpi_ssdt_size'
+pubsym acpi_ctx
+pubsym acpi_usage, 'kos_acpi_usage'
+pubsym acpi_node_alloc_cnt, 'kos_acpi_node_alloc_cnt'
+pubsym acpi_node_free_cnt, 'kos_acpi_node_free_cnt'
+pubsym acpi.count_nodes, 'kos_acpi_count_nodes', 4
 
-public stack_init as 'kos_stack_init'
-public net_add_device
+pubsym stack_init, 'kos_stack_init'
+pubsym net_add_device
 
-public draw_data
-public img_background
-public mem_BACKGROUND
-public sys_background
-public REDRAW_BACKGROUND as 'kos_redraw_background'
-public new_sys_threads as 'kos_new_sys_threads'
-public osloop as 'kos_osloop'
-public set_mouse_data as 'kos_set_mouse_data'
-public scheduler_current as 'kos_scheduler_current'
-public kos_eth_input
-public net_buff_alloc as 'kos_net_buff_alloc'
+pubsym draw_data
+pubsym img_background
+pubsym mem_BACKGROUND
+pubsym sys_background
+pubsym REDRAW_BACKGROUND, 'kos_redraw_background'
+pubsym new_sys_threads, 'kos_new_sys_threads', no_mangle
+pubsym osloop, 'kos_osloop'
+pubsym set_mouse_data, 'kos_set_mouse_data', 20
+pubsym scheduler_current, 'kos_scheduler_current'
+pubsym kos_eth_input
+pubsym net_buff_alloc, 'kos_net_buff_alloc', 4
 
-public mem_block_list
-public pci_root as "kos_pci_root"
+pubsym mem_block_list
+pubsym pci_root, "kos_pci_root"
 
-public acpi.aml.init as "kos_acpi_aml_init"
-public acpi_root as "kos_acpi_root"
-public aml._.attach as "kos_aml_attach"
-public acpi.fill_pci_irqs as "kos_acpi_fill_pci_irqs"
-public pci.walk_tree as "kos_pci_walk_tree"
-public acpi.aml.new_thread as "kos_acpi_aml_new_thread"
-public aml._.alloc_node as "kos_aml_alloc_node"
-public aml._.constructor.integer as "kos_aml_constructor_integer"
-public aml._.constructor.package as "kos_aml_constructor_package"
-public acpi._.lookup_node as "kos_acpi_lookup_node"
-public acpi._.print_tree as "kos_acpi_print_tree"
-public acpi_dev_data as "kos_acpi_dev_data"
-public acpi_dev_size as "kos_acpi_dev_size"
-public acpi_dev_next as "kos_acpi_dev_next"
-public kernel_alloc as "kos_kernel_alloc"
+pubsym acpi.aml.init, "kos_acpi_aml_init"
+pubsym acpi_root, "kos_acpi_root"
+pubsym aml._.attach, "kos_aml_attach"
+pubsym acpi.fill_pci_irqs, "kos_acpi_fill_pci_irqs"
+pubsym pci.walk_tree, "kos_pci_walk_tree", 16
+pubsym acpi.aml.new_thread, "kos_acpi_aml_new_thread"
+pubsym aml._.alloc_node, "kos_aml_alloc_node"
+pubsym aml._.constructor.integer, "kos_aml_constructor_integer"
+pubsym aml._.constructor.package, "kos_aml_constructor_package"
+pubsym acpi._.lookup_node, "kos_acpi_lookup_node"
+pubsym acpi._.print_tree, "kos_acpi_print_tree"
+pubsym acpi_dev_data, "kos_acpi_dev_data"
+pubsym acpi_dev_size, "kos_acpi_dev_size"
+pubsym acpi_dev_next, "kos_acpi_dev_next"
+pubsym kernel_alloc, "kos_kernel_alloc"
 
-public window._.set_screen as 'kos_window_set_screen'
-public _display as 'kos_display'
+pubsym window._.set_screen, 'kos_window_set_screen'
+pubsym _display, 'kos_display'
 
-public BOOT as 'kos_boot'
+pubsym BOOT, 'kos_boot'
 
 macro cli {
         pushfd
@@ -130,8 +192,12 @@ include 'macros.inc'
 
 macro diff16 msg,blah2,blah3 {
   if msg eq "end of .data segment"
-; fasm doesn't align on 65536, but ld script does
-section '.bss.aligned65k' writeable align 65536
+    if defined WIN32
+      section '.bss.8k' writeable align 8192
+    else
+      ; fasm doesn't align on 65536, but ld script does
+      section '.bss.aligned65k' writeable align 65536
+    end if
 bss_base:
   end if
 }
@@ -328,7 +394,7 @@ proc umka._.check_alignment
         ret
 endp
 
-public i40_asm
+pubsym i40_asm
 
 ;void i40_asm(uint32_t _eax,
 ;             uint32_t _ebx,
@@ -359,7 +425,7 @@ i40_asm:
         pop     ebp edi esi edx ecx ebx eax
         ret
 
-public set_eflags_tf
+pubsym set_eflags_tf
 
 proc set_eflags_tf c uses ebx esi edi ebp, tf
         mov    ecx, [tf]
@@ -581,7 +647,7 @@ proc umka_init c uses ebx esi edi ebp
         ret
 endp
 
-public skin_udata
+pubsym skin_udata
 proc idle uses ebx esi edi
 .loop:
         mov     ecx, 10000000
@@ -593,7 +659,7 @@ proc idle uses ebx esi edi
         ret
 endp
 
-extrn pci_read
+extrn pci_read, 20
 proc pci_read_reg uses ebx esi edi
         mov     ecx, eax
         and     ecx, 3
@@ -617,6 +683,14 @@ endp
 proc sys_msg_board
         cmp     cl, 0x0d
         jz      @f
+if defined WIN32
+        extrn   putchar
+        pushad
+        push    ecx
+        call    putchar
+        pop     ecx
+        popad
+else
         pushad
         mov     eax, SYS_WRITE
         mov     ebx, STDOUT
@@ -626,6 +700,7 @@ proc sys_msg_board
         int     0x80
         pop     ecx
         popad
+end if
 @@:
         ret
 endp
@@ -635,13 +710,13 @@ proc delay_ms
         ret
 endp
 
-public umka_cli
+pubsym umka_cli
 proc umka_cli
         cli     ; macro
         ret
 endp
 
-public umka_sti
+pubsym umka_sti
 proc umka_sti
         sti     ; macro
         ret
@@ -649,7 +724,7 @@ endp
 
 extrn reset_procmask
 extrn get_fake_if
-public irq0
+pubsym irq0
 proc irq0 c, _signo, _info, _context
         DEBUGF 2, "### irq0\n"
         pushfd
@@ -813,11 +888,15 @@ restore sys_msg_board,delay_ms
 
 coverage_end:
 
-; fasm doesn't align on 65536, but ld script does
-section '.data.aligned65k' writeable align 65536
-public umka_tool
+if defined WIN32
+    section '.data.8k' writeable align 8192
+else
+    ; fasm doesn't align on 65536, but ld script does
+    section '.data.aligned65k' writeable align 65536
+end if
+pubsym umka_tool
 umka_tool dd ?
-public umka_initialized
+pubsym umka_initialized
 umka_initialized dd 0
 fpu_owner dd ?
 

@@ -1,11 +1,12 @@
 #include <stdint.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+
+#ifndef _WIN32
+#include <unistd.h>
 #include <fcntl.h>
-#include <signal.h>
+#endif
+
 #include "umka.h"
 
 #define MSR_IA32_DEBUGCTLMSR        0x1d9
@@ -16,18 +17,23 @@ int covfd, msrfd;
 
 uint64_t rdmsr(uint32_t reg)
 {
-    uint64_t data;
+    uint64_t data = 0;
 
+#ifndef _WIN32
     if (pread(msrfd, &data, sizeof data, reg) != sizeof data) {
         perror("rdmsr: pread");
         exit(1);
     }
+#else
+    printf("STUB: %s:%d", __FILE__, __LINE__);
+#endif
 
     return data;
 }
 
 void wrmsr(uint32_t reg, uint64_t data)
 {
+#ifndef _WIN32
     int fd;
     fd = open("/dev/cpu/0/msr", O_WRONLY);
     if (fd < 0) {
@@ -41,10 +47,13 @@ void wrmsr(uint32_t reg, uint64_t data)
     }
 
     close(fd);
-    return;
+#else
+    printf("STUB: %s:%d", __FILE__, __LINE__);
+#endif
 }
 
 void handle_sigtrap() {
+#ifndef _WIN32
     uint64_t from = rdmsr(MSR_IA32_LASTBRANCHFROMIP);
     uint64_t to = rdmsr(MSR_IA32_LASTBRANCHTOIP);
 
@@ -55,11 +64,15 @@ void handle_sigtrap() {
     }
 
     wrmsr(MSR_IA32_DEBUGCTLMSR, 3);
+#else
+    printf("STUB: %s:%d", __FILE__, __LINE__);
+#endif
 }
 
 uint32_t set_eflags_tf(uint32_t tf);
 
 void trace_lbr_begin() {
+#ifndef _WIN32
     struct sigaction action;
     action.sa_sigaction = &handle_sigtrap;
     action.sa_flags = SA_SIGINFO;
@@ -78,12 +91,19 @@ void trace_lbr_begin() {
     void *coverage_end_addr = coverage_end;
     write(covfd, &coverage_begin_addr, 4);
     write(covfd, &coverage_end_addr, 4);
+#else
+    printf("STUB: %s:%d", __FILE__, __LINE__);
+#endif
 }
 
 void trace_lbr_end() {
+#ifndef _WIN32
     wrmsr(MSR_IA32_DEBUGCTLMSR, 0);
     close(msrfd);
     close(covfd);
+#else
+    printf("STUB: %s:%d", __FILE__, __LINE__);
+#endif
 }
 
 uint32_t trace_lbr_pause(void) {
