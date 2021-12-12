@@ -11,6 +11,7 @@
 typedef int32_t ssize_t;
 typedef int64_t off_t;
 #define PATH_MAX 255
+typedef void siginfo_t
 #endif
 
 #define STDCALL __attribute__((__stdcall__))
@@ -405,7 +406,7 @@ __attribute__((__noreturn__)) void
 kos_osloop(void);
 
 void
-irq0(int signo, void *info, void *context);
+irq0(int signo, siginfo_t *info, void *context);
 
 void
 umka_init(void);

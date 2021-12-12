@@ -1,0 +1,2 @@
+name: QEMU
+command: qemu-system-x86_64 -M pc -m 1024 -sdl -hda /data/work/distr/archlinux-2020.10.01-x86_64.iso -hdb hdd.raw

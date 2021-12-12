@@ -1,0 +1,2 @@
+name: HP Pavilion 15-cw0013ur
+owner: dunkaist

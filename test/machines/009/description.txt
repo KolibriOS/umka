@@ -1,0 +1,2 @@
+name: Intel i5
+owner: Kopa

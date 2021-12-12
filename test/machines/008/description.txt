@@ -1,0 +1,2 @@
+name: Intel Bay Trail platform, Valleyview Atom SoC
+owner: Kopa
