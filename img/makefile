@@ -356,12 +356,14 @@ xfs_v5_files_s05k_b4k_n8k.img:
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 fat32_test0.img:
-	fallocate -l 127MiB $@
+	fallocate -l 64MiB $@
 	mkfs.fat -n KOLIBRIOS -F 32 $@
 	sudo mount $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
-	$(RANDDIR) $(TEMP_DIR) 4096 8 255 65536
+	$(RANDDIR) $(TEMP_DIR) 1000 8 255 65536
 	$(DIRTOTEST) $(TEMP_DIR) fat32_test0.img hd0 > ../test/045_#f70_#fat32_test0.t
+	tree $(TEMP_DIR)
+	du -sh $(TEMP_DIR)
 	sudo umount $(TEMP_DIR)
 
 
