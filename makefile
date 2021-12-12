@@ -1,11 +1,25 @@
-KOLIBRIOS ?= /root/Sources/kolibrios
-FASM=fasm -dUEFI=1 -dextended_primary_loader=1 -dUMKA=1
-CC=gcc
-WARNINGS=-Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op \
-         -Wrestrict -Wnull-dereference -Wjump-misses-init -Wshadow -Wformat=2 \
-         -Wswitch -Wswitch-enum -Wpedantic \
+ifndef KOLIBRIOS
+        $(error "Set KOLIBRIOS environment variable to KolibriOS root")
+endif
+
+FASM ?= fasm -dUEFI=1 -dextended_primary_loader=1 -dUMKA=1
+CC ?= gcc
+WARNINGS_COMMON=-Wall -Wextra \
+         -Wnull-dereference -Wshadow -Wformat=2 -Wswitch -Wswitch-enum \
+         -Wpedantic \
          #-Wconversion -Wsign-conversion
-NOWARNINGS=-Wno-address-of-packed-member
+NOWARNINGS_COMMON=-Wno-address-of-packed-member -Wno-missing-prototype-for-cc
+
+ifeq ($(CC),gcc)
+        WARNINGS=$(WARNINGS_COMMON) -Wduplicated-cond -Wduplicated-branches -Wrestrict -Wlogical-op -Wjump-misses-init
+        NOWARNINGS=$(NOWARNINGS_COMMON)
+else ifeq ($(CC),clang)
+        WARNINGS=$(WARNINGS_COMMON)
+        NOWARNINGS=$(NOWARNINGS_COMMON)
+else
+        $(error compiler $(CC) is not supported)
+endif
+
 CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -g -O0 -D_FILE_OFFSET_BITS=64 \
        -DNDEBUG -masm=intel -D_POSIX_C_SOURCE=200809L -Ilinux -fno-pie
 CFLAGS_32=$(CFLAGS) -m32
@@ -25,17 +39,17 @@ covpreproc: covpreproc.c
 
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o vnet.o \
             lodepng.o pci.o thread.o util.o getopt.o isatty.o
-	$(CC) $(LDFLAGS_32) $^ -o $@ -static -T umka.ld
+	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs` -T umka.ld
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o trace_lbr.o \
          pci.o thread.o umka_ping.o util.o
-	$(CC) $(LDFLAGS_32) $^ -o $@ -static -T umka.ld
+	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o pci.o thread.o util.o
-	$(CC) $(LDFLAGS_32) $^ -o $@ -static -T umka.ld
+	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka.o umka.fas: umka.asm
 	INCLUDE="$(KOLIBRIOS)/kernel/trunk;$(KOLIBRIOS)/programs/develop/libraries/libcrash/hash" \

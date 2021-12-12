@@ -80,7 +80,7 @@ acpi_node_t *acpi_get(const char *path) {
     size_t len = fread(acpi_value, 1, ACPI_BUF_SIZE, f);
     acpi_value[len-1] = '\0';
     fclose(f);
-    acpi_node_t *n;
+    acpi_node_t *n = NULL;
     char *str = acpi_value;
     if (acpi_value[0] == '0') {
         kos_node_integer_t *aint = (kos_node_integer_t*)kos_aml_constructor_integer();
