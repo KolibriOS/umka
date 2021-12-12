@@ -358,8 +358,7 @@ xfs_v5_files_s05k_b4k_n8k.img:
 fat32_test0.img:
 	fallocate -l 64MiB $@
 	mkfs.fat -n KOLIBRIOS -F 32 $@
-	sudo mount $@ $(TEMP_DIR)
-	sudo chown $$USER $(TEMP_DIR) -R
+	sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $@ $(TEMP_DIR)
 	$(RANDDIR) $(TEMP_DIR) 1000 8 255 65536
 	$(DIRTOTEST) $(TEMP_DIR) fat32_test0.img hd0 > ../test/045_#f70_#fat32_test0.t
 	tree $(TEMP_DIR)
