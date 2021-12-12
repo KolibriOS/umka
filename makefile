@@ -1,3 +1,4 @@
+KOLIBRIOS=/root/Sources/kolibrios
 FASM=fasm -dUEFI=1 -dextended_primary_loader=1 -dUMKA=1
 CC=gcc
 WARNINGS=-Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op \
@@ -15,6 +16,9 @@ all: umka_shell umka_fuse umka_os umka_gen_devices_dat umka.sym umka.prp \
      umka.lst tags covpreproc default.skn skin.skn
 
 .PHONY: test
+
+test: umka_shell
+	@cd test && make clean all && cd ../
 
 covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@

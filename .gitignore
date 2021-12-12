@@ -11,6 +11,7 @@ umka_gen_devices_dat
 mkdirrange
 mkfilepattern
 lfbviewx
+randdir
 *.img
 *.img.xz
 *.img.gz

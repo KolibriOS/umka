@@ -49,14 +49,14 @@ acpi: $(acpi_tests)
 
 %.out.log: %.t
 	$(UMKA_SHELL) < $*.t > $@
-	@ cmp $*.{out,ref}.log
-	@ if [ -f "$*.ref.png" ]; then cmp $*.{out,ref}.png; fi
+	@ cmp $*.out.log $*.ref.log
+	@ if [ -f "$*.ref.png" ]; then cmp $*.out.png $*.ref.png; fi
 
 collect_coverage:
 	../covpreproc ../umka.lst 0x34 coverage.* > ../umka.cov
 
 clean:
-	rm -f ???_*.out.{log,png} coverage.*
+	rm -f *.out.log *.out.png coverage.*
 
 update_logs:
 	for f in *ref.log; do cp $$(basename $$f .ref.log).out.log $$f; done
