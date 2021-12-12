@@ -1,9 +1,11 @@
+RANDDIR=../tools/randdir
 MKDIRRANGE=../tools/mkdirrange
 MKFILEPATTERN=../tools/mkfilepattern
+DIRTOTEST=python3 ../tools/dirtotest.py
 MOUNT_OPT=-t xfs
 TEMP_DIR:=$(shell mktemp -d)
 
-all: s05k s4k unicode v5 kolibri.img coverage
+all: s05k s4k unicode v5 kolibri.img fat32_test0.img coverage
 	rmdir $(TEMP_DIR)
 
 s05k: xfs_v4_ftype0_s05k_b2k_n8k.img xfs_v4_ftype1_s05k_b2k_n8k.img xfs_v4_xattr.img xfs_v4_files_s05k_b4k_n8k.img xfs_v4_ftype0_s05k_b2k_n8k_xattr.img xfs_v4_btrees_l2.img xfs_short_dir_i8.img
@@ -352,5 +354,14 @@ xfs_v5_files_s05k_b4k_n8k.img:
 	fallocate -i -o 0 -l 1MiB $@ 
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
+
+fat32_test0.img:
+	fallocate -l 127MiB $@
+	mkfs.fat -n KOLIBRIOS -F 32 $@
+	sudo mount $@ $(TEMP_DIR)
+	sudo chown $$USER $(TEMP_DIR) -R
+	$(RANDDIR) $(TEMP_DIR) 4096 8 255 65536
+	$(DIRTOTEST) $(TEMP_DIR) fat32_test0.img hd0 > ../test/045_#f70_#fat32_test0.t
+	sudo umount $(TEMP_DIR)
 
 

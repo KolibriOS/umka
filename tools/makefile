@@ -7,7 +7,7 @@ CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -O2 \
        -DNDEBUG -D_POSIX_C_SOURCE=200809L -fno-pie
 LDFLAGS=-no-pie
 
-all: mkdirrange mkfilepattern lfbviewx
+all: mkdirrange mkfilepattern lfbviewx randdir
 
 mkdirrange: mkdirrange.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
@@ -17,6 +17,9 @@ mkfilepattern: mkfilepattern.c
 
 lfbviewx: lfbviewx.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@ -lX11 -lXext -D_GNU_SOURCE
+
+randdir: randdir.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
 .PHONY: all clean
 
