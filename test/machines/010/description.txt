@@ -1,2 +1,0 @@
-name: Bay Trail Atom
-owner: Evgeniy

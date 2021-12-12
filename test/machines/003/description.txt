@@ -1,2 +1,0 @@
-name: QEMU
-command: qemu-system-x86_64 -M q35 -m 1024 -sdl -hda archlinux-2020.05.01-x86_64.iso -hdb hdd

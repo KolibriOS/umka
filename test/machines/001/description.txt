@@ -1,2 +1,0 @@
-name: Acer Aspire V5-552
-owner: dunkaist

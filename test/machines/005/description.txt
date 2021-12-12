@@ -1,2 +1,0 @@
-name: mediacenter libreelec
-owner: hidnplayr

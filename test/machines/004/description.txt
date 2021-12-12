@@ -1,2 +1,0 @@
-name: Samsung PC
-owner: dunkaist/none

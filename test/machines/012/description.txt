@@ -1,2 +1,0 @@
-name: new motherboard
-owner: punk_joker
