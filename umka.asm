@@ -1,9 +1,11 @@
 ; TODO: SPDX
 
-if defined WIN32
+if HOST eq windows
     format MS COFF
-else
+else if HOST eq linux
     format ELF
+else
+    error "Your OS is not supported"
 end if
 
 ; win32:
@@ -21,7 +23,7 @@ end if
 ;   pubsym name, "name", 20        -> public name as "name"
 ;   pubsym name, "name", no_mangle -> public name as "name"
 macro pubsym name, marg1, marg2 {
-    if defined WIN32
+    if HOST eq windows
         if marg1 eq no_mangle
             public name
         else if marg1 eqtype 20
@@ -37,12 +39,14 @@ macro pubsym name, marg1, marg2 {
         else
             public name as '_' # `name
         end if
-    else
+    else if HOST eq linux
         if marg1 eqtype 'string'
             public name as marg1
         else
             public name
         end if
+    else
+        error "Your OS is not supported"
     end if
 }
 
@@ -53,14 +57,16 @@ macro pubsym name, marg1, marg2 {
 ;   extrn name     -> extrn name
 ;   extrn name, 20 -> extrn name
 macro extrn name, [argsize] {
-    if defined WIN32
+    if HOST eq windows
         if argsize eqtype 20
             extrn '_' # `name # '@' # `argsize as name
         else
             extrn '_' # `name as name
         end if
-    else
+    else if HOST eq linux
         extrn name
+    else
+        error "Your OS is not supported"
     end if
 }
 
@@ -192,11 +198,13 @@ include 'macros.inc'
 
 macro diff16 msg,blah2,blah3 {
   if msg eq "end of .data segment"
-    if defined WIN32
+    if HOST eq windows
       section '.bss.8k' writeable align 8192
-    else
+    else if HOST eq linux
       ; fasm doesn't align on 65536, but ld script does
       section '.bss.aligned65k' writeable align 65536
+    else
+      error "Your OS is not supported"
     end if
 bss_base:
   end if
@@ -683,14 +691,14 @@ endp
 proc sys_msg_board
         cmp     cl, 0x0d
         jz      @f
-if defined WIN32
+if HOST eq windows
         extrn   putchar
         pushad
         push    ecx
         call    putchar
         pop     ecx
         popad
-else
+else if HOST eq linux
         pushad
         mov     eax, SYS_WRITE
         mov     ebx, STDOUT
@@ -700,6 +708,8 @@ else
         int     0x80
         pop     ecx
         popad
+else
+    error "Your OS is not supported"
 end if
 @@:
         ret
@@ -888,11 +898,13 @@ restore sys_msg_board,delay_ms
 
 coverage_end:
 
-if defined WIN32
+if HOST eq windows
     section '.data.8k' writeable align 8192
-else
+else if HOST eq linux
     ; fasm doesn't align on 65536, but ld script does
     section '.data.aligned65k' writeable align 65536
+else
+    error "Your OS is not supported"
 end if
 pubsym umka_tool
 umka_tool dd ?

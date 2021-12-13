@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 void reset_procmask(void) {
     printf("STUB: %s:%d", __FILE__, __LINE__);
 }

@@ -3,15 +3,16 @@
 
 #include <inttypes.h>
 #include <stddef.h>
+#include <sys/types.h>
 
+#define UMKA_PATH_MAX 4096
 // TODO: Cleanup
 #ifndef _WIN32
 #include <signal.h> // for irq0: siginfo_t
 #else
-typedef int32_t ssize_t;
-typedef int64_t off_t;
-#define PATH_MAX 255
-typedef void siginfo_t
+//typedef int32_t ssize_t;
+//typedef int64_t off_t;
+typedef void siginfo_t;
 #endif
 
 #define STDCALL __attribute__((__stdcall__))

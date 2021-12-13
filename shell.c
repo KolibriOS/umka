@@ -35,7 +35,6 @@
 #include <sys/select.h>
 #endif
 
-#include "isatty.h"
 #include "getopt.h"
 #include "vdisk.h"
 #include "vnet.h"
@@ -45,7 +44,7 @@
 #include "util.h"
 #include "lodepng.h"
 
-#define PATH_MAX 4096
+//#define PATH_MAX 4096
 #define FGETS_BUF_LEN 4096
 #define MAX_COMMAND_ARGS 42
 #define PRINT_BYTES_PER_LINE 32

@@ -34,3 +34,5 @@ covpreproc
 *.aml
 ignore.*
 t.d
+*~
+*.exe

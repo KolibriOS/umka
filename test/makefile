@@ -1,7 +1,7 @@
 ifndef COVERAGE
-UMKA_SHELL=../umka_shell
+UMKA_SHELL ?= ../umka_shell
 else
-UMKA_SHELL=sudo taskset 1 ../umka_shell -c
+UMKA_SHELL ?= sudo taskset 1 ../umka_shell -c
 endif
 
 xfs_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#xfs_*.t)))
@@ -48,9 +48,14 @@ arp: $(arp_tests)
 acpi: $(acpi_tests)
 
 %.out.log: %.t
-	$(UMKA_SHELL) < $*.t > $@
+	$(UMKA_SHELL) -i $*.t
+ifeq ($(HOST),linux)
 	@ cmp $*.out.log $*.ref.log
 	@ if [ -f "$*.ref.png" ]; then cmp $*.out.png $*.ref.png; fi
+else
+	@ comp /M $*.out.log $*.ref.log
+#	@ if [ -f "$*.ref.png" ]; then cmp $*.out.png $*.ref.png; fi
+endif
 
 collect_coverage:
 	../covpreproc ../umka.lst 0x34 coverage.* > ../umka.cov
