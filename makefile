@@ -8,7 +8,7 @@ endif
 
 FASM_EXE ?= fasm
 FASM_INCLUDE=$(KOLIBRIOS)/kernel/trunk;$(KOLIBRIOS)/programs/develop/libraries/libcrash/hash
-FASM_FLAGS=-dUEFI=1 -dextended_primary_loader=1 -dUMKA=1 -dHOST=$(HOST)
+FASM_FLAGS=-dUEFI=1 -dextended_primary_loader=1 -dUMKA=1 -dHOST=$(HOST) -m 2000000
 
 CC ?= gcc
 WARNINGS_COMMON=-Wall -Wextra \

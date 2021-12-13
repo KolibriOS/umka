@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <unistd.h>
 #include <assert.h>
 #include <time.h>
 #include <errno.h>
