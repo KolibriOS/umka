@@ -38,7 +38,7 @@ ifeq ($(HOST),linux)
         FASM=INCLUDE="$(FASM_INCLUDE)" $(FASM_EXE) $(FASM_FLAGS)
 else ifeq ($(HOST),windows)
         FASM_INCLUDE=$(KOLIBRIOS)\kernel\trunk;$(KOLIBRIOS)\programs\develop\libraries\libcrash\hash
-        FASM=set INCLUDE=$(FASM_INCLUDE)&&$(FASM_EXE) $(FASM_FLAGS)
+        FASM=set "INCLUDE=$(FASM_INCLUDE)" && $(FASM_EXE) $(FASM_FLAGS)
 else
         $(error your OS is not supported)
 endif
