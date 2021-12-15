@@ -97,10 +97,10 @@ util.o: util.c util.h umka.h
 	$(CC) $(CFLAGS_32) -c $<
 
 default.skn: $(KOLIBRIOS)/skins/Leency/Shkvorka/default.asm
-	$(FASM) $< $@
+	$(FASM) "$<" $@
 
 skin.skn: $(KOLIBRIOS)/skins/Leency/Octo_flat/default.asm
-	$(FASM) $< $@
+	$(FASM) "$<" $@
 
 umka.prp: umka.fas
 	prepsrc $< $@
