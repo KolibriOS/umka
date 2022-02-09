@@ -31,7 +31,6 @@ set_window_colors 0 0 0 0 0 0 0 0 0 0
 
 dump_win_stack 2
 dump_win_pos 2
-dump_taskdata 2
 dump_appdata 2
 
 process_info -1

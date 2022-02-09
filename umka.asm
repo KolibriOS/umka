@@ -103,9 +103,6 @@ pubsym current_slot, 'kos_current_slot'
 pubsym current_slot_idx, 'kos_current_slot_idx'
 
 pubsym thread_count, 'kos_thread_count'
-pubsym TASK_TABLE, 'kos_task_table'
-pubsym TASK_BASE, 'kos_task_base'
-pubsym TASK_DATA, 'kos_task_data'
 pubsym SLOT_BASE, 'kos_slot_base'
 pubsym window_data, 'kos_window_data'
 
@@ -214,9 +211,6 @@ include 'struct.inc'
 macro BOOT_LO a {}
 macro BOOT a {}
 window_data equ __pew01
-TASK_TABLE equ __pew02
-TASK_BASE equ __pew03
-TASK_DATA equ __pew04
 CDDataBuf equ __pew06
 idts equ __pew07
 WIN_STACK equ __pew08
@@ -239,8 +233,7 @@ HEAP_BASE equ __pew23
 ;}
 include 'const.inc'
 restore window_data
-restore TASK_TABLE
-restore TASK_BASE,TASK_DATA,CDDataBuf,idts,WIN_STACK,WIN_POS
+restore CDDataBuf,idts,WIN_STACK,WIN_POS
 restore FDD_BUFF,WIN_TEMP_XY,KEY_COUNT,KEY_BUFF,BTN_COUNT,BTN_BUFF,BTN_ADDR
 restore MEM_AMOUNT,SYS_SHUTDOWN,SLOT_BASE,sys_proc,VGABasePtr
 restore HEAP_BASE
@@ -254,20 +247,6 @@ macro save_ring3_context {
 
 macro restore_ring3_context {
         popad
-}
-
-macro add r, v {
-  if v eq TASK_TABLE - (SLOT_BASE shr 3)
-        push    r
-        mov     r, SLOT_BASE
-        shr     r, 3
-        neg     r
-        add     r, TASK_TABLE
-        add     esp, 4
-        add     r, [esp-4]
-  else
-        add     r, v
-  end if
 }
 
 macro stdcall target, [args] {
@@ -291,22 +270,10 @@ macro call target {
         call    target
   end if
 }
-;macro mov r, v {
-;  if r eq byte [current_slot_idx] & v eq bh
-;        push    eax
-;        mov     eax, ebx
-;        sub     eax, SLOT_BASE
-;        shr     eax, BSF sizeof.APPDATA
-;        mov     [current_slot_idx], eax
-;        pop     eax
-;  else
-;        mov     r, v
-;  end if
-;}
 do_change_task equ hjk
 irq0 equ jhg
 include 'core/sched.inc'
-purge call, mov
+purge call
 restore irq0
 include 'core/syscall.inc'
 ;include 'core/fpu.inc'
@@ -316,6 +283,15 @@ include 'core/heap.inc'
 include 'core/malloc.inc'
 include 'core/taskman.inc'
 include 'core/dll.inc'
+macro call target {
+  if target eq pci_read_reg
+	call	_pci_read_reg
+  else
+        call    target
+  end if
+}
+include 'bus/pci/pci32.inc'
+purge call
 ;include 'core/peload.inc'
 ;include 'core/exports.inc'
 include 'core/string.inc'
@@ -343,10 +319,11 @@ include 'gui/font.inc'
 include 'gui/button.inc'
 include 'gui/mouse.inc'
 include 'gui/skincode.inc'
+include 'gui/background.inc'
 
 include 'hid/keyboard.inc'
 include 'hid/mousedrv.inc'
-;include 'hid/set_dtc.inc'      ; setting date,time,clock and alarm-clock
+include 'hid/set_dtc.inc'      ; setting date,time,clock and alarm-clock
 
 include 'sound/playnote.inc'
 
@@ -619,7 +596,7 @@ proc umka_init c uses ebx esi edi ebp
         add     eax, RING0_STACK_SIZE
         stdcall kernel_alloc, eax
         mov     ebx, eax
-        mov     edx, SLOT_BASE+256*2
+        mov     edx, SLOT_BASE+sizeof.APPDATA*2
         call    setup_os_slot
         mov     dword[edx], 'OS'
         sub     [edx+APPDATA.saved_esp], 4
@@ -630,9 +607,8 @@ proc umka_init c uses ebx esi edi ebp
 
         mov     [current_slot_idx], 2
         mov     [thread_count], 2
-        mov     dword[TASK_BASE], TASK_TABLE + 2*sizeof.TASKDATA
         mov     [current_slot], SLOT_BASE+2*sizeof.APPDATA
-        mov     [TASK_TABLE + 2*sizeof.TASKDATA + TASKDATA.pid], 2
+        mov     [SLOT_BASE + 2*sizeof.APPDATA + APPDATA.tid], 2
 
         call    set_window_defaults
         call    init_background
@@ -668,7 +644,7 @@ proc idle uses ebx esi edi
 endp
 
 extrn pci_read, 20
-proc pci_read_reg uses ebx esi edi
+proc _pci_read_reg uses ebx esi edi
         mov     ecx, eax
         and     ecx, 3
         movi    edx, 1
@@ -798,7 +774,6 @@ allow_medium_removal:
 EjectMedium:
 save_image:
 init_sys_v86:
-pci_enum:
 load_pe_driver:
 usb_init:
 fdc_init:
@@ -820,12 +795,8 @@ init_fpu:
 init_mtrr:
 create_trampoline_pgmap:
 alloc_page:
-pci_write_reg:
 
-sys_settime:
-sys_pcibios:
 sys_IPC:
-pci_api:
 sys_resize_app_memory:
 f68:
 v86_irq:
@@ -879,20 +850,10 @@ macro pew x {inclu#de `x}
 macro org x {}
 macro format [x] {}
 
-macro lea r, v {
-  if v eq [(ecx-(TASK_TABLE and 1FFFFFFFh)-TASKDATA.state)*8+SLOT_BASE]
-        int3
-  else if v eq [(edx-(TASK_TABLE and 1FFFFFFFh))*8+SLOT_BASE]
-        int3
-  else
-        lea     r, v
-  end if
-}
-
 include 'kernel.asm'
 
-purge lea,add,org,mov
-restore lea,add,org,mov
+purge org,mov
+restore add,org,mov
 purge sys_msg_board,delay_ms
 restore sys_msg_board,delay_ms
 
@@ -921,9 +882,6 @@ uglobal
 align 64
 os_base:        rb PAGE_SIZE
 window_data:    rb sizeof.WDATA * 256
-TASK_TABLE:     rb 16
-TASK_BASE:      rd 4
-TASK_DATA:      rd sizeof.TASKDATA * 255 / 4
 CDDataBuf:      rb 0x1000
 idts            rb IRQ_RESERVED * 8     ; IDT descriptor is 8 bytes long
 WIN_STACK       rw 0x200        ; why not 0x100?

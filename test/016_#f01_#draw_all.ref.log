@@ -49,14 +49,6 @@ font smoothing: 0 - off
 /> dump_win_pos 2
   0:   0
   1:   1
-/> dump_taskdata 2
-event_mask: 0
-pid: 2
-state: 0x0
-wnd_number: 2
-counter_sum: 0
-counter_add: 0
-cpu_usage: 0
 /> dump_appdata 2
 app_name: OS
 except_mask: 0
@@ -65,6 +57,9 @@ cur_dir:
 draw_bgr_x: 0
 draw_bgr_y: 0
 event_mask: 0
+tid: 2
+state: 0x0
+wnd_number: 2
 terminate_protection: 1
 keyboard_mode: 0
 captionEncoding: 0

@@ -96,8 +96,11 @@ getopt.o: getopt.c getopt.h
 util.o: util.c util.h umka.h
 	$(CC) $(CFLAGS_32) -c $<
 
-default.skn: $(KOLIBRIOS)/skins/Leency/Shkvorka/default.asm
-	$(FASM) "$<" $@
+default.skn: $(KOLIBRIOS)/skins/Leency/Shkvorka/default.asm colors.dtp
+	$(FASM) $< $@
+
+colors.dtp: $(KOLIBRIOS)/skins/Leency/Shkvorka/colors.dtp.asm
+	$(FASM) $< $@
 
 skin.skn: $(KOLIBRIOS)/skins/Leency/Octo_flat/default.asm
 	$(FASM) "$<" $@

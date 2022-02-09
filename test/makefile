@@ -1,3 +1,7 @@
+ifndef HOST
+        $(error "Set HOST variable to linux/windows")
+endif
+
 ifndef COVERAGE
 UMKA_SHELL ?= ../umka_shell
 else

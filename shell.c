@@ -603,6 +603,9 @@ shell_dump_appdata(int argc, char **argv) {
     fprintf(fout, "draw_bgr_x: %u\n", a->draw_bgr_x);
     fprintf(fout, "draw_bgr_y: %u\n", a->draw_bgr_y);
     fprintf(fout, "event_mask: %" PRIx32 "\n", a->event_mask);
+    fprintf(fout, "tid: %" PRId32 "\n", a->tid);
+    fprintf(fout, "state: 0x%" PRIx8 "\n", a->state);
+    fprintf(fout, "wnd_number: %" PRIu8 "\n", a->wnd_number);
     fprintf(fout, "terminate_protection: %u\n", a->terminate_protection);
     fprintf(fout, "keyboard_mode: %u\n", a->keyboard_mode);
     fprintf(fout, "captionEncoding: %u\n", a->captionEncoding);
@@ -627,26 +630,6 @@ shell_dump_appdata(int argc, char **argv) {
 }
 
 static void
-shell_dump_taskdata(int argc, char **argv) {
-    const char *usage = \
-        "usage: dump_taskdata <index>\n"
-        "  index            index into taskdata array to dump";
-    if (argc < 2) {
-        fputs(usage, fout);
-        return;
-    }
-    int idx = strtol(argv[1], NULL, 0);
-    taskdata_t *t = kos_task_table + idx;
-    fprintf(fout, "event_mask: %" PRIx32 "\n", t->event_mask);
-    fprintf(fout, "pid: %" PRId32 "\n", t->pid);
-    fprintf(fout, "state: 0x%" PRIx8 "\n", t->state);
-    fprintf(fout, "wnd_number: %" PRIu8 "\n", t->wnd_number);
-    fprintf(fout, "counter_sum: %" PRIu32 "\n", t->counter_sum);
-    fprintf(fout, "counter_add: %" PRIu32 "\n", t->counter_add);
-    fprintf(fout, "cpu_usage: %" PRIu32 "\n", t->cpu_usage);
-}
-
-static void
 shell_switch_to_thread(int argc, char **argv) {
     const char *usage = \
         "usage: switch_to_thread <tid>\n"
@@ -657,7 +640,6 @@ shell_switch_to_thread(int argc, char **argv) {
     }
     uint8_t tid = strtoul(argv[1], NULL, 0);
     kos_current_slot_idx = tid;
-    kos_task_base = kos_task_table + tid;
     kos_current_slot = kos_slot_base + tid;
 }
 
@@ -2744,7 +2726,6 @@ func_table_t shell_cmds[] = {
     { "draw_rect",               shell_draw_rect },
     { "draw_window",             shell_draw_window },
     { "dump_appdata",            shell_dump_appdata },
-    { "dump_taskdata",           shell_dump_taskdata },
     { "dump_win_pos",            shell_dump_win_pos },
     { "dump_win_stack",          shell_dump_win_stack },
     { "dump_win_map",            shell_dump_win_map },

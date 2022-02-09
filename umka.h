@@ -787,7 +787,8 @@ typedef struct {
     uint32_t draw_bgr_x;           // +116
     uint32_t draw_bgr_y;           // +120
     uint8_t state;                 // +124
-    uint8_t pad2[3];               // +125
+    uint8_t wnd_number;            // +125
+    uint8_t pad2[2];               // +126
     uint8_t *wnd_shape;            // +128
     uint32_t wnd_shape_scale;      // +132
     uint32_t mem_start;            // +136
@@ -815,23 +816,6 @@ typedef struct {
 
 _Static_assert(sizeof(appdata_t) == 256, "must be 0x100 bytes long");
 
-typedef struct {
-    uint32_t event_mask;
-    uint32_t pid;
-    uint16_t pad1;
-    uint8_t state;
-    uint8_t pad2;
-    uint16_t pad3;
-    uint8_t wnd_number;
-    uint8_t pad4;
-    uint32_t mem_start;
-    uint32_t counter_sum;
-    uint32_t counter_add;
-    uint32_t cpu_usage;
-} taskdata_t;
-
-_Static_assert(sizeof(taskdata_t) == 32, "must be 0x20 bytes long");
-
 #define UMKA_SHELL 1u
 #define UMKA_FUSE  2u
 #define UMKA_OS    3u
@@ -847,9 +831,7 @@ extern uint32_t umka_tool;
 extern uint32_t umka_initialized;
 extern uint8_t kos_redraw_background;
 extern size_t kos_task_count;
-extern taskdata_t *kos_task_base;
 extern wdata_t kos_window_data[];
-extern taskdata_t kos_task_table[];
 extern appdata_t kos_slot_base[];
 extern uint32_t kos_current_process;
 extern appdata_t *kos_current_slot;
@@ -891,7 +873,7 @@ umka_scheduler_add_thread(appdata_t *thread, int32_t priority) {
 
 typedef struct {
     appdata_t *appdata;
-    taskdata_t *taskdata;
+    void *taskdata;
     int same;
 } find_next_task_t;
 

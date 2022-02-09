@@ -36,3 +36,4 @@ ignore.*
 t.d
 *~
 *.exe
+colors.dtp
