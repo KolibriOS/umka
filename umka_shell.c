@@ -67,7 +67,7 @@ main(int argc, char **argv) {
                 perror("[!] can't open file");
                 exit(1);
             }
-            fout = fopen(outfile, "w");
+            fout = freopen(outfile, "w", stdout);
             if (!fout) {
                 perror("[!] can't open file");
                 exit(1);
