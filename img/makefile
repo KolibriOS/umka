@@ -8,7 +8,7 @@ TEMP_DIR:=$(shell mktemp -d)
 all: s05k s4k unicode v5 kolibri.img fat32_test0.img coverage
 	rmdir $(TEMP_DIR)
 
-s05k: xfs_v4_ftype0_s05k_b2k_n8k.img xfs_v4_ftype1_s05k_b2k_n8k.img xfs_v4_xattr.img xfs_v4_files_s05k_b4k_n8k.img xfs_v4_ftype0_s05k_b2k_n8k_xattr.img xfs_v4_btrees_l2.img xfs_short_dir_i8.img
+s05k: xfs_v4_ftype0_s05k_b2k_n8k.img xfs_v4_ftype1_s05k_b2k_n8k.img xfs_v4_xattr.img xfs_v4_files_s05k_b4k_n8k.img xfs_v4_ftype0_s05k_b2k_n8k_xattr.img xfs_v4_btrees_l2.img xfs_short_dir_i8.img exfat_s05k_c16k_b16k.img
 
 s4k: xfs_v4_ftype0_s4k_b4k_n8k.img
 
@@ -27,14 +27,14 @@ kolibri.img: ../default.skn
 jfs.img:
 	fallocate -l 16MiB $@
 	mkfs.jfs -q $@
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_borg_bit.img:
 	fallocate -l 16MiB $@
 	mkfs.xfs -n version=ci $@
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
@@ -52,7 +52,7 @@ xfs_short_dir_i8.img:
 	$(MKDIRRANGE) $(TEMP_DIR)/sf/d0000000002_xx 7 10  0 244
 #
 	sudo umount $(TEMP_DIR)
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
@@ -83,7 +83,7 @@ xfs_v4_ftype0_s05k_b2k_n8k.img:
 	$(MKDIRRANGE) $(TEMP_DIR)/btree_leaf_free 0 1200  201 43
 #
 	sudo umount $(TEMP_DIR)
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
@@ -114,7 +114,7 @@ xfs_v4_ftype1_s05k_b2k_n8k.img:
 	$(MKDIRRANGE) $(TEMP_DIR)/btree_leaf_free 0 1200  201 43
 #
 	sudo umount $(TEMP_DIR)
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
@@ -137,7 +137,7 @@ xfs_v4_xattr.img:
 	$(MKDIRRANGE) $(TEMP_DIR)/btree 0 600  0 244
 #
 	sudo umount $(TEMP_DIR)
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
@@ -158,7 +158,7 @@ xfs_v4_btrees_l2.img:
 	$(MKFILEPATTERN) $(TEMP_DIR)/file_btree_l2 0 16388096
 #
 	sudo umount $(TEMP_DIR)
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
@@ -193,7 +193,7 @@ xfs_v4_files_s05k_b4k_n8k.img:
 	$(MKFILEPATTERN) $(TEMP_DIR)/4GiB_plus 0x4000 0x4000
 #
 	sudo umount $(TEMP_DIR)
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
@@ -224,7 +224,7 @@ xfs_v4_ftype0_s4k_b4k_n8k.img:
 	$(MKDIRRANGE) $(TEMP_DIR)/btree_leaf_free 0 1200  201 43
 #
 	sudo umount $(TEMP_DIR)
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	sudo losetup -b 4096 /dev/loop8 $@
 	sudo parted --script /dev/loop8 mktable gpt
 	sudo parted --script --align optimal /dev/loop8 mkpart primary 1MiB 100%
@@ -266,7 +266,7 @@ xfs_v4_ftype0_s05k_b2k_n8k_xattr.img:
 	$(MKDIRRANGE) $(TEMP_DIR)/btree_leaf_free 0 1200  201 43
 #
 	sudo umount $(TEMP_DIR)
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
@@ -291,7 +291,7 @@ xfs_v4_unicode.img:
 	echo привет❦💗мир > $(TEMP_DIR)/дир3/файл33
 #
 	sudo umount $(TEMP_DIR)
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
@@ -322,7 +322,7 @@ xfs_v5_ftype1_s05k_b2k_n8k.img:
 	$(MKDIRRANGE) $(TEMP_DIR)/btree_leaf_free 0 1200  201 43
 #
 	sudo umount $(TEMP_DIR)
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
@@ -351,7 +351,7 @@ xfs_v5_files_s05k_b4k_n8k.img:
 	$(MKFILEPATTERN) $(TEMP_DIR)/btree_l1_no_hole 0 8196096
 #
 	sudo umount $(TEMP_DIR)
-	fallocate -i -o 0 -l 1MiB $@ 
+	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
@@ -365,4 +365,15 @@ fat32_test0.img:
 	du -sh $(TEMP_DIR)
 	sudo umount $(TEMP_DIR)
 
+exfat_s05k_c16k_b16k.img:
+	fallocate -l 64MiB $@
+	mkfs.exfat -L KOLIBRIOS -c 16k -b 16k $@
+	sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $@ $(TEMP_DIR)
+	mkdir $(TEMP_DIR)/dir_empty
+	mkdir $(TEMP_DIR)/dir_one
+	touch $(TEMP_DIR)/dir_one/file000
+	sudo umount $(TEMP_DIR)
+	fallocate -i -o 0 -l 1MiB $@
+	parted --script $@ mktable msdos
+	parted --script --align optimal $@ mkpart primary 1MiB 100%
 

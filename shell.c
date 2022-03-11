@@ -324,6 +324,8 @@ disk_list_partitions(disk_t *d) {
             fputs("ext\n", fout);
         } else if (d->partitions[i]->fs_user_functions == fat_user_functions) {
             fputs("fat\n", fout);
+        } else if (d->partitions[i]->fs_user_functions == exfat_user_functions) {
+            fputs("exfat\n", fout);
         } else if (d->partitions[i]->fs_user_functions == ntfs_user_functions) {
             fputs("ntfs\n", fout);
         } else {

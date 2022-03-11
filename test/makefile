@@ -9,6 +9,7 @@ UMKA_SHELL ?= sudo taskset 1 ../umka_shell -c
 endif
 
 xfs_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#xfs_*.t)))
+exfat_tests    := $(addsuffix .out.log, $(basename $(wildcard *\#exfat_*.t)))
 s05k_tests     := $(addsuffix .out.log, $(basename $(wildcard *\#s05k_*.t)))
 s4k_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#s4k_*.t)))
 f30_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#f30_*.t)))
@@ -28,10 +29,11 @@ net_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#net_*.t)))
 arp_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#arp_*.t)))
 acpi_tests     := $(addsuffix .out.log, $(basename $(wildcard *\#acpi_*.t)))
 
-all: xfs s05k s4k f30 f70 f70s0 f70s1 f70s5 lookup bug xattr unicode v5 draw coverage i40 net arp acpi
+all: xfs exfat s05k s4k f30 f70 f70s0 f70s1 f70s5 lookup bug xattr unicode v5 draw coverage i40 net arp acpi
 	@echo all tests passed
 
 xfs: $(xfs_tests)
+exfat: $(exfat_tests)
 s05k: $(s05k_tests)
 s4k: $(s4k_tests)
 f30: $(f30_tests)

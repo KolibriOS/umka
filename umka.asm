@@ -87,6 +87,7 @@ pubsym disk_media_changed, 8
 pubsym xfs._.user_functions, 'xfs_user_functions'
 pubsym ext_user_functions
 pubsym fat_user_functions
+pubsym exFAT_user_functions, 'exfat_user_functions'
 pubsym ntfs_user_functions
 
 pubsym i40, no_mangle
@@ -852,10 +853,8 @@ macro format [x] {}
 
 include 'kernel.asm'
 
-purge org,mov
-restore add,org,mov
-purge sys_msg_board,delay_ms
-restore sys_msg_board,delay_ms
+purge org,sys_msg_board,delay_ms
+restore org,sys_msg_board,delay_ms
 
 coverage_end:
 

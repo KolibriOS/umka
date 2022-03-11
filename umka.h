@@ -433,6 +433,7 @@ hash_oneshot(void *ctx, void *data, size_t len);
 extern uint8_t xfs_user_functions[];
 extern uint8_t ext_user_functions[];
 extern uint8_t fat_user_functions[];
+extern uint8_t exfat_user_functions[];
 extern uint8_t ntfs_user_functions[];
 
 extern uint8_t kos_ramdisk[2880*512];
