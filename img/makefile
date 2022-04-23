@@ -366,12 +366,91 @@ fat32_test0.img:
 	sudo umount $(TEMP_DIR)
 
 exfat_s05k_c16k_b16k.img:
-	fallocate -l 64MiB $@
+	fallocate -l 256MiB $@
 	mkfs.exfat -L KOLIBRIOS -c 16k -b 16k $@
 	sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $@ $(TEMP_DIR)
-	mkdir $(TEMP_DIR)/dir_empty
-	mkdir $(TEMP_DIR)/dir_one
-	touch $(TEMP_DIR)/dir_one/file000
+	mkdir $(TEMP_DIR)/dir_0
+	mkdir $(TEMP_DIR)/dir_1
+	touch $(TEMP_DIR)/dir_1/file000
+	mkdir $(TEMP_DIR)/dir_1000
+	$(MKDIRRANGE) $(TEMP_DIR)/dir_1000 0 1000  201 43
+	mkdir $(TEMP_DIR)/dir_10000
+	$(MKDIRRANGE) $(TEMP_DIR)/dir_10000 0 10000  201 43
+#	mkdir $(TEMP_DIR)/dir_100000
+#	$(MKDIRRANGE) $(TEMP_DIR)/dir_100000 0 100000  201 43
+	sudo umount $(TEMP_DIR)
+	fallocate -i -o 0 -l 1MiB $@
+	parted --script $@ mktable msdos
+	parted --script --align optimal $@ mkpart primary 1MiB 100%
+
+exfat_s05k_c8k_b8k.img:
+	fallocate -l 256MiB $@
+	mkfs.exfat -L KOLIBRIOS -c 8k -b 8k $@
+	sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $@ $(TEMP_DIR)
+	mkdir $(TEMP_DIR)/dir_000
+	echo -n '' > $(TEMP_DIR)/dir_000/file_000
+	mkdir $(TEMP_DIR)/dir_001
+	echo -n 'x' > $(TEMP_DIR)/dir_001/file_001
+	mkdir $(TEMP_DIR)/dir_002
+	echo -n 'x' > $(TEMP_DIR)/dir_002/file_002
+	mkdir $(TEMP_DIR)/dir_003
+	echo -n 'x' > $(TEMP_DIR)/dir_003/file_003
+	mkdir $(TEMP_DIR)/dir_004
+	echo -n 'x' > $(TEMP_DIR)/dir_004/file_004
+	mkdir $(TEMP_DIR)/dir_005
+	echo -n 'x' > $(TEMP_DIR)/dir_005/file_005
+	mkdir $(TEMP_DIR)/dir_006
+	echo -n 'x' > $(TEMP_DIR)/dir_006/file_006
+	mkdir $(TEMP_DIR)/dir_007
+	echo -n 'x' > $(TEMP_DIR)/dir_007/file_007
+	mkdir $(TEMP_DIR)/dir_008
+	echo -n 'x' > $(TEMP_DIR)/dir_008/file_008
+	mkdir $(TEMP_DIR)/dir_009
+	echo -n 'x' > $(TEMP_DIR)/dir_009/file_009
+	mkdir $(TEMP_DIR)/dir_010
+	echo -n 'x' > $(TEMP_DIR)/dir_010/file_010
+	mkdir $(TEMP_DIR)/dir_011
+	echo -n 'x' > $(TEMP_DIR)/dir_011/file_011
+	mkdir $(TEMP_DIR)/dir_012
+	echo -n 'x' > $(TEMP_DIR)/dir_012/file_012
+	mkdir $(TEMP_DIR)/dir_013
+	echo -n 'x' > $(TEMP_DIR)/dir_013/file_013
+	mkdir $(TEMP_DIR)/dir_014
+	echo -n 'x' > $(TEMP_DIR)/dir_014/file_014
+	mkdir $(TEMP_DIR)/dir_015
+	echo -n 'x' > $(TEMP_DIR)/dir_015/file_015
+	mkdir $(TEMP_DIR)/dir_016
+	echo -n 'x' > $(TEMP_DIR)/dir_016/file_016
+	mkdir $(TEMP_DIR)/dir_017
+	echo -n 'x' > $(TEMP_DIR)/dir_017/file_017
+	mkdir $(TEMP_DIR)/dir_018
+	echo -n 'x' > $(TEMP_DIR)/dir_018/file_018
+	mkdir $(TEMP_DIR)/dir_019
+	echo -n 'x' > $(TEMP_DIR)/dir_019/file_019
+	mkdir $(TEMP_DIR)/dir_020
+	echo -n 'x' > $(TEMP_DIR)/dir_020/file_020
+	mkdir $(TEMP_DIR)/dir_021
+	echo -n 'x' > $(TEMP_DIR)/dir_021/file_021
+	mkdir $(TEMP_DIR)/dir_022
+	echo -n 'x' > $(TEMP_DIR)/dir_022/file_022
+	mkdir $(TEMP_DIR)/dir_023
+	echo -n 'x' > $(TEMP_DIR)/dir_023/file_023
+	mkdir $(TEMP_DIR)/dir_024
+	echo -n 'x' > $(TEMP_DIR)/dir_024/file_024
+	mkdir $(TEMP_DIR)/dir_025
+	echo -n 'x' > $(TEMP_DIR)/dir_025/file_025
+	mkdir $(TEMP_DIR)/dir_026
+	echo -n 'x' > $(TEMP_DIR)/dir_026/file_026
+	mkdir $(TEMP_DIR)/dir_027
+	echo -n 'x' > $(TEMP_DIR)/dir_027/file_027
+	mkdir $(TEMP_DIR)/dir_028
+	echo -n 'x' > $(TEMP_DIR)/dir_028/file_028
+	mkdir $(TEMP_DIR)/dir_029
+	echo -n 'x' > $(TEMP_DIR)/dir_029/file_029
+	mkdir $(TEMP_DIR)/dir_030
+	echo -n 'x' > $(TEMP_DIR)/dir_030/file_030
+	mkdir $(TEMP_DIR)/dir_031
+	echo -n 'x' > $(TEMP_DIR)/dir_031/file_031
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable msdos
