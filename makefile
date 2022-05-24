@@ -7,7 +7,6 @@ ifndef HOST
 endif
 
 FASM_EXE ?= fasm
-FASM_INCLUDE=$(KOLIBRIOS)/kernel/trunk;$(KOLIBRIOS)/programs/develop/libraries/libcrash/hash
 FASM_FLAGS=-dUEFI=1 -dextended_primary_loader=1 -dUMKA=1 -dHOST=$(HOST) -m 2000000
 
 CC ?= gcc
@@ -78,7 +77,7 @@ umka_gen_devices_dat: umka_gen_devices_dat.o umka.o pci.o thread.o util.o
 umka.o umka.fas: umka.asm
 	$(FASM) $< umka.o -s umka.fas
 
-shell.o: shell.c
+shell.o: shell.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
 
 thread.o: $(HOST)/thread.c
@@ -89,6 +88,9 @@ pci.o: $(HOST)/pci.c
 
 lodepng.o: lodepng.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
+
+#bestline.o: bestline.c bestline.h
+#	$(CC) $(CFLAGS_32) -U_POSIX_C_SOURCE -Wno-logical-op -Wno-switch-enum -c $<
 
 getopt.o: getopt.c getopt.h
 	$(CC) $(CFLAGS_32) -c $<
@@ -136,7 +138,7 @@ umka_fuse.o: umka_fuse.c umka.h
 	$(CC) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $<
 
 umka_os.o: umka_os.c umka.h
-	$(CC) $(CFLAGS_32) -c $< -D_XOPEN_SOURCE=600
+	$(CC) $(CFLAGS_32) -c $<
 
 umka_gen_devices_dat.o: umka_gen_devices_dat.c umka.h
 	$(CC) $(CFLAGS_32) -c $<

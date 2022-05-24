@@ -1,7 +1,23 @@
+/*
+MEMORY
+{
+  pew : ORIGIN = 0, LENGTH = 64K
+}
+
 SECTIONS
 {
-  . = ALIGN(65536);
-  .data.aligned :
+  .aou 0:
+  {
+    *(.app)
+  } : NONE
+
+}
+INSERT BEFORE .interp;
+*/
+
+SECTIONS
+{
+  .data.aligned BLOCK(65536) :
   {
     *(SORT_BY_NAME(.data.align*))
   }
@@ -11,8 +27,7 @@ INSERT AFTER .data;
 
 SECTIONS
 {
-  . = ALIGN(65536);
-  .bss.aligned :
+  .bss.aligned BLOCK(65536) :
   {
     *(SORT_BY_NAME(.bss.align*))
   }

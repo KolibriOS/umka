@@ -84,6 +84,7 @@ int go_ping = 0;
 void
 umka_thread_ping(void) {
     umka_sti();
+    fprintf(stderr, "[ping] starting\n");
     while (!go_ping) { /* wait until initialized */ }
 
     f75ret_t r75;

@@ -2,6 +2,7 @@
 #define __USE_GNU
 #include <signal.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 sigset_t mask;
 
@@ -12,6 +13,10 @@ void reset_procmask(void) {
 }
 
 int get_fake_if(ucontext_t *ctx) {
-    // we fake IF with id flag
+    // we fake IF with ID flag
     return !(ctx->uc_mcontext.__gregs[REG_EFL] & (1 << 21));
+}
+
+void system_shutdown() {
+    exit(0);
 }

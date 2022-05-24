@@ -223,13 +223,9 @@ next_line(int is_tty, int block) {
         FD_SET(fileno(fin), &readfds);
         struct timeval timeout = {.tv_sec = 0, .tv_usec = 0};
         int sr = select(fileno(fin)+1, &readfds, NULL, NULL, &timeout);
+        cmd_buf[0] = '\0';
         if (sr > 0) {
             fgets(cmd_buf, FGETS_BUF_LEN, fin);
-            if (cmd_buf[0] == EOF) {
-                cmd_buf[0] = '\0';
-            }
-        } else {
-            cmd_buf[0] = '\0';
         }
         return 1;
     }

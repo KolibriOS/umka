@@ -164,15 +164,17 @@ pubsym _display, 'kos_display'
 
 pubsym BOOT, 'kos_boot'
 
+EFLAGS.ID = 1 SHL 21
+
 macro cli {
         pushfd
-        bts     dword[esp], 21
+        bts     dword[esp], BSF EFLAGS.ID
         popfd
 }
 
 macro sti {
         pushfd
-        btr     dword[esp], 21
+        btr     dword[esp], BSF EFLAGS.ID
         popfd
 }
 
@@ -187,6 +189,9 @@ macro int n {
     int n
   end if
 }
+
+section '.app' executable writable align 64
+rb 64*1024
 
 section '.text' executable align 64
 
@@ -286,7 +291,7 @@ include 'core/taskman.inc'
 include 'core/dll.inc'
 macro call target {
   if target eq pci_read_reg
-	call	_pci_read_reg
+        call    _pci_read_reg
   else
         call    target
   end if
@@ -603,7 +608,7 @@ proc umka_init c uses ebx esi edi ebp
         sub     [edx+APPDATA.saved_esp], 4
         mov     eax, [edx+APPDATA.saved_esp]
         mov     dword[eax], 0
-        xor     ecx, ecx
+        movi    ecx, MAX_PRIORITY
         call    scheduler_add_thread
 
         mov     [current_slot_idx], 2
@@ -720,7 +725,7 @@ proc irq0 c, _signo, _info, _context
 
         inc     [timer_ticks]
         call    updatecputimes
-        ccall   reset_procmask
+        ccall   reset_procmask          ; kind of irq_eoi:ta
         ccall   get_fake_if, [_context]
         test    eax, eax
         jnz     @f
@@ -760,6 +765,8 @@ proc map_io_mem _base, _size, _flags
         ret
 endp
 
+extrn system_shutdown
+
 sysfn_saveramdisk:
 sysfn_meminfo:
 check_fdd_motor_status:
@@ -767,7 +774,6 @@ check_ATAPI_device_event:
 check_fdd_motor_status_has_work?:
 check_ATAPI_device_event_has_work?:
 request_terminate:
-system_shutdown:
 terminate:
 LoadMedium:
 clear_CD_cache:
