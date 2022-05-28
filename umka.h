@@ -17,8 +17,61 @@ typedef void siginfo_t;
 
 #define STDCALL __attribute__((__stdcall__))
 
+#define KEYBOARD_MODE_ASCII     0
+#define KEYBOARD_MODE_SCANCODES 1
+
+enum kos_lang {
+    KOS_LANG_EN = 1,
+    KOS_LANG_FIRST = KOS_LANG_EN,
+    KOS_LANG_FI,
+    KOS_LANG_GE,
+    KOS_LANG_RU,
+    KOS_LANG_FR,
+    KOS_LANG_ET,
+    KOS_LANG_UA,
+    KOS_LANG_IT,
+    KOS_LANG_BE,
+    KOS_LANG_SP,
+    KOS_LANG_CA,
+    KOS_LANG_LAST = KOS_LANG_CA
+};
+
+#define KOS_LAYOUT_SIZE 128
+
 #define BDFE_LEN_CP866 304
 #define BDFE_LEN_UNICODE 560
+
+struct point16s {
+    int16_t y, x;
+};
+
+struct mouse_state {
+    uint8_t bl_held:1;
+    uint8_t br_held:1;
+    uint8_t bm_held:1;
+    uint8_t b4_held:1;
+    uint8_t b5_held:1;
+};
+
+struct mouse_events {
+    uint8_t bl_pressed:1;
+    uint8_t br_pressed:1;
+    uint8_t bm_pressed:1;
+    uint8_t :5;
+    uint8_t vscroll_used:1;
+    uint8_t bl_released:1;
+    uint8_t br_released:1;
+    uint8_t bm_released:1;
+    uint8_t :4;
+    uint8_t hscroll_used:1;
+    uint8_t bl_dbclick:1;
+    uint8_t :6;
+};
+
+struct mouse_state_events {
+    struct mouse_state st;
+    struct mouse_events ev;
+};
 
 typedef struct {
     uint32_t left, top, right, bottom;
@@ -852,6 +905,11 @@ extern uint32_t kos_acpi_node_alloc_cnt;
 extern uint32_t kos_acpi_node_free_cnt;
 extern uint32_t kos_acpi_count_nodes(void *ctx) STDCALL;
 extern disk_t disk_list;
+extern uint8_t kos_key_count;
+extern uint8_t kos_key_buff[120*2 + 2*2];
+extern uint8_t kos_keyboard_mode;
+extern uint32_t kos_syslang;
+extern uint32_t kos_keyboard;
 
 static inline void
 umka_scheduler_add_thread(appdata_t *thread, int32_t priority) {
@@ -945,6 +1003,17 @@ umka_sys_set_pixel(size_t x, size_t y, uint32_t color, int invert) {
           "c"(y),
           "d"((invert << 24) + color)
         : "memory");
+}
+
+static inline uint32_t
+umka_get_key() {
+    uint32_t key;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(key)
+        : "a"(2)
+        : "memory");
+    return key;
 }
 
 static inline void
@@ -1124,6 +1193,97 @@ umka_sys_bg_unmap(void *addr) {
 }
 
 static inline void
+umka_sys_set_mouse_pos_screen(struct point16s new_pos) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(18),
+          "b"(19),
+          "c"(4),
+          "d"(new_pos)
+        :);
+}
+
+static inline int
+umka_sys_set_keyboard_layout(int type, void *layout) {
+    int status;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(status)
+        : "a"(21),
+          "b"(2),
+          "c"(type),
+          "d"(layout)
+        : "memory");
+    return status;
+}
+
+static inline int
+umka_sys_set_keyboard_lang(enum kos_lang lang_id) {
+    int status;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(status)
+        : "a"(21),
+          "b"(2),
+          "c"(9),
+          "d"(lang_id)
+        : "memory");
+    return status;
+}
+
+static inline int
+umka_sys_set_system_lang(enum kos_lang lang_id) {
+    int status;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(status)
+        : "a"(21),
+          "b"(5),
+          "c"(lang_id)
+        : "memory");
+    return status;
+}
+
+static inline void
+umka_sys_get_keyboard_layout(int type, void *layout) {
+    int status;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(status)
+        : "a"(26),
+          "b"(2),
+          "c"(type),
+          "d"(layout)
+        : "memory");
+}
+
+static inline int
+umka_sys_get_keyboard_lang() {
+    int status;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(status)
+        : "a"(26),
+          "b"(2),
+          "c"(9)
+        :);
+    return status;
+}
+
+static inline int
+umka_sys_get_system_lang() {
+    int status;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(status)
+        : "a"(26),
+          "b"(5)
+        :);
+    return status;
+}
+
+static inline void
 umka_sys_set_cwd(const char *dir) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1144,6 +1304,95 @@ umka_sys_get_cwd(const char *buf, size_t len) {
           "c"(buf),
           "d"(len)
         : "memory");
+}
+
+static inline struct point16s
+umka_sys_get_mouse_pos_screen() {
+    struct point16s pos;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(pos)
+        : "a"(37),
+          "b"(0)
+        :);
+    return pos;
+}
+
+static inline struct point16s
+umka_sys_get_mouse_pos_window() {
+    struct point16s pos;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(pos)
+        : "a"(37),
+          "b"(1)
+        :);
+    return pos;
+}
+
+static inline struct mouse_state
+umka_sys_get_mouse_buttons_state() {
+    struct mouse_state mouse;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(mouse)
+        : "a"(37),
+          "b"(2)
+        :);
+    return mouse;
+}
+
+static inline struct mouse_state_events
+umka_sys_get_mouse_buttons_state_events() {
+    union {uint32_t x; struct mouse_state_events m;} u;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(u.x)
+        : "a"(37),
+          "b"(3)
+        :);
+    return u.m;
+}
+
+static inline void*
+umka_sys_load_cursor_from_file(const char *fname) {
+    void *handle;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(handle)
+        : "a"(37),
+          "b"(4),
+          "c"(fname),
+          "d"(0)
+        :);
+    return handle;
+}
+
+static inline void*
+umka_sys_load_cursor_from_mem(void *data) {
+    void *handle;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(handle)
+        : "a"(37),
+          "b"(4),
+          "c"(data),
+          "d"(1)
+        :);
+    return handle;
+}
+
+static inline void*
+umka_sys_set_cursor(void *handle) {
+    void *prev;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(prev)
+        : "a"(37),
+          "b"(5),
+          "c"(handle)
+        : "memory");
+    return prev;
 }
 
 static inline void
@@ -1346,6 +1595,29 @@ umka_sys_put_image_palette(void *image, size_t xsize, size_t ysize,
     regs.edi = (uintptr_t)palette;
     regs.ebp = row_offset;
     umka_i40(&regs);
+}
+
+static inline void
+umka_sys_set_keyboard_mode(int mode) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(66),
+          "b"(1),
+          "c"(mode)
+        : "memory");
+}
+
+static inline int
+umka_sys_get_keyboard_mode() {
+    int mode;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(mode)
+        : "a"(66),
+          "b"(2)
+        : "memory");
+    return mode;
 }
 
 static inline void
@@ -1847,5 +2119,14 @@ umka_sys_net_arp_del_entry(uint32_t dev_num, int32_t arp_num) {
 
 // Function 76, Protocol 5 - ARP, Subfunction 6, Send ARP announce ==
 // Function 76, Protocol 5 - ARP, Subfunction 7, Read # conflicts ===
+
+static inline void
+umka_set_keyboard_data(uint32_t scancode) {
+    __asm__ __inline__ __volatile__ (
+        "call   kos_set_keyboard_data"
+        :
+        : "c"(scancode)
+        : "eax", "edx", "memory", "cc");
+}
 
 #endif  // UMKA_H_INCLUDED

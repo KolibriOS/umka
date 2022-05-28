@@ -79,6 +79,14 @@ UMKA_OS    = 3
 
 UMKA_MEMORY_BYTES = 256 SHL 20
 
+pubsym set_keyboard_data, 'kos_set_keyboard_data'
+pubsym KEY_COUNT as 'kos_key_count'
+pubsym KEY_BUFF as 'kos_key_buff'
+pubsym keyboard_mode as 'kos_keyboard_mode'
+pubsym sys_getkey as 'kos_get_key'
+pubsym syslang as 'kos_syslang'
+pubsym keyboard as 'kos_keyboard'
+
 pubsym disk_add, 16
 pubsym disk_del, 4
 pubsym disk_list
@@ -566,8 +574,6 @@ proc umka_init c uses ebx esi edi ebp
 
         mov     [X_UNDER], 500
         mov     [Y_UNDER], 500
-        mov     word[MOUSE_X], 40
-        mov     word[MOUSE_Y], 30
 
         mov     eax, -1
         mov     edi, thr_slot_map+4
@@ -625,6 +631,14 @@ proc umka_init c uses ebx esi edi ebp
         mov     [SLOT_BASE+APPDATA.cursor+sizeof.APPDATA*2], eax
 
         ; from set_variables
+        mov     ax, [BOOT.y_res]
+        shr     ax, 1
+        shl     eax, 16
+        mov     ax, [BOOT.x_res]
+        shr     ax, 1
+        mov     [MOUSE_X], eax
+        call    wakeup_osloop
+
         xor     eax, eax
         mov     [BTN_ADDR], dword BUTTON_INFO   ; address of button list
         mov     byte [KEY_COUNT], al            ; keyboard buffer
@@ -894,7 +908,7 @@ WIN_POS         rw 0x200
 FDD_BUFF:       rb 0x400
 WIN_TEMP_XY     rb 0x100
 KEY_COUNT       db ?
-KEY_BUFF        rb 255  ; 120*2 + 2*2 = 244 bytes, actually 255 bytes
+KEY_BUFF        rb 244  ; 120*2 + 2*2 = 244 bytes, actually 255 bytes
 BTN_COUNT       db ?
 BTN_BUFF        rd 0x261
 BTN_ADDR        dd ?

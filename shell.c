@@ -179,6 +179,20 @@ print_hash(uint8_t *x, size_t len) {
     fputc('\n', fout);
 }
 
+void *host_load_file(const char *fname) {
+    FILE *f = fopen(fname, "r");
+    if (!f) {
+        return NULL;
+    }
+    fseek(f, 0, SEEK_END);
+    size_t fsize = ftell(f);
+    rewind(f);
+    void *fdata = malloc(fsize);
+    fread(fdata, 1, fsize, f);
+    fclose(f);
+    return fdata;
+}
+
 static const char *
 get_last_dir(const char *path) {
     const char *last = strrchr(path, '/');
@@ -240,9 +254,37 @@ split_args(char *s, char **argv) {
 }
 
 static void
+shell_send_scancode(int argc, char **argv) {
+    const char *usage = \
+        "usage: send_scancode <code>...\n"
+        "  code             dec or hex number\n";
+
+    if (argc < 2) {
+        fputs(usage, fout);
+        return;
+    }
+    argc -= 1;
+    argv += 1;
+
+    while (argc) {
+        char *endptr;
+        size_t code = strtoul(argv[0], &endptr, 0);
+        if (*endptr == '\0') {
+            umka_set_keyboard_data(code);
+            argc--;
+            argv++;
+        } else {
+            fprintf(fout, "not an integer: %s\n", argv[0]);
+            fputs(usage, fout);
+            return;
+        }
+    }
+}
+
+static void
 shell_umka_init(int argc, char **argv) {
     const char *usage = \
-        "usage: umka_init";
+        "usage: umka_init\n";
     (void)argv;
     if (argc < 0) {
         fputs(usage, fout);
@@ -258,7 +300,7 @@ shell_umka_set_boot_params(int argc, char **argv) {
     const char *usage = \
         "usage: umka_set_boot_params [--x_res <num>] [--y_res <num>]\n"
         "  --x_res <num>    screen width\n"
-        "  --y_res <num>    screen height";
+        "  --y_res <num>    screen height\n";
 
     argc -= 1;
     argv += 1;
@@ -276,9 +318,9 @@ shell_umka_set_boot_params(int argc, char **argv) {
             argv += 2;
             continue;
         } else {
-            printf("bad option: %s\n", argv[0]);
-            puts(usage);
-            exit(1);
+            fprintf(fout, "bad option: %s\n", argv[0]);
+            fputs(usage, fout);
+            return;
         }
     }
 
@@ -288,7 +330,7 @@ static void
 shell_i40(int argc, char **argv) {
     const char *usage = \
         "usage: i40 <eax> [ebx [ecx [edx [esi [edi [ebp]]]]]]...\n"
-        "  see '/kernel/docs/sysfuncs.txt' for details";
+        "  see '/kernel/docs/sysfuncs.txt' for details\n";
     if (argc < 2 || argc > 8) {
         fputs(usage, fout);
         return;
@@ -334,7 +376,7 @@ static void
 shell_ramdisk_init(int argc, char **argv) {
     const char *usage = \
         "usage: ramdisk_init <file>\n"
-        "  <file>           absolute or relative path";
+        "  <file>           absolute or relative path\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -367,7 +409,7 @@ shell_disk_add(int argc, char **argv) {
         "usage: disk_add <file> <name> [option]...\n"
         "  <file>           absolute or relative path\n"
         "  <name>           disk name, e.g. hd0 or rd\n"
-        "  -c cache size    size of disk cache in bytes";
+        "  -c cache size    size of disk cache in bytes\n";
     if (argc < 3) {
         fputs(usage, fout);
         return;
@@ -425,7 +467,7 @@ static void
 shell_disk_del(int argc, char **argv) {
     const char *usage = \
         "usage: disk_del <name>\n"
-        "  name             disk name, i.e. rd or hd0";
+        "  name             disk name, i.e. rd or hd0\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -438,7 +480,7 @@ shell_disk_del(int argc, char **argv) {
 static void
 shell_pwd(int argc, char **argv) {
     const char *usage = \
-        "usage: pwd";
+        "usage: pwd\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -459,7 +501,7 @@ shell_set_pixel(int argc, char **argv) {
         "  x                x window coordinate\n"
         "  y                y window coordinate\n"
         "  color            argb in hex\n"
-        "  -i               inverted color";
+        "  -i               inverted color\n";
     if (argc < 4) {
         fputs(usage, fout);
         return;
@@ -488,7 +530,7 @@ shell_write_text(int argc, char **argv) {
         "  font_and_enc     font size and string encoding\n"
         "  draw_to_buf      draw to the buffer pointed to by the next param\n"
         "  length           length of the string if it is non-asciiz\n"
-        "  bg_color_or_buf  argb or pointer";
+        "  bg_color_or_buf  argb or pointer\n";
     if (argc != 12) {
         fputs(usage, fout);
         return;
@@ -512,11 +554,42 @@ shell_write_text(int argc, char **argv) {
 }
 
 static void
+shell_get_key(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: get_key\n";
+    if (argc > 1) {
+        fputs(usage, fout);
+        return;
+    }
+    fprintf(fout, "0x%8.8" PRIx32 "\n", umka_get_key());
+}
+
+static void
+shell_dump_key_buff(int argc, char **argv) {
+    const char *usage = \
+        "usage: dump_key_buff [count]\n"
+        "  count            how many items to dump (all by default)\n";
+    if (argc > 2) {
+        fputs(usage, fout);
+        return;
+    }
+    int count = INT_MAX;
+    if (argc > 1) {
+        count = strtol(argv[1], NULL, 0);
+    }
+    for (int i = 0; i < count && i < kos_key_count; i++) {
+        fprintf(fout, "%3i 0x%2.2x 0x%2.2x\n", i, kos_key_buff[i],
+                kos_key_buff[120+2+i]);
+    }
+}
+
+static void
 shell_dump_win_stack(int argc, char **argv) {
     const char *usage = \
         "usage: dump_win_stack [count]\n"
-        "  count            how many items to dump";
-    if (argc < 1) {
+        "  count            how many items to dump\n";
+    if (argc > 2) {
         fputs(usage, fout);
         return;
     }
@@ -533,7 +606,7 @@ static void
 shell_dump_win_pos(int argc, char **argv) {
     const char *usage = \
         "usage: dump_win_pos [count]\n"
-        "  count            how many items to dump";
+        "  count            how many items to dump\n";
     if (argc < 1) {
         fputs(usage, fout);
         return;
@@ -549,8 +622,9 @@ shell_dump_win_pos(int argc, char **argv) {
 
 static void
 shell_dump_win_map(int argc, char **argv) {
+// TODO: area
     const char *usage = \
-        "usage: dump_win_map";
+        "usage: dump_win_map\n";
     (void)argv;
     if (argc < 0) {
         fputs(usage, fout);
@@ -569,7 +643,7 @@ shell_dump_appdata(int argc, char **argv) {
     const char *usage = \
         "usage: dump_appdata <index> [-p]\n"
         "  index            index into appdata array to dump\n"
-        "  -p               print fields that are pointers";
+        "  -p               print fields that are pointers\n";
     if (argc < 2) {
         fputs(usage, fout);
         return;
@@ -631,7 +705,7 @@ static void
 shell_switch_to_thread(int argc, char **argv) {
     const char *usage = \
         "usage: switch_to_thread <tid>\n"
-        "  <tid>          thread id to switch to";
+        "  <tid>          thread id to switch to\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -642,11 +716,38 @@ shell_switch_to_thread(int argc, char **argv) {
 }
 
 static void
+shell_get(int argc, char **argv) {
+    const char *usage = \
+        "usage: get <var>\n"
+        "  <var>          variable to get\n";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
+    const char *var = argv[1];
+    if (!strcmp(var, "redraw_background")) {
+        fprintf(fout, "%i\n", kos_redraw_background);
+    } else if (!strcmp(var, "key_count")) {
+        fprintf(fout, "%i\n", kos_key_count);
+    } else if (!strcmp(var, "syslang")) {
+        fprintf(fout, "%i\n", kos_syslang);
+    } else if (!strcmp(var, "keyboard")) {
+        fprintf(fout, "%i\n", kos_keyboard);
+    } else if (!strcmp(var, "keyboard_mode")) {
+        fprintf(fout, "%i\n", kos_keyboard_mode);
+    } else {
+        fprintf(fout, "no such variable: %s\n", var);
+        fputs(usage, fout);
+        return;
+    }
+}
+
+static void
 shell_set(int argc, char **argv) {
     const char *usage = \
         "usage: set <var> <value>\n"
         "  <var>          variable to set\n"
-        "  <value>        decimal or hex value";
+        "  <value>        decimal or hex value\n";
     if (argc != 3) {
         fputs(usage, fout);
         return;
@@ -655,17 +756,24 @@ shell_set(int argc, char **argv) {
     size_t value = strtoul(argv[2], NULL, 0);
     if (!strcmp(var, "redraw_background")) {
         kos_redraw_background = value;
+    } else if (!strcmp(var, "syslang")) {
+        kos_syslang = value;
+    } else if (!strcmp(var, "keyboard")) {
+        kos_keyboard = value;
+    } else if (!strcmp(var, "keyboard_mode")) {
+        kos_keyboard_mode = value;
     } else {
-        printf("bad option: %s\n", argv[0]);
-        puts(usage);
-        exit(1);
+        fprintf(fout, "bad option: %s\n", argv[1]);
+        fputs(usage, fout);
+        return;
     }
 }
 
 static void
 shell_new_sys_thread(int argc, char **argv) {
+// FIXME
     const char *usage = \
-        "usage: new_sys_thread";
+        "usage: new_sys_thread\n";
     if (!argc) {
         fputs(usage, fout);
         return;
@@ -767,7 +875,7 @@ static void
 shell_process_info(int argc, char **argv) {
     const char *usage = \
         "usage: process_info <pid>\n"
-        "  pid              process id to dump, -1 for self";
+        "  pid              process id to dump, -1 for self\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -812,7 +920,7 @@ shell_display_number(int argc, char **argv) {
         "  font             0 = 6x9, 1 = 8x16\n"
         "  draw_to_buf      0/1\n"
         "  scale_factor     0 = x1, ..., 7 = x8\n"
-        "  bg_color_or_buf  depending on flags fill_bg and draw_to_buf";
+        "  bg_color_or_buf  depending on flags fill_bg and draw_to_buf\n";
     if (argc != 15) {
         fputs(usage, fout);
         return;
@@ -849,7 +957,7 @@ shell_set_window_colors(int argc, char **argv) {
         "usage: set_window_colors <frame> <grab> <work_3d_dark> <work_3d_light>"
             " <grab_text> <work> <work_button> <work_button_text> <work_text>"
             " <work_graph>\n"
-        "  *                all colors are in hex";
+        "  *                all colors are in hex\n";
     if (argc != (1 + sizeof(system_colors_t)/4)) {
         fputs(usage, fout);
         return;
@@ -873,7 +981,7 @@ shell_set_window_colors(int argc, char **argv) {
 static void
 shell_get_window_colors(int argc, char **argv) {
     const char *usage = \
-        "usage: get_window_colors";
+        "usage: get_window_colors\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -900,7 +1008,7 @@ shell_get_window_colors(int argc, char **argv) {
 static void
 shell_get_skin_height(int argc, char **argv) {
     const char *usage = \
-        "usage: get_skin_height";
+        "usage: get_skin_height\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -915,7 +1023,7 @@ shell_get_skin_height(int argc, char **argv) {
 static void
 shell_get_screen_area(int argc, char **argv) {
     const char *usage = \
-        "usage: get_screen_area";
+        "usage: get_screen_area\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -938,7 +1046,7 @@ shell_set_screen_area(int argc, char **argv) {
         "  left             left x coord\n"
         "  top              top y coord\n"
         "  right            right x coord (not length!)\n"
-        "  bottom           bottom y coord";
+        "  bottom           bottom y coord\n";
     if (argc != 5) {
         fputs(usage, fout);
         return;
@@ -956,7 +1064,7 @@ shell_set_screen_area(int argc, char **argv) {
 static void
 shell_get_skin_margins(int argc, char **argv) {
     const char *usage = \
-        "usage: get_skin_margins";
+        "usage: get_skin_margins\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -976,7 +1084,7 @@ static void
 shell_set_button_style(int argc, char **argv) {
     const char *usage = \
         "usage: set_button_style <style>\n"
-        "  style            0 - flat, 1 - 3d";
+        "  style            0 - flat, 1 - 3d\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -991,7 +1099,7 @@ static void
 shell_set_skin(int argc, char **argv) {
     const char *usage = \
         "usage: set_skin <path>\n"
-        "  path             i.e. /rd/1/DEFAULT.SKN";
+        "  path             i.e. /rd/1/DEFAULT.SKN\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1003,15 +1111,282 @@ shell_set_skin(int argc, char **argv) {
     fprintf(fout, "status: %" PRIi32 "\n", status);
 }
 
+char *lang_id_map[] = {"en", "fi", "ge", "ru", "fr", "et", "ua", "it", "be",
+                       "sp", "ca"};
+
 static void
-shell_get_font_smoothing(int argc, char **argv) {
+shell_get_keyboard_layout(int argc, char **argv) {
     const char *usage = \
-        "usage: get_font_smoothing";
+        "usage: get_keyboard_layout <-t type> [-f file]\n"
+        "  -t type          layout type: 1 - normal, 2 - shift, 3 - alt\n"
+        "  -f file          file name to save layout to\n";
+    if (argc < 3) {
+        fputs(usage, fout);
+        return;
+    }
+    int type;
+    if (!strcmp(argv[1], "-t")) {
+        const char *type_str = argv[2];
+        char *endptr;
+        type = strtol(type_str, &endptr, 0);
+        if (*endptr != '\0') {
+            if (!strcmp(type_str, "normal")) {
+                type = 1;
+            } else if (!strcmp(type_str, "shift")) {
+                type = 2;
+            } else if (!strcmp(type_str, "alt")) {
+                type = 3;
+            } else {
+                fprintf(fout, "no such layout type: %s\n", type_str);
+                fputs(usage, fout);
+                return;
+            }
+        }
+    }
+    uint8_t layout[KOS_LAYOUT_SIZE];
+    COVERAGE_ON();
+    umka_sys_get_keyboard_layout(type, layout);
+    COVERAGE_OFF();
+    if (argc == 3) {
+#define NUM_COLS 16 // produces nice output, 80 chars
+        for (size_t row = 0; row < KOS_LAYOUT_SIZE/NUM_COLS; row++) {
+            for (size_t col = 0; col < NUM_COLS; col++) {
+                fprintf(fout, " 0x%2.2x", layout[row*NUM_COLS+col]);
+            }
+            putchar('\n');
+        }
+#undef COLS
+    } else if (argc == 5 && !strcmp(argv[3], "-f")) {
+        const char *fname = argv[4];
+        FILE *f = fopen(fname, "w");
+        if (!f) {
+            fprintf(fout, "can't open file for writing: %s\n", fname);
+            fputs(usage, fout);
+            return;
+        }
+        size_t nread = fwrite(layout, 1, KOS_LAYOUT_SIZE, f);
+        fclose(f);
+        if (nread != KOS_LAYOUT_SIZE) {
+            fprintf(fout, "can't write %i bytes of layout, only %i\n",
+                    KOS_LAYOUT_SIZE, nread);
+            fputs(usage, fout);
+            return;
+        }
+    } else {
+        fputs(usage, fout);
+        return;
+    }
+}
+
+static void
+shell_set_keyboard_layout(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_keyboard_layout <-t type> <-f file|code{128}>\n"
+        "  -t type          layout type: 1 - normal, 2 - shift, 3 - alt\n"
+        "  -f file          file name to read layout from\n"
+        "  code             i-th ASCII code for the scancode i\n";
+    if (argc != 5 && argc != 131) {
+        fputs(usage, fout);
+        return;
+    }
+    int type;
+    if (!strcmp(argv[1], "-t")) {
+        const char *type_str = argv[2];
+        char *endptr;
+        type = strtol(type_str, &endptr, 0);
+        if (*endptr != '\0') {
+            if (!strcmp(type_str, "normal")) {
+                type = 1;
+            } else if (!strcmp(type_str, "shift")) {
+                type = 2;
+            } else if (!strcmp(type_str, "alt")) {
+                type = 3;
+            } else {
+                fprintf(fout, "no such layout type: %s\n", type_str);
+                fputs(usage, fout);
+                return;
+            }
+        }
+    }
+    uint8_t layout[KOS_LAYOUT_SIZE];
+    if (!strcmp(argv[3], "-f") && argc == 5) {
+        const char *fname = argv[4];
+        FILE *f = fopen(fname, "r");
+        if (!f) {
+            fprintf(fout, "can't open file: %s\n", fname);
+            fputs(usage, fout);
+            return;
+        }
+        size_t nread = fread(layout, 1, KOS_LAYOUT_SIZE, f);
+        fclose(f);
+        if (nread != KOS_LAYOUT_SIZE) {
+            fprintf(fout, "can't read %i bytes of layout, only %i\n",
+                    KOS_LAYOUT_SIZE, nread);
+            fputs(usage, fout);
+            return;
+        }
+    } else {
+        char *endptr;
+        char **ascii_codes = argv + 4;
+        for (size_t i = 0; i < KOS_LAYOUT_SIZE; i++) {
+            long code = strtol(ascii_codes[i], &endptr, 0);
+            if (*endptr != '\0' || code > 0xff) {
+                fprintf(fout, "bad number: %s\n", ascii_codes[i]);
+                fputs(usage, fout);
+                return;
+            }
+            layout[i] = code;
+        }
+    }
+    COVERAGE_ON();
+    int status = umka_sys_set_keyboard_layout(type, layout);
+    COVERAGE_OFF();
+    fprintf(fout, "status: %i\n", status);
+}
+
+static void
+shell_get_keyboard_lang(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: get_keyboard_lang\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
     }
+    COVERAGE_ON();
+    int lang = umka_sys_get_keyboard_lang();
+    COVERAGE_OFF();
+    if (lang >= KOS_LANG_FIRST && lang <= KOS_LANG_LAST) {
+        fprintf(fout, "%i - %s\n", lang, lang_id_map[lang - KOS_LANG_FIRST]);
+    } else {
+        fprintf(fout, "invalid lang: %i\n", lang);
+    }
+}
+
+static void
+shell_get_system_lang(int argc, char **argv) {
     (void)argv;
+    const char *usage = \
+        "usage: get_system_lang\n";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
+    COVERAGE_ON();
+    int lang = umka_sys_get_system_lang();
+    COVERAGE_OFF();
+    if (lang >= KOS_LANG_FIRST && lang <= KOS_LANG_LAST) {
+        fprintf(fout, "%i - %s\n", lang, lang_id_map[lang - KOS_LANG_FIRST]);
+    } else {
+        fprintf(fout, "invalid lang: %i\n", lang);
+    }
+}
+
+static void
+shell_set_keyboard_lang(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_keyboard_lang <lang_id>\n"
+        "  lang_id          number or a two-digit code:\n"
+        "                   1 - en, 2 - fi, 3 - ge, 4 - ru, 5 - fr, 6 - et,\n"
+        "                   7 - ua, 8 - it, 9 - be, 10 - sp, 11 - ca\n";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
+    char *endptr;
+    const char *lang_str = argv[1];
+    int lang = strtol(lang_str, &endptr, 0);
+    if (*endptr != '\0') {
+        for (lang = 0; lang < KOS_LANG_LAST; lang++) {
+            if (!strcmp(lang_str, lang_id_map[lang])) {
+                break;
+            }
+        }
+        if (lang == KOS_LANG_LAST) {
+            fprintf(fout, "no such lang: %s\n", lang_str);
+            fputs(usage, fout);
+            return;
+        }
+        lang += KOS_LANG_FIRST;
+    }
+    COVERAGE_ON();
+    umka_sys_set_keyboard_lang(lang);
+    COVERAGE_OFF();
+}
+
+static void
+shell_set_system_lang(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_system_lang <lang_id>\n"
+        "  lang_id          number or a two-digit code:\n"
+        "                   1 - en, 2 - fi, 3 - ge, 4 - ru, 5 - fr, 6 - et,\n"
+        "                   7 - ua, 8 - it, 9 - be, 10 - sp, 11 - ca\n";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
+    char *endptr;
+    const char *lang_str = argv[1];
+    int lang = strtol(lang_str, &endptr, 0);
+    if (*endptr != '\0') {
+        for (lang = 0; lang < KOS_LANG_LAST; lang++) {
+            if (!strcmp(lang_str, lang_id_map[lang])) {
+                break;
+            }
+        }
+        if (lang == KOS_LANG_LAST) {
+            fprintf(fout, "no such lang: %s\n", lang_str);
+            fputs(usage, fout);
+            return;
+        }
+        lang += KOS_LANG_FIRST;  // not zero-based
+    }
+    COVERAGE_ON();
+    umka_sys_set_system_lang(lang);
+    COVERAGE_OFF();
+}
+
+static void
+shell_get_keyboard_mode(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: get_keyboard_mode\n";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
+    const char *names[] = {"ASCII", "scancodes"};
+    COVERAGE_ON();
+    int type = umka_sys_get_keyboard_mode();
+    COVERAGE_OFF();
+    fprintf(fout, "keyboard_mode: %i - %s\n", type,
+            type < 2 ? names[type] : "invalid!");
+}
+
+static void
+shell_set_keyboard_mode(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_keyboard_mode <mode>\n"
+        "  mode             0 - ASCII, 1 - scancodes\n";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
+    int type = strtol(argv[1], NULL, 0);
+    COVERAGE_ON();
+    umka_sys_set_keyboard_mode(type);
+    COVERAGE_OFF();
+}
+
+static void
+shell_get_font_smoothing(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: get_font_smoothing\n";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
     const char *names[] = {"off", "anti-aliasing", "subpixel"};
     COVERAGE_ON();
     int type = umka_sys_get_font_smoothing();
@@ -1023,7 +1398,7 @@ static void
 shell_set_font_smoothing(int argc, char **argv) {
     const char *usage = \
         "usage: set_font_smoothing <mode>\n"
-        "  mode             0 - off, 1 - gray AA, 2 - subpixel AA";
+        "  mode             0 - off, 1 - gray AA, 2 - subpixel AA\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1037,7 +1412,7 @@ shell_set_font_smoothing(int argc, char **argv) {
 static void
 shell_get_font_size(int argc, char **argv) {
     const char *usage = \
-        "usage: get_font_size";
+        "usage: get_font_size\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -1053,7 +1428,7 @@ static void
 shell_set_font_size(int argc, char **argv) {
     const char *usage = \
         "usage: set_font_size <size>\n"
-        "  size             in pixels";
+        "  size             in pixels\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1062,6 +1437,97 @@ shell_set_font_size(int argc, char **argv) {
     COVERAGE_ON();
     umka_sys_set_font_size(size);
     COVERAGE_OFF();
+}
+
+static void
+shell_set_mouse_pos_screen(int argc, char **argv) {
+    const char *usage = \
+        "usage: set_mouse_pos_screen <x> <y>\n"
+        "  x                in pixels\n"
+        "  y                in pixels\n";
+    if (argc != 3) {
+        fputs(usage, fout);
+        return;
+    }
+    struct point16s pos;
+    pos.x = strtol(argv[1], NULL, 0);
+    pos.y = strtol(argv[2], NULL, 0);
+    COVERAGE_ON();
+    umka_sys_set_mouse_pos_screen(pos);
+    COVERAGE_OFF();
+}
+
+static void
+shell_get_mouse_pos_screen(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: get_mouse_pos_screen\n";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
+    COVERAGE_ON();
+    struct point16s pos = umka_sys_get_mouse_pos_screen();
+    COVERAGE_OFF();
+    fprintf(fout, "x y: %" PRIi16 " %" PRIi16 "\n", pos.x, pos.y);
+}
+
+static void
+shell_get_mouse_pos_window(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: get_mouse_pos_window\n";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
+    COVERAGE_ON();
+    struct point16s pos = umka_sys_get_mouse_pos_window();
+    COVERAGE_OFF();
+    if (pos.y < 0) {
+        pos.x++;
+    }
+    fprintf(fout, "x y: %" PRIi16 " %" PRIi16 "\n", pos.x, pos.y);
+}
+
+static void
+shell_get_mouse_buttons_state(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: get_mouse_buttons_state\n";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
+    COVERAGE_ON();
+    struct mouse_state m = umka_sys_get_mouse_buttons_state();
+    COVERAGE_OFF();
+    fprintf(fout, "buttons held (left right middle 4th 5th): %u %u %u %u %u\n",
+            m.bl_held, m.br_held, m.bm_held, m.b4_held, m.b5_held);
+}
+
+static void
+shell_get_mouse_buttons_state_events(int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: get_mouse_buttons_state_events\n";
+    if (argc != 1) {
+        fputs(usage, fout);
+        return;
+    }
+    COVERAGE_ON();
+    struct mouse_state_events m = umka_sys_get_mouse_buttons_state_events();
+    COVERAGE_OFF();
+    fprintf(fout, "buttons held (left right middle 4th 5th): %u %u %u %u %u\n",
+            m.st.bl_held, m.st.br_held, m.st.bm_held, m.st.b4_held,
+            m.st.b5_held);
+    fprintf(fout, "buttons pressed (left right middle): %u %u %u\n",
+            m.ev.bl_pressed, m.ev.br_pressed, m.ev.bm_pressed);
+    fprintf(fout, "buttons released (left right middle): %u %u %u\n",
+            m.ev.bl_released, m.ev.br_released, m.ev.bm_released);
+    fprintf(fout, "left button double click: %u\n", m.ev.bl_dbclick);
+    fprintf(fout, "scrolls used (vertical horizontal): %u %u\n",
+            m.ev.vscroll_used, m.ev.hscroll_used);
 }
 
 static void
@@ -1076,7 +1542,7 @@ shell_button(int argc, char **argv) {
         "  id               24-bit\n"
         "  color            hex\n"
         "  draw_button      0/1\n"
-        "  draw_frame       0/1";
+        "  draw_frame       0/1\n";
     if (argc != 9) {
         fputs(usage, fout);
         return;
@@ -1096,6 +1562,53 @@ shell_button(int argc, char **argv) {
 }
 
 static void
+shell_load_cursor_from_file(int argc, char **argv) {
+    const char *usage = \
+        "usage: load_cursor_from_file <file>\n"
+        "  file             file in .cur format in kolibri fs\n";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
+    int show_pointers = 0;
+    COVERAGE_ON();
+    void *handle = umka_sys_load_cursor_from_file(argv[1]);
+    COVERAGE_OFF();
+    if (show_pointers) {
+        fprintf(fout, "handle = %p\n", handle);
+    } else {
+        fprintf(fout, "handle = %s\n", handle ? "non-zero" : "0");
+    }
+}
+
+static void
+shell_load_cursor_from_mem(int argc, char **argv) {
+    const char *usage = \
+        "usage: load_cursor_from_mem <file>\n"
+        "  file             file in .cur format in host fs\n";
+    if (argc != 2) {
+        fputs(usage, fout);
+        return;
+    }
+    int show_pointers = 0;
+    const char *fname = argv[1];
+    void *fdata = host_load_file(fname);
+    if (!fdata) {
+        fprintf(fout, "[umka] Can't load file: %s\n", fname);
+        return;
+    }
+    COVERAGE_ON();
+    void *handle = umka_sys_load_cursor_from_mem(fdata);
+    COVERAGE_OFF();
+    free(fdata);
+    if (show_pointers) {
+        fprintf(fout, "handle = %p\n", handle);
+    } else {
+        fprintf(fout, "handle = %s\n", handle ? "non-zero" : "0");
+    }
+}
+
+static void
 shell_put_image(int argc, char **argv) {
     const char *usage = \
         "usage: put_image <file> <xsize> <ysize> <x> <y>\n"
@@ -1103,7 +1616,7 @@ shell_put_image(int argc, char **argv) {
         "  xsize            x size\n"
         "  ysize            y size\n"
         "  x                x coord\n"
-        "  y                y coord";
+        "  y                y coord\n";
     if (argc != 6) {
         fputs(usage, fout);
         return;
@@ -1136,7 +1649,7 @@ shell_put_image_palette(int argc, char **argv) {
         "  x                x coord\n"
         "  y                y coord\n"
         "  bpp              bits per pixel\n"
-        "  row_offset       in bytes";
+        "  row_offset       in bytes\n";
     if (argc != 8) {
         fputs(usage, fout);
         return;
@@ -1171,7 +1684,7 @@ shell_draw_rect(int argc, char **argv) {
         "  y                y coord\n"
         "  ysize            y size\n"
         "  color            in hex\n"
-        "  -g               0/1 - gradient";
+        "  -g               0/1 - gradient\n";
     if (argc < 6) {
         fputs(usage, fout);
         return;
@@ -1190,7 +1703,7 @@ shell_draw_rect(int argc, char **argv) {
 static void
 shell_get_screen_size(int argc, char **argv) {
     const char *usage = \
-        "usage: get_screen_size";
+        "usage: get_screen_size\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -1212,7 +1725,7 @@ shell_draw_line(int argc, char **argv) {
         "  ybegin           y top coord\n"
         "  yend             y bottom coord\n"
         "  color            hex\n"
-        "  -i               inverted color";
+        "  -i               inverted color\n";
     if (argc < 6) {
         fputs(usage, fout);
         return;
@@ -1233,7 +1746,7 @@ shell_set_window_caption(int argc, char **argv) {
     const char *usage = \
         "usage: set_window_caption <caption> <encoding>\n"
         "  caption          asciiz string\n"
-        "  encoding         1 = cp866, 2 = UTF-16LE, 3 = UTF-8";
+        "  encoding         1 = cp866, 2 = UTF-16LE, 3 = UTF-8\n";
     if (argc != 3) {
         fputs(usage, fout);
         return;
@@ -1262,7 +1775,7 @@ shell_draw_window(int argc, char **argv) {
         "  gradient_fill    0/1\n"
         "  movable          0/1\n"
         "  style            1 - draw nothing, 3 - skinned, 4 - skinned fixed\n"
-        "  caption          asciiz";
+        "  caption          asciiz\n";
     if (argc != 13) {
         fputs(usage, fout);
         return;
@@ -1291,7 +1804,7 @@ shell_window_redraw(int argc, char **argv) {
     const char *usage = \
         "usage: window_redraw <1|2>\n"
         "  1                begin\n"
-        "  2                end";
+        "  2                end\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1309,7 +1822,7 @@ shell_move_window(int argc, char **argv) {
         "  x                new x coord\n"
         "  y                new y coord\n"
         "  xsize            x size -1\n"
-        "  ysize            y size -1";
+        "  ysize            y size -1\n";
     if (argc != 5) {
         fputs(usage, fout);
         return;
@@ -1341,7 +1854,7 @@ shell_blit_bitmap(int argc, char **argv) {
         "  background       0/1 - blit into background surface\n"
         "  transparent      0/1\n"
         "  client_relative  0/1\n"
-        "  row_length       in bytes";
+        "  row_length       in bytes\n";
     if (argc != 15) {
         fputs(usage, fout);
         return;
@@ -1384,7 +1897,7 @@ static void
 shell_write_devices_dat(int argc, char **argv) {
     const char *usage = \
         "usage: write_devices_dat <file>\n"
-        "  file             path/to/devices.dat";
+        "  file             path/to/devices.dat\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1398,7 +1911,7 @@ static void
 shell_scrot(int argc, char **argv) {
     const char *usage = \
         "usage: scrot <file>\n"
-        "  file             path/to/file in png format";
+        "  file             path/to/file in png format\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1423,7 +1936,7 @@ static void
 shell_cd(int argc, char **argv) {
     const char *usage = \
         "usage: cd <path>\n"
-        "  path             path/to/dir";
+        "  path             path/to/dir\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1529,7 +2042,7 @@ static void
 shell_exec(int argc, char **argv) {
     const char *usage = \
         "usage: exec <file>\n"
-        "  file           executable to run";
+        "  file           executable to run\n";
     if (!argc) {
         fputs(usage, fout);
         return;
@@ -1619,7 +2132,7 @@ shell_ls70(int argc, char **argv) {
         "  -f number        index of the first dir entry to read\n"
         "  -c number        number of dir entries to read\n"
         "  -e encoding      cp866|utf16|utf8\n"
-        "                   return directory listing in this encoding";
+        "                   return directory listing in this encoding\n";
     shell_ls(argc, argv, usage, F70);
 }
 
@@ -1632,7 +2145,7 @@ shell_ls80(int argc, char **argv) {
         "  -e encoding      cp866|utf16|utf8\n"
         "                   return directory listing in this encoding\n"
         "  -p encoding      cp866|utf16|utf8\n"
-        "                   path to dir is specified in this encoding";
+        "                   path to dir is specified in this encoding\n";
     shell_ls(argc, argv, usage, F80);
 }
 
@@ -1640,7 +2153,7 @@ static void
 shell_stat(int argc, char **argv, f70or80_t f70or80) {
     const char *usage = \
         "usage: stat <file>\n"
-        "  file             path/to/file";
+        "  file             path/to/file\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1764,7 +2277,7 @@ shell_read70(int argc, char **argv) {
         "  offset           in bytes\n"
         "  length           in bytes\n"
         "  -b               dump bytes in hex\n"
-        "  -h               print hash of data read";
+        "  -h               print hash of data read\n";
 
     shell_read(argc, argv, F70, usage);
 }
@@ -1779,7 +2292,7 @@ shell_read80(int argc, char **argv) {
         "  length           in bytes\n"
         "  -b               dump bytes in hex\n"
         "  -h               print hash of data read\n"
-        "  -e               encoding";
+        "  -e               encoding\n";
     shell_read(argc, argv, F80, usage);
 }
 
@@ -1787,7 +2300,7 @@ static void
 shell_acpi_preload_table(int argc, char **argv) {
     const char *usage = \
         "usage: acpi_preload_table <file>\n"
-        "  file             path/to/local/file.aml";
+        "  file             path/to/local/file.aml\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1812,7 +2325,7 @@ shell_acpi_preload_table(int argc, char **argv) {
 static void
 shell_acpi_enable(int argc, char **argv) {
     const char *usage = \
-        "usage: acpi_enable";
+        "usage: acpi_enable\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -1827,7 +2340,7 @@ static void
 shell_acpi_get_node_cnt(int argc, char **argv) {
     (void)argv;
     const char *usage = \
-        "usage: acpi_get_node_cnt";
+        "usage: acpi_get_node_cnt\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -1840,7 +2353,7 @@ static void
 shell_acpi_get_node_alloc_cnt(int argc, char **argv) {
     (void)argv;
     const char *usage = \
-        "usage: acpi_get_node_alloc_cnt";
+        "usage: acpi_get_node_alloc_cnt\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -1852,7 +2365,7 @@ static void
 shell_acpi_get_node_free_cnt(int argc, char **argv) {
     (void)argv;
     const char *usage = \
-        "usage: acpi_get_node_free_cnt";
+        "usage: acpi_get_node_free_cnt\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -1864,7 +2377,7 @@ static void
 shell_acpi_set_usage(int argc, char **argv) {
     const char *usage = \
         "usage: acpi_set_usage <num>\n"
-        "  num            one of ACPI_USAGE_* constants";
+        "  num            one of ACPI_USAGE_* constants\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1877,7 +2390,7 @@ static void
 shell_acpi_get_usage(int argc, char **argv) {
     (void)argv;
     const char *usage = \
-        "usage: acpi_get_usage";
+        "usage: acpi_get_usage\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -1889,9 +2402,9 @@ static void
 shell_acpi_call(int argc, char **argv) {
     const char *usage = \
         "usage: acpi_call <method> [args...]\n"
-        "  method         name of acpi method to call, e.g. \\_SB_PCI0_PRT";
+        "  method         name of acpi method to call, e.g. \\_SB_PCI0_PRT\n";
     if (argc > 2) {
-        puts("arguments are not supported / not implemented!");
+        fputs("arguments are not supported / not implemented!", fout);
         fputs(usage, fout);
         return;
     }
@@ -1911,7 +2424,7 @@ static void
 shell_pci_set_path(int argc, char **argv) {
     const char *usage = \
         "usage: pci_set_path <path>\n"
-        "  path           where aaaa:bb:cc.d dirs are";
+        "  path           where aaaa:bb:cc.d dirs are\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1923,7 +2436,7 @@ static void
 shell_pci_get_path(int argc, char **argv) {
     (void)argv;
     const char *usage = \
-        "usage: pci_get_path";
+        "usage: pci_get_path\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -1936,7 +2449,7 @@ shell_pci_get_path(int argc, char **argv) {
 static void
 shell_stack_init(int argc, char **argv) {
     const char *usage = \
-        "usage: stack_init";
+        "usage: stack_init\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -1948,7 +2461,7 @@ shell_stack_init(int argc, char **argv) {
 static void
 shell_net_add_device(int argc, char **argv) {
     const char *usage = \
-        "usage: net_add_device";
+        "usage: net_add_device\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -1962,7 +2475,7 @@ shell_net_add_device(int argc, char **argv) {
 static void
 shell_net_get_dev_count(int argc, char **argv) {
     const char *usage = \
-        "usage: net_get_dev_count";
+        "usage: net_get_dev_count\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -1976,7 +2489,7 @@ static void
 shell_net_get_dev_type(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev_type <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -1994,7 +2507,7 @@ static void
 shell_net_get_dev_name(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev_name <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2013,7 +2526,7 @@ static void
 shell_net_dev_reset(int argc, char **argv) {
     const char *usage = \
         "usage: net_dev_reset <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2027,7 +2540,7 @@ static void
 shell_net_dev_stop(int argc, char **argv) {
     const char *usage = \
         "usage: net_dev_stop <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2041,7 +2554,7 @@ static void
 shell_net_get_dev(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2058,7 +2571,7 @@ static void
 shell_net_get_packet_tx_count(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_packet_tx_count <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2076,7 +2589,7 @@ static void
 shell_net_get_packet_rx_count(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_packet_rx_count <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2094,7 +2607,7 @@ static void
 shell_net_get_byte_tx_count(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_byte_tx_count <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2112,7 +2625,7 @@ static void
 shell_net_get_byte_rx_count(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_byte_rx_count <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2163,7 +2676,7 @@ static void
 shell_net_get_link_status(int argc, char **argv) {
     const char *usage = \
         "usage: net_get_link_status <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2185,7 +2698,7 @@ shell_net_open_socket(int argc, char **argv) {
         "usage: net_open_socket <domain> <type> <protocol>\n"
         "  domain         domain\n"
         "  type           type\n"
-        "  protocol       protocol";
+        "  protocol       protocol\n";
     if (argc != 4) {
         fputs(usage, fout);
         return;
@@ -2203,7 +2716,7 @@ static void
 shell_net_close_socket(int argc, char **argv) {
     const char *usage = \
         "usage: net_close_socket <socket number>\n"
-        "  socket number  socket number";
+        "  socket number  socket number\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2220,7 +2733,7 @@ shell_net_bind(int argc, char **argv) {
         "usage: net_bind <fd> <port> <ip>\n"
         "  fd             socket number\n"
         "  port           port\n"
-        "  addr           addr";
+        "  addr           addr\n";
     if (argc != 4) {
         fputs(usage, fout);
         return;
@@ -2245,7 +2758,7 @@ shell_net_listen(int argc, char **argv) {
     const char *usage = \
         "usage: net_listen <fd> <backlog>\n"
         "  fd             socket number\n"
-        "  backlog        max queue length";
+        "  backlog        max queue length\n";
     if (argc != 3) {
         fputs(usage, fout);
         return;
@@ -2263,7 +2776,7 @@ shell_net_connect(int argc, char **argv) {
         "usage: net_connect <fd> <port> <ip>\n"
         "  fd             socket number\n"
         "  port           port\n"
-        "  addr           addr";
+        "  addr           addr\n";
     if (argc != 4) {
         fputs(usage, fout);
         return;
@@ -2289,7 +2802,7 @@ shell_net_accept(int argc, char **argv) {
         "usage: net_accept <fd> <port> <ip>\n"
         "  fd             socket number\n"
         "  port           port\n"
-        "  addr           addr";
+        "  addr           addr\n";
     if (argc != 4) {
         fputs(usage, fout);
         return;
@@ -2313,7 +2826,7 @@ static void
 shell_net_eth_read_mac(int argc, char **argv) {
     const char *usage = \
         "usage: net_eth_read_mac <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2334,7 +2847,7 @@ static void
 shell_net_ipv4_get_addr(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_addr <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2355,7 +2868,7 @@ shell_net_ipv4_set_addr(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_addr <dev_num> <addr>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  addr           a.b.c.d";
+        "  addr           a.b.c.d\n";
     if (argc != 3) {
         fputs(usage, fout);
         return;
@@ -2375,7 +2888,7 @@ static void
 shell_net_ipv4_get_dns(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_dns <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2396,7 +2909,7 @@ shell_net_ipv4_set_dns(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_dns <dev_num> <dns>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  dns            a.b.c.d";
+        "  dns            a.b.c.d\n";
     if (argc != 3) {
         fputs(usage, fout);
         return;
@@ -2415,7 +2928,7 @@ static void
 shell_net_ipv4_get_subnet(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_subnet <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2436,7 +2949,7 @@ shell_net_ipv4_set_subnet(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_subnet <dev_num> <subnet>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  subnet         a.b.c.d";
+        "  subnet         a.b.c.d\n";
     if (argc != 3) {
         fputs(usage, fout);
         return;
@@ -2456,7 +2969,7 @@ static void
 shell_net_ipv4_get_gw(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_gw <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2477,7 +2990,7 @@ shell_net_ipv4_set_gw(int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_gw <dev_num> <gw>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  gw             a.b.c.d";
+        "  gw             a.b.c.d\n";
     if (argc != 3) {
         fputs(usage, fout);
         return;
@@ -2497,7 +3010,7 @@ static void
 shell_net_arp_get_count(int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_get_count <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2516,7 +3029,7 @@ shell_net_arp_get_entry(int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_get_entry <dev_num> <arp_num>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  arp_num        arp number as returned by net_add_device";
+        "  arp_num        arp number as returned by net_add_device\n";
     if (argc != 3) {
         fputs(usage, fout);
         return;
@@ -2550,7 +3063,7 @@ shell_net_arp_add_entry(int argc, char **argv) {
         "  addr           IP addr\n"
         "  mac            ethernet addr\n"
         "  status         see ARP.inc\n"
-        "  ttl            Time to live";
+        "  ttl            Time to live\n";
     if (argc != 6) {
         fputs(usage, fout);
         return;
@@ -2575,7 +3088,7 @@ shell_net_arp_del_entry(int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_del_entry <dev_num> <arp_num>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  arp_num        arp number as returned by net_add_device";
+        "  arp_num        arp number as returned by net_add_device\n";
     if (argc != 3) {
         fputs(usage, fout);
         return;
@@ -2595,7 +3108,7 @@ shell_bg_set_size(int argc, char **argv) {
     const char *usage = \
         "usage: bg_set_size <xsize> <ysize>\n"
         "  xsize          in pixels\n"
-        "  ysize          in pixels";
+        "  ysize          in pixels\n";
     if (argc != 3) {
         fputs(usage, fout);
         return;
@@ -2610,7 +3123,7 @@ shell_bg_put_pixel(int argc, char **argv) {
     const char *usage = \
         "usage: bg_put_pixel <offset> <color>\n"
         "  offset         in bytes, (x+y*xsize)*3\n"
-        "  color          in hex";
+        "  color          in hex\n";
     if (argc != 3) {
         fputs(usage, fout);
         return;
@@ -2624,7 +3137,7 @@ static void
 shell_bg_redraw(int argc, char **argv) {
     (void)argv;
     const char *usage = \
-        "usage: bg_redraw";
+        "usage: bg_redraw\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -2636,7 +3149,7 @@ static void
 shell_bg_set_mode(int argc, char **argv) {
     const char *usage = \
         "usage: bg_set_mode <mode>\n"
-        "  mode           1 = tile, 2 = stretch";
+        "  mode           1 = tile, 2 = stretch\n";
     if (argc != 3) {
         fputs(usage, fout);
         return;
@@ -2670,7 +3183,7 @@ static void
 shell_bg_map(int argc, char **argv) {
     (void)argv;
     const char *usage = \
-        "usage: bg_map";
+        "usage: bg_map\n";
     if (argc != 1) {
         fputs(usage, fout);
         return;
@@ -2683,7 +3196,7 @@ static void
 shell_bg_unmap(int argc, char **argv) {
     const char *usage = \
         "usage: bg_unmap <addr>\n"
-        "  addr           return value of bg_map";
+        "  addr           return value of bg_map\n";
     if (argc != 2) {
         fputs(usage, fout);
         return;
@@ -2696,118 +3209,139 @@ shell_bg_unmap(int argc, char **argv) {
 static void shell_help(int argc, char **argv);
 
 func_table_t shell_cmds[] = {
-    { "umka_init",               shell_umka_init },
-    { "umka_set_boot_params",    shell_umka_set_boot_params },
-    { "acpi_call",               shell_acpi_call },
-    { "acpi_enable",             shell_acpi_enable },
-    { "acpi_get_usage",          shell_acpi_get_usage },
-    { "acpi_preload_table",      shell_acpi_preload_table },
-    { "acpi_set_usage",          shell_acpi_set_usage },
-    { "acpi_get_node_alloc_cnt", shell_acpi_get_node_alloc_cnt },
-    { "acpi_get_node_free_cnt",  shell_acpi_get_node_free_cnt },
-    { "acpi_get_node_cnt",       shell_acpi_get_node_cnt },
-    { "bg_map",                  shell_bg_map },
-    { "bg_put_img",              shell_bg_put_img },
-    { "bg_put_pixel",            shell_bg_put_pixel },
-    { "bg_redraw",               shell_bg_redraw },
-    { "bg_set_mode",             shell_bg_set_mode },
-    { "bg_set_size",             shell_bg_set_size },
-    { "bg_unmap",                shell_bg_unmap },
-    { "blit_bitmap",             shell_blit_bitmap },
-    { "button",                  shell_button },
-    { "cd",                      shell_cd },
-    { "set",                     shell_set },
-    { "disk_add",                shell_disk_add },
-    { "disk_del",                shell_disk_del },
-    { "display_number",          shell_display_number },
-    { "draw_line",               shell_draw_line },
-    { "draw_rect",               shell_draw_rect },
-    { "draw_window",             shell_draw_window },
-    { "dump_appdata",            shell_dump_appdata },
-    { "dump_win_pos",            shell_dump_win_pos },
-    { "dump_win_stack",          shell_dump_win_stack },
-    { "dump_win_map",            shell_dump_win_map },
-    { "exec",                    shell_exec },
-    { "get_font_size",           shell_get_font_size },
-    { "get_font_smoothing",      shell_get_font_smoothing },
-    { "get_screen_area",         shell_get_screen_area },
-    { "get_screen_size",         shell_get_screen_size },
-    { "get_skin_height",         shell_get_skin_height },
-    { "get_skin_margins",        shell_get_skin_margins },
-    { "get_window_colors",       shell_get_window_colors },
-    { "help",                    shell_help },
-    { "i40",                     shell_i40 },
-    { "ls70",                    shell_ls70 },
-    { "ls80",                    shell_ls80 },
-    { "move_window",             shell_move_window },
-    { "mouse_move",              shell_mouse_move },
+    { "send_scancode",                   shell_send_scancode },
+    { "umka_init",                       shell_umka_init },
+    { "umka_set_boot_params",            shell_umka_set_boot_params },
+    { "acpi_call",                       shell_acpi_call },
+    { "acpi_enable",                     shell_acpi_enable },
+    { "acpi_get_usage",                  shell_acpi_get_usage },
+    { "acpi_preload_table",              shell_acpi_preload_table },
+    { "acpi_set_usage",                  shell_acpi_set_usage },
+    { "acpi_get_node_alloc_cnt",         shell_acpi_get_node_alloc_cnt },
+    { "acpi_get_node_free_cnt",          shell_acpi_get_node_free_cnt },
+    { "acpi_get_node_cnt",               shell_acpi_get_node_cnt },
+    { "bg_map",                          shell_bg_map },
+    { "bg_put_img",                      shell_bg_put_img },
+    { "bg_put_pixel",                    shell_bg_put_pixel },
+    { "bg_redraw",                       shell_bg_redraw },
+    { "bg_set_mode",                     shell_bg_set_mode },
+    { "bg_set_size",                     shell_bg_set_size },
+    { "bg_unmap",                        shell_bg_unmap },
+    { "blit_bitmap",                     shell_blit_bitmap },
+    { "button",                          shell_button },
+    { "cd",                              shell_cd },
+    { "set",                             shell_set },
+    { "get",                             shell_get },
+    { "get_key",                         shell_get_key },
+    { "disk_add",                        shell_disk_add },
+    { "disk_del",                        shell_disk_del },
+    { "display_number",                  shell_display_number },
+    { "draw_line",                       shell_draw_line },
+    { "draw_rect",                       shell_draw_rect },
+    { "draw_window",                     shell_draw_window },
+    { "dump_appdata",                    shell_dump_appdata },
+    { "dump_key_buff",                   shell_dump_key_buff },
+    { "dump_win_pos",                    shell_dump_win_pos },
+    { "dump_win_stack",                  shell_dump_win_stack },
+    { "dump_win_map",                    shell_dump_win_map },
+    { "exec",                            shell_exec },
+    { "get_font_size",                   shell_get_font_size },
+    { "get_font_smoothing",              shell_get_font_smoothing },
+    { "get_keyboard_lang",               shell_get_keyboard_lang },
+    { "get_keyboard_layout",             shell_get_keyboard_layout },
+    { "get_keyboard_mode",               shell_get_keyboard_mode },
+    { "get_mouse_buttons_state",         shell_get_mouse_buttons_state },
+    { "get_mouse_buttons_state_events",  shell_get_mouse_buttons_state_events },
+    { "get_mouse_pos_screen",            shell_get_mouse_pos_screen },
+    { "get_mouse_pos_window",            shell_get_mouse_pos_window },
+    { "get_screen_area",                 shell_get_screen_area },
+    { "get_screen_size",                 shell_get_screen_size },
+    { "get_skin_height",                 shell_get_skin_height },
+    { "get_skin_margins",                shell_get_skin_margins },
+    { "get_system_lang",                 shell_get_system_lang },
+    { "get_window_colors",               shell_get_window_colors },
+    { "help",                            shell_help },
+    { "i40",                             shell_i40 },
+    { "load_cursor_from_file",           shell_load_cursor_from_file },
+    { "load_cursor_from_mem",            shell_load_cursor_from_mem },
+    { "ls70",                            shell_ls70 },
+    { "ls80",                            shell_ls80 },
+    { "move_window",                     shell_move_window },
+    { "mouse_move",                      shell_mouse_move },
 #ifndef _WIN32
-    { "stack_init",              shell_stack_init },
-    { "net_accept",              shell_net_accept },
-    { "net_add_device",          shell_net_add_device },
-    { "net_arp_add_entry",       shell_net_arp_add_entry },
-    { "net_arp_del_entry",       shell_net_arp_del_entry },
-    { "net_arp_get_count",       shell_net_arp_get_count },
-    { "net_arp_get_entry",       shell_net_arp_get_entry },
-    { "net_bind",                shell_net_bind },
-    { "net_close_socket",        shell_net_close_socket },
-    { "net_connect",             shell_net_connect },
-    { "net_dev_reset",           shell_net_dev_reset },
-    { "net_dev_stop",            shell_net_dev_stop },
-    { "net_eth_read_mac",        shell_net_eth_read_mac },
-    { "net_get_byte_rx_count",   shell_net_get_byte_rx_count },
-    { "net_get_byte_tx_count",   shell_net_get_byte_tx_count },
-    { "net_get_dev",             shell_net_get_dev },
-    { "net_get_dev_count",       shell_net_get_dev_count },
-    { "net_get_dev_name",        shell_net_get_dev_name },
-    { "net_get_dev_type",        shell_net_get_dev_type },
-    { "net_get_link_status",     shell_net_get_link_status },
-    { "net_get_packet_rx_count", shell_net_get_packet_rx_count },
-    { "net_get_packet_tx_count", shell_net_get_packet_tx_count },
-    { "net_ipv4_get_addr",       shell_net_ipv4_get_addr },
-    { "net_ipv4_get_dns",        shell_net_ipv4_get_dns },
-    { "net_ipv4_get_gw",         shell_net_ipv4_get_gw },
-    { "net_ipv4_get_subnet",     shell_net_ipv4_get_subnet },
-    { "net_ipv4_set_addr",       shell_net_ipv4_set_addr },
-    { "net_ipv4_set_dns",        shell_net_ipv4_set_dns },
-    { "net_ipv4_set_gw",         shell_net_ipv4_set_gw },
-    { "net_ipv4_set_subnet",     shell_net_ipv4_set_subnet },
-    { "net_listen",              shell_net_listen },
-    { "net_open_socket",         shell_net_open_socket },
+    { "stack_init",                      shell_stack_init },
+    { "net_accept",                      shell_net_accept },
+    { "net_add_device",                  shell_net_add_device },
+    { "net_arp_add_entry",               shell_net_arp_add_entry },
+    { "net_arp_del_entry",               shell_net_arp_del_entry },
+    { "net_arp_get_count",               shell_net_arp_get_count },
+    { "net_arp_get_entry",               shell_net_arp_get_entry },
+    { "net_bind",                        shell_net_bind },
+    { "net_close_socket",                shell_net_close_socket },
+    { "net_connect",                     shell_net_connect },
+    { "net_dev_reset",                   shell_net_dev_reset },
+    { "net_dev_stop",                    shell_net_dev_stop },
+    { "net_eth_read_mac",                shell_net_eth_read_mac },
+    { "net_get_byte_rx_count",           shell_net_get_byte_rx_count },
+    { "net_get_byte_tx_count",           shell_net_get_byte_tx_count },
+    { "net_get_dev",                     shell_net_get_dev },
+    { "net_get_dev_count",               shell_net_get_dev_count },
+    { "net_get_dev_name",                shell_net_get_dev_name },
+    { "net_get_dev_type",                shell_net_get_dev_type },
+    { "net_get_link_status",             shell_net_get_link_status },
+    { "net_get_packet_rx_count",         shell_net_get_packet_rx_count },
+    { "net_get_packet_tx_count",         shell_net_get_packet_tx_count },
+    { "net_ipv4_get_addr",               shell_net_ipv4_get_addr },
+    { "net_ipv4_get_dns",                shell_net_ipv4_get_dns },
+    { "net_ipv4_get_gw",                 shell_net_ipv4_get_gw },
+    { "net_ipv4_get_subnet",             shell_net_ipv4_get_subnet },
+    { "net_ipv4_set_addr",               shell_net_ipv4_set_addr },
+    { "net_ipv4_set_dns",                shell_net_ipv4_set_dns },
+    { "net_ipv4_set_gw",                 shell_net_ipv4_set_gw },
+    { "net_ipv4_set_subnet",             shell_net_ipv4_set_subnet },
+    { "net_listen",                      shell_net_listen },
+    { "net_open_socket",                 shell_net_open_socket },
 #endif // _WIN32
-    { "pci_get_path",            shell_pci_get_path },
-    { "pci_set_path",            shell_pci_set_path },
-    { "process_info",            shell_process_info },
-    { "put_image",               shell_put_image },
-    { "put_image_palette",       shell_put_image_palette },
-    { "pwd",                     shell_pwd },
-    { "ramdisk_init",            shell_ramdisk_init },
-    { "read70",                  shell_read70 },
-    { "read80",                  shell_read80 },
-    { "scrot",                   shell_scrot },
-    { "write_devices_dat",       shell_write_devices_dat },
-    { "set_button_style",        shell_set_button_style },
-    { "set_cwd",                 shell_cd },
-    { "set_font_size",           shell_set_font_size },
-    { "set_font_smoothing",      shell_set_font_smoothing },
-    { "set_pixel",               shell_set_pixel },
-    { "set_screen_area",         shell_set_screen_area },
-    { "set_skin",                shell_set_skin },
-    { "set_window_caption",      shell_set_window_caption },
-    { "set_window_colors",       shell_set_window_colors },
-    { "stat70",                  shell_stat70 },
-    { "stat80",                  shell_stat80 },
-    { "window_redraw",           shell_window_redraw },
-    { "write_text",              shell_write_text },
-    { "switch_to_thread",        shell_switch_to_thread },
-    { "new_sys_thread",          shell_new_sys_thread },
+    { "pci_get_path",                    shell_pci_get_path },
+    { "pci_set_path",                    shell_pci_set_path },
+    { "process_info",                    shell_process_info },
+    { "put_image",                       shell_put_image },
+    { "put_image_palette",               shell_put_image_palette },
+    { "pwd",                             shell_pwd },
+    { "ramdisk_init",                    shell_ramdisk_init },
+    { "read70",                          shell_read70 },
+    { "read80",                          shell_read80 },
+    { "scrot",                           shell_scrot },
+    { "write_devices_dat",               shell_write_devices_dat },
+    { "set_button_style",                shell_set_button_style },
+//    { "set_cursor",                      shell_set_cursor },
+    { "set_cwd",                         shell_cd },
+    { "set_font_size",                   shell_set_font_size },
+    { "set_font_smoothing",              shell_set_font_smoothing },
+    { "set_keyboard_lang",               shell_set_keyboard_lang },
+    { "set_keyboard_layout",             shell_set_keyboard_layout },
+    { "set_keyboard_mode",               shell_set_keyboard_mode },
+    { "set_mouse_pos_screen",            shell_set_mouse_pos_screen },
+    { "set_pixel",                       shell_set_pixel },
+    { "set_screen_area",                 shell_set_screen_area },
+    { "set_skin",                        shell_set_skin },
+    { "set_system_lang",                 shell_set_system_lang },
+    { "set_window_caption",              shell_set_window_caption },
+    { "set_window_colors",               shell_set_window_colors },
+    { "stat70",                          shell_stat70 },
+    { "stat80",                          shell_stat80 },
+    { "window_redraw",                   shell_window_redraw },
+    { "write_text",                      shell_write_text },
+    { "switch_to_thread",                shell_switch_to_thread },
+    { "new_sys_thread",                  shell_new_sys_thread },
+    { NULL,                              NULL },
 };
 
 static void
 shell_help(int argc, char **argv) {
     const char *usage = \
         "usage: help [command]\n"
-        "  command        help on this command usage";
+        "  command        help on this command usage\n";
     switch (argc) {
     case 1:
         fputs(usage, fout);
@@ -2856,9 +3390,7 @@ run_test(FILE *in, FILE *out, int block) {
         }
         int argc = split_args(cmd_buf, argv);
         func_table_t *ft;
-        for (ft = shell_cmds;
-             ft < shell_cmds + sizeof(shell_cmds) / sizeof(*shell_cmds);
-             ft++) {
+        for (ft = shell_cmds; ft->name; ft++) {
             if (!strcmp(argv[0], ft->name)) {
                 break;
             }

@@ -28,8 +28,10 @@ i40_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#i40_*.t)))
 net_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#net_*.t)))
 arp_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#arp_*.t)))
 acpi_tests     := $(addsuffix .out.log, $(basename $(wildcard *\#acpi_*.t)))
+input_tests    := $(addsuffix .out.log, $(basename $(wildcard *\#input_*.t)))
 
-all: xfs exfat s05k s4k f30 f70 f70s0 f70s1 f70s5 lookup bug xattr unicode v5 draw coverage i40 net arp acpi
+all: xfs exfat s05k s4k f30 f70 f70s0 f70s1 f70s5 lookup bug xattr unicode v5 \
+     draw coverage i40 net arp acpi input
 	@echo all tests passed
 
 xfs: $(xfs_tests)
@@ -52,6 +54,7 @@ i40: $(i40_tests)
 net: $(net_tests)
 arp: $(arp_tests)
 acpi: $(acpi_tests)
+input: $(input_tests)
 
 %.out.log: %.t
 	$(UMKA_SHELL) -i $*.t

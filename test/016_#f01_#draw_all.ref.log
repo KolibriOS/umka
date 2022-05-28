@@ -1,4 +1,5 @@
 /> umka_init
+/> set_mouse_pos_screen 40 30
 #disk_add ../img/kolibri.img rd -c 0
 /> ramdisk_init ../img/kolibri.img
 /rd/1: fat

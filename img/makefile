@@ -18,11 +18,12 @@ v5: xfs_v5_ftype1_s05k_b2k_n8k.img xfs_v5_files_s05k_b4k_n8k.img
 
 coverage: jfs.img xfs_borg_bit.img xfs_short_dir_i8.img
 
-kolibri.img: ../default.skn
+kolibri.img: ../default.skn ../fill.cur
 	touch $@
 	fallocate -z -o 0 -l 1440KiB $@
 	mkfs.vfat -n KOLIBRIOS -F 12 $@
-	mcopy -vmoi $@ $< ::DEFAULT.SKN
+	mcopy -vmoi $@ ../default.skn ::DEFAULT.SKN
+	mcopy -vmoi $@ ../fill.cur ::FILL.CUR
 
 jfs.img:
 	fallocate -l 16MiB $@
