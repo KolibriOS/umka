@@ -61,14 +61,14 @@ covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o vnet.o \
-            lodepng.o pci.o thread.o util.o optparse.o
+            lodepng.o pci.o thread.o util.o optparse.o bestline.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs` -T umka.ld
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o trace_lbr.o \
-         pci.o thread.o umka_ping.o util.o
+         pci.o thread.o umka_ping.o util.o bestline.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o pci.o thread.o util.o
@@ -89,8 +89,8 @@ pci.o: $(HOST)/pci.c
 lodepng.o: lodepng.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
 
-#bestline.o: bestline.c bestline.h
-#	$(CC) $(CFLAGS_32) -U_POSIX_C_SOURCE -Wno-logical-op -Wno-switch-enum -c $<
+bestline.o: bestline.c bestline.h
+	$(CC) $(CFLAGS_32) -U_POSIX_C_SOURCE -Wno-logical-op -Wno-switch-enum -c $<
 
 optparse.o: optparse.c optparse.h
 	$(CC) $(CFLAGS_32) -c $<

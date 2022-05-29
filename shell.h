@@ -7,6 +7,7 @@ struct shell_ctx {
     FILE *fin;
     FILE *fout;
     int reproducible;
+    const char *hist_file;
 };
 
 void *run_test(struct shell_ctx *ctx);

@@ -33,12 +33,9 @@
 // TODO: Cleanup
 #ifndef _WIN32
 #include <arpa/inet.h>
-#include <sys/select.h>
 #endif
 
 #include "shell.h"
-#include "optparse.h"
-//#include "bestline.h"
 #include "vdisk.h"
 #include "vnet.h"
 #include "umka.h"
@@ -46,9 +43,9 @@
 #include "pci.h"
 #include "util.h"
 #include "lodepng.h"
+#include "optparse.h"
+#include "bestline.h"
 
-//#define PATH_MAX 4096
-#define FGETS_BUF_LEN 4096
 #define MAX_COMMAND_ARGS 42
 #define PRINT_BYTES_PER_LINE 32
 #define MAX_DIRENTS_TO_READ 100
@@ -57,12 +54,10 @@
 #define DEFAULT_READDIR_ENCODING UTF8
 #define DEFAULT_PATH_ENCODING UTF8
 
-char prompt_line[2*PATH_MAX];
+char prompt_line[PATH_MAX];
 char cur_dir[PATH_MAX] = "/";
 const char *last_dir = cur_dir;
 bool cur_dir_changed = true;
-
-char cmd_buf[FGETS_BUF_LEN];
 
 typedef struct {
     char *name;
@@ -219,7 +214,7 @@ prompt(struct shell_ctx *ctx) {
     fprintf(ctx->fout, "%s> ", last_dir);
     fflush(ctx->fout);
 }
-/*
+
 static void
 completion(const char *buf, bestlineCompletions *lc) {
     if (buf[0] == 'h') {
@@ -236,39 +231,6 @@ hints(const char *buf, const char **ansi1, const char **ansi2) {
         return " World";
     }
     return NULL;
-}
-*/
-static int
-next_line(struct shell_ctx *ctx, int is_tty) {
-    if (is_tty) {
-        prompt(ctx);
-    }
-    return fgets(cmd_buf, FGETS_BUF_LEN, ctx->fin) != NULL;
-// TODO: Cleanup
-#ifdef _WIN32
-    return fgets(cmd_buf, FGETS_BUF_LEN, ctx->fin) != NULL;
-#else
-    fd_set readfds;
-//    FD_ZERO(&readfds);
-    memset(&readfds, 0, sizeof(readfds));
-    FD_SET(fileno(ctx->fin), &readfds);
-    struct timeval timeout = {.tv_sec = 0, .tv_usec = 0};
-    int sr = select(fileno(ctx->fin)+1, &readfds, NULL, NULL, &timeout);
-    cmd_buf[0] = '\0';
-    if (sr > 0) {
-        fgets(cmd_buf, FGETS_BUF_LEN, ctx->fin);
-    }
-    return 1;
-#endif
-/*
-    sprintf(prompt_line, "%s> ", last_dir);
-    char *line = bestlineRaw(prompt_line, fileno(ctx->fin), fileno(ctx->fout));
-    if (line) {
-        strcpy(cmd_buf, line);
-        bestlineFree(line);
-    }
-    return line != NULL;
-*/
 }
 
 static int
@@ -778,7 +740,13 @@ shell_set(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     const char *var = argv[1];
-    size_t value = strtoul(argv[2], NULL, 0);
+    const char *val_str = argv[2];
+    char *endptr;
+    ssize_t value = strtol(val_str, &endptr, 0);
+    if (*endptr != '\0') {
+        fprintf(ctx->fout, "integer required: %s\n", val_str);
+        return;
+    }
     if (!strcmp(var, "redraw_background")) {
         kos_redraw_background = value;
     } else if (!strcmp(var, "syslang")) {
@@ -3398,35 +3366,42 @@ void *
 run_test(struct shell_ctx *ctx) {
     int is_tty = isatty(fileno(ctx->fin));
     char **argv = (char**)calloc(sizeof(char*), (MAX_COMMAND_ARGS + 1));
-//    bestlineSetCompletionCallback(completion);
-//    bestlineSetHintsCallback(hints);
-//    bestlineHistoryLoad("umka_shell.history");
-    while(next_line(ctx, is_tty)) {
-        if (cmd_buf[0] == '#' || cmd_buf[0] == '\n' || cmd_buf[0] == '\0' ||
-            cmd_buf[0] == '\r') {
-            fprintf(ctx->fout, "%s", cmd_buf);
-            continue;
-        }
-        if (cmd_buf[0] == 'X') break;
+    bestlineSetCompletionCallback(completion);
+    bestlineSetHintsCallback(hints);
+    bestlineHistoryLoad(ctx->hist_file);
+    sprintf(prompt_line, "%s> ", last_dir);
+    char *line;
+    while((line = bestline(prompt_line))) {
         if (!is_tty) {
             prompt(ctx);
-            fprintf(ctx->fout, "%s", cmd_buf);
-            fflush(ctx->fout);
+            fprintf(ctx->fout, "%s\n", line);
         }
-        int argc = split_args(cmd_buf, argv);
-        func_table_t *ft;
-        for (ft = shell_cmds; ft->name; ft++) {
-            if (!strcmp(argv[0], ft->name)) {
-                break;
-            }
-        }
-        if (ft->name) {
-            ft->func(ctx, argc, argv);
+        if (!strcmp(line, "X") || !strcmp(line, "q")) {
+            free(line);
+            break;
+        } else if (line[0] == '\0' || line[0] == '#' || line[0] == '\n'
+                   || *line == '\r') {
+            free(line);
+            continue;
         } else {
-            fprintf(ctx->fout, "unknown command: %s\n", argv[0]);
+            bestlineHistoryAdd(line);
+            int argc = split_args(line, argv);
+            func_table_t *ft;
+            for (ft = shell_cmds; ft->name; ft++) {
+                if (!strcmp(argv[0], ft->name)) {
+                    break;
+                }
+            }
+            if (ft->name) {
+                ft->func(ctx, argc, argv);
+            } else {
+                fprintf(ctx->fout, "unknown command: %s\n", argv[0]);
+            }
+            free(line);
         }
     }
     free(argv);
+    bestlineHistorySave(ctx->hist_file);
 
     return NULL;
 }

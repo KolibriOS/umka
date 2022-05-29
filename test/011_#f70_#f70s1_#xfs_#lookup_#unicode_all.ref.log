@@ -1,7 +1,7 @@
 /> umka_init
 /> disk_add ../img/xfs_v4_unicode.img hd0 -c 0
 /hd0/1: xfs
-
+/> 
 /> stat80 /hd0/1/dir0
 status = 0 success
 attr: ----f
@@ -32,7 +32,7 @@ attr: ----f
 /> stat80 /hd0/1/дир3
 status = 0 success
 attr: ----f
-
+/> 
 /> stat80 /hd0/1/dir0/file00
 status = 0 success
 attr: -----
@@ -61,7 +61,7 @@ size: 26
 status = 0 success
 attr: -----
 size: 26
-
+/> 
 /> read80 /hd0/1/dir0/file00 0 100 -b
 status = 6 end_of_file, count = 12
 68656c6c6f5f776f726c640a
@@ -74,7 +74,7 @@ d0bfd180d0b8d0b2d0b5d182e29da6d0bcd0b8d1800a
 /> read80 /hd0/1/дир3/файл33 0 100 -b
 status = 6 end_of_file, count = 26
 d0bfd180d0b8d0b2d0b5d182e29da6f09f9297d0bcd0b8d1800a
-
+/> 
 /> ls70 /hd0/1/ -e utf8
 status = 6 end_of_file, count = 7
 total = 7
@@ -131,7 +131,7 @@ status = 5 file_not_found
 status = 5 file_not_found
 /> ls70 /hd0/1/дир3/ -e default
 status = 5 file_not_found
-
+/> 
 /> ls80 /hd0/1/ -e utf8
 status = 6 end_of_file, count = 7
 total = 7
@@ -220,7 +220,7 @@ total = 3
 ----f .
 ----f ..
 ----- D09;3
-
+/> 
 /> ls80 /hd0/1/❦👩❦/ -e utf8
 status = 6 end_of_file, count = 5
 total = 5
@@ -253,5 +253,5 @@ total = 5
 ----f i�=�f'f'
 ----f f'i�=�f'
 ----f f'f'i�=�
-
+/> 
 /> disk_del hd0

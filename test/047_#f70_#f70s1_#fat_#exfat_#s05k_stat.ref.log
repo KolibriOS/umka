@@ -1,7 +1,7 @@
 /> umka_init
 /> disk_add ../img/exfat_s05k_c8k_b8k.img hd0 -c 0
 /hd0/1: exfat
-
+/> 
 /> stat70 /hd0/1/dir_000
 status = 0 success
 attr: ----f
@@ -226,5 +226,5 @@ attr: ----f
 status = 0 success
 attr: -----
 size: 1
-
+/> 
 /> disk_del hd0

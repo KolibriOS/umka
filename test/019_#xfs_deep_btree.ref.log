@@ -1,7 +1,7 @@
 /> umka_init
 /> disk_add ../img/xfs_v4_btrees_l2.img hd0 -c 0
 /hd0/1: xfs
-
+/> 
 /> ls80 /hd0/1/dir_btree_l2 -f 0 -c 1
 status = 0 success, count = 1
 ----f .
@@ -393,7 +393,7 @@ status = 6 end_of_file, count = 83
 ----f d0000193178_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ----f d0000193179_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ----f d0000193180_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
+/> 
 /> read70 /hd0/1/file_btree_l2 0 16388096 -h
 status = 0 success, count = 16388096
 8cbbb4bf572aaf6016e608260f372facfffb6e40fc31d8d7d83b08b526273d75
@@ -409,5 +409,5 @@ bb66ddff9fa267bf7a42153d0de9dc029b775e23d6378ade96e6c92ceaf6841a
 /> read70 /hd0/1/file_btree_l2 0x1000 0x1001 -h
 status = 0 success, count = 4097
 aa026c31286b2ba83a047f8d07baa712b34da983235afb79b4d2cb60cf668f2b
-
+/> 
 /> disk_del hd0

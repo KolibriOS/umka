@@ -1,7 +1,7 @@
 /> umka_init
 /> disk_add ../img/xfs_v5_files_s05k_b4k_n8k.img hd0 -c 0
 /hd0/1: xfs
-# zero length
+/> # zero length
 /> read70 /hd0/1/no_hole 0 0 -b
 status = 0 success, count = 0
 
@@ -74,7 +74,7 @@ status = 0 success, count = 0
 /> read70 /hd0/1/no_hole 0xffffffffffffffff 0 -b
 status = 0 success, count = 0
 
-# one-byte length
+/> # one-byte length
 /> read70 /hd0/1/no_hole 0 1 -b
 status = 0 success, count = 1
 00
@@ -147,7 +147,7 @@ status = 6 end_of_file, count = 0
 /> read70 /hd0/1/no_hole 0xffffffffffffffff 1 -b
 status = 6 end_of_file, count = 0
 
-# fixed-size block, different begin/end positions
+/> # fixed-size block, different begin/end positions
 /> read70 /hd0/1/no_hole 0 11 -b
 status = 0 success, count = 11
 000102030405060708090a
@@ -205,8 +205,8 @@ status = 6 end_of_file, count = 0
 /> read70 /hd0/1/no_hole 0xffffffffffffffff 11 -b
 status = 6 end_of_file, count = 0
 
-
-# btree
+/> 
+/> # btree
 /> read70 /hd0/1/btree_l1_no_hole 0x80000 11 -b
 status = 0 success, count = 11
 0000080004000800080008

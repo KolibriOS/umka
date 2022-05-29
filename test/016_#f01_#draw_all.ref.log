@@ -1,6 +1,6 @@
 /> umka_init
 /> set_mouse_pos_screen 40 30
-#disk_add ../img/kolibri.img rd -c 0
+/> #disk_add ../img/kolibri.img rd -c 0
 /> ramdisk_init ../img/kolibri.img
 /rd/1: fat
 /> set_skin /sys/DEFAULT.SKN
@@ -22,15 +22,15 @@ status: 0
 /> display_number 0 10 4 0 0 1234 5 45 0xffff00 1 1 0 0 0x0000ff
 /> blit_bitmap chess_image.rgba 20 35 8 8  0 0 8 8  0 0 0 1  32
 /> window_redraw 2
-
+/> 
 /> set_window_caption hi_there 0
-
+/> 
 /> get_font_smoothing
 font smoothing: 2 - subpixel
 /> set_font_smoothing 0
 /> get_font_smoothing
 font smoothing: 0 - off
-
+/> 
 /> get_window_colors
 0x00586786 frame
 0x00fefefe grab
@@ -43,7 +43,7 @@ font smoothing: 0 - off
 0x00000000 work_text
 0x007e7e7e work_graph
 /> set_window_colors 0 0 0 0 0 0 0 0 0 0
-
+/> 
 /> dump_win_stack 2
   0:   0
   1:   1
@@ -69,7 +69,7 @@ wnd_caption:
 wnd_clientbox (ltwh): 5 24 291 172
 priority: 0
 in_schedule: prev (2), next (2)
-
+/> 
 /> process_info -1
 cpu_usage: 0
 window_stack_position: 2
@@ -100,16 +100,16 @@ wnd_state: 0x00
 5 top
 65 right
 3 bottom
-
+/> 
 /> get_font_size
 0px
 /> set_font_size 16
 /> get_font_size
 16px
-
+/> 
 /> get_screen_size
 400x300
-
+/> 
 /> scrot 016_#f01_#draw_all.out.png
-
+/> 
 /> disk_del rd

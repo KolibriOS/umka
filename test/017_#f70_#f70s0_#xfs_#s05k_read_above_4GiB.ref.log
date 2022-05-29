@@ -1,7 +1,7 @@
 /> umka_init
 /> disk_add ../img/xfs_v4_files_s05k_b4k_n8k.img hd0 -c 0
 /hd0/1: xfs
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x3ff4 11 -b
 status = 0 success, count = 11
 0000000000000000000000
@@ -23,7 +23,7 @@ status = 0 success, count = 11
 /> read70 /hd0/1/4GiB_plus 0x4001 11 -b
 status = 0 success, count = 11
 4002400440064008400a40
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x7ff4 11 -b
 status = 0 success, count = 11
 f47ff67ff87ffa7ffc7ffe
@@ -45,7 +45,7 @@ status = 0 success, count = 11
 /> read70 /hd0/1/4GiB_plus 0x8001 11 -b
 status = 0 success, count = 11
 0000000000000000000000
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0xfffffff4 11 -b
 status = 0 success, count = 11
 f4fffffff8fffffffcffff
@@ -67,7 +67,7 @@ status = 0 success, count = 11
 /> read70 /hd0/1/4GiB_plus 0x100000001 11 -b
 status = 0 success, count = 11
 0000000100000008000000
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x11ffffff4 11 -b
 status = 0 success, count = 11
 0000000000000000000000
@@ -89,7 +89,7 @@ status = 0 success, count = 11
 /> read70 /hd0/1/4GiB_plus 0x120000001 11 -b
 status = 0 success, count = 11
 0000200100000008000020
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x120003ff4 11 -b
 status = 0 success, count = 11
 01000000f83f0020010000
@@ -111,7 +111,7 @@ status = 0 success, count = 11
 /> read70 /hd0/1/4GiB_plus 0x120004001 11 -b
 status = 0 success, count = 11
 0000000000000000000000
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x11fffefff 0x0fff -h
 status = 0 success, count = 4095
 1f65b79da1bf0dc2a529219184e005cc1453894c4ea996a1307784c7690eb7d2
@@ -124,7 +124,7 @@ status = 0 success, count = 4097
 /> read70 /hd0/1/4GiB_plus 0x11fffefff 0x2001 -h
 status = 0 success, count = 8193
 d22f0c1a9c494cc1a8a1e1a2ccf4057502f2839603632d47c69cc272b8d7ef96
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x11ffff000 0x0fff -h
 status = 0 success, count = 4095
 1f65b79da1bf0dc2a529219184e005cc1453894c4ea996a1307784c7690eb7d2
@@ -137,7 +137,7 @@ status = 0 success, count = 4097
 /> read70 /hd0/1/4GiB_plus 0x11ffff000 0x2001 -h
 status = 0 success, count = 8193
 0f8d363587a204a536ae4e17046f1b946d3716805d181d147968eb2d1efc5c63
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x11ffff001 0x0fff -h
 status = 0 success, count = 4095
 1f65b79da1bf0dc2a529219184e005cc1453894c4ea996a1307784c7690eb7d2
@@ -150,7 +150,7 @@ status = 0 success, count = 4097
 /> read70 /hd0/1/4GiB_plus 0x11ffff001 0x2001 -h
 status = 0 success, count = 8193
 56d243996479770cd97a33c679fb57ff3c354d7785f5d846f53e171bad850389
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x120002fff 0x0fff -h
 status = 0 success, count = 4095
 a126d59a9acb9cd3c977779638d1df609be8bd079b1b57373c87974b73a562ec
@@ -163,7 +163,7 @@ f78a428aec38eb1d81a138060671b2a450c7b7d4cdda6226db4cd9fcc073bbc3
 /> read70 /hd0/1/4GiB_plus 0x120002fff 0x2001 -h
 status = 0 success, count = 8193
 5d3ab86c1605d59550fe26506a8e16ca3e6b46b2a8cf9030a5dc5a00bd728823
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x120003000 0x0fff -h
 status = 0 success, count = 4095
 5077407c7ecc83efb242c96ed6ec3ad86008f253a083b61cc9855a5e6c94c3f5
@@ -176,7 +176,7 @@ status = 0 success, count = 4097
 /> read70 /hd0/1/4GiB_plus 0x120003000 0x2001 -h
 status = 0 success, count = 8193
 e6a7c5df31fce8a8ee6ae52b715b2fca721e6fca63d1605e02be585de8526cf1
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x120003001 0x0fff -h
 status = 0 success, count = 4095
 316310be962fd169a9961c0fc91a98deb30ab7c20fe35d32f4c0f14fa30660d5
@@ -189,7 +189,7 @@ status = 0 success, count = 4097
 /> read70 /hd0/1/4GiB_plus 0x120003001 0x2001 -h
 status = 0 success, count = 8193
 1adf6f95f4151bb640c60cf530ebfe91b5e268bf78044bd51de755a95bc07d08
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x120003fff 0x0fff -h
 status = 0 success, count = 4095
 1f65b79da1bf0dc2a529219184e005cc1453894c4ea996a1307784c7690eb7d2
@@ -202,7 +202,7 @@ status = 0 success, count = 4097
 /> read70 /hd0/1/4GiB_plus 0x120003fff 0x2001 -h
 status = 0 success, count = 8193
 b70dd656adf5c5b3434b695386dd07658e667f6f9d0cd34af5a3e8527924964f
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x120004000 0x0fff -h
 status = 0 success, count = 4095
 1f65b79da1bf0dc2a529219184e005cc1453894c4ea996a1307784c7690eb7d2
@@ -215,7 +215,7 @@ status = 0 success, count = 4097
 /> read70 /hd0/1/4GiB_plus 0x120004000 0x2001 -h
 status = 0 success, count = 8193
 b70dd656adf5c5b3434b695386dd07658e667f6f9d0cd34af5a3e8527924964f
-
+/> 
 /> read70 /hd0/1/4GiB_plus 0x120004001 0x0fff -h
 status = 0 success, count = 4095
 1f65b79da1bf0dc2a529219184e005cc1453894c4ea996a1307784c7690eb7d2
@@ -228,8 +228,8 @@ status = 0 success, count = 4097
 /> read70 /hd0/1/4GiB_plus 0x120004001 0x2001 -h
 status = 0 success, count = 8193
 b70dd656adf5c5b3434b695386dd07658e667f6f9d0cd34af5a3e8527924964f
-
-# data, hole, data
+/> 
+/> # data, hole, data
 /> read70 /hd0/1/4GiB_plus 0x120003fff 0x6000 -h
 status = 6 end_of_file, count = 20481
 f4ab1c2ab5e007814bc19cf58547cf98df1c1c70a1d02f5c417fe2a15b47239f
@@ -239,8 +239,8 @@ status = 6 end_of_file, count = 20480
 /> read70 /hd0/1/4GiB_plus 0x120004001 0x6000 -h
 status = 6 end_of_file, count = 20479
 ba9f86ce5ae88d4875fa38ef47f7257ba00e172ed2e2ee1473599de58c80823c
-
-# hole, data, hole
+/> 
+/> # hole, data, hole
 /> read70 /hd0/1/4GiB_plus 0x11fffefff 0x6000 -h
 status = 0 success, count = 24576
 8ffe00fc8d9cb9b2d33865a95917df2cee3f6711c8d6358fd082ed5494851411

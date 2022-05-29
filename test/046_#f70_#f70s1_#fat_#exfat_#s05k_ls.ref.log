@@ -1,7 +1,7 @@
 /> umka_init
 /> disk_add ../img/exfat_s05k_c16k_b16k.img hd0 -c 0
 /hd0/1: exfat
-
+/> 
 /> ls70 /hd0/1/dir_0 -f 0 -c 0
 /> ls70 /hd0/1/dir_0 -f 0 -c 1
 status = 0 success, count = 1
@@ -19,7 +19,7 @@ status = 6 end_of_file, count = 0
 status = 6 end_of_file, count = 0
 /> ls70 /hd0/1/dir_0 -f 1 -c 0xffffffff
 status = 6 end_of_file, count = 0
-
+/> 
 /> ls70 /hd0/1/dir_1 -f 0 -c 0
 /> ls70 /hd0/1/dir_1 -f 0 -c 1
 status = 0 success, count = 1
@@ -42,7 +42,7 @@ status = 6 end_of_file, count = 1
 /> ls70 /hd0/1/dir_1 -f 1 -c 0xffffffff
 status = 6 end_of_file, count = 1
 ----- file000
-
+/> 
 /> ls70 /hd0/1/dir_1000
 status = 0 success, count = 100
 total = 1001
@@ -11273,5 +11273,5 @@ total = 10001
 ----f d0000009999_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 /> ls70 /hd0/1/dir_100000
 status = 5 file_not_found
-
+/> 
 /> disk_del hd0

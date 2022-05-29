@@ -16,7 +16,7 @@ status = 5 file_not_found
 status = 5 file_not_found
 /> stat70 /hd0/1/sf_empty/deadbeef
 status = 5 file_not_found
-
+/> 
 /> stat70 /hd0/1/sf/.
 status = 0 success
 attr: ----f
@@ -38,9 +38,9 @@ attr: ----f
 /> stat70 /hd0/1/sf/../sf/
 status = 0 success
 attr: ----f
-#stat70 /hd0/1/sf///..//sf
-#stat70 /hd0/1/sf///..//sf/
-
+/> #stat70 /hd0/1/sf///..//sf
+/> #stat70 /hd0/1/sf///..//sf/
+/> 
 /> stat70 /hd0/1/sf/d0000000000_
 status = 0 success
 attr: ----f
@@ -52,7 +52,7 @@ status = 0 success
 attr: ----f
 /> stat70 /hd0/1/sf/d0000000003_xxx
 status = 5 file_not_found
-
+/> 
 /> cd /hd0/1/sf
 sf> stat70 .
 status = 0 success
@@ -68,7 +68,7 @@ status = 0 success
 attr: ----f
 sf> stat70 d0000000003_xxx
 status = 5 file_not_found
-
+sf> 
 sf> cd /hd0/1/block
 block> stat70 .
 status = 0 success
@@ -93,7 +93,7 @@ status = 0 success
 attr: ----f
 block> stat70 d0000000005_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 status = 5 file_not_found
-
+block> 
 block> cd /hd0/1/leaf
 leaf> stat70 .
 status = 0 success
@@ -112,7 +112,7 @@ status = 0 success
 attr: ----f
 leaf> stat70 d0000000040_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 status = 5 file_not_found
-
+leaf> 
 leaf> cd /hd0/1/node
 node> stat70 d0000000000_
 status = 0 success
@@ -144,7 +144,7 @@ attr: ----f
 node> stat70 d0000001099_xxxxxxxxxxxxxxxxxx
 status = 0 success
 attr: ----f
-
+node> 
 node> cd /hd0/1/btree_leaf
 btree_leaf> stat70 d0000000000_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 status = 0 success
@@ -164,7 +164,7 @@ attr: ----f
 btree_leaf> stat70 d0000000999_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 status = 0 success
 attr: ----f
-
+btree_leaf> 
 btree_leaf> cd /hd0/1/btree_leaf_free
 btree_leaf_free> stat70 d0000000000_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 status = 0 success
@@ -184,5 +184,5 @@ attr: ----f
 btree_leaf_free> stat70 d0000001199_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 status = 0 success
 attr: ----f
-
+btree_leaf_free> 
 btree_leaf_free> disk_del hd0

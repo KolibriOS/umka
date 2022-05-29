@@ -26,8 +26,19 @@
 #include "umka.h"
 #include "trace.h"
 
+#define HIST_FILE_BASENAME ".umka_shell.history"
 #define UMKA_DEFAULT_DISPLAY_WIDTH 400
 #define UMKA_DEFAULT_DISPLAY_HEIGHT 300
+
+char history_filename[PATH_MAX];
+
+void build_history_filename() {
+    const char *dir_name;
+    if (!(dir_name = getenv("HOME"))) {
+        dir_name = ".";
+    }
+    sprintf(history_filename, "%s/%s", dir_name, HIST_FILE_BASENAME);
+}
 
 int
 main(int argc, char **argv) {
@@ -40,7 +51,9 @@ main(int argc, char **argv) {
         "  -r               reproducible logs (without pointers and datetime)\n"
         "  -c               collect coverage";
     const char *infile = NULL, *outfile = NULL;
-    struct shell_ctx ctx = {.fin = stdin, .fout = stdout, .reproducible = 0};
+    struct shell_ctx ctx = {.fin = stdin, .fout = stdout, .reproducible = 0,
+                            .hist_file = history_filename};
+    build_history_filename();
 
     kos_boot.bpp = 32;
     kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
@@ -74,11 +87,11 @@ main(int argc, char **argv) {
             exit(1);
         }
     }
-    if (infile && !(ctx.fin = fopen(infile, "r"))) {
+    if (infile && !(ctx.fin = freopen(infile, "r", stdin))) {
         fprintf(stderr, "[!] can't open file for reading: %s", infile);
         exit(1);
     }
-    if (outfile && !(ctx.fout = fopen(outfile, "w"))) {
+    if (outfile && !(ctx.fout = freopen(outfile, "w", stdout))) {
         fprintf(stderr, "[!] can't open file for writing: %s", outfile);
         exit(1);
     }

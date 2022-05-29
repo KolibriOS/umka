@@ -1,8 +1,8 @@
 /> umka_init
 /> disk_add ../img/xfs_v4_files_s05k_b4k_n8k.img hd0 -c 0
 /hd0/1: xfs
-# hole begin
-# zero length
+/> # hole begin
+/> # zero length
 /> read70 /hd0/1/hole_begin 0 0 -b
 status = 0 success, count = 0
 
@@ -21,7 +21,7 @@ status = 0 success, count = 0
 /> read70 /hd0/1/hole_begin 0x4001 0 -b
 status = 0 success, count = 0
 
-# one-byte length
+/> # one-byte length
 /> read70 /hd0/1/hole_begin 0 1 -b
 status = 0 success, count = 1
 00
@@ -40,7 +40,7 @@ status = 0 success, count = 1
 /> read70 /hd0/1/hole_begin 0x4001 1 -b
 status = 0 success, count = 1
 40
-# fixed-size block, different begin/end positions
+/> # fixed-size block, different begin/end positions
 /> read70 /hd0/1/hole_begin 0 11 -b
 status = 0 success, count = 11
 0000000000000000000000
@@ -71,9 +71,9 @@ status = 0 success, count = 11
 /> read70 /hd0/1/hole_begin 0x4001 11 -b
 status = 0 success, count = 11
 4002400440064008400a40
-
-# hole middle
-# zero length
+/> 
+/> # hole middle
+/> # zero length
 /> read70 /hd0/1/hole_middle 0x7ffe 0 -b
 status = 0 success, count = 0
 
@@ -98,7 +98,7 @@ status = 0 success, count = 0
 /> read70 /hd0/1/hole_middle 0xc001 0 -b
 status = 0 success, count = 0
 
-# one-byte length
+/> # one-byte length
 /> read70 /hd0/1/hole_middle 0x7ffe 1 -b
 status = 0 success, count = 1
 fe
@@ -123,7 +123,7 @@ status = 0 success, count = 1
 /> read70 /hd0/1/hole_middle 0xc001 1 -b
 status = 0 success, count = 1
 c0
-# fixed-size block, different begin/end positions
+/> # fixed-size block, different begin/end positions
 /> read70 /hd0/1/hole_middle 0x7ff4 11 -b
 status = 0 success, count = 11
 f47ff67ff87ffa7ffc7ffe
@@ -172,9 +172,9 @@ status = 0 success, count = 11
 /> read70 /hd0/1/hole_middle 0xc001 11 -b
 status = 0 success, count = 11
 c002c004c006c008c00ac0
-
-# hole end
-# zero length
+/> 
+/> # hole end
+/> # zero length
 /> read70 /hd0/1/hole_end 0xbffe 0 -b
 status = 0 success, count = 0
 
@@ -199,7 +199,7 @@ status = 0 success, count = 0
 /> read70 /hd0/1/hole_end 0x10001 0 -b
 status = 0 success, count = 0
 
-# one-byte length
+/> # one-byte length
 /> read70 /hd0/1/hole_end 0xbffe 1 -b
 status = 0 success, count = 1
 fe
@@ -224,7 +224,7 @@ status = 6 end_of_file, count = 0
 /> read70 /hd0/1/hole_end 0x10001 1 -b
 status = 6 end_of_file, count = 0
 
-# fixed-size block, different begin/end positions
+/> # fixed-size block, different begin/end positions
 /> read70 /hd0/1/hole_end 0xbff4 11 -b
 status = 0 success, count = 11
 f4bff6bff8bffabffcbffe
