@@ -108,3 +108,12 @@ Links & Acknowledgements
 
 [2] LodePNG by Lode Vandevenne
     https://lodev.org/lodepng/
+
+[3] Optparse by Christopher Wellons
+    https://github.com/skeeto/optparse
+
+[4] Universal TUN/TAP device driver by Maxim Krasnyansky and others
+    https://www.kernel.org/doc/html/v5.12/networking/tuntap.html
+
+[5] Bestline by Justine Tunney
+    https://github.com/jart/bestline

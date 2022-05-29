@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "optparse.h"
 #include "shell.h"
 #include "umka.h"
 #include "trace.h"
@@ -30,62 +31,62 @@
 
 int
 main(int argc, char **argv) {
+    (void)argc;
     umka_tool = UMKA_SHELL;
     const char *usage = \
-        "usage: umka_shell [test_file.t] [-c]\n"
+        "usage: umka_shell [-i infile] [-o outfile] [-r] [-c] [-h]\n"
+        "  -i infile        file with commands\n"
+        "  -o outfile       file for logs\n"
+        "  -r               reproducible logs (without pointers and datetime)\n"
         "  -c               collect coverage";
-    const char *infile = NULL;
-    char outfile[PATH_MAX] = {0};
-    FILE *fin = stdin, *fout = stdout;
+    const char *infile = NULL, *outfile = NULL;
+    struct shell_ctx ctx = {.fin = stdin, .fout = stdout, .reproducible = 0};
 
     kos_boot.bpp = 32;
     kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
     kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
 
-    // skip 'umka_shell'
-    argc -= 1;
-    argv += 1;
+    struct optparse options;
+    int opt;
+    optparse_init(&options, argv);
 
-    while (argc) {
-        if (!strcmp(argv[0], "-c")) {
+    while ((opt = optparse(&options, "i:o:rc")) != -1) {
+        switch (opt) {
+        case 'i':
+            infile = options.optarg;
+            break;
+        case 'o':
+            outfile = options.optarg;
+            break;
+        case 'r':
+            ctx.reproducible = 1;
+            break;
+        case 'c':
             coverage = 1;
-            argc -= 1;
-            argv += 1;
-            continue;
-        } else if (!strcmp(argv[0], "-i") && argc > 1) {
-            infile = argv[1];
-            strncpy(outfile, infile, PATH_MAX-2); // ".t" is shorter than ".out"
-            char *last_dot = strrchr(outfile, '.');
-            if (!last_dot) {
-                printf("[!] test file must have '.t' suffix\n");
-                exit(1);
-            }
-            strcpy(last_dot, ".out.log");
-            fin = fopen(infile, "r");
-            if (!fin) {
-                perror("[!] can't open file");
-                exit(1);
-            }
-            fout = freopen(outfile, "w", stdout);
-            if (!fout) {
-                perror("[!] can't open file");
-                exit(1);
-            }
-            argc -= 2;
-            argv += 2;
-            continue;
-        } else {
-            printf("bad option: %s\n", argv[0]);
-            puts(usage);
+            break;
+        case 'h':
+            fputs(usage, stderr);
+            exit(0);
+        default:
+            fprintf(stderr, "bad option: %c\n", opt);
+            fputs(usage, stderr);
             exit(1);
         }
+    }
+    if (infile && !(ctx.fin = fopen(infile, "r"))) {
+        fprintf(stderr, "[!] can't open file for reading: %s", infile);
+        exit(1);
+    }
+    if (outfile && !(ctx.fout = fopen(outfile, "w"))) {
+        fprintf(stderr, "[!] can't open file for writing: %s", outfile);
+        exit(1);
     }
 
     if (coverage)
         trace_begin();
 
-    run_test(fin, fout, 1);
+    run_test(&ctx);
 
     if (coverage)
         trace_end();

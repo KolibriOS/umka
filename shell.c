@@ -36,7 +36,9 @@
 #include <sys/select.h>
 #endif
 
-#include "getopt.h"
+#include "shell.h"
+#include "optparse.h"
+//#include "bestline.h"
 #include "vdisk.h"
 #include "vnet.h"
 #include "umka.h"
@@ -55,8 +57,7 @@
 #define DEFAULT_READDIR_ENCODING UTF8
 #define DEFAULT_PATH_ENCODING UTF8
 
-FILE *fin, *fout;
-
+char prompt_line[2*PATH_MAX];
 char cur_dir[PATH_MAX] = "/";
 const char *last_dir = cur_dir;
 bool cur_dir_changed = true;
@@ -65,7 +66,7 @@ char cmd_buf[FGETS_BUF_LEN];
 
 typedef struct {
     char *name;
-    void (*func) (int, char **);
+    void (*func) (struct shell_ctx *, int, char **);
 } func_table_t;
 
 const char *f70_status_name[] = {
@@ -118,12 +119,12 @@ convert_f70_file_attr(uint32_t attr, char s[KF_ATTR_CNT+1]) {
 }
 
 static void
-print_f70_status(f7080ret_t *r, int use_ebx) {
-    fprintf(fout, "status = %d %s", r->status, get_f70_status_name(r->status));
+print_f70_status(struct shell_ctx *ctx, f7080ret_t *r, int use_ebx) {
+    fprintf(ctx->fout, "status = %d %s", r->status, get_f70_status_name(r->status));
     if (use_ebx &&
         (r->status == ERROR_SUCCESS || r->status == ERROR_END_OF_FILE))
-        fprintf(fout, ", count = %d", r->count);
-    fputc('\n', fout);
+        fprintf(ctx->fout, ", count = %d", r->count);
+    fputc('\n', ctx->fout);
 }
 
 static bool
@@ -135,48 +136,48 @@ parse_uintmax(const char *str, uintmax_t *res) {
 }
 
 static bool
-parse_uint32(const char *str, uint32_t *res) {
+parse_uint32(struct shell_ctx *ctx, const char *str, uint32_t *res) {
     uintmax_t x;
     if (parse_uintmax(str, &x) && x <= UINT32_MAX) {
         *res = (uint32_t)x;
         return true;
     } else {
-        perror("invalid number");
+        fprintf(ctx->fout, "invalid number: %s\n", str);
         return false;
     }
 }
 
 static bool
-parse_uint64(const char *str, uint64_t *res) {
+parse_uint64(struct shell_ctx *ctx, const char *str, uint64_t *res) {
     uintmax_t x;
     if (parse_uintmax(str, &x) && x <= UINT64_MAX) {
         *res = x;
         return true;
     } else {
-        perror("invalid number");
+        fprintf(ctx->fout, "invalid number: %s\n", str);
         return false;
     }
 }
 
 static void
-print_bytes(uint8_t *x, size_t len) {
+print_bytes(struct shell_ctx *ctx, uint8_t *x, size_t len) {
     for (size_t i = 0; i < len; i++) {
         if (i % PRINT_BYTES_PER_LINE == 0 && i != 0) {
-            fputc('\n', fout);
+            fputc('\n', ctx->fout);
         }
-        fprintf(fout, "%2.2x", x[i]);
+        fprintf(ctx->fout, "%2.2x", x[i]);
     }
-    fputc('\n', fout);
+    fputc('\n', ctx->fout);
 }
 
 static void
-print_hash(uint8_t *x, size_t len) {
-    hash_context ctx;
-    hash_oneshot(&ctx, x, len);
+print_hash(struct shell_ctx *ctx, uint8_t *x, size_t len) {
+    hash_context hash;
+    hash_oneshot(&hash, x, len);
     for (size_t i = 0; i < HASH_SIZE; i++) {
-        fprintf(fout, "%2.2x", ctx.hash[i]);
+        fprintf(ctx->fout, "%2.2x", hash.hash[i]);
     }
-    fputc('\n', fout);
+    fputc('\n', ctx->fout);
 }
 
 void *host_load_file(const char *fname) {
@@ -205,7 +206,7 @@ get_last_dir(const char *path) {
 }
 
 static void
-prompt() {
+prompt(struct shell_ctx *ctx) {
     if (cur_dir_changed) {
         if (umka_initialized) {
             COVERAGE_ON();
@@ -215,35 +216,59 @@ prompt() {
         last_dir = get_last_dir(cur_dir);
         cur_dir_changed = false;
     }
-    fprintf(fout, "%s> ", last_dir);
-    fflush(fout);
+    fprintf(ctx->fout, "%s> ", last_dir);
+    fflush(ctx->fout);
+}
+/*
+static void
+completion(const char *buf, bestlineCompletions *lc) {
+    if (buf[0] == 'h') {
+        bestlineAddCompletion(lc,"hello");
+        bestlineAddCompletion(lc,"hello there");
+    }
 }
 
-static int
-next_line(int is_tty, int block) {
-    if (is_tty) {
-        prompt();
+static char *
+hints(const char *buf, const char **ansi1, const char **ansi2) {
+    if (!strcmp(buf,"hello")) {
+        *ansi1 = "\033[35m";
+        *ansi2 = "\033[39m";
+        return " World";
     }
+    return NULL;
+}
+*/
+static int
+next_line(struct shell_ctx *ctx, int is_tty) {
+    if (is_tty) {
+        prompt(ctx);
+    }
+    return fgets(cmd_buf, FGETS_BUF_LEN, ctx->fin) != NULL;
 // TODO: Cleanup
 #ifdef _WIN32
-    return fgets(cmd_buf, FGETS_BUF_LEN, fin) != NULL;
+    return fgets(cmd_buf, FGETS_BUF_LEN, ctx->fin) != NULL;
 #else
-    if (block) {
-        return fgets(cmd_buf, FGETS_BUF_LEN, fin) != NULL;
-    } else {
-        fd_set readfds;
-//        FD_ZERO(&readfds);
-        memset(&readfds, 0, sizeof(readfds));
-        FD_SET(fileno(fin), &readfds);
-        struct timeval timeout = {.tv_sec = 0, .tv_usec = 0};
-        int sr = select(fileno(fin)+1, &readfds, NULL, NULL, &timeout);
-        cmd_buf[0] = '\0';
-        if (sr > 0) {
-            fgets(cmd_buf, FGETS_BUF_LEN, fin);
-        }
-        return 1;
+    fd_set readfds;
+//    FD_ZERO(&readfds);
+    memset(&readfds, 0, sizeof(readfds));
+    FD_SET(fileno(ctx->fin), &readfds);
+    struct timeval timeout = {.tv_sec = 0, .tv_usec = 0};
+    int sr = select(fileno(ctx->fin)+1, &readfds, NULL, NULL, &timeout);
+    cmd_buf[0] = '\0';
+    if (sr > 0) {
+        fgets(cmd_buf, FGETS_BUF_LEN, ctx->fin);
     }
+    return 1;
 #endif
+/*
+    sprintf(prompt_line, "%s> ", last_dir);
+    char *line = bestlineRaw(prompt_line, fileno(ctx->fin), fileno(ctx->fout));
+    if (line) {
+        strcpy(cmd_buf, line);
+        bestlineFree(line);
+    }
+    return line != NULL;
+*/
 }
 
 static int
@@ -254,13 +279,13 @@ split_args(char *s, char **argv) {
 }
 
 static void
-shell_send_scancode(int argc, char **argv) {
+shell_send_scancode(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: send_scancode <code>...\n"
         "  code             dec or hex number\n";
 
     if (argc < 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     argc -= 1;
@@ -274,20 +299,20 @@ shell_send_scancode(int argc, char **argv) {
             argc--;
             argv++;
         } else {
-            fprintf(fout, "not an integer: %s\n", argv[0]);
-            fputs(usage, fout);
+            fprintf(ctx->fout, "not an integer: %s\n", argv[0]);
+            fputs(usage, ctx->fout);
             return;
         }
     }
 }
 
 static void
-shell_umka_init(int argc, char **argv) {
+shell_umka_init(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: umka_init\n";
     (void)argv;
     if (argc < 0) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
@@ -296,7 +321,7 @@ shell_umka_init(int argc, char **argv) {
 }
 
 static void
-shell_umka_set_boot_params(int argc, char **argv) {
+shell_umka_set_boot_params(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: umka_set_boot_params [--x_res <num>] [--y_res <num>]\n"
         "  --x_res <num>    screen width\n"
@@ -318,8 +343,8 @@ shell_umka_set_boot_params(int argc, char **argv) {
             argv += 2;
             continue;
         } else {
-            fprintf(fout, "bad option: %s\n", argv[0]);
-            fputs(usage, fout);
+            fprintf(ctx->fout, "bad option: %s\n", argv[0]);
+            fputs(usage, ctx->fout);
             return;
         }
     }
@@ -327,12 +352,12 @@ shell_umka_set_boot_params(int argc, char **argv) {
 }
 
 static void
-shell_i40(int argc, char **argv) {
+shell_i40(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: i40 <eax> [ebx [ecx [edx [esi [edi [ebp]]]]]]...\n"
         "  see '/kernel/docs/sysfuncs.txt' for details\n";
     if (argc < 2 || argc > 8) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     pushad_t regs = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -346,51 +371,51 @@ shell_i40(int argc, char **argv) {
     COVERAGE_ON();
     umka_i40(&regs);
     COVERAGE_OFF();
-    fprintf(fout, "eax = %8.8x  %" PRIu32 "  %" PRIi32 "\n"
+    fprintf(ctx->fout, "eax = %8.8x  %" PRIu32 "  %" PRIi32 "\n"
            "ebx = %8.8x  %" PRIu32 "  %" PRIi32 "\n",
            regs.eax, regs.eax, (int32_t)regs.eax,
            regs.ebx, regs.ebx, (int32_t)regs.ebx);
 }
 
 static void
-disk_list_partitions(disk_t *d) {
+disk_list_partitions(struct shell_ctx *ctx, disk_t *d) {
     for (size_t i = 0; i < d->num_partitions; i++) {
-        fprintf(fout, "/%s/%d: ", d->name, i+1);
+        fprintf(ctx->fout, "/%s/%d: ", d->name, i+1);
         if (d->partitions[i]->fs_user_functions == xfs_user_functions) {
-            fputs("xfs\n", fout);
+            fputs("xfs\n", ctx->fout);
         } else if (d->partitions[i]->fs_user_functions == ext_user_functions) {
-            fputs("ext\n", fout);
+            fputs("ext\n", ctx->fout);
         } else if (d->partitions[i]->fs_user_functions == fat_user_functions) {
-            fputs("fat\n", fout);
+            fputs("fat\n", ctx->fout);
         } else if (d->partitions[i]->fs_user_functions == exfat_user_functions) {
-            fputs("exfat\n", fout);
+            fputs("exfat\n", ctx->fout);
         } else if (d->partitions[i]->fs_user_functions == ntfs_user_functions) {
-            fputs("ntfs\n", fout);
+            fputs("ntfs\n", ctx->fout);
         } else {
-            fputs("???\n", fout);
+            fputs("???\n", ctx->fout);
         }
     }
 }
 
 static void
-shell_ramdisk_init(int argc, char **argv) {
+shell_ramdisk_init(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: ramdisk_init <file>\n"
         "  <file>           absolute or relative path\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *fname = argv[1];
     FILE *f = fopen(fname, "rb");
     if (!f) {
-        fprintf(fout, "[!] can't open file '%s': %s\n", fname, strerror(errno));
+        fprintf(ctx->fout, "[!] can't open file '%s': %s\n", fname, strerror(errno));
         return;
     }
     fseek(f, 0, SEEK_END);
     size_t fsize = ftell(f);
     if (fsize > 2880*512) {
-        fprintf(fout, "[!] file '%s' is too big, max size is 1474560 bytes\n",
+        fprintf(ctx->fout, "[!] file '%s' is too big, max size is 1474560 bytes\n",
                 fname);
         return;
     }
@@ -400,18 +425,18 @@ shell_ramdisk_init(int argc, char **argv) {
     COVERAGE_ON();
     void *ramdisk = kos_ramdisk_init();
     COVERAGE_OFF();
-    disk_list_partitions(ramdisk);
+    disk_list_partitions(ctx, ramdisk);
 }
 
 static void
-shell_disk_add(int argc, char **argv) {
+shell_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: disk_add <file> <name> [option]...\n"
         "  <file>           absolute or relative path\n"
         "  <name>           disk name, e.g. hd0 or rd\n"
         "  -c cache size    size of disk cache in bytes\n";
     if (argc < 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t cache_size = 0;
@@ -427,7 +452,7 @@ shell_disk_add(int argc, char **argv) {
             adjust_cache_size = 1;
             break;
         default:
-            fputs(usage, fout);
+            fputs(usage, ctx->fout);
             return;
         }
     }
@@ -441,17 +466,17 @@ shell_disk_add(int argc, char **argv) {
             COVERAGE_ON();
             disk_media_changed(vdisk, 1);
             COVERAGE_OFF();
-            disk_list_partitions(vdisk);
+            disk_list_partitions(ctx, vdisk);
             return;
         }
     }
-    fprintf(fout, "umka: can't add file '%s' as disk '%s'\n", file_name,
+    fprintf(ctx->fout, "umka: can't add file '%s' as disk '%s'\n", file_name,
             disk_name);
     return;
 }
 
 static void
-disk_del_by_name(const char *name) {
+disk_del_by_name(struct shell_ctx *ctx, const char *name) {
     for(disk_t *d = disk_list.next; d != &disk_list; d = d->next) {
         if (!strcmp(d->name, name)) {
             COVERAGE_ON();
@@ -460,29 +485,29 @@ disk_del_by_name(const char *name) {
             return;
         }
     }
-    fprintf(fout, "umka: can't find disk '%s'\n", name);
+    fprintf(ctx->fout, "umka: can't find disk '%s'\n", name);
 }
 
 static void
-shell_disk_del(int argc, char **argv) {
+shell_disk_del(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: disk_del <name>\n"
         "  name             disk name, i.e. rd or hd0\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *name = argv[1];
-    disk_del_by_name(name);
+    disk_del_by_name(ctx, name);
     return;
 }
 
 static void
-shell_pwd(int argc, char **argv) {
+shell_pwd(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: pwd\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
@@ -491,11 +516,11 @@ shell_pwd(int argc, char **argv) {
     COVERAGE_ON();
     umka_sys_get_cwd(cur_dir, PATH_MAX);
     COVERAGE_OFF();
-    fprintf(fout, "%s%s%s\n", quote, cur_dir, quote);
+    fprintf(ctx->fout, "%s%s%s\n", quote, cur_dir, quote);
 }
 
 static void
-shell_set_pixel(int argc, char **argv) {
+shell_set_pixel(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_pixel <x> <y> <color> [-i]\n"
         "  x                x window coordinate\n"
@@ -503,7 +528,7 @@ shell_set_pixel(int argc, char **argv) {
         "  color            argb in hex\n"
         "  -i               inverted color\n";
     if (argc < 4) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x = strtoul(argv[1], NULL, 0);
@@ -516,7 +541,7 @@ shell_set_pixel(int argc, char **argv) {
 }
 
 static void
-shell_write_text(int argc, char **argv) {
+shell_write_text(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: write_text <x> <y> <color> <string> <asciiz> <fill_bg>"
             " <font_and_enc> <draw_to_buf> <scale_factor> <length>"
@@ -532,7 +557,7 @@ shell_write_text(int argc, char **argv) {
         "  length           length of the string if it is non-asciiz\n"
         "  bg_color_or_buf  argb or pointer\n";
     if (argc != 12) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x = strtoul(argv[1], NULL, 0);
@@ -554,24 +579,24 @@ shell_write_text(int argc, char **argv) {
 }
 
 static void
-shell_get_key(int argc, char **argv) {
+shell_get_key(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_key\n";
     if (argc > 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
-    fprintf(fout, "0x%8.8" PRIx32 "\n", umka_get_key());
+    fprintf(ctx->fout, "0x%8.8" PRIx32 "\n", umka_get_key());
 }
 
 static void
-shell_dump_key_buff(int argc, char **argv) {
+shell_dump_key_buff(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: dump_key_buff [count]\n"
         "  count            how many items to dump (all by default)\n";
     if (argc > 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int count = INT_MAX;
@@ -579,18 +604,18 @@ shell_dump_key_buff(int argc, char **argv) {
         count = strtol(argv[1], NULL, 0);
     }
     for (int i = 0; i < count && i < kos_key_count; i++) {
-        fprintf(fout, "%3i 0x%2.2x 0x%2.2x\n", i, kos_key_buff[i],
+        fprintf(ctx->fout, "%3i 0x%2.2x 0x%2.2x\n", i, kos_key_buff[i],
                 kos_key_buff[120+2+i]);
     }
 }
 
 static void
-shell_dump_win_stack(int argc, char **argv) {
+shell_dump_win_stack(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: dump_win_stack [count]\n"
         "  count            how many items to dump\n";
     if (argc > 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int depth = 5;
@@ -598,17 +623,17 @@ shell_dump_win_stack(int argc, char **argv) {
         depth = strtol(argv[1], NULL, 0);
     }
     for (int i = 0; i < depth; i++) {
-        fprintf(fout, "%3i: %3u\n", i, kos_win_stack[i]);
+        fprintf(ctx->fout, "%3i: %3u\n", i, kos_win_stack[i]);
     }
 }
 
 static void
-shell_dump_win_pos(int argc, char **argv) {
+shell_dump_win_pos(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: dump_win_pos [count]\n"
         "  count            how many items to dump\n";
     if (argc < 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int depth = 5;
@@ -616,36 +641,36 @@ shell_dump_win_pos(int argc, char **argv) {
         depth = strtol(argv[1], NULL, 0);
     }
     for (int i = 0; i < depth; i++) {
-        fprintf(fout, "%3i: %3u\n", i, kos_win_pos[i]);
+        fprintf(ctx->fout, "%3i: %3u\n", i, kos_win_pos[i]);
     }
 }
 
 static void
-shell_dump_win_map(int argc, char **argv) {
+shell_dump_win_map(struct shell_ctx *ctx, int argc, char **argv) {
 // TODO: area
     const char *usage = \
         "usage: dump_win_map\n";
     (void)argv;
     if (argc < 0) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     for (size_t y = 0; y < kos_display.height; y++) {
         for (size_t x = 0; x < kos_display.width; x++) {
-            fputc(kos_display.win_map[y * kos_display.width + x] + '0', fout);
+            fputc(kos_display.win_map[y * kos_display.width + x] + '0', ctx->fout);
         }
-        fputc('\n', fout);
+        fputc('\n', ctx->fout);
     }
 }
 
 static void
-shell_dump_appdata(int argc, char **argv) {
+shell_dump_appdata(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: dump_appdata <index> [-p]\n"
         "  index            index into appdata array to dump\n"
         "  -p               print fields that are pointers\n";
     if (argc < 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int show_pointers = 0;
@@ -654,60 +679,60 @@ shell_dump_appdata(int argc, char **argv) {
         show_pointers = 1;
     }
     appdata_t *a = kos_slot_base + idx;
-    fprintf(fout, "app_name: %s\n", a->app_name);
+    fprintf(ctx->fout, "app_name: %s\n", a->app_name);
     if (show_pointers) {
-        fprintf(fout, "process: %p\n", (void*)a->process);
-        fprintf(fout, "fpu_state: %p\n", (void*)a->fpu_state);
-        fprintf(fout, "exc_handler: %p\n", (void*)a->exc_handler);
+        fprintf(ctx->fout, "process: %p\n", (void*)a->process);
+        fprintf(ctx->fout, "fpu_state: %p\n", (void*)a->fpu_state);
+        fprintf(ctx->fout, "exc_handler: %p\n", (void*)a->exc_handler);
     }
-    fprintf(fout, "except_mask: %" PRIx32 "\n", a->except_mask);
+    fprintf(ctx->fout, "except_mask: %" PRIx32 "\n", a->except_mask);
     if (show_pointers) {
-        fprintf(fout, "pl0_stack: %p\n", (void*)a->pl0_stack);
-        fprintf(fout, "cursor: %p\n", (void*)a->cursor);
-        fprintf(fout, "fd_ev: %p\n", (void*)a->fd_ev);
-        fprintf(fout, "bk_ev: %p\n", (void*)a->bk_ev);
-        fprintf(fout, "fd_obj: %p\n", (void*)a->fd_obj);
-        fprintf(fout, "bk_obj: %p\n", (void*)a->bk_obj);
-        fprintf(fout, "saved_esp: %p\n", (void*)a->saved_esp);
+        fprintf(ctx->fout, "pl0_stack: %p\n", (void*)a->pl0_stack);
+        fprintf(ctx->fout, "cursor: %p\n", (void*)a->cursor);
+        fprintf(ctx->fout, "fd_ev: %p\n", (void*)a->fd_ev);
+        fprintf(ctx->fout, "bk_ev: %p\n", (void*)a->bk_ev);
+        fprintf(ctx->fout, "fd_obj: %p\n", (void*)a->fd_obj);
+        fprintf(ctx->fout, "bk_obj: %p\n", (void*)a->bk_obj);
+        fprintf(ctx->fout, "saved_esp: %p\n", (void*)a->saved_esp);
     }
-    fprintf(fout, "dbg_state: %u\n", a->dbg_state);
-    fprintf(fout, "cur_dir: %s\n", a->cur_dir);
-    fprintf(fout, "draw_bgr_x: %u\n", a->draw_bgr_x);
-    fprintf(fout, "draw_bgr_y: %u\n", a->draw_bgr_y);
-    fprintf(fout, "event_mask: %" PRIx32 "\n", a->event_mask);
-    fprintf(fout, "tid: %" PRId32 "\n", a->tid);
-    fprintf(fout, "state: 0x%" PRIx8 "\n", a->state);
-    fprintf(fout, "wnd_number: %" PRIu8 "\n", a->wnd_number);
-    fprintf(fout, "terminate_protection: %u\n", a->terminate_protection);
-    fprintf(fout, "keyboard_mode: %u\n", a->keyboard_mode);
-    fprintf(fout, "captionEncoding: %u\n", a->captionEncoding);
-    fprintf(fout, "exec_params: %s\n", a->exec_params);
-    fprintf(fout, "wnd_caption: %s\n", a->wnd_caption);
-    fprintf(fout, "wnd_clientbox (ltwh): %u %u %u %u\n", a->wnd_clientbox.left,
+    fprintf(ctx->fout, "dbg_state: %u\n", a->dbg_state);
+    fprintf(ctx->fout, "cur_dir: %s\n", a->cur_dir);
+    fprintf(ctx->fout, "draw_bgr_x: %u\n", a->draw_bgr_x);
+    fprintf(ctx->fout, "draw_bgr_y: %u\n", a->draw_bgr_y);
+    fprintf(ctx->fout, "event_mask: %" PRIx32 "\n", a->event_mask);
+    fprintf(ctx->fout, "tid: %" PRId32 "\n", a->tid);
+    fprintf(ctx->fout, "state: 0x%" PRIx8 "\n", a->state);
+    fprintf(ctx->fout, "wnd_number: %" PRIu8 "\n", a->wnd_number);
+    fprintf(ctx->fout, "terminate_protection: %u\n", a->terminate_protection);
+    fprintf(ctx->fout, "keyboard_mode: %u\n", a->keyboard_mode);
+    fprintf(ctx->fout, "captionEncoding: %u\n", a->captionEncoding);
+    fprintf(ctx->fout, "exec_params: %s\n", a->exec_params);
+    fprintf(ctx->fout, "wnd_caption: %s\n", a->wnd_caption);
+    fprintf(ctx->fout, "wnd_clientbox (ltwh): %u %u %u %u\n", a->wnd_clientbox.left,
             a->wnd_clientbox.top, a->wnd_clientbox.width,
             a->wnd_clientbox.height);
-    fprintf(fout, "priority: %u\n", a->priority);
+    fprintf(ctx->fout, "priority: %u\n", a->priority);
 
-    fprintf(fout, "in_schedule: prev");
+    fprintf(ctx->fout, "in_schedule: prev");
     if (show_pointers) {
-        fprintf(fout, " %p", (void*)a->in_schedule.prev);
+        fprintf(ctx->fout, " %p", (void*)a->in_schedule.prev);
     }
-    fprintf(fout, " (%u), next",
+    fprintf(ctx->fout, " (%u), next",
             (appdata_t*)a->in_schedule.prev - kos_slot_base);
     if (show_pointers) {
-        fprintf(fout, " %p", (void*)a->in_schedule.next);
+        fprintf(ctx->fout, " %p", (void*)a->in_schedule.next);
     }
-    fprintf(fout, " (%u)\n",
+    fprintf(ctx->fout, " (%u)\n",
             (appdata_t*)a->in_schedule.next - kos_slot_base);
 }
 
 static void
-shell_switch_to_thread(int argc, char **argv) {
+shell_switch_to_thread(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: switch_to_thread <tid>\n"
         "  <tid>          thread id to switch to\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t tid = strtoul(argv[1], NULL, 0);
@@ -716,40 +741,40 @@ shell_switch_to_thread(int argc, char **argv) {
 }
 
 static void
-shell_get(int argc, char **argv) {
+shell_get(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get <var>\n"
         "  <var>          variable to get\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *var = argv[1];
     if (!strcmp(var, "redraw_background")) {
-        fprintf(fout, "%i\n", kos_redraw_background);
+        fprintf(ctx->fout, "%i\n", kos_redraw_background);
     } else if (!strcmp(var, "key_count")) {
-        fprintf(fout, "%i\n", kos_key_count);
+        fprintf(ctx->fout, "%i\n", kos_key_count);
     } else if (!strcmp(var, "syslang")) {
-        fprintf(fout, "%i\n", kos_syslang);
+        fprintf(ctx->fout, "%i\n", kos_syslang);
     } else if (!strcmp(var, "keyboard")) {
-        fprintf(fout, "%i\n", kos_keyboard);
+        fprintf(ctx->fout, "%i\n", kos_keyboard);
     } else if (!strcmp(var, "keyboard_mode")) {
-        fprintf(fout, "%i\n", kos_keyboard_mode);
+        fprintf(ctx->fout, "%i\n", kos_keyboard_mode);
     } else {
-        fprintf(fout, "no such variable: %s\n", var);
-        fputs(usage, fout);
+        fprintf(ctx->fout, "no such variable: %s\n", var);
+        fputs(usage, ctx->fout);
         return;
     }
 }
 
 static void
-shell_set(int argc, char **argv) {
+shell_set(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set <var> <value>\n"
         "  <var>          variable to set\n"
         "  <value>        decimal or hex value\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *var = argv[1];
@@ -763,28 +788,28 @@ shell_set(int argc, char **argv) {
     } else if (!strcmp(var, "keyboard_mode")) {
         kos_keyboard_mode = value;
     } else {
-        fprintf(fout, "bad option: %s\n", argv[1]);
-        fputs(usage, fout);
+        fprintf(ctx->fout, "bad option: %s\n", argv[1]);
+        fputs(usage, ctx->fout);
         return;
     }
 }
 
 static void
-shell_new_sys_thread(int argc, char **argv) {
+shell_new_sys_thread(struct shell_ctx *ctx, int argc, char **argv) {
 // FIXME
     const char *usage = \
         "usage: new_sys_thread\n";
     if (!argc) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
     size_t tid = umka_new_sys_threads(0, NULL, NULL);
-    fprintf(fout, "tid: %u\n", tid);
+    fprintf(ctx->fout, "tid: %u\n", tid);
 }
 
 static void
-shell_mouse_move(int argc, char **argv) {
+shell_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: mouse_move [-l] [-m] [-r] [-x {+|-|=}<value>]"
             "[-y {+|-|=}<value>] [-h {+|-}<value>] [-v {+|-}<value>]\n"
@@ -796,7 +821,7 @@ shell_mouse_move(int argc, char **argv) {
         "  -h             scroll horizontally\n"
         "  -v             scroll vertically\n";
     if (!argc) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int lbheld = 0, mbheld = 0, rbheld = 0, xabs = 0, yabs = 0;
@@ -826,7 +851,7 @@ shell_mouse_move(int argc, char **argv) {
                 xmoving = -strtol(optarg, NULL, 0);
                 break;
             default:
-                fputs(usage, fout);
+                fputs(usage, ctx->fout);
                 return;
             }
             break;
@@ -842,26 +867,26 @@ shell_mouse_move(int argc, char **argv) {
                 ymoving = -strtol(optarg, NULL, 0);
                 break;
             default:
-                fputs(usage, fout);
+                fputs(usage, ctx->fout);
                 return;
             }
             break;
         case 'h':
             if ((optarg[0] != '+') && (optarg[0] != '-')) {
-                fputs(usage, fout);
+                fputs(usage, ctx->fout);
                 return;
             }
             hscroll = strtol(optarg, NULL, 0);
             break;
         case 'v':
             if ((optarg[0] != '+') && (optarg[0] != '-')) {
-                fputs(usage, fout);
+                fputs(usage, ctx->fout);
                 return;
             }
             vscroll = strtol(optarg, NULL, 0);
             break;
         default:
-            fputs(usage, fout);
+            fputs(usage, ctx->fout);
             return;
         }
     }
@@ -872,12 +897,12 @@ shell_mouse_move(int argc, char **argv) {
 }
 
 static void
-shell_process_info(int argc, char **argv) {
+shell_process_info(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: process_info <pid>\n"
         "  pid              process id to dump, -1 for self\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     process_information_t info;
@@ -885,24 +910,24 @@ shell_process_info(int argc, char **argv) {
     COVERAGE_ON();
     umka_sys_process_info(pid, &info);
     COVERAGE_OFF();
-    fprintf(fout, "cpu_usage: %u\n", info.cpu_usage);
-    fprintf(fout, "window_stack_position: %u\n", info.window_stack_position);
-    fprintf(fout, "window_stack_value: %u\n", info.window_stack_value);
-    fprintf(fout, "process_name: %s\n", info.process_name);
-    fprintf(fout, "memory_start: 0x%.8" PRIx32 "\n", info.memory_start);
-    fprintf(fout, "used_memory: %u (0x%x)\n", info.used_memory,
+    fprintf(ctx->fout, "cpu_usage: %u\n", info.cpu_usage);
+    fprintf(ctx->fout, "window_stack_position: %u\n", info.window_stack_position);
+    fprintf(ctx->fout, "window_stack_value: %u\n", info.window_stack_value);
+    fprintf(ctx->fout, "process_name: %s\n", info.process_name);
+    fprintf(ctx->fout, "memory_start: 0x%.8" PRIx32 "\n", info.memory_start);
+    fprintf(ctx->fout, "used_memory: %u (0x%x)\n", info.used_memory,
             info.used_memory);
-    fprintf(fout, "pid: %u\n", info.pid);
-    fprintf(fout, "box: %u %u %u %u\n", info.box.left, info.box.top,
+    fprintf(ctx->fout, "pid: %u\n", info.pid);
+    fprintf(ctx->fout, "box: %u %u %u %u\n", info.box.left, info.box.top,
             info.box.width, info.box.height);
-    fprintf(fout, "slot_state: %u\n", info.slot_state);
-    fprintf(fout, "client_box: %u %u %u %u\n", info.client_box.left,
+    fprintf(ctx->fout, "slot_state: %u\n", info.slot_state);
+    fprintf(ctx->fout, "client_box: %u %u %u %u\n", info.client_box.left,
             info.client_box.top, info.client_box.width, info.client_box.height);
-    fprintf(fout, "wnd_state: 0x%.2" PRIx8 "\n", info.wnd_state);
+    fprintf(ctx->fout, "wnd_state: 0x%.2" PRIx8 "\n", info.wnd_state);
 }
 
 static void
-shell_display_number(int argc, char **argv) {
+shell_display_number(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: display_number <is_pointer> <base> <num_digits> <is_qword>"
             " <show_lead_zeros> <num_or_ptr> <x> <y> <color> <fill_bg> <font>"
@@ -922,7 +947,7 @@ shell_display_number(int argc, char **argv) {
         "  scale_factor     0 = x1, ..., 7 = x8\n"
         "  bg_color_or_buf  depending on flags fill_bg and draw_to_buf\n";
     if (argc != 15) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int is_pointer = strtoul(argv[1], NULL, 0);
@@ -952,14 +977,14 @@ shell_display_number(int argc, char **argv) {
 }
 
 static void
-shell_set_window_colors(int argc, char **argv) {
+shell_set_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_window_colors <frame> <grab> <work_3d_dark> <work_3d_light>"
             " <grab_text> <work> <work_button> <work_button_text> <work_text>"
             " <work_graph>\n"
         "  *                all colors are in hex\n";
     if (argc != (1 + sizeof(system_colors_t)/4)) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     system_colors_t colors;
@@ -979,11 +1004,11 @@ shell_set_window_colors(int argc, char **argv) {
 }
 
 static void
-shell_get_window_colors(int argc, char **argv) {
+shell_get_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_window_colors\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
@@ -992,40 +1017,40 @@ shell_get_window_colors(int argc, char **argv) {
     COVERAGE_ON();
     umka_sys_get_window_colors(&colors);
     COVERAGE_OFF();
-    fprintf(fout, "0x%.8" PRIx32 " frame\n", colors.frame);
-    fprintf(fout, "0x%.8" PRIx32 " grab\n", colors.grab);
-    fprintf(fout, "0x%.8" PRIx32 " work_3d_dark\n", colors.work_3d_dark);
-    fprintf(fout, "0x%.8" PRIx32 " work_3d_light\n", colors.work_3d_light);
-    fprintf(fout, "0x%.8" PRIx32 " grab_text\n", colors.grab_text);
-    fprintf(fout, "0x%.8" PRIx32 " work\n", colors.work);
-    fprintf(fout, "0x%.8" PRIx32 " work_button\n", colors.work_button);
-    fprintf(fout, "0x%.8" PRIx32 " work_button_text\n",
+    fprintf(ctx->fout, "0x%.8" PRIx32 " frame\n", colors.frame);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " grab\n", colors.grab);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work_3d_dark\n", colors.work_3d_dark);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work_3d_light\n", colors.work_3d_light);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " grab_text\n", colors.grab_text);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work\n", colors.work);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work_button\n", colors.work_button);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work_button_text\n",
             colors.work_button_text);
-    fprintf(fout, "0x%.8" PRIx32 " work_text\n", colors.work_text);
-    fprintf(fout, "0x%.8" PRIx32 " work_graph\n", colors.work_graph);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work_text\n", colors.work_text);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work_graph\n", colors.work_graph);
 }
 
 static void
-shell_get_skin_height(int argc, char **argv) {
+shell_get_skin_height(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_skin_height\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
     COVERAGE_ON();
     uint32_t skin_height = umka_sys_get_skin_height();
     COVERAGE_OFF();
-    fprintf(fout, "%" PRIu32 "\n", skin_height);
+    fprintf(ctx->fout, "%" PRIu32 "\n", skin_height);
 }
 
 static void
-shell_get_screen_area(int argc, char **argv) {
+shell_get_screen_area(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_screen_area\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
@@ -1033,14 +1058,14 @@ shell_get_screen_area(int argc, char **argv) {
     COVERAGE_ON();
     umka_sys_get_screen_area(&wa);
     COVERAGE_OFF();
-    fprintf(fout, "%" PRIu32 " left\n", wa.left);
-    fprintf(fout, "%" PRIu32 " top\n", wa.top);
-    fprintf(fout, "%" PRIu32 " right\n", wa.right);
-    fprintf(fout, "%" PRIu32 " bottom\n", wa.bottom);
+    fprintf(ctx->fout, "%" PRIu32 " left\n", wa.left);
+    fprintf(ctx->fout, "%" PRIu32 " top\n", wa.top);
+    fprintf(ctx->fout, "%" PRIu32 " right\n", wa.right);
+    fprintf(ctx->fout, "%" PRIu32 " bottom\n", wa.bottom);
 }
 
 static void
-shell_set_screen_area(int argc, char **argv) {
+shell_set_screen_area(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_screen_area <left> <top> <right> <bottom>\n"
         "  left             left x coord\n"
@@ -1048,7 +1073,7 @@ shell_set_screen_area(int argc, char **argv) {
         "  right            right x coord (not length!)\n"
         "  bottom           bottom y coord\n";
     if (argc != 5) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     rect_t wa;
@@ -1062,11 +1087,11 @@ shell_set_screen_area(int argc, char **argv) {
 }
 
 static void
-shell_get_skin_margins(int argc, char **argv) {
+shell_get_skin_margins(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_skin_margins\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
@@ -1074,19 +1099,19 @@ shell_get_skin_margins(int argc, char **argv) {
     COVERAGE_ON();
     umka_sys_get_skin_margins(&wa);
     COVERAGE_OFF();
-    fprintf(fout, "%" PRIu32 " left\n", wa.left);
-    fprintf(fout, "%" PRIu32 " top\n", wa.top);
-    fprintf(fout, "%" PRIu32 " right\n", wa.right);
-    fprintf(fout, "%" PRIu32 " bottom\n", wa.bottom);
+    fprintf(ctx->fout, "%" PRIu32 " left\n", wa.left);
+    fprintf(ctx->fout, "%" PRIu32 " top\n", wa.top);
+    fprintf(ctx->fout, "%" PRIu32 " right\n", wa.right);
+    fprintf(ctx->fout, "%" PRIu32 " bottom\n", wa.bottom);
 }
 
 static void
-shell_set_button_style(int argc, char **argv) {
+shell_set_button_style(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_button_style <style>\n"
         "  style            0 - flat, 1 - 3d\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t style = strtoul(argv[1], NULL, 0);
@@ -1096,32 +1121,32 @@ shell_set_button_style(int argc, char **argv) {
 }
 
 static void
-shell_set_skin(int argc, char **argv) {
+shell_set_skin(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_skin <path>\n"
         "  path             i.e. /rd/1/DEFAULT.SKN\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *path = argv[1];
     COVERAGE_ON();
     int32_t status = umka_sys_set_skin(path);
     COVERAGE_OFF();
-    fprintf(fout, "status: %" PRIi32 "\n", status);
+    fprintf(ctx->fout, "status: %" PRIi32 "\n", status);
 }
 
 char *lang_id_map[] = {"en", "fi", "ge", "ru", "fr", "et", "ua", "it", "be",
                        "sp", "ca"};
 
 static void
-shell_get_keyboard_layout(int argc, char **argv) {
+shell_get_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_keyboard_layout <-t type> [-f file]\n"
         "  -t type          layout type: 1 - normal, 2 - shift, 3 - alt\n"
         "  -f file          file name to save layout to\n";
     if (argc < 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int type;
@@ -1137,8 +1162,8 @@ shell_get_keyboard_layout(int argc, char **argv) {
             } else if (!strcmp(type_str, "alt")) {
                 type = 3;
             } else {
-                fprintf(fout, "no such layout type: %s\n", type_str);
-                fputs(usage, fout);
+                fprintf(ctx->fout, "no such layout type: %s\n", type_str);
+                fputs(usage, ctx->fout);
                 return;
             }
         }
@@ -1151,42 +1176,42 @@ shell_get_keyboard_layout(int argc, char **argv) {
 #define NUM_COLS 16 // produces nice output, 80 chars
         for (size_t row = 0; row < KOS_LAYOUT_SIZE/NUM_COLS; row++) {
             for (size_t col = 0; col < NUM_COLS; col++) {
-                fprintf(fout, " 0x%2.2x", layout[row*NUM_COLS+col]);
+                fprintf(ctx->fout, " 0x%2.2x", layout[row*NUM_COLS+col]);
             }
-            putchar('\n');
+            fputc('\n', ctx->fout);
         }
 #undef COLS
     } else if (argc == 5 && !strcmp(argv[3], "-f")) {
         const char *fname = argv[4];
         FILE *f = fopen(fname, "w");
         if (!f) {
-            fprintf(fout, "can't open file for writing: %s\n", fname);
-            fputs(usage, fout);
+            fprintf(ctx->fout, "can't open file for writing: %s\n", fname);
+            fputs(usage, ctx->fout);
             return;
         }
         size_t nread = fwrite(layout, 1, KOS_LAYOUT_SIZE, f);
         fclose(f);
         if (nread != KOS_LAYOUT_SIZE) {
-            fprintf(fout, "can't write %i bytes of layout, only %i\n",
+            fprintf(ctx->fout, "can't write %i bytes of layout, only %i\n",
                     KOS_LAYOUT_SIZE, nread);
-            fputs(usage, fout);
+            fputs(usage, ctx->fout);
             return;
         }
     } else {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
 }
 
 static void
-shell_set_keyboard_layout(int argc, char **argv) {
+shell_set_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_keyboard_layout <-t type> <-f file|code{128}>\n"
         "  -t type          layout type: 1 - normal, 2 - shift, 3 - alt\n"
         "  -f file          file name to read layout from\n"
         "  code             i-th ASCII code for the scancode i\n";
     if (argc != 5 && argc != 131) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int type;
@@ -1202,8 +1227,8 @@ shell_set_keyboard_layout(int argc, char **argv) {
             } else if (!strcmp(type_str, "alt")) {
                 type = 3;
             } else {
-                fprintf(fout, "no such layout type: %s\n", type_str);
-                fputs(usage, fout);
+                fprintf(ctx->fout, "no such layout type: %s\n", type_str);
+                fputs(usage, ctx->fout);
                 return;
             }
         }
@@ -1213,16 +1238,16 @@ shell_set_keyboard_layout(int argc, char **argv) {
         const char *fname = argv[4];
         FILE *f = fopen(fname, "r");
         if (!f) {
-            fprintf(fout, "can't open file: %s\n", fname);
-            fputs(usage, fout);
+            fprintf(ctx->fout, "can't open file: %s\n", fname);
+            fputs(usage, ctx->fout);
             return;
         }
         size_t nread = fread(layout, 1, KOS_LAYOUT_SIZE, f);
         fclose(f);
         if (nread != KOS_LAYOUT_SIZE) {
-            fprintf(fout, "can't read %i bytes of layout, only %i\n",
+            fprintf(ctx->fout, "can't read %i bytes of layout, only %i\n",
                     KOS_LAYOUT_SIZE, nread);
-            fputs(usage, fout);
+            fputs(usage, ctx->fout);
             return;
         }
     } else {
@@ -1231,8 +1256,8 @@ shell_set_keyboard_layout(int argc, char **argv) {
         for (size_t i = 0; i < KOS_LAYOUT_SIZE; i++) {
             long code = strtol(ascii_codes[i], &endptr, 0);
             if (*endptr != '\0' || code > 0xff) {
-                fprintf(fout, "bad number: %s\n", ascii_codes[i]);
-                fputs(usage, fout);
+                fprintf(ctx->fout, "bad number: %s\n", ascii_codes[i]);
+                fputs(usage, ctx->fout);
                 return;
             }
             layout[i] = code;
@@ -1241,56 +1266,56 @@ shell_set_keyboard_layout(int argc, char **argv) {
     COVERAGE_ON();
     int status = umka_sys_set_keyboard_layout(type, layout);
     COVERAGE_OFF();
-    fprintf(fout, "status: %i\n", status);
+    fprintf(ctx->fout, "status: %i\n", status);
 }
 
 static void
-shell_get_keyboard_lang(int argc, char **argv) {
+shell_get_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_keyboard_lang\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     int lang = umka_sys_get_keyboard_lang();
     COVERAGE_OFF();
     if (lang >= KOS_LANG_FIRST && lang <= KOS_LANG_LAST) {
-        fprintf(fout, "%i - %s\n", lang, lang_id_map[lang - KOS_LANG_FIRST]);
+        fprintf(ctx->fout, "%i - %s\n", lang, lang_id_map[lang - KOS_LANG_FIRST]);
     } else {
-        fprintf(fout, "invalid lang: %i\n", lang);
+        fprintf(ctx->fout, "invalid lang: %i\n", lang);
     }
 }
 
 static void
-shell_get_system_lang(int argc, char **argv) {
+shell_get_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_system_lang\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     int lang = umka_sys_get_system_lang();
     COVERAGE_OFF();
     if (lang >= KOS_LANG_FIRST && lang <= KOS_LANG_LAST) {
-        fprintf(fout, "%i - %s\n", lang, lang_id_map[lang - KOS_LANG_FIRST]);
+        fprintf(ctx->fout, "%i - %s\n", lang, lang_id_map[lang - KOS_LANG_FIRST]);
     } else {
-        fprintf(fout, "invalid lang: %i\n", lang);
+        fprintf(ctx->fout, "invalid lang: %i\n", lang);
     }
 }
 
 static void
-shell_set_keyboard_lang(int argc, char **argv) {
+shell_set_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_keyboard_lang <lang_id>\n"
         "  lang_id          number or a two-digit code:\n"
         "                   1 - en, 2 - fi, 3 - ge, 4 - ru, 5 - fr, 6 - et,\n"
         "                   7 - ua, 8 - it, 9 - be, 10 - sp, 11 - ca\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     char *endptr;
@@ -1303,8 +1328,8 @@ shell_set_keyboard_lang(int argc, char **argv) {
             }
         }
         if (lang == KOS_LANG_LAST) {
-            fprintf(fout, "no such lang: %s\n", lang_str);
-            fputs(usage, fout);
+            fprintf(ctx->fout, "no such lang: %s\n", lang_str);
+            fputs(usage, ctx->fout);
             return;
         }
         lang += KOS_LANG_FIRST;
@@ -1315,14 +1340,14 @@ shell_set_keyboard_lang(int argc, char **argv) {
 }
 
 static void
-shell_set_system_lang(int argc, char **argv) {
+shell_set_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_system_lang <lang_id>\n"
         "  lang_id          number or a two-digit code:\n"
         "                   1 - en, 2 - fi, 3 - ge, 4 - ru, 5 - fr, 6 - et,\n"
         "                   7 - ua, 8 - it, 9 - be, 10 - sp, 11 - ca\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     char *endptr;
@@ -1335,8 +1360,8 @@ shell_set_system_lang(int argc, char **argv) {
             }
         }
         if (lang == KOS_LANG_LAST) {
-            fprintf(fout, "no such lang: %s\n", lang_str);
-            fputs(usage, fout);
+            fprintf(ctx->fout, "no such lang: %s\n", lang_str);
+            fputs(usage, ctx->fout);
             return;
         }
         lang += KOS_LANG_FIRST;  // not zero-based
@@ -1347,29 +1372,29 @@ shell_set_system_lang(int argc, char **argv) {
 }
 
 static void
-shell_get_keyboard_mode(int argc, char **argv) {
+shell_get_keyboard_mode(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_keyboard_mode\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *names[] = {"ASCII", "scancodes"};
     COVERAGE_ON();
     int type = umka_sys_get_keyboard_mode();
     COVERAGE_OFF();
-    fprintf(fout, "keyboard_mode: %i - %s\n", type,
+    fprintf(ctx->fout, "keyboard_mode: %i - %s\n", type,
             type < 2 ? names[type] : "invalid!");
 }
 
 static void
-shell_set_keyboard_mode(int argc, char **argv) {
+shell_set_keyboard_mode(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_keyboard_mode <mode>\n"
         "  mode             0 - ASCII, 1 - scancodes\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int type = strtol(argv[1], NULL, 0);
@@ -1379,28 +1404,28 @@ shell_set_keyboard_mode(int argc, char **argv) {
 }
 
 static void
-shell_get_font_smoothing(int argc, char **argv) {
+shell_get_font_smoothing(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_font_smoothing\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *names[] = {"off", "anti-aliasing", "subpixel"};
     COVERAGE_ON();
     int type = umka_sys_get_font_smoothing();
     COVERAGE_OFF();
-    fprintf(fout, "font smoothing: %i - %s\n", type, names[type]);
+    fprintf(ctx->fout, "font smoothing: %i - %s\n", type, names[type]);
 }
 
 static void
-shell_set_font_smoothing(int argc, char **argv) {
+shell_set_font_smoothing(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_font_smoothing <mode>\n"
         "  mode             0 - off, 1 - gray AA, 2 - subpixel AA\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int type = strtol(argv[1], NULL, 0);
@@ -1410,27 +1435,27 @@ shell_set_font_smoothing(int argc, char **argv) {
 }
 
 static void
-shell_get_font_size(int argc, char **argv) {
+shell_get_font_size(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_font_size\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
     COVERAGE_ON();
     size_t size = umka_sys_get_font_size();
     COVERAGE_OFF();
-    fprintf(fout, "%upx\n", size);
+    fprintf(ctx->fout, "%upx\n", size);
 }
 
 static void
-shell_set_font_size(int argc, char **argv) {
+shell_set_font_size(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_font_size <size>\n"
         "  size             in pixels\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t size = strtoul(argv[1], NULL, 0);
@@ -1440,13 +1465,13 @@ shell_set_font_size(int argc, char **argv) {
 }
 
 static void
-shell_set_mouse_pos_screen(int argc, char **argv) {
+shell_set_mouse_pos_screen(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_mouse_pos_screen <x> <y>\n"
         "  x                in pixels\n"
         "  y                in pixels\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     struct point16s pos;
@@ -1458,27 +1483,27 @@ shell_set_mouse_pos_screen(int argc, char **argv) {
 }
 
 static void
-shell_get_mouse_pos_screen(int argc, char **argv) {
+shell_get_mouse_pos_screen(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_mouse_pos_screen\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     struct point16s pos = umka_sys_get_mouse_pos_screen();
     COVERAGE_OFF();
-    fprintf(fout, "x y: %" PRIi16 " %" PRIi16 "\n", pos.x, pos.y);
+    fprintf(ctx->fout, "x y: %" PRIi16 " %" PRIi16 "\n", pos.x, pos.y);
 }
 
 static void
-shell_get_mouse_pos_window(int argc, char **argv) {
+shell_get_mouse_pos_window(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_mouse_pos_window\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
@@ -1487,51 +1512,51 @@ shell_get_mouse_pos_window(int argc, char **argv) {
     if (pos.y < 0) {
         pos.x++;
     }
-    fprintf(fout, "x y: %" PRIi16 " %" PRIi16 "\n", pos.x, pos.y);
+    fprintf(ctx->fout, "x y: %" PRIi16 " %" PRIi16 "\n", pos.x, pos.y);
 }
 
 static void
-shell_get_mouse_buttons_state(int argc, char **argv) {
+shell_get_mouse_buttons_state(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_mouse_buttons_state\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     struct mouse_state m = umka_sys_get_mouse_buttons_state();
     COVERAGE_OFF();
-    fprintf(fout, "buttons held (left right middle 4th 5th): %u %u %u %u %u\n",
+    fprintf(ctx->fout, "buttons held (left right middle 4th 5th): %u %u %u %u %u\n",
             m.bl_held, m.br_held, m.bm_held, m.b4_held, m.b5_held);
 }
 
 static void
-shell_get_mouse_buttons_state_events(int argc, char **argv) {
+shell_get_mouse_buttons_state_events(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_mouse_buttons_state_events\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     struct mouse_state_events m = umka_sys_get_mouse_buttons_state_events();
     COVERAGE_OFF();
-    fprintf(fout, "buttons held (left right middle 4th 5th): %u %u %u %u %u\n",
+    fprintf(ctx->fout, "buttons held (left right middle 4th 5th): %u %u %u %u %u\n",
             m.st.bl_held, m.st.br_held, m.st.bm_held, m.st.b4_held,
             m.st.b5_held);
-    fprintf(fout, "buttons pressed (left right middle): %u %u %u\n",
+    fprintf(ctx->fout, "buttons pressed (left right middle): %u %u %u\n",
             m.ev.bl_pressed, m.ev.br_pressed, m.ev.bm_pressed);
-    fprintf(fout, "buttons released (left right middle): %u %u %u\n",
+    fprintf(ctx->fout, "buttons released (left right middle): %u %u %u\n",
             m.ev.bl_released, m.ev.br_released, m.ev.bm_released);
-    fprintf(fout, "left button double click: %u\n", m.ev.bl_dbclick);
-    fprintf(fout, "scrolls used (vertical horizontal): %u %u\n",
+    fprintf(ctx->fout, "left button double click: %u\n", m.ev.bl_dbclick);
+    fprintf(ctx->fout, "scrolls used (vertical horizontal): %u %u\n",
             m.ev.vscroll_used, m.ev.hscroll_used);
 }
 
 static void
-shell_button(int argc, char **argv) {
+shell_button(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: button <x> <xsize> <y> <ysize> <id> <color> <draw_button>"
             " <draw_frame>\n"
@@ -1544,7 +1569,7 @@ shell_button(int argc, char **argv) {
         "  draw_button      0/1\n"
         "  draw_frame       0/1\n";
     if (argc != 9) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x     = strtoul(argv[1], NULL, 0);
@@ -1562,12 +1587,12 @@ shell_button(int argc, char **argv) {
 }
 
 static void
-shell_load_cursor_from_file(int argc, char **argv) {
+shell_load_cursor_from_file(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: load_cursor_from_file <file>\n"
         "  file             file in .cur format in kolibri fs\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int show_pointers = 0;
@@ -1575,26 +1600,26 @@ shell_load_cursor_from_file(int argc, char **argv) {
     void *handle = umka_sys_load_cursor_from_file(argv[1]);
     COVERAGE_OFF();
     if (show_pointers) {
-        fprintf(fout, "handle = %p\n", handle);
+        fprintf(ctx->fout, "handle = %p\n", handle);
     } else {
-        fprintf(fout, "handle = %s\n", handle ? "non-zero" : "0");
+        fprintf(ctx->fout, "handle = %s\n", handle ? "non-zero" : "0");
     }
 }
 
 static void
-shell_load_cursor_from_mem(int argc, char **argv) {
+shell_load_cursor_from_mem(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: load_cursor_from_mem <file>\n"
         "  file             file in .cur format in host fs\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int show_pointers = 0;
     const char *fname = argv[1];
     void *fdata = host_load_file(fname);
     if (!fdata) {
-        fprintf(fout, "[umka] Can't load file: %s\n", fname);
+        fprintf(ctx->fout, "[umka] Can't load file: %s\n", fname);
         return;
     }
     COVERAGE_ON();
@@ -1602,14 +1627,14 @@ shell_load_cursor_from_mem(int argc, char **argv) {
     COVERAGE_OFF();
     free(fdata);
     if (show_pointers) {
-        fprintf(fout, "handle = %p\n", handle);
+        fprintf(ctx->fout, "handle = %p\n", handle);
     } else {
-        fprintf(fout, "handle = %s\n", handle ? "non-zero" : "0");
+        fprintf(ctx->fout, "handle = %s\n", handle ? "non-zero" : "0");
     }
 }
 
 static void
-shell_put_image(int argc, char **argv) {
+shell_put_image(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: put_image <file> <xsize> <ysize> <x> <y>\n"
         "  file             file with rgb triplets\n"
@@ -1618,7 +1643,7 @@ shell_put_image(int argc, char **argv) {
         "  x                x coord\n"
         "  y                y coord\n";
     if (argc != 6) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     FILE *f = fopen(argv[1], "rb");
@@ -1639,7 +1664,7 @@ shell_put_image(int argc, char **argv) {
 }
 
 static void
-shell_put_image_palette(int argc, char **argv) {
+shell_put_image_palette(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: put_image_palette <file> <xsize> <ysize> <x> <y> <bpp>"
             " <row_offset>\n"
@@ -1651,7 +1676,7 @@ shell_put_image_palette(int argc, char **argv) {
         "  bpp              bits per pixel\n"
         "  row_offset       in bytes\n";
     if (argc != 8) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     FILE *f = fopen(argv[1], "rb");
@@ -1676,7 +1701,7 @@ shell_put_image_palette(int argc, char **argv) {
 }
 
 static void
-shell_draw_rect(int argc, char **argv) {
+shell_draw_rect(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: draw_rect <x> <xsize> <y> <ysize> <color> [-g]\n"
         "  x                x coord\n"
@@ -1686,7 +1711,7 @@ shell_draw_rect(int argc, char **argv) {
         "  color            in hex\n"
         "  -g               0/1 - gradient\n";
     if (argc < 6) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x     = strtoul(argv[1], NULL, 0);
@@ -1701,11 +1726,11 @@ shell_draw_rect(int argc, char **argv) {
 }
 
 static void
-shell_get_screen_size(int argc, char **argv) {
+shell_get_screen_size(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_screen_size\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
@@ -1713,11 +1738,11 @@ shell_get_screen_size(int argc, char **argv) {
     COVERAGE_ON();
     umka_sys_get_screen_size(&xsize, &ysize);
     COVERAGE_OFF();
-    fprintf(fout, "%" PRIu32 "x%" PRIu32 "\n", xsize, ysize);
+    fprintf(ctx->fout, "%" PRIu32 "x%" PRIu32 "\n", xsize, ysize);
 }
 
 static void
-shell_draw_line(int argc, char **argv) {
+shell_draw_line(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: draw_line <xbegin> <xend> <ybegin> <yend> <color> [-i]\n"
         "  xbegin           x left coord\n"
@@ -1727,7 +1752,7 @@ shell_draw_line(int argc, char **argv) {
         "  color            hex\n"
         "  -i               inverted color\n";
     if (argc < 6) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x    = strtoul(argv[1], NULL, 0);
@@ -1742,13 +1767,13 @@ shell_draw_line(int argc, char **argv) {
 }
 
 static void
-shell_set_window_caption(int argc, char **argv) {
+shell_set_window_caption(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_window_caption <caption> <encoding>\n"
         "  caption          asciiz string\n"
         "  encoding         1 = cp866, 2 = UTF-16LE, 3 = UTF-8\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *caption = argv[1];
@@ -1759,7 +1784,7 @@ shell_set_window_caption(int argc, char **argv) {
 }
 
 static void
-shell_draw_window(int argc, char **argv) {
+shell_draw_window(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: draw_window <x> <xsize> <y> <ysize> <color> <has_caption>"
             " <client_relative> <fill_workarea> <gradient_fill> <movable>"
@@ -1777,7 +1802,7 @@ shell_draw_window(int argc, char **argv) {
         "  style            1 - draw nothing, 3 - skinned, 4 - skinned fixed\n"
         "  caption          asciiz\n";
     if (argc != 13) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x     = strtoul(argv[1], NULL, 0);
@@ -1800,13 +1825,13 @@ shell_draw_window(int argc, char **argv) {
 }
 
 static void
-shell_window_redraw(int argc, char **argv) {
+shell_window_redraw(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: window_redraw <1|2>\n"
         "  1                begin\n"
         "  2                end\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int begin_end = strtoul(argv[1], NULL, 0);
@@ -1816,7 +1841,7 @@ shell_window_redraw(int argc, char **argv) {
 }
 
 static void
-shell_move_window(int argc, char **argv) {
+shell_move_window(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: move_window <x> <y> <xsize> <ysize>\n"
         "  x                new x coord\n"
@@ -1824,7 +1849,7 @@ shell_move_window(int argc, char **argv) {
         "  xsize            x size -1\n"
         "  ysize            y size -1\n";
     if (argc != 5) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x      = strtoul(argv[1], NULL, 0);
@@ -1837,7 +1862,7 @@ shell_move_window(int argc, char **argv) {
 }
 
 static void
-shell_blit_bitmap(int argc, char **argv) {
+shell_blit_bitmap(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: blit_bitmap <dstx> <dsty> <dstxsize> <dstysize> <srcx> <srcy>"
             " <srcxsize> <srcysize> <operation> <background> <transparent>"
@@ -1856,13 +1881,13 @@ shell_blit_bitmap(int argc, char **argv) {
         "  client_relative  0/1\n"
         "  row_length       in bytes\n";
     if (argc != 15) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *fname = argv[1];
     FILE *f = fopen(fname, "rb");
     if (!f) {
-        fprintf(fout, "[!] can't open file '%s': %s\n", fname, strerror(errno));
+        fprintf(ctx->fout, "[!] can't open file '%s': %s\n", fname, strerror(errno));
         return;
     }
     fseek(f, 0, SEEK_END);
@@ -1894,12 +1919,12 @@ shell_blit_bitmap(int argc, char **argv) {
 }
 
 static void
-shell_write_devices_dat(int argc, char **argv) {
+shell_write_devices_dat(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: write_devices_dat <file>\n"
         "  file             path/to/devices.dat\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
@@ -1908,12 +1933,12 @@ shell_write_devices_dat(int argc, char **argv) {
 }
 
 static void
-shell_scrot(int argc, char **argv) {
+shell_scrot(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: scrot <file>\n"
         "  file             path/to/file in png format\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t xsize, ysize;
@@ -1929,16 +1954,16 @@ shell_scrot(int argc, char **argv) {
     }
 
     unsigned error = lodepng_encode32_file(argv[1], kos_lfb_base, xsize, ysize);
-    if(error) fprintf(fout, "error %u: %s\n", error, lodepng_error_text(error));
+    if(error) fprintf(ctx->fout, "error %u: %s\n", error, lodepng_error_text(error));
 }
 
 static void
-shell_cd(int argc, char **argv) {
+shell_cd(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: cd <path>\n"
         "  path             path/to/dir\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
@@ -1948,7 +1973,7 @@ shell_cd(int argc, char **argv) {
 }
 
 static void
-ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
+ls_range(struct shell_ctx *ctx, f7080s1arg_t *fX0, f70or80_t f70or80) {
     f7080ret_t r;
     size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 :
                                                  BDFE_LEN_UNICODE;
@@ -1964,7 +1989,7 @@ ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
         umka_sys_lfn(fX0, &r, f70or80);
         COVERAGE_OFF();
         fX0->offset += fX0->size;
-        print_f70_status(&r, 1);
+        print_f70_status(ctx, &r, 1);
         f7080s1info_t *dir = fX0->buf;
         int ok = (r.count <= fX0->size);
         ok &= (dir->cnt == r.count);
@@ -1977,7 +2002,7 @@ ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
         for (size_t i = 0; i < dir->cnt; i++) {
             char fattr[KF_ATTR_CNT+1];
             convert_f70_file_attr(bdfe->attr, fattr);
-            fprintf(fout, "%s %s\n", fattr, bdfe->name);
+            fprintf(ctx->fout, "%s %s\n", fattr, bdfe->name);
             bdfe = (bdfe_t*)((uintptr_t)bdfe + bdfe_len);
         }
         if (r.status == ERROR_END_OF_FILE) {
@@ -1987,7 +2012,7 @@ ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
 }
 
 static void
-ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
+ls_all(struct shell_ctx *ctx, f7080s1arg_t *fX0, f70or80_t f70or80) {
     f7080ret_t r;
     size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 :
                                                  BDFE_LEN_UNICODE;
@@ -1995,7 +2020,7 @@ ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
         COVERAGE_ON();
         umka_sys_lfn(fX0, &r, f70or80);
         COVERAGE_OFF();
-        print_f70_status(&r, 1);
+        print_f70_status(ctx, &r, 1);
         assert((r.status == ERROR_SUCCESS && r.count == fX0->size)
               || (r.status == ERROR_END_OF_FILE && r.count < fX0->size));
         f7080s1info_t *dir = fX0->buf;
@@ -2007,12 +2032,12 @@ ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
         assert(ok);
         if (!ok)
             break;
-        fprintf(fout, "total = %"PRIi32"\n", dir->total_cnt);
+        fprintf(ctx->fout, "total = %"PRIi32"\n", dir->total_cnt);
         bdfe_t *bdfe = dir->bdfes;
         for (size_t i = 0; i < dir->cnt; i++) {
             char fattr[KF_ATTR_CNT+1];
             convert_f70_file_attr(bdfe->attr, fattr);
-            fprintf(fout, "%s %s\n", fattr, bdfe->name);
+            fprintf(ctx->fout, "%s %s\n", fattr, bdfe->name);
             bdfe = (bdfe_t*)((uintptr_t)bdfe + bdfe_len);
         }
         if (r.status == ERROR_END_OF_FILE) {
@@ -2039,12 +2064,12 @@ parse_encoding(const char *str) {
 }
 
 static void
-shell_exec(int argc, char **argv) {
+shell_exec(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: exec <file>\n"
         "  file           executable to run\n";
     if (!argc) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     f7080s7arg_t fX0 = {.sf = 7};
@@ -2061,16 +2086,17 @@ shell_exec(int argc, char **argv) {
     if (r.status < 0) {
         r.status = -r.status;
     } else {
-        fprintf(fout, "pid: %" PRIu32 "\n", r.status);
+        fprintf(ctx->fout, "pid: %" PRIu32 "\n", r.status);
         r.status = 0;
     }
-    print_f70_status(&r, 1);
+    print_f70_status(ctx, &r, 1);
 }
 
 static void
-shell_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
+shell_ls(struct shell_ctx *ctx, int argc, char **argv, const char *usage,
+         f70or80_t f70or80) {
     if (!argc) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     int opt;
@@ -2098,7 +2124,7 @@ shell_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
             path_enc = parse_encoding(optarg);
             break;
         default:
-            fputs(usage, fout);
+            fputs(usage, ctx->fout);
             return;
         }
     }
@@ -2117,27 +2143,27 @@ shell_ls(int argc, char **argv, const char *usage, f70or80_t f70or80) {
         fX0.u.f80.path = path;
     }
     if (count != MAX_DIRENTS_TO_READ) {
-        ls_range(&fX0, f70or80);
+        ls_range(ctx, &fX0, f70or80);
     } else {
-        ls_all(&fX0, f70or80);
+        ls_all(ctx, &fX0, f70or80);
     }
     free(dir);
     return;
 }
 
 static void
-shell_ls70(int argc, char **argv) {
+shell_ls70(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: ls70 [dir] [option]...\n"
         "  -f number        index of the first dir entry to read\n"
         "  -c number        number of dir entries to read\n"
         "  -e encoding      cp866|utf16|utf8\n"
         "                   return directory listing in this encoding\n";
-    shell_ls(argc, argv, usage, F70);
+    shell_ls(ctx, argc, argv, usage, F70);
 }
 
 static void
-shell_ls80(int argc, char **argv) {
+shell_ls80(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: ls80 [dir] [option]...\n"
         "  -f number        index of the first dir entry to read\n"
@@ -2146,16 +2172,16 @@ shell_ls80(int argc, char **argv) {
         "                   return directory listing in this encoding\n"
         "  -p encoding      cp866|utf16|utf8\n"
         "                   path to dir is specified in this encoding\n";
-    shell_ls(argc, argv, usage, F80);
+    shell_ls(ctx, argc, argv, usage, F80);
 }
 
 static void
-shell_stat(int argc, char **argv, f70or80_t f70or80) {
+shell_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
     const char *usage = \
         "usage: stat <file>\n"
         "  file             path/to/file\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     f7080s5arg_t fX0 = {.sf = 5, .flags = 0};
@@ -2172,14 +2198,14 @@ shell_stat(int argc, char **argv, f70or80_t f70or80) {
     COVERAGE_ON();
     umka_sys_lfn(&fX0, &r, f70or80);
     COVERAGE_OFF();
-    print_f70_status(&r, 0);
+    print_f70_status(ctx, &r, 0);
     if (r.status != ERROR_SUCCESS)
         return;
     char fattr[KF_ATTR_CNT+1];
     convert_f70_file_attr(file.attr, fattr);
-    fprintf(fout, "attr: %s\n", fattr);
+    fprintf(ctx->fout, "attr: %s\n", fattr);
     if ((file.attr & KF_FOLDER) == 0) {   // don't show size for dirs
-        fprintf(fout, "size: %llu\n", file.size);
+        fprintf(ctx->fout, "size: %llu\n", file.size);
     }
 
 #if PRINT_DATE_TIME == 1    // TODO: runtime, argv flag
@@ -2187,17 +2213,17 @@ shell_stat(int argc, char **argv, f70or80_t f70or80) {
     struct tm *t;
     time = kos_time_to_epoch(&file.ctime);
     t = localtime(&time);
-    fprintf(fout, "ctime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
+    fprintf(ctx->fout, "ctime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
            t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
            t->tm_hour, t->tm_min, t->tm_sec);
     time = kos_time_to_epoch(&file.atime);
     t = localtime(&time);
-    fprintf(fout, "atime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
+    fprintf(ctx->fout, "atime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
            t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
            t->tm_hour, t->tm_min, t->tm_sec);
     time = kos_time_to_epoch(&file.mtime);
     t = localtime(&time);
-    fprintf(fout, "mtime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
+    fprintf(ctx->fout, "mtime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
            t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
            t->tm_hour, t->tm_min, t->tm_sec);
 #endif
@@ -2205,19 +2231,20 @@ shell_stat(int argc, char **argv, f70or80_t f70or80) {
 }
 
 static void
-shell_stat70(int argc, char **argv) {
-    shell_stat(argc, argv, F70);
+shell_stat70(struct shell_ctx *ctx, int argc, char **argv) {
+    shell_stat(ctx, argc, argv, F70);
 }
 
 static void
-shell_stat80(int argc, char **argv) {
-    shell_stat(argc, argv, F80);
+shell_stat80(struct shell_ctx *ctx, int argc, char **argv) {
+    shell_stat(ctx, argc, argv, F80);
 }
 
 static void
-shell_read(int argc, char **argv, f70or80_t f70or80, const char *usage) {
+shell_read(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80,
+           const char *usage) {
     if (argc < 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     f7080s0arg_t fX0 = {.sf = 0};
@@ -2231,9 +2258,9 @@ shell_read(int argc, char **argv, f70or80_t f70or80, const char *usage) {
         fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
         fX0.u.f80.path = argv[opt++];
     }
-    if ((opt >= argc) || !parse_uint64(argv[opt++], &fX0.offset))
+    if ((opt >= argc) || !parse_uint64(ctx, argv[opt++], &fX0.offset))
         return;
-    if ((opt >= argc) || !parse_uint32(argv[opt++], &fX0.count))
+    if ((opt >= argc) || !parse_uint32(ctx, argv[opt++], &fX0.count))
         return;
     for (; opt < argc; opt++) {
         if (!strcmp(argv[opt], "-b")) {
@@ -2242,12 +2269,12 @@ shell_read(int argc, char **argv, f70or80_t f70or80, const char *usage) {
             dump_hash = true;
         } else if (!strcmp(argv[opt], "-e")) {
             if (f70or80 == F70) {
-                fprintf(fout, "f70 doesn't accept encoding parameter,"
+                fprintf(ctx->fout, "f70 doesn't accept encoding parameter,"
                         " use f80\n");
                 return;
             }
         } else {
-            fprintf(fout, "invalid option: '%s'\n", argv[opt]);
+            fprintf(ctx->fout, "invalid option: '%s'\n", argv[opt]);
             return;
         }
     }
@@ -2257,12 +2284,12 @@ shell_read(int argc, char **argv, f70or80_t f70or80, const char *usage) {
     umka_sys_lfn(&fX0, &r, f70or80);
     COVERAGE_OFF();
 
-    print_f70_status(&r, 1);
+    print_f70_status(ctx, &r, 1);
     if (r.status == ERROR_SUCCESS || r.status == ERROR_END_OF_FILE) {
         if (dump_bytes)
-            print_bytes(fX0.buf, r.count);
+            print_bytes(ctx, fX0.buf, r.count);
         if (dump_hash)
-            print_hash(fX0.buf, r.count);
+            print_hash(ctx, fX0.buf, r.count);
     }
 
     free(fX0.buf);
@@ -2270,7 +2297,7 @@ shell_read(int argc, char **argv, f70or80_t f70or80, const char *usage) {
 }
 
 static void
-shell_read70(int argc, char **argv) {
+shell_read70(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: read70 <file> <offset> <length> [-b] [-h]\n"
         "  file             path/to/file\n"
@@ -2279,11 +2306,11 @@ shell_read70(int argc, char **argv) {
         "  -b               dump bytes in hex\n"
         "  -h               print hash of data read\n";
 
-    shell_read(argc, argv, F70, usage);
+    shell_read(ctx, argc, argv, F70, usage);
 }
 
 static void
-shell_read80(int argc, char **argv) {
+shell_read80(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: read80 <file> <offset> <length> [-b] [-h]"
             " [-e cp866|utf8|utf16]\n"
@@ -2293,21 +2320,21 @@ shell_read80(int argc, char **argv) {
         "  -b               dump bytes in hex\n"
         "  -h               print hash of data read\n"
         "  -e               encoding\n";
-    shell_read(argc, argv, F80, usage);
+    shell_read(ctx, argc, argv, F80, usage);
 }
 
 static void
-shell_acpi_preload_table(int argc, char **argv) {
+shell_acpi_preload_table(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_preload_table <file>\n"
         "  file             path/to/local/file.aml\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     FILE *f = fopen(argv[1], "rb");
     if (!f) {
-        fprintf(fout, "[umka] can't open file: %s\n", argv[1]);
+        fprintf(ctx->fout, "[umka] can't open file: %s\n", argv[1]);
         return;
     }
     fseek(f, 0, SEEK_END);
@@ -2316,18 +2343,18 @@ shell_acpi_preload_table(int argc, char **argv) {
     uint8_t *table = (uint8_t*)malloc(fsize);
     fread(table, fsize, 1, f);
     fclose(f);
-    fprintf(fout, "table #%zu\n", kos_acpi_ssdt_cnt);
+    fprintf(ctx->fout, "table #%zu\n", kos_acpi_ssdt_cnt);
     kos_acpi_ssdt_base[kos_acpi_ssdt_cnt] = table;
     kos_acpi_ssdt_size[kos_acpi_ssdt_cnt] = fsize;
     kos_acpi_ssdt_cnt++;
 }
 
 static void
-shell_acpi_enable(int argc, char **argv) {
+shell_acpi_enable(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_enable\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
@@ -2337,49 +2364,49 @@ shell_acpi_enable(int argc, char **argv) {
 }
 
 static void
-shell_acpi_get_node_cnt(int argc, char **argv) {
+shell_acpi_get_node_cnt(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: acpi_get_node_cnt\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t cnt = kos_acpi_count_nodes(acpi_ctx);
-    fprintf(fout, "nodes in namespace: %" PRIu32 "\n", cnt);
+    fprintf(ctx->fout, "nodes in namespace: %" PRIu32 "\n", cnt);
 }
 
 static void
-shell_acpi_get_node_alloc_cnt(int argc, char **argv) {
+shell_acpi_get_node_alloc_cnt(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: acpi_get_node_alloc_cnt\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
-    fprintf(fout, "nodes allocated: %" PRIu32 "\n", kos_acpi_node_alloc_cnt);
+    fprintf(ctx->fout, "nodes allocated: %" PRIu32 "\n", kos_acpi_node_alloc_cnt);
 }
 
 static void
-shell_acpi_get_node_free_cnt(int argc, char **argv) {
+shell_acpi_get_node_free_cnt(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: acpi_get_node_free_cnt\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
-    fprintf(fout, "nodes freed: %" PRIu32 "\n", kos_acpi_node_free_cnt);
+    fprintf(ctx->fout, "nodes freed: %" PRIu32 "\n", kos_acpi_node_free_cnt);
 }
 
 static void
-shell_acpi_set_usage(int argc, char **argv) {
+shell_acpi_set_usage(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_set_usage <num>\n"
         "  num            one of ACPI_USAGE_* constants\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t acpi_usage = strtoul(argv[1], NULL, 0);
@@ -2387,71 +2414,71 @@ shell_acpi_set_usage(int argc, char **argv) {
 }
 
 static void
-shell_acpi_get_usage(int argc, char **argv) {
+shell_acpi_get_usage(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: acpi_get_usage\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
-    fprintf(fout, "ACPI usage: %" PRIu32 "\n", kos_acpi_usage);
+    fprintf(ctx->fout, "ACPI usage: %" PRIu32 "\n", kos_acpi_usage);
 }
 
 static void
-shell_acpi_call(int argc, char **argv) {
+shell_acpi_call(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_call <method> [args...]\n"
         "  method         name of acpi method to call, e.g. \\_SB_PCI0_PRT\n";
     if (argc > 2) {
-        fputs("arguments are not supported / not implemented!", fout);
-        fputs(usage, fout);
+        fputs("arguments are not supported / not implemented!", ctx->fout);
+        fputs(usage, ctx->fout);
         return;
     }
     if (argc < 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *method = argv[1];
-    fprintf(fout, "calling acpi method: '%s'\n", method);
+    fprintf(ctx->fout, "calling acpi method: '%s'\n", method);
     COVERAGE_ON();
     kos_acpi_call_name(acpi_ctx, method);
     COVERAGE_OFF();
-    fprintf(fout, "acpi method returned\n");
+    fprintf(ctx->fout, "acpi method returned\n");
 }
 
 static void
-shell_pci_set_path(int argc, char **argv) {
+shell_pci_set_path(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: pci_set_path <path>\n"
         "  path           where aaaa:bb:cc.d dirs are\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     strcpy(pci_path, argv[1]);
 }
 
 static void
-shell_pci_get_path(int argc, char **argv) {
+shell_pci_get_path(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: pci_get_path\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
-    fprintf(fout, "pci path: %s\n", pci_path);
+    fprintf(ctx->fout, "pci path: %s\n", pci_path);
 }
 
 #ifndef _WIN32
 
 static void
-shell_stack_init(int argc, char **argv) {
+shell_stack_init(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: stack_init\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
@@ -2459,283 +2486,283 @@ shell_stack_init(int argc, char **argv) {
 }
 
 static void
-shell_net_add_device(int argc, char **argv) {
+shell_net_add_device(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_add_device\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
     net_device_t *vnet = vnet_init(42);   // FIXME: tap & list like block devices
     int32_t dev_num = kos_net_add_device(vnet);
-    fprintf(fout, "device number: %" PRIi32 "\n", dev_num);
+    fprintf(ctx->fout, "device number: %" PRIi32 "\n", dev_num);
 }
 
 static void
-shell_net_get_dev_count(int argc, char **argv) {
+shell_net_get_dev_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev_count\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
     uint32_t count = umka_sys_net_get_dev_count();
-    fprintf(fout, "active network devices: %u\n", count);
+    fprintf(ctx->fout, "active network devices: %u\n", count);
 }
 
 static void
-shell_net_get_dev_type(int argc, char **argv) {
+shell_net_get_dev_type(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev_type <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     int32_t dev_type = umka_sys_net_get_dev_type(dev_num);
-    fprintf(fout, "status: %s\n", dev_type == -1 ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", dev_type == -1 ? "fail" : "ok");
     if (dev_type != -1) {
-        fprintf(fout, "type of network device #%" PRIu8 ": %i\n",
+        fprintf(ctx->fout, "type of network device #%" PRIu8 ": %i\n",
                 dev_num, dev_type);
     }
 }
 
 static void
-shell_net_get_dev_name(int argc, char **argv) {
+shell_net_get_dev_name(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev_name <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     char dev_name[64];
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     int32_t status = umka_sys_net_get_dev_name(dev_num, dev_name);
-    fprintf(fout, "status: %s\n", status == -1 ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", status == -1 ? "fail" : "ok");
     if (status != -1) {
-        fprintf(fout, "name of network device #%" PRIu8 ": %s\n",
+        fprintf(ctx->fout, "name of network device #%" PRIu8 ": %s\n",
                 dev_num, dev_name);
     }
 }
 
 static void
-shell_net_dev_reset(int argc, char **argv) {
+shell_net_dev_reset(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_dev_reset <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     int32_t status = umka_sys_net_dev_reset(dev_num);
-    fprintf(fout, "status: %s\n", status == -1 ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", status == -1 ? "fail" : "ok");
 }
 
 static void
-shell_net_dev_stop(int argc, char **argv) {
+shell_net_dev_stop(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_dev_stop <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     int32_t status = umka_sys_net_dev_stop(dev_num);
-    fprintf(fout, "status: %s\n", status == -1 ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", status == -1 ? "fail" : "ok");
 }
 
 static void
-shell_net_get_dev(int argc, char **argv) {
+shell_net_get_dev(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     intptr_t dev = umka_sys_net_get_dev(dev_num);
-    fprintf(fout, "status: %s\n", dev == -1 ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", dev == -1 ? "fail" : "ok");
     if (dev != -1) {
-        fprintf(fout, "address of net dev #%" PRIu8 ": 0x%x\n", dev_num, dev);
+        fprintf(ctx->fout, "address of net dev #%" PRIu8 ": 0x%x\n", dev_num, dev);
     }
 }
 
 static void
-shell_net_get_packet_tx_count(int argc, char **argv) {
+shell_net_get_packet_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_packet_tx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     uint32_t count = umka_sys_net_get_packet_tx_count(dev_num);
-    fprintf(fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
     if (count != UINT32_MAX) {
-        fprintf(fout, "packet tx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
+        fprintf(ctx->fout, "packet tx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
                dev_num, count);
     }
 }
 
 static void
-shell_net_get_packet_rx_count(int argc, char **argv) {
+shell_net_get_packet_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_packet_rx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     uint32_t count = umka_sys_net_get_packet_rx_count(dev_num);
-    fprintf(fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
     if (count != UINT32_MAX) {
-        fprintf(fout, "packet rx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
+        fprintf(ctx->fout, "packet rx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
                dev_num, count);
     }
 }
 
 static void
-shell_net_get_byte_tx_count(int argc, char **argv) {
+shell_net_get_byte_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_byte_tx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     uint32_t count = umka_sys_net_get_byte_tx_count(dev_num);
-    fprintf(fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
     if (count != UINT32_MAX) {
-        fprintf(fout, "byte tx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
+        fprintf(ctx->fout, "byte tx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
                dev_num, count);
     }
 }
 
 static void
-shell_net_get_byte_rx_count(int argc, char **argv) {
+shell_net_get_byte_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_byte_rx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     uint32_t count = umka_sys_net_get_byte_rx_count(dev_num);
-    fprintf(fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
     if (count != UINT32_MAX) {
-        fprintf(fout, "byte rx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
+        fprintf(ctx->fout, "byte rx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
                dev_num, count);
     }
 }
 
 static void
-print_link_status_names(uint32_t status) {
+print_link_status_names(struct shell_ctx *ctx, uint32_t status) {
     switch (status & 0x3) {
     case ETH_LINK_DOWN:
-        fprintf(fout, "ETH_LINK_DOWN");
+        fprintf(ctx->fout, "ETH_LINK_DOWN");
         break;
     case ETH_LINK_UNKNOWN:
-        fprintf(fout, "ETH_LINK_UNKNOWN");
+        fprintf(ctx->fout, "ETH_LINK_UNKNOWN");
         break;
     case ETH_LINK_FD:
-        fprintf(fout, "ETH_LINK_FD");
+        fprintf(ctx->fout, "ETH_LINK_FD");
         break;
     default:
-        fprintf(fout, "ERROR");
+        fprintf(ctx->fout, "ERROR");
         break;
     }
 
     switch(status & ~3u) {
     case ETH_LINK_1G:
-        fprintf(fout, " + ETH_LINK_1G");
+        fprintf(ctx->fout, " + ETH_LINK_1G");
         break;
     case ETH_LINK_100M:
-        fprintf(fout, " + ETH_LINK_100M");
+        fprintf(ctx->fout, " + ETH_LINK_100M");
         break;
     case ETH_LINK_10M:
-        fprintf(fout, " + ETH_LINK_10M");
+        fprintf(ctx->fout, " + ETH_LINK_10M");
         break;
     default:
-        fprintf(fout, " + UNKNOWN");
+        fprintf(ctx->fout, " + UNKNOWN");
         break;
     }
 }
 
 static void
-shell_net_get_link_status(int argc, char **argv) {
+shell_net_get_link_status(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_link_status <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     uint32_t status = umka_sys_net_get_link_status(dev_num);
-    fprintf(fout, "status: %s\n", status == UINT32_MAX ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", status == UINT32_MAX ? "fail" : "ok");
     if (status != UINT32_MAX) {
-        fprintf(fout, "link status of net dev #%" PRIu8 ": %" PRIu32 " ",
+        fprintf(ctx->fout, "link status of net dev #%" PRIu8 ": %" PRIu32 " ",
                dev_num, status);
-        print_link_status_names(status);
+        print_link_status_names(ctx, status);
         putchar('\n');
     }
 }
 
 static void
-shell_net_open_socket(int argc, char **argv) {
+shell_net_open_socket(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_open_socket <domain> <type> <protocol>\n"
         "  domain         domain\n"
         "  type           type\n"
         "  protocol       protocol\n";
     if (argc != 4) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t domain   = strtoul(argv[1], NULL, 0);
     uint32_t type     = strtoul(argv[2], NULL, 0);
     uint32_t protocol = strtoul(argv[3], NULL, 0);
     f75ret_t r = umka_sys_net_open_socket(domain, type, protocol);
-    fprintf(fout, "value: 0x%" PRIx32 "\n", r.value);
-    fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
+    fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
+    fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 // UINT32_MAX
 }
 
 static void
-shell_net_close_socket(int argc, char **argv) {
+shell_net_close_socket(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_close_socket <socket number>\n"
         "  socket number  socket number\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
     f75ret_t r = umka_sys_net_close_socket(fd);
-    fprintf(fout, "value: 0x%" PRIx32 "\n", r.value);
-    fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
+    fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
+    fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
 static void
-shell_net_bind(int argc, char **argv) {
+shell_net_bind(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_bind <fd> <port> <ip>\n"
         "  fd             socket number\n"
         "  port           port\n"
         "  addr           addr\n";
     if (argc != 4) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
@@ -2747,38 +2774,38 @@ shell_net_bind(int argc, char **argv) {
     sa.sin_family = AF_INET4;
     sa.sin_port = htons(port);
     sa.sin_addr.s_addr = addr;
-    fprintf(fout, "sockaddr at %p\n", (void*)&sa);
+    fprintf(ctx->fout, "sockaddr at %p\n", (void*)&sa);
     f75ret_t r = umka_sys_net_bind(fd, &sa, sizeof(struct sockaddr_in));
-    fprintf(fout, "value: 0x%" PRIx32 "\n", r.value);
-    fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
+    fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
+    fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
 static void
-shell_net_listen(int argc, char **argv) {
+shell_net_listen(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_listen <fd> <backlog>\n"
         "  fd             socket number\n"
         "  backlog        max queue length\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
     uint32_t backlog = strtoul(argv[2], NULL, 0);
     f75ret_t r = umka_sys_net_listen(fd, backlog);
-    fprintf(fout, "value: 0x%" PRIx32 "\n", r.value);
-    fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
+    fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
+    fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
 static void
-shell_net_connect(int argc, char **argv) {
+shell_net_connect(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_connect <fd> <port> <ip>\n"
         "  fd             socket number\n"
         "  port           port\n"
         "  addr           addr\n";
     if (argc != 4) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
@@ -2790,21 +2817,21 @@ shell_net_connect(int argc, char **argv) {
     sa.sin_family = AF_INET4;
     sa.sin_port = htons(port);
     sa.sin_addr.s_addr = addr;
-    fprintf(fout, "sockaddr at %p\n", (void*)&sa);
+    fprintf(ctx->fout, "sockaddr at %p\n", (void*)&sa);
     f75ret_t r = umka_sys_net_connect(fd, &sa, sizeof(struct sockaddr_in));
-    fprintf(fout, "value: 0x%" PRIx32 "\n", r.value);
-    fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
+    fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
+    fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
 static void
-shell_net_accept(int argc, char **argv) {
+shell_net_accept(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_accept <fd> <port> <ip>\n"
         "  fd             socket number\n"
         "  port           port\n"
         "  addr           addr\n";
     if (argc != 4) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
@@ -2816,27 +2843,27 @@ shell_net_accept(int argc, char **argv) {
     sa.sin_family = AF_INET4;
     sa.sin_port = htons(port);
     sa.sin_addr.s_addr = addr;
-    fprintf(fout, "sockaddr at %p\n", (void*)&sa);
+    fprintf(ctx->fout, "sockaddr at %p\n", (void*)&sa);
     f75ret_t r = umka_sys_net_accept(fd, &sa, sizeof(struct sockaddr_in));
-    fprintf(fout, "value: 0x%" PRIx32 "\n", r.value);
-    fprintf(fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
+    fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
+    fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
 static void
-shell_net_eth_read_mac(int argc, char **argv) {
+shell_net_eth_read_mac(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_eth_read_mac <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     f76ret_t r = umka_sys_net_eth_read_mac(dev_num);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        fprintf(fout, "%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n",
+        fprintf(ctx->fout, "%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n",
                (uint8_t)(r.ebx >>  0), (uint8_t)(r.ebx >>  8),
                (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
                (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
@@ -2844,33 +2871,33 @@ shell_net_eth_read_mac(int argc, char **argv) {
 }
 
 static void
-shell_net_ipv4_get_addr(int argc, char **argv) {
+shell_net_ipv4_get_addr(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_addr <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     f76ret_t r = umka_sys_net_ipv4_get_addr(dev_num);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        fprintf(fout, "%d.%d.%d.%d\n",
+        fprintf(ctx->fout, "%d.%d.%d.%d\n",
                 (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
                 (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
     }
 }
 
 static void
-shell_net_ipv4_set_addr(int argc, char **argv) {
+shell_net_ipv4_set_addr(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_addr <dev_num> <addr>\n"
         "  dev_num        device number as returned by net_add_device\n"
         "  addr           a.b.c.d\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -2878,80 +2905,80 @@ shell_net_ipv4_set_addr(int argc, char **argv) {
     uint32_t addr = inet_addr(addr_str);
     f76ret_t r = umka_sys_net_ipv4_set_addr(dev_num, addr);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        fprintf(fout, "status: ok\n");
+        fprintf(ctx->fout, "status: ok\n");
     }
 }
 
 static void
-shell_net_ipv4_get_dns(int argc, char **argv) {
+shell_net_ipv4_get_dns(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_dns <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     f76ret_t r = umka_sys_net_ipv4_get_dns(dev_num);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        fprintf(fout, "%d.%d.%d.%d\n",
+        fprintf(ctx->fout, "%d.%d.%d.%d\n",
                 (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
                 (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
     }
 }
 
 static void
-shell_net_ipv4_set_dns(int argc, char **argv) {
+shell_net_ipv4_set_dns(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_dns <dev_num> <dns>\n"
         "  dev_num        device number as returned by net_add_device\n"
         "  dns            a.b.c.d\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     uint32_t dns = inet_addr(argv[2]);
     f76ret_t r = umka_sys_net_ipv4_set_dns(dev_num, dns);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        fprintf(fout, "status: ok\n");
+        fprintf(ctx->fout, "status: ok\n");
     }
 }
 
 static void
-shell_net_ipv4_get_subnet(int argc, char **argv) {
+shell_net_ipv4_get_subnet(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_subnet <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     f76ret_t r = umka_sys_net_ipv4_get_subnet(dev_num);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        fprintf(fout, "%d.%d.%d.%d\n",
+        fprintf(ctx->fout, "%d.%d.%d.%d\n",
                 (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
                 (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
     }
 }
 
 static void
-shell_net_ipv4_set_subnet(int argc, char **argv) {
+shell_net_ipv4_set_subnet(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_subnet <dev_num> <subnet>\n"
         "  dev_num        device number as returned by net_add_device\n"
         "  subnet         a.b.c.d\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -2959,40 +2986,40 @@ shell_net_ipv4_set_subnet(int argc, char **argv) {
     uint32_t subnet = inet_addr(subnet_str);
     f76ret_t r = umka_sys_net_ipv4_set_subnet(dev_num, subnet);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        fprintf(fout, "status: ok\n");
+        fprintf(ctx->fout, "status: ok\n");
     }
 }
 
 static void
-shell_net_ipv4_get_gw(int argc, char **argv) {
+shell_net_ipv4_get_gw(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_gw <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     f76ret_t r = umka_sys_net_ipv4_get_gw(dev_num);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        fprintf(fout, "%d.%d.%d.%d\n",
+        fprintf(ctx->fout, "%d.%d.%d.%d\n",
                 (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
                 (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
     }
 }
 
 static void
-shell_net_ipv4_set_gw(int argc, char **argv) {
+shell_net_ipv4_set_gw(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_gw <dev_num> <gw>\n"
         "  dev_num        device number as returned by net_add_device\n"
         "  gw             a.b.c.d\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3000,38 +3027,38 @@ shell_net_ipv4_set_gw(int argc, char **argv) {
     uint32_t gw = inet_addr(gw_str);
     f76ret_t r = umka_sys_net_ipv4_set_gw(dev_num, gw);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        fprintf(fout, "status: ok\n");
+        fprintf(ctx->fout, "status: ok\n");
     }
 }
 
 static void
-shell_net_arp_get_count(int argc, char **argv) {
+shell_net_arp_get_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_get_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     f76ret_t r = umka_sys_net_arp_get_count(dev_num);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        fprintf(fout, "%" PRIi32 "\n", r.eax);
+        fprintf(ctx->fout, "%" PRIi32 "\n", r.eax);
     }
 }
 
 static void
-shell_net_arp_get_entry(int argc, char **argv) {
+shell_net_arp_get_entry(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_get_entry <dev_num> <arp_num>\n"
         "  dev_num        device number as returned by net_add_device\n"
         "  arp_num        arp number as returned by net_add_device\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3039,9 +3066,9 @@ shell_net_arp_get_entry(int argc, char **argv) {
     arp_entry_t arp;
     f76ret_t r = umka_sys_net_arp_get_entry(dev_num, arp_num, &arp);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        fprintf(fout, "arp #%u: IP %d.%d.%d.%d, "
+        fprintf(ctx->fout, "arp #%u: IP %d.%d.%d.%d, "
                "mac %2.2" SCNu8 ":%2.2" SCNu8 ":%2.2" SCNu8
                ":%2.2" SCNu8 ":%2.2" SCNu8 ":%2.2" SCNu8 ", "
                "status %" PRIu16 ", "
@@ -3056,7 +3083,7 @@ shell_net_arp_get_entry(int argc, char **argv) {
 }
 
 static void
-shell_net_arp_add_entry(int argc, char **argv) {
+shell_net_arp_add_entry(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_add_entry <dev_num> <addr> <mac> <status> <ttl>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -3065,7 +3092,7 @@ shell_net_arp_add_entry(int argc, char **argv) {
         "  status         see ARP.inc\n"
         "  ttl            Time to live\n";
     if (argc != 6) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     arp_entry_t arp;
@@ -3079,38 +3106,38 @@ shell_net_arp_add_entry(int argc, char **argv) {
     arp.ttl = strtoul(argv[5], NULL, 0);
     f76ret_t r = umka_sys_net_arp_add_entry(dev_num, &arp);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     }
 }
 
 static void
-shell_net_arp_del_entry(int argc, char **argv) {
+shell_net_arp_del_entry(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_del_entry <dev_num> <arp_num>\n"
         "  dev_num        device number as returned by net_add_device\n"
         "  arp_num        arp number as returned by net_add_device\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     int32_t arp_num = strtoul(argv[2], NULL, 0);
     f76ret_t r = umka_sys_net_arp_del_entry(dev_num, arp_num);
     if (r.eax == UINT32_MAX) {
-        fprintf(fout, "status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     }
 }
 
 #endif // _WIN32
 
 static void
-shell_bg_set_size(int argc, char **argv) {
+shell_bg_set_size(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_set_size <xsize> <ysize>\n"
         "  xsize          in pixels\n"
         "  ysize          in pixels\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t xsize = strtoul(argv[1], NULL, 0);
@@ -3119,13 +3146,13 @@ shell_bg_set_size(int argc, char **argv) {
 }
 
 static void
-shell_bg_put_pixel(int argc, char **argv) {
+shell_bg_put_pixel(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_put_pixel <offset> <color>\n"
         "  offset         in bytes, (x+y*xsize)*3\n"
         "  color          in hex\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t offset = strtoul(argv[1], NULL, 0);
@@ -3134,24 +3161,24 @@ shell_bg_put_pixel(int argc, char **argv) {
 }
 
 static void
-shell_bg_redraw(int argc, char **argv) {
+shell_bg_redraw(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: bg_redraw\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     umka_sys_bg_redraw();
 }
 
 static void
-shell_bg_set_mode(int argc, char **argv) {
+shell_bg_set_mode(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_set_mode <mode>\n"
         "  mode           1 = tile, 2 = stretch\n";
     if (argc != 3) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t mode = strtoul(argv[1], NULL, 0);
@@ -3159,13 +3186,13 @@ shell_bg_set_mode(int argc, char **argv) {
 }
 
 static void
-shell_bg_put_img(int argc, char **argv) {
+shell_bg_put_img(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_put_img <image> <offset>\n"
         "  image          file\n"
         "  offset         in bytes, (x+y*xsize)*3\n";
     if (argc != 4) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     FILE *f = fopen(argv[1], "rb");
@@ -3180,33 +3207,33 @@ shell_bg_put_img(int argc, char **argv) {
 }
 
 static void
-shell_bg_map(int argc, char **argv) {
+shell_bg_map(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: bg_map\n";
     if (argc != 1) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     void *addr = umka_sys_bg_map();
-    fprintf(fout, "%p\n", addr);
+    fprintf(ctx->fout, "%p\n", addr);
 }
 
 static void
-shell_bg_unmap(int argc, char **argv) {
+shell_bg_unmap(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_unmap <addr>\n"
         "  addr           return value of bg_map\n";
     if (argc != 2) {
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
     void *addr = (void*)strtoul(argv[1], NULL, 0);
     uint32_t status = umka_sys_bg_unmap(addr);
-    fprintf(fout, "status = %d\n", status);
+    fprintf(ctx->fout, "status = %d\n", status);
 }
 
-static void shell_help(int argc, char **argv);
+static void shell_help(struct shell_ctx *ctx, int argc, char **argv);
 
 func_table_t shell_cmds[] = {
     { "send_scancode",                   shell_send_scancode },
@@ -3338,55 +3365,53 @@ func_table_t shell_cmds[] = {
 };
 
 static void
-shell_help(int argc, char **argv) {
+shell_help(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: help [command]\n"
         "  command        help on this command usage\n";
     switch (argc) {
     case 1:
-        fputs(usage, fout);
-        fputs("\navailable commands:\n", fout);
-        for (func_table_t *ft = shell_cmds;
-             ft < shell_cmds + sizeof(shell_cmds) / sizeof(*shell_cmds);
-             ft++) {
-            fprintf(fout, "  %s\n", ft->name);
+        fputs(usage, ctx->fout);
+        fputs("\navailable commands:\n", ctx->fout);
+        for (func_table_t *ft = shell_cmds; ft->name; ft++) {
+            fprintf(ctx->fout, "  %s\n", ft->name);
         }
         break;
     case 2: {
         const char *cmd_name = argv[1];
-        size_t i;
-        for (i = 0; i < sizeof(shell_cmds) / sizeof(*shell_cmds); i++) {
-            if (!strcmp(shell_cmds[i].name, cmd_name)) {
-                shell_cmds[i].func(0, NULL);
+        for (func_table_t *ft = shell_cmds; ft->name; ft++) {
+            if (!strcmp(ft->name, cmd_name)) {
+                ft->func(ctx, 0, NULL);
                 return;
             }
         }
-        fprintf(fout, "no such command: %s\n", cmd_name);
+        fprintf(ctx->fout, "no such command: %s\n", cmd_name);
         break;
     }
     default:
-        fputs(usage, fout);
+        fputs(usage, ctx->fout);
         return;
     }
 }
 
 void *
-run_test(FILE *in, FILE *out, int block) {
-    fin = in;
-    fout = out;
-    int is_tty = isatty(fileno(fin));
+run_test(struct shell_ctx *ctx) {
+    int is_tty = isatty(fileno(ctx->fin));
     char **argv = (char**)calloc(sizeof(char*), (MAX_COMMAND_ARGS + 1));
-    while(next_line(is_tty, block)) {
+//    bestlineSetCompletionCallback(completion);
+//    bestlineSetHintsCallback(hints);
+//    bestlineHistoryLoad("umka_shell.history");
+    while(next_line(ctx, is_tty)) {
         if (cmd_buf[0] == '#' || cmd_buf[0] == '\n' || cmd_buf[0] == '\0' ||
             cmd_buf[0] == '\r') {
-            fprintf(fout, "%s", cmd_buf);
+            fprintf(ctx->fout, "%s", cmd_buf);
             continue;
         }
         if (cmd_buf[0] == 'X') break;
         if (!is_tty) {
-            prompt();
-            fprintf(fout, "%s", cmd_buf);
-            fflush(fout);
+            prompt(ctx);
+            fprintf(ctx->fout, "%s", cmd_buf);
+            fflush(ctx->fout);
         }
         int argc = split_args(cmd_buf, argv);
         func_table_t *ft;
@@ -3396,9 +3421,9 @@ run_test(FILE *in, FILE *out, int block) {
             }
         }
         if (ft->name) {
-            ft->func(argc, argv);
+            ft->func(ctx, argc, argv);
         } else {
-            fprintf(fout, "unknown command: %s\n", argv[0]);
+            fprintf(ctx->fout, "unknown command: %s\n", argv[0]);
         }
     }
     free(argv);

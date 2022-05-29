@@ -43,13 +43,6 @@ static void
 monitor(void) {
     umka_sti();
     fprintf(stderr, "Start monitor thread\n");
-    FILE *fin = fopen("/tmp/umka.fifo.2u", "r");
-    FILE *fout = fopen("/tmp/umka.fifo.4u", "w");
-    if (!fin || !fout) {
-        fprintf(stderr, "Can't open monitor files!\n");
-        return;
-    }
-    run_test(fin, fout, 0);
 }
 
 void umka_thread_ping(void);
@@ -95,7 +88,7 @@ void new_monitor(void) {
         perror("fdopen mpty");
         return;
     }
-    run_test(fmpty, fmpty, 0);
+    run_test(ctx);
 }
 */
 

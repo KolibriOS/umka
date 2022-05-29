@@ -61,7 +61,7 @@ covpreproc: covpreproc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o vnet.o \
-            lodepng.o pci.o thread.o util.o getopt.o
+            lodepng.o pci.o thread.o util.o optparse.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
@@ -92,7 +92,7 @@ lodepng.o: lodepng.c lodepng.h
 #bestline.o: bestline.c bestline.h
 #	$(CC) $(CFLAGS_32) -U_POSIX_C_SOURCE -Wno-logical-op -Wno-switch-enum -c $<
 
-getopt.o: getopt.c getopt.h
+optparse.o: optparse.c optparse.h
 	$(CC) $(CFLAGS_32) -c $<
 
 util.o: util.c util.h umka.h
