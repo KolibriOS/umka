@@ -394,6 +394,26 @@ typedef struct {
 // Protocol family
 #define AF_INET4  AF_INET
 
+/*
+struct sockaddr_in {
+    uint16_t sin_family;    // sa_family_t
+    uint16_t sin_port;      // in_port_t
+    uint32_t sin_addr;      // struct in_addr
+    uint8_t sin_zero[8];    // zero
+};
+
+struct addrinfo {
+    uint32_t ai_flags;      // bitmask of AI_*
+    uint32_t ai_family;     // PF_*
+    uint32_t ai_socktype;   // SOCK_*
+    uint32_t ai_protocol;   // 0 or IPPROTO_*
+    uint32_t ai_addrlen;    // length of ai_addr
+    uint32_t ai_canonname;  // char*
+    uint32_t ai_addr;       // struct sockaddr*
+    uint32_t ai_next;       // struct addrinfo*
+};
+*/
+
 typedef struct net_device_t net_device_t;
 
 typedef struct {
@@ -708,7 +728,7 @@ typedef struct {
 extern display_t kos_display;
 
 typedef struct {
-    uint64_t addr;
+    void *addr;
     uint64_t size;
     uint32_t type;
 } e820entry_t;
@@ -1631,6 +1651,19 @@ umka_sys_move_window(size_t x, size_t y, ssize_t xsize, ssize_t ysize) {
           "d"(xsize),
           "S"(ysize)
         : "memory");
+}
+
+static inline void*
+umka_sys_load_dll(const char *fname) {
+    void *table;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(table)
+        : "a"(68),
+          "b"(19),
+          "c"(fname)
+        : "memory");
+    return table;
 }
 
 static inline void

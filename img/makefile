@@ -24,6 +24,9 @@ kolibri.img: ../default.skn ../fill.cur
 	mkfs.vfat -n KOLIBRIOS -F 12 $@
 	mcopy -vmoi $@ ../default.skn ::DEFAULT.SKN
 	mcopy -vmoi $@ ../fill.cur ::FILL.CUR
+	mcopy -vmoi $@ ../spray.cur ::SPRAY.CUR
+	mmd -i $@ ::LIB
+	mcopy -vmoi $@ ../network.obj ::LIB/NETWORK.OBJ
 
 jfs.img:
 	fallocate -l 16MiB $@

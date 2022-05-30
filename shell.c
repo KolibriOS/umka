@@ -2439,6 +2439,23 @@ shell_pci_get_path(struct shell_ctx *ctx, int argc, char **argv) {
     fprintf(ctx->fout, "pci path: %s\n", pci_path);
 }
 
+static void
+shell_load_dll(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: load_dll <path>\n"
+        "  path           /path/to/library.obj in KolibriOS fs\n";
+    if (argc != 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    COVERAGE_ON();
+    void *export = umka_sys_load_dll(argv[1]);
+    COVERAGE_OFF();
+//    if (ctx->reproducible)
+    fprintf(ctx->fout, "### export: %p\n", export);
+}
+
+
 #ifndef _WIN32
 
 static void
@@ -3337,6 +3354,7 @@ func_table_t shell_cmds[] = {
     { "i40",                             shell_i40 },
     { "load_cursor_from_file",           shell_load_cursor_from_file },
     { "load_cursor_from_mem",            shell_load_cursor_from_mem },
+    { "load_dll",                        shell_load_dll },
     { "ls70",                            shell_ls70 },
     { "ls80",                            shell_ls80 },
     { "move_window",                     shell_move_window },

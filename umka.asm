@@ -174,6 +174,9 @@ pubsym BOOT, 'kos_boot'
 
 EFLAGS.ID = 1 SHL 21
 
+macro invlpg addr {
+}
+
 macro cli {
         pushfd
         bts     dword[esp], BSF EFLAGS.ID
@@ -242,6 +245,7 @@ SLOT_BASE equ __pew20
 sys_proc equ __pew21
 VGABasePtr equ __pew22
 HEAP_BASE equ __pew23
+page_tabs equ page_tabs_pew
 ;macro OS_BASE [x] {
 ;  OS_BASE equ os_base
 ;}
@@ -251,6 +255,7 @@ restore CDDataBuf,idts,WIN_STACK,WIN_POS
 restore FDD_BUFF,WIN_TEMP_XY,KEY_COUNT,KEY_BUFF,BTN_COUNT,BTN_BUFF,BTN_ADDR
 restore MEM_AMOUNT,SYS_SHUTDOWN,SLOT_BASE,sys_proc,VGABasePtr
 restore HEAP_BASE
+restore page_tabs
 purge BOOT_LO,BOOT
 
 LFB_BASE = lfb_base
@@ -267,6 +272,8 @@ macro stdcall target, [args] {
 common
   if target eq is_region_userspace
         cmp     esp, esp        ; ZF
+  else if target eq is_string_userspace
+        cmp     esp, esp        ; ZF
   else
         stdcall target, args
   end if
@@ -275,6 +282,48 @@ common
 include 'system.inc'
 include 'fdo.inc'
 
+OS_BASE equ 0
+macro mov target, source {
+  if source eq (HEAP_BASE - 0 + HEAP_MIN_SIZE)/4096
+        push    eax eax
+        mov     eax, HEAP_BASE
+        add     eax, HEAP_MIN_SIZE
+        shr     eax, 12
+        mov     [esp+4], eax
+        pop     eax
+        pop     target
+  else if target eq dword [sys_proc-0+PROC.pdt_0+(page_tabs shr 20)]
+        push    eax ecx
+        mov     eax, page_tabs
+        shr     eax, 20
+        add     eax, PROC.pdt_0
+        add     eax, sys_proc
+        mov     ecx, sys_proc+PROC.pdt_0+PG_SWR
+        mov     [eax], ecx
+        pop     ecx eax
+  else
+        mov     target, source
+  end if
+}
+macro cmp target, source {
+  if source eq (HEAP_BASE - 0 + HEAP_MIN_SIZE)/4096
+        push    eax eax
+        mov     eax, HEAP_BASE
+        add     eax, HEAP_MIN_SIZE
+        shr     eax, 12
+        mov     [esp], eax
+        mov     eax, [esp+4]
+        cmp     target, [esp]
+        pop     eax eax
+  else
+        mov     target, source
+  end if
+}
+
+include 'init.inc'
+purge cmp
+purge mov
+restore OS_BASE
 include 'core/sync.inc'
 ;include 'core/sys32.inc'
 macro call target {
@@ -291,11 +340,32 @@ purge call
 restore irq0
 include 'core/syscall.inc'
 ;include 'core/fpu.inc'
-;include 'core/memory.inc'
+map_io_mem equ map_io_mem_pew
+create_trampoline_pgmap equ create_trampoline_pgmap_pew
+alloc_page equ alloc_page_pew
+alloc_pages equ alloc_pages_pew
+free_page equ free_page_pew
+include 'core/memory.inc'
+restore map_io_mem, free_page, create_trampoline_pgmap, alloc_page, alloc_pages
 ;include 'core/mtrr.inc'
 include 'core/heap.inc'
 include 'core/malloc.inc'
+macro mov target, source {
+  if target eq [edi - 4096 + (page_tabs shr 20)]
+        push    eax ebx
+        mov     ebx, eax
+        mov     eax, page_tabs
+        shr     eax, 20
+        sub     eax, 4096
+        add     eax, edi
+        mov     [eax], ebx
+        pop     ebx eax
+  else
+        mov     target, source
+  end if
+}
 include 'core/taskman.inc'
+purge mov
 include 'core/dll.inc'
 macro call target {
   if target eq pci_read_reg
@@ -458,6 +528,8 @@ proc umka_init c uses ebx esi edi ebp
         mov     ecx, uglobals_size
         xor     eax, eax
         rep stosb
+
+;        call    init_page_map
 
         mov     [xsave_area_size], 0x1000
 
@@ -782,7 +854,7 @@ endp
 extrn system_shutdown
 
 sysfn_saveramdisk:
-sysfn_meminfo:
+;sysfn_meminfo:
 check_fdd_motor_status:
 check_ATAPI_device_event:
 check_fdd_motor_status_has_work?:
@@ -795,7 +867,7 @@ allow_medium_removal:
 EjectMedium:
 save_image:
 init_sys_v86:
-load_pe_driver:
+;load_pe_driver:
 usb_init:
 fdc_init:
 mtrr_validate:
@@ -805,11 +877,8 @@ ReadCDWRetr:
 WaitUnitReady:
 prevent_medium_removal:
 Read_TOC:
-commit_pages:
-release_pages:
 lock_application_table:
 unlock_application_table:
-get_pg_addr:
 free_page:
 build_interrupt_table:
 init_fpu:
@@ -817,16 +886,16 @@ init_mtrr:
 create_trampoline_pgmap:
 alloc_page:
 
-sys_IPC:
+;sys_IPC:
 sys_resize_app_memory:
-f68:
+;f68:
 v86_irq:
-test_cpu:
-acpi_locate:
-init_BIOS32:
-mem_test:
-init_mem:
-init_page_map:
+;test_cpu:
+;acpi_locate:
+;init_BIOS32:
+;mem_test:
+;init_mem:
+;init_page_map:
 ahci_init:
 enable_acpi:
 acpi.call_name:
@@ -843,13 +912,14 @@ acpi._.lookup_node:
 acpi._.print_tree:
         ret
 
+load_PE:
 alloc_pages:
         ret     4
-create_ring_buffer:
+;create_ring_buffer:
         ret     8
-map_page:
+;map_page:
         ret     12
-map_memEx:
+;map_memEx:
         ret     20
 
 uglobal
@@ -924,6 +994,8 @@ HEAP_BASE       rb UMKA_MEMORY_BYTES - (HEAP_BASE - os_base + \
 endg
 
 uglobal
+page_tabs:
+rb 256*1024*1024
 v86_irqhooks rd IRQ_RESERVED*2
 cache_ide0  IDE_CACHE
 cache_ide1  IDE_CACHE
