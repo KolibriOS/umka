@@ -2450,7 +2450,9 @@ shell_stack_init(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     (void)argv;
+    COVERAGE_ON();
     umka_stack_init();
+    COVERAGE_OFF();
 }
 
 static void
@@ -2463,7 +2465,9 @@ shell_net_add_device(struct shell_ctx *ctx, int argc, char **argv) {
     }
     (void)argv;
     net_device_t *vnet = vnet_init(42);   // FIXME: tap & list like block devices
+    COVERAGE_ON();
     int32_t dev_num = kos_net_add_device(vnet);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "device number: %" PRIi32 "\n", dev_num);
 }
 
@@ -2476,7 +2480,9 @@ shell_net_get_dev_count(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     (void)argv;
+    COVERAGE_ON();
     uint32_t count = umka_sys_net_get_dev_count();
+    COVERAGE_OFF();
     fprintf(ctx->fout, "active network devices: %u\n", count);
 }
 
@@ -2490,7 +2496,9 @@ shell_net_get_dev_type(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     int32_t dev_type = umka_sys_net_get_dev_type(dev_num);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "status: %s\n", dev_type == -1 ? "fail" : "ok");
     if (dev_type != -1) {
         fprintf(ctx->fout, "type of network device #%" PRIu8 ": %i\n",
@@ -2509,7 +2517,9 @@ shell_net_get_dev_name(struct shell_ctx *ctx, int argc, char **argv) {
     }
     char dev_name[64];
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     int32_t status = umka_sys_net_get_dev_name(dev_num, dev_name);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "status: %s\n", status == -1 ? "fail" : "ok");
     if (status != -1) {
         fprintf(ctx->fout, "name of network device #%" PRIu8 ": %s\n",
@@ -2527,7 +2537,9 @@ shell_net_dev_reset(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     int32_t status = umka_sys_net_dev_reset(dev_num);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "status: %s\n", status == -1 ? "fail" : "ok");
 }
 
@@ -2541,7 +2553,9 @@ shell_net_dev_stop(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     int32_t status = umka_sys_net_dev_stop(dev_num);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "status: %s\n", status == -1 ? "fail" : "ok");
 }
 
@@ -2555,7 +2569,9 @@ shell_net_get_dev(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     intptr_t dev = umka_sys_net_get_dev(dev_num);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "status: %s\n", dev == -1 ? "fail" : "ok");
     if (dev != -1) {
         fprintf(ctx->fout, "address of net dev #%" PRIu8 ": 0x%x\n", dev_num, dev);
@@ -2572,7 +2588,9 @@ shell_net_get_packet_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     uint32_t count = umka_sys_net_get_packet_tx_count(dev_num);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
     if (count != UINT32_MAX) {
         fprintf(ctx->fout, "packet tx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
@@ -2590,7 +2608,9 @@ shell_net_get_packet_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     uint32_t count = umka_sys_net_get_packet_rx_count(dev_num);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
     if (count != UINT32_MAX) {
         fprintf(ctx->fout, "packet rx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
@@ -2608,7 +2628,9 @@ shell_net_get_byte_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     uint32_t count = umka_sys_net_get_byte_tx_count(dev_num);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
     if (count != UINT32_MAX) {
         fprintf(ctx->fout, "byte tx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
@@ -2626,7 +2648,9 @@ shell_net_get_byte_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     uint32_t count = umka_sys_net_get_byte_rx_count(dev_num);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
     if (count != UINT32_MAX) {
         fprintf(ctx->fout, "byte rx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
@@ -2677,7 +2701,9 @@ shell_net_get_link_status(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     uint32_t status = umka_sys_net_get_link_status(dev_num);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "status: %s\n", status == UINT32_MAX ? "fail" : "ok");
     if (status != UINT32_MAX) {
         fprintf(ctx->fout, "link status of net dev #%" PRIu8 ": %" PRIu32 " ",
@@ -2701,7 +2727,9 @@ shell_net_open_socket(struct shell_ctx *ctx, int argc, char **argv) {
     uint32_t domain   = strtoul(argv[1], NULL, 0);
     uint32_t type     = strtoul(argv[2], NULL, 0);
     uint32_t protocol = strtoul(argv[3], NULL, 0);
+    COVERAGE_ON();
     f75ret_t r = umka_sys_net_open_socket(domain, type, protocol);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
     fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 // UINT32_MAX
@@ -2717,7 +2745,9 @@ shell_net_close_socket(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     f75ret_t r = umka_sys_net_close_socket(fd);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
     fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
@@ -2743,7 +2773,9 @@ shell_net_bind(struct shell_ctx *ctx, int argc, char **argv) {
     sa.sin_port = htons(port);
     sa.sin_addr.s_addr = addr;
     fprintf(ctx->fout, "sockaddr at %p\n", (void*)&sa);
+    COVERAGE_ON();
     f75ret_t r = umka_sys_net_bind(fd, &sa, sizeof(struct sockaddr_in));
+    COVERAGE_OFF();
     fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
     fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
@@ -2760,7 +2792,9 @@ shell_net_listen(struct shell_ctx *ctx, int argc, char **argv) {
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
     uint32_t backlog = strtoul(argv[2], NULL, 0);
+    COVERAGE_ON();
     f75ret_t r = umka_sys_net_listen(fd, backlog);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
     fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
@@ -2786,7 +2820,9 @@ shell_net_connect(struct shell_ctx *ctx, int argc, char **argv) {
     sa.sin_port = htons(port);
     sa.sin_addr.s_addr = addr;
     fprintf(ctx->fout, "sockaddr at %p\n", (void*)&sa);
+    COVERAGE_ON();
     f75ret_t r = umka_sys_net_connect(fd, &sa, sizeof(struct sockaddr_in));
+    COVERAGE_OFF();
     fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
     fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
@@ -2812,7 +2848,9 @@ shell_net_accept(struct shell_ctx *ctx, int argc, char **argv) {
     sa.sin_port = htons(port);
     sa.sin_addr.s_addr = addr;
     fprintf(ctx->fout, "sockaddr at %p\n", (void*)&sa);
+    COVERAGE_ON();
     f75ret_t r = umka_sys_net_accept(fd, &sa, sizeof(struct sockaddr_in));
+    COVERAGE_OFF();
     fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
     fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
@@ -2827,7 +2865,9 @@ shell_net_eth_read_mac(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_eth_read_mac(dev_num);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     } else {
@@ -2848,7 +2888,9 @@ shell_net_ipv4_get_addr(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_ipv4_get_addr(dev_num);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     } else {
@@ -2871,7 +2913,9 @@ shell_net_ipv4_set_addr(struct shell_ctx *ctx, int argc, char **argv) {
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     char *addr_str = argv[2];
     uint32_t addr = inet_addr(addr_str);
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_ipv4_set_addr(dev_num, addr);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     } else {
@@ -2889,7 +2933,9 @@ shell_net_ipv4_get_dns(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_ipv4_get_dns(dev_num);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     } else {
@@ -2911,7 +2957,9 @@ shell_net_ipv4_set_dns(struct shell_ctx *ctx, int argc, char **argv) {
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     uint32_t dns = inet_addr(argv[2]);
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_ipv4_set_dns(dev_num, dns);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     } else {
@@ -2929,7 +2977,9 @@ shell_net_ipv4_get_subnet(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_ipv4_get_subnet(dev_num);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     } else {
@@ -2952,7 +3002,9 @@ shell_net_ipv4_set_subnet(struct shell_ctx *ctx, int argc, char **argv) {
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     char *subnet_str = argv[2];
     uint32_t subnet = inet_addr(subnet_str);
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_ipv4_set_subnet(dev_num, subnet);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     } else {
@@ -2970,7 +3022,9 @@ shell_net_ipv4_get_gw(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_ipv4_get_gw(dev_num);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     } else {
@@ -2993,7 +3047,9 @@ shell_net_ipv4_set_gw(struct shell_ctx *ctx, int argc, char **argv) {
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     char *gw_str = argv[2];
     uint32_t gw = inet_addr(gw_str);
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_ipv4_set_gw(dev_num, gw);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     } else {
@@ -3011,7 +3067,9 @@ shell_net_arp_get_count(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_arp_get_count(dev_num);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     } else {
@@ -3032,7 +3090,9 @@ shell_net_arp_get_entry(struct shell_ctx *ctx, int argc, char **argv) {
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     uint32_t arp_num = strtoul(argv[2], NULL, 0);
     arp_entry_t arp;
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_arp_get_entry(dev_num, arp_num, &arp);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     } else {
@@ -3072,7 +3132,9 @@ shell_net_arp_add_entry(struct shell_ctx *ctx, int argc, char **argv) {
                     arp.mac+3, arp.mac+4, arp.mac+5);
     arp.status = strtoul(argv[4], NULL, 0);
     arp.ttl = strtoul(argv[5], NULL, 0);
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_arp_add_entry(dev_num, &arp);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     }
@@ -3090,7 +3152,9 @@ shell_net_arp_del_entry(struct shell_ctx *ctx, int argc, char **argv) {
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
     int32_t arp_num = strtoul(argv[2], NULL, 0);
+    COVERAGE_ON();
     f76ret_t r = umka_sys_net_arp_del_entry(dev_num, arp_num);
+    COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
         fprintf(ctx->fout, "status: fail\n");
     }
@@ -3110,7 +3174,9 @@ shell_bg_set_size(struct shell_ctx *ctx, int argc, char **argv) {
     }
     uint32_t xsize = strtoul(argv[1], NULL, 0);
     uint32_t ysize = strtoul(argv[2], NULL, 0);
+    COVERAGE_ON();
     umka_sys_bg_set_size(xsize, ysize);
+    COVERAGE_OFF();
 }
 
 static void
@@ -3125,7 +3191,9 @@ shell_bg_put_pixel(struct shell_ctx *ctx, int argc, char **argv) {
     }
     size_t offset = strtoul(argv[1], NULL, 0);
     uint32_t color = strtoul(argv[2], NULL, 0);
+    COVERAGE_ON();
     umka_sys_bg_put_pixel(offset, color);
+    COVERAGE_OFF();
 }
 
 static void
@@ -3137,7 +3205,9 @@ shell_bg_redraw(struct shell_ctx *ctx, int argc, char **argv) {
         fputs(usage, ctx->fout);
         return;
     }
+    COVERAGE_ON();
     umka_sys_bg_redraw();
+    COVERAGE_OFF();
 }
 
 static void
@@ -3150,7 +3220,9 @@ shell_bg_set_mode(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     uint32_t mode = strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     umka_sys_bg_set_mode(mode);
+    COVERAGE_OFF();
 }
 
 static void
@@ -3171,7 +3243,9 @@ shell_bg_put_img(struct shell_ctx *ctx, int argc, char **argv) {
     fread(image, fsize, 1, f);
     fclose(f);
     size_t offset = strtoul(argv[2], NULL, 0);
+    COVERAGE_ON();
     umka_sys_bg_put_img(image, offset, fsize);
+    COVERAGE_OFF();
 }
 
 static void
@@ -3183,7 +3257,9 @@ shell_bg_map(struct shell_ctx *ctx, int argc, char **argv) {
         fputs(usage, ctx->fout);
         return;
     }
+    COVERAGE_ON();
     void *addr = umka_sys_bg_map();
+    COVERAGE_OFF();
     fprintf(ctx->fout, "%p\n", addr);
 }
 
@@ -3197,7 +3273,9 @@ shell_bg_unmap(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     void *addr = (void*)strtoul(argv[1], NULL, 0);
+    COVERAGE_ON();
     uint32_t status = umka_sys_bg_unmap(addr);
+    COVERAGE_OFF();
     fprintf(ctx->fout, "status = %d\n", status);
 }
 
