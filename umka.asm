@@ -316,7 +316,7 @@ macro cmp target, source {
         cmp     target, [esp]
         pop     eax eax
   else
-        mov     target, source
+        cmp     target, source
   end if
 }
 
@@ -348,7 +348,9 @@ free_page equ free_page_pew
 include 'core/memory.inc'
 restore map_io_mem, free_page, create_trampoline_pgmap, alloc_page, alloc_pages
 ;include 'core/mtrr.inc'
+;user_alloc_at equ user_alloc_at_pew
 include 'core/heap.inc'
+;restore user_alloc_at
 include 'core/malloc.inc'
 macro mov target, source {
   if target eq [edi - 4096 + (page_tabs shr 20)]
@@ -529,6 +531,8 @@ proc umka_init c uses ebx esi edi ebp
         xor     eax, eax
         rep stosb
 
+;        call    mem_test
+;        call    init_mem
 ;        call    init_page_map
 
         mov     [xsave_area_size], 0x1000
@@ -851,6 +855,11 @@ proc map_io_mem _base, _size, _flags
         ret
 endp
 
+;proc user_alloc_at stdcall, address:dword, alloc_size:dword
+;        xor     eax, eax
+;        ret
+;endp
+
 extrn system_shutdown
 
 sysfn_saveramdisk:
@@ -941,12 +950,22 @@ macro pew x {inclu#de `x}
 macro org x {}
 macro format [x] {}
 
+bios32_entry equ bios32_entry_pew
+tmp_page_tabs equ tmp_page_tabs_pew
 include 'kernel.asm'
-
+restore bios32_entry, tmp_page_tabs
 purge org,sys_msg_board,delay_ms
 restore org,sys_msg_board,delay_ms
 
 coverage_end:
+
+
+section '.data.boot' writeable align 0x1000
+BOOT boot_data
+virtual at BOOT
+BOOT_LO boot_data
+end virtual
+
 
 if HOST eq windows
     section '.data.8k' writeable align 8192
@@ -961,11 +980,6 @@ umka_tool dd ?
 pubsym umka_initialized
 umka_initialized dd 0
 fpu_owner dd ?
-
-BOOT boot_data
-virtual at BOOT
-BOOT_LO boot_data
-end virtual
 
 uglobal
 align 64
@@ -994,6 +1008,10 @@ HEAP_BASE       rb UMKA_MEMORY_BYTES - (HEAP_BASE - os_base + \
 endg
 
 uglobal
+align 4
+bios32_entry    dd ?
+tmp_page_tabs   dd ?
+
 page_tabs:
 rb 256*1024*1024
 v86_irqhooks rd IRQ_RESERVED*2

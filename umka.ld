@@ -17,7 +17,17 @@ INSERT BEFORE .interp;
 
 SECTIONS
 {
-  .data.aligned BLOCK(65536) :
+  .data.boot BLOCK(0x1000) :
+  {
+    *(.data.boot)
+  }
+
+}
+INSERT BEFORE .data;
+
+SECTIONS
+{
+  .data.aligned BLOCK(0x10000) :
   {
     *(SORT_BY_NAME(.data.align*))
   }
@@ -27,7 +37,7 @@ INSERT AFTER .data;
 
 SECTIONS
 {
-  .bss.aligned BLOCK(65536) :
+  .bss.aligned BLOCK(0x10000) :
   {
     *(SORT_BY_NAME(.bss.align*))
   }

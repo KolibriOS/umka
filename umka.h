@@ -728,7 +728,7 @@ typedef struct {
 extern display_t kos_display;
 
 typedef struct {
-    void *addr;
+    uint64_t addr;
     uint64_t size;
     uint32_t type;
 } e820entry_t;

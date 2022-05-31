@@ -40,9 +40,11 @@ void build_history_filename() {
     sprintf(history_filename, "%s/%s", dir_name, HIST_FILE_BASENAME);
 }
 
+/*
 uint8_t mem0[64*1024*1024];
 uint8_t mem1[128*1024*1024];
 uint8_t mem2[256*1024*1024];
+*/
 
 int
 main(int argc, char **argv) {
@@ -56,14 +58,14 @@ main(int argc, char **argv) {
         "  -c               collect coverage";
     const char *infile = NULL, *outfile = NULL;
     struct shell_ctx ctx = {.fin = stdin, .fout = stdout, .reproducible = 0,
-                            .hist_file = history_filename};
+                            .hist_file = history_filename, .var = NULL};
     build_history_filename();
-
+/*
     kos_boot.memmap_block_cnt = 3;
-    kos_boot.memmap_blocks[0] = (e820entry_t){mem0, 64*1024*1024, 1};
-    kos_boot.memmap_blocks[1] = (e820entry_t){mem1, 128*1024*1024, 1};
-    kos_boot.memmap_blocks[2] = (e820entry_t){mem2, 256*1024*1024, 1};
-
+    kos_boot.memmap_blocks[0] = (e820entry_t){(uintptr_t)mem0, 64*1024*1024, 1};
+    kos_boot.memmap_blocks[1] = (e820entry_t){(uintptr_t)mem1, 128*1024*1024, 1};
+    kos_boot.memmap_blocks[2] = (e820entry_t){(uintptr_t)mem2, 256*1024*1024, 1};
+*/
     kos_boot.bpp = 32;
     kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
     kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;

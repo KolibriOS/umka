@@ -154,6 +154,134 @@ parse_uint64(struct shell_ctx *ctx, const char *str, uint64_t *res) {
     }
 }
 
+static struct shell_var *
+shell_var_get(struct shell_ctx *ctx, const char *name) {
+    for (struct shell_var *var = ctx->var; var; var = var->next) {
+        if (!strcmp(var->name, name)) {
+            return var;
+        }
+    }
+    return NULL;
+}
+
+static bool
+shell_parse_sint(struct shell_ctx *ctx, ssize_t *value, const char *s) {
+    if (s[0] == '$') {
+        struct shell_var *var = shell_var_get(ctx, s);
+        if (var) {
+            *value = var->value.sint;
+            return true;
+        }
+    } else {
+        *value = strtol(s, NULL, 0);
+        return true;
+    }
+    return false;
+}
+
+static bool
+shell_parse_uint(struct shell_ctx *ctx, size_t *value, const char *s) {
+    if (s[0] == '$') {
+        struct shell_var *var = shell_var_get(ctx, s);
+        if (var) {
+            *value = var->value.uint;
+            return true;
+        }
+    } else {
+        *value = strtoul(s, NULL, 0);
+        return true;
+    }
+    return false;
+}
+
+static bool
+shell_parse_ptr(struct shell_ctx *ctx, void **value, const char *s) {
+    if (s[0] == '$') {
+        struct shell_var *var = shell_var_get(ctx, s);
+        if (var) {
+            *value = var->value.ptr;
+            return true;
+        }
+    } else {
+        *value = (void*)strtoul(s, NULL, 0);
+        return true;
+    }
+    return false;
+}
+
+static bool
+shell_var_name(struct shell_ctx *ctx, const char *name) {
+    struct shell_var *var = ctx->var;
+    if (!var || var->name[0] != '\0') {
+        return false;
+    }
+    if (name[0] != '$' || strlen(name) >= SHELL_VAR_NAME_LEN) {
+        return false;
+    }
+    strcpy(var->name, name);
+    return true;
+}
+
+struct shell_var *
+shell_var_new() {
+    struct shell_var *var = (struct shell_var*)malloc(sizeof(struct shell_var));
+    var->next = NULL;
+    var->name[0] = '\0';
+    return var;
+}
+
+static struct shell_var *
+shell_var_add(struct shell_ctx *ctx) {
+    struct shell_var *var = ctx->var;
+    struct shell_var *new_var;
+    if (!var) {
+        new_var = shell_var_new();
+        ctx->var = new_var;
+    } else {
+        if (var->name[0] == '\0') {
+            new_var = var;
+        } else {
+            new_var = shell_var_new();
+            new_var->next = var;
+            ctx->var = new_var;
+        }
+    }
+    return new_var;
+}
+
+static bool
+shell_var_add_sint(struct shell_ctx *ctx, ssize_t value) {
+    struct shell_var *var = shell_var_add(ctx);
+    if (!var) {
+        return false;
+    }
+    var->type = SHELL_VAR_SINT;
+    var->value.sint = value;
+    return true;
+}
+
+static bool
+shell_var_add_uint(struct shell_ctx *ctx, size_t value) {
+    struct shell_var *var = shell_var_add(ctx);
+    if (!var) {
+        return false;
+    }
+    var->type = SHELL_VAR_UINT;
+    var->value.uint = value;
+    return true;
+}
+
+static bool
+shell_var_add_ptr(struct shell_ctx *ctx, void *value) {
+    struct shell_var *var = shell_var_add(ctx);
+    if (!var) {
+        return false;
+    }
+    var->type = SHELL_VAR_POINTER;
+    var->value.ptr = value;
+    return true;
+}
+
 static void
 print_bytes(struct shell_ctx *ctx, uint8_t *x, size_t len) {
     for (size_t i = 0; i < len; i++) {
@@ -241,11 +369,25 @@ split_args(char *s, char **argv) {
 }
 
 static void
-shell_send_scancode(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_var(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: var <$name>\n"
+        "  $name            variable name, must start with $ sign\n";
+    if (argc != 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    bool status = shell_var_name(ctx, argv[1]);
+    if (!status) {
+        fprintf(ctx->fout, "fail\n");
+    }
+}
+
+static void
+cmd_send_scancode(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: send_scancode <code>...\n"
         "  code             dec or hex number\n";
-
     if (argc < 2) {
         fputs(usage, ctx->fout);
         return;
@@ -269,7 +411,7 @@ shell_send_scancode(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_umka_init(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_umka_init(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: umka_init\n";
     (void)argv;
@@ -283,7 +425,7 @@ shell_umka_init(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_umka_set_boot_params(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_umka_set_boot_params(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: umka_set_boot_params [--x_res <num>] [--y_res <num>]\n"
         "  --x_res <num>    screen width\n"
@@ -314,7 +456,7 @@ shell_umka_set_boot_params(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_i40(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_i40(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: i40 <eax> [ebx [ecx [edx [esi [edi [ebp]]]]]]...\n"
         "  see '/kernel/docs/sysfuncs.txt' for details\n";
@@ -360,7 +502,7 @@ disk_list_partitions(struct shell_ctx *ctx, disk_t *d) {
 }
 
 static void
-shell_ramdisk_init(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_ramdisk_init(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: ramdisk_init <file>\n"
         "  <file>           absolute or relative path\n";
@@ -391,7 +533,7 @@ shell_ramdisk_init(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: disk_add <file> <name> [option]...\n"
         "  <file>           absolute or relative path\n"
@@ -451,7 +593,7 @@ disk_del_by_name(struct shell_ctx *ctx, const char *name) {
 }
 
 static void
-shell_disk_del(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_disk_del(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: disk_del <name>\n"
         "  name             disk name, i.e. rd or hd0\n";
@@ -465,7 +607,7 @@ shell_disk_del(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_pwd(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_pwd(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: pwd\n";
     if (argc != 1) {
@@ -482,7 +624,7 @@ shell_pwd(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set_pixel(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_pixel(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_pixel <x> <y> <color> [-i]\n"
         "  x                x window coordinate\n"
@@ -503,7 +645,7 @@ shell_set_pixel(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_write_text(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_write_text(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: write_text <x> <y> <color> <string> <asciiz> <fill_bg>"
             " <font_and_enc> <draw_to_buf> <scale_factor> <length>"
@@ -541,7 +683,7 @@ shell_write_text(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_key(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_key(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_key\n";
@@ -553,7 +695,7 @@ shell_get_key(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_dump_key_buff(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_dump_key_buff(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: dump_key_buff [count]\n"
         "  count            how many items to dump (all by default)\n";
@@ -572,7 +714,7 @@ shell_dump_key_buff(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_dump_win_stack(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_dump_win_stack(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: dump_win_stack [count]\n"
         "  count            how many items to dump\n";
@@ -590,7 +732,7 @@ shell_dump_win_stack(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_dump_win_pos(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_dump_win_pos(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: dump_win_pos [count]\n"
         "  count            how many items to dump\n";
@@ -608,7 +750,7 @@ shell_dump_win_pos(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_dump_win_map(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_dump_win_map(struct shell_ctx *ctx, int argc, char **argv) {
 // TODO: area
     const char *usage = \
         "usage: dump_win_map\n";
@@ -626,7 +768,7 @@ shell_dump_win_map(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_dump_appdata(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_dump_appdata(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: dump_appdata <index> [-p]\n"
         "  index            index into appdata array to dump\n"
@@ -689,7 +831,7 @@ shell_dump_appdata(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_switch_to_thread(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_switch_to_thread(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: switch_to_thread <tid>\n"
         "  <tid>          thread id to switch to\n";
@@ -703,7 +845,7 @@ shell_switch_to_thread(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get <var>\n"
         "  <var>          variable to get\n";
@@ -730,7 +872,7 @@ shell_get(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set <var> <value>\n"
         "  <var>          variable to set\n"
@@ -763,7 +905,7 @@ shell_set(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_new_sys_thread(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_new_sys_thread(struct shell_ctx *ctx, int argc, char **argv) {
 // FIXME
     const char *usage = \
         "usage: new_sys_thread\n";
@@ -777,7 +919,7 @@ shell_new_sys_thread(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: mouse_move [-l] [-m] [-r] [-x {+|-|=}<value>]"
             "[-y {+|-|=}<value>] [-h {+|-}<value>] [-v {+|-}<value>]\n"
@@ -865,7 +1007,7 @@ shell_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_process_info(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_process_info(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: process_info <pid>\n"
         "  pid              process id to dump, -1 for self\n";
@@ -874,7 +1016,8 @@ shell_process_info(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     process_information_t info;
-    int32_t pid = strtol(argv[1], NULL, 0);
+    ssize_t pid;
+    shell_parse_sint(ctx, &pid, argv[1]);
     COVERAGE_ON();
     umka_sys_process_info(pid, &info);
     COVERAGE_OFF();
@@ -895,7 +1038,7 @@ shell_process_info(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_display_number(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_display_number(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: display_number <is_pointer> <base> <num_digits> <is_qword>"
             " <show_lead_zeros> <num_or_ptr> <x> <y> <color> <fill_bg> <font>"
@@ -945,7 +1088,7 @@ shell_display_number(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_window_colors <frame> <grab> <work_3d_dark> <work_3d_light>"
             " <grab_text> <work> <work_button> <work_button_text> <work_text>"
@@ -972,7 +1115,7 @@ shell_set_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_window_colors\n";
     if (argc != 1) {
@@ -999,7 +1142,7 @@ shell_get_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_skin_height(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_skin_height(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_skin_height\n";
     if (argc != 1) {
@@ -1014,7 +1157,7 @@ shell_get_skin_height(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_screen_area(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_screen_area(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_screen_area\n";
     if (argc != 1) {
@@ -1033,7 +1176,7 @@ shell_get_screen_area(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set_screen_area(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_screen_area(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_screen_area <left> <top> <right> <bottom>\n"
         "  left             left x coord\n"
@@ -1055,7 +1198,7 @@ shell_set_screen_area(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_skin_margins(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_skin_margins(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_skin_margins\n";
     if (argc != 1) {
@@ -1074,7 +1217,7 @@ shell_get_skin_margins(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set_button_style(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_button_style(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_button_style <style>\n"
         "  style            0 - flat, 1 - 3d\n";
@@ -1089,7 +1232,7 @@ shell_set_button_style(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set_skin(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_skin(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_skin <path>\n"
         "  path             i.e. /rd/1/DEFAULT.SKN\n";
@@ -1108,7 +1251,7 @@ char *lang_id_map[] = {"en", "fi", "ge", "ru", "fr", "et", "ua", "it", "be",
                        "sp", "ca"};
 
 static void
-shell_get_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_keyboard_layout <-t type> [-f file]\n"
         "  -t type          layout type: 1 - normal, 2 - shift, 3 - alt\n"
@@ -1172,7 +1315,7 @@ shell_get_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_keyboard_layout <-t type> <-f file|code{128}>\n"
         "  -t type          layout type: 1 - normal, 2 - shift, 3 - alt\n"
@@ -1238,7 +1381,7 @@ shell_set_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_keyboard_lang\n";
@@ -1254,10 +1397,11 @@ shell_get_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
     } else {
         fprintf(ctx->fout, "invalid lang: %i\n", lang);
     }
+    shell_var_add_sint(ctx, lang);
 }
 
 static void
-shell_get_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_system_lang\n";
@@ -1273,10 +1417,11 @@ shell_get_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
     } else {
         fprintf(ctx->fout, "invalid lang: %i\n", lang);
     }
+    shell_var_add_uint(ctx, lang);
 }
 
 static void
-shell_set_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_keyboard_lang <lang_id>\n"
         "  lang_id          number or a two-digit code:\n"
@@ -1308,7 +1453,7 @@ shell_set_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_system_lang <lang_id>\n"
         "  lang_id          number or a two-digit code:\n"
@@ -1340,7 +1485,7 @@ shell_set_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_keyboard_mode(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_keyboard_mode(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_keyboard_mode\n";
@@ -1357,7 +1502,7 @@ shell_get_keyboard_mode(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set_keyboard_mode(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_keyboard_mode(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_keyboard_mode <mode>\n"
         "  mode             0 - ASCII, 1 - scancodes\n";
@@ -1372,7 +1517,7 @@ shell_set_keyboard_mode(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_font_smoothing(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_font_smoothing(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_font_smoothing\n";
@@ -1388,7 +1533,7 @@ shell_get_font_smoothing(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set_font_smoothing(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_font_smoothing(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_font_smoothing <mode>\n"
         "  mode             0 - off, 1 - gray AA, 2 - subpixel AA\n";
@@ -1403,7 +1548,7 @@ shell_set_font_smoothing(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_font_size(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_font_size(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_font_size\n";
     if (argc != 1) {
@@ -1418,7 +1563,7 @@ shell_get_font_size(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set_font_size(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_font_size(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_font_size <size>\n"
         "  size             in pixels\n";
@@ -1433,7 +1578,7 @@ shell_set_font_size(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set_mouse_pos_screen(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_mouse_pos_screen(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_mouse_pos_screen <x> <y>\n"
         "  x                in pixels\n"
@@ -1451,7 +1596,7 @@ shell_set_mouse_pos_screen(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_mouse_pos_screen(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_mouse_pos_screen(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_mouse_pos_screen\n";
@@ -1466,7 +1611,7 @@ shell_get_mouse_pos_screen(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_mouse_pos_window(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_mouse_pos_window(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_mouse_pos_window\n";
@@ -1484,7 +1629,7 @@ shell_get_mouse_pos_window(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_mouse_buttons_state(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_mouse_buttons_state(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_mouse_buttons_state\n";
@@ -1500,7 +1645,7 @@ shell_get_mouse_buttons_state(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_mouse_buttons_state_events(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_mouse_buttons_state_events(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: get_mouse_buttons_state_events\n";
@@ -1524,7 +1669,7 @@ shell_get_mouse_buttons_state_events(struct shell_ctx *ctx, int argc, char **arg
 }
 
 static void
-shell_button(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_button(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: button <x> <xsize> <y> <ysize> <id> <color> <draw_button>"
             " <draw_frame>\n"
@@ -1540,7 +1685,8 @@ shell_button(struct shell_ctx *ctx, int argc, char **argv) {
         fputs(usage, ctx->fout);
         return;
     }
-    size_t x     = strtoul(argv[1], NULL, 0);
+    size_t x;
+    shell_parse_uint(ctx, &x, argv[1]);
     size_t xsize = strtoul(argv[2], NULL, 0);
     size_t y     = strtoul(argv[3], NULL, 0);
     size_t ysize = strtoul(argv[4], NULL, 0);
@@ -1555,7 +1701,7 @@ shell_button(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_load_cursor_from_file(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_load_cursor_from_file(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: load_cursor_from_file <file>\n"
         "  file             file in .cur format in kolibri fs\n";
@@ -1572,10 +1718,11 @@ shell_load_cursor_from_file(struct shell_ctx *ctx, int argc, char **argv) {
     } else {
         fprintf(ctx->fout, "handle = %s\n", handle ? "non-zero" : "0");
     }
+    shell_var_add_ptr(ctx, handle);
 }
 
 static void
-shell_load_cursor_from_mem(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_load_cursor_from_mem(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: load_cursor_from_mem <file>\n"
         "  file             file in .cur format in host fs\n";
@@ -1599,10 +1746,34 @@ shell_load_cursor_from_mem(struct shell_ctx *ctx, int argc, char **argv) {
     } else {
         fprintf(ctx->fout, "handle = %s\n", handle ? "non-zero" : "0");
     }
+    shell_var_add_ptr(ctx, handle);
 }
 
 static void
-shell_put_image(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_cursor(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: set_cursor <handle>\n"
+        "  handle           as returned by load_cursor* functions\n";
+    if (argc != 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    int show_pointers = 0;
+    void *handle;
+    shell_parse_ptr(ctx, &handle, argv[1]);
+    COVERAGE_ON();
+    handle = umka_sys_set_cursor(handle);
+    COVERAGE_OFF();
+    if (show_pointers) {
+        fprintf(ctx->fout, "prev handle = %p\n", handle);
+    } else {
+        fprintf(ctx->fout, "prev handle = %s\n", handle ? "non-zero" : "0");
+    }
+    shell_var_add_ptr(ctx, handle);
+}
+
+static void
+cmd_put_image(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: put_image <file> <xsize> <ysize> <x> <y>\n"
         "  file             file with rgb triplets\n"
@@ -1632,7 +1803,7 @@ shell_put_image(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_put_image_palette(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_put_image_palette(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: put_image_palette <file> <xsize> <ysize> <x> <y> <bpp>"
             " <row_offset>\n"
@@ -1669,7 +1840,7 @@ shell_put_image_palette(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_draw_rect(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_draw_rect(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: draw_rect <x> <xsize> <y> <ysize> <color> [-g]\n"
         "  x                x coord\n"
@@ -1694,7 +1865,7 @@ shell_draw_rect(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_get_screen_size(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_get_screen_size(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_screen_size\n";
     if (argc != 1) {
@@ -1710,7 +1881,7 @@ shell_get_screen_size(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_draw_line(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_draw_line(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: draw_line <xbegin> <xend> <ybegin> <yend> <color> [-i]\n"
         "  xbegin           x left coord\n"
@@ -1735,7 +1906,7 @@ shell_draw_line(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_set_window_caption(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_set_window_caption(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_window_caption <caption> <encoding>\n"
         "  caption          asciiz string\n"
@@ -1752,7 +1923,7 @@ shell_set_window_caption(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_draw_window(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_draw_window(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: draw_window <x> <xsize> <y> <ysize> <color> <has_caption>"
             " <client_relative> <fill_workarea> <gradient_fill> <movable>"
@@ -1793,7 +1964,7 @@ shell_draw_window(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_window_redraw(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_window_redraw(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: window_redraw <1|2>\n"
         "  1                begin\n"
@@ -1809,7 +1980,7 @@ shell_window_redraw(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_move_window(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_move_window(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: move_window <x> <y> <xsize> <ysize>\n"
         "  x                new x coord\n"
@@ -1830,7 +2001,7 @@ shell_move_window(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_blit_bitmap(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_blit_bitmap(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: blit_bitmap <dstx> <dsty> <dstxsize> <dstysize> <srcx> <srcy>"
             " <srcxsize> <srcysize> <operation> <background> <transparent>"
@@ -1887,7 +2058,7 @@ shell_blit_bitmap(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_write_devices_dat(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_write_devices_dat(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: write_devices_dat <file>\n"
         "  file             path/to/devices.dat\n";
@@ -1901,7 +2072,7 @@ shell_write_devices_dat(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_scrot(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_scrot(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: scrot <file>\n"
         "  file             path/to/file in png format\n";
@@ -1926,7 +2097,7 @@ shell_scrot(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_cd(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_cd(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: cd <path>\n"
         "  path             path/to/dir\n";
@@ -2032,7 +2203,7 @@ parse_encoding(const char *str) {
 }
 
 static void
-shell_exec(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_exec(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: exec <file>\n"
         "  file           executable to run\n";
@@ -2061,7 +2232,7 @@ shell_exec(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_ls(struct shell_ctx *ctx, int argc, char **argv, const char *usage,
+cmd_ls(struct shell_ctx *ctx, int argc, char **argv, const char *usage,
          f70or80_t f70or80) {
     if (!argc) {
         fputs(usage, ctx->fout);
@@ -2120,18 +2291,18 @@ shell_ls(struct shell_ctx *ctx, int argc, char **argv, const char *usage,
 }
 
 static void
-shell_ls70(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_ls70(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: ls70 [dir] [option]...\n"
         "  -f number        index of the first dir entry to read\n"
         "  -c number        number of dir entries to read\n"
         "  -e encoding      cp866|utf16|utf8\n"
         "                   return directory listing in this encoding\n";
-    shell_ls(ctx, argc, argv, usage, F70);
+    cmd_ls(ctx, argc, argv, usage, F70);
 }
 
 static void
-shell_ls80(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_ls80(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: ls80 [dir] [option]...\n"
         "  -f number        index of the first dir entry to read\n"
@@ -2140,11 +2311,11 @@ shell_ls80(struct shell_ctx *ctx, int argc, char **argv) {
         "                   return directory listing in this encoding\n"
         "  -p encoding      cp866|utf16|utf8\n"
         "                   path to dir is specified in this encoding\n";
-    shell_ls(ctx, argc, argv, usage, F80);
+    cmd_ls(ctx, argc, argv, usage, F80);
 }
 
 static void
-shell_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
+cmd_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
     const char *usage = \
         "usage: stat <file>\n"
         "  file             path/to/file\n";
@@ -2199,17 +2370,17 @@ shell_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
 }
 
 static void
-shell_stat70(struct shell_ctx *ctx, int argc, char **argv) {
-    shell_stat(ctx, argc, argv, F70);
+cmd_stat70(struct shell_ctx *ctx, int argc, char **argv) {
+    cmd_stat(ctx, argc, argv, F70);
 }
 
 static void
-shell_stat80(struct shell_ctx *ctx, int argc, char **argv) {
-    shell_stat(ctx, argc, argv, F80);
+cmd_stat80(struct shell_ctx *ctx, int argc, char **argv) {
+    cmd_stat(ctx, argc, argv, F80);
 }
 
 static void
-shell_read(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80,
+cmd_read(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80,
            const char *usage) {
     if (argc < 3) {
         fputs(usage, ctx->fout);
@@ -2265,7 +2436,7 @@ shell_read(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80,
 }
 
 static void
-shell_read70(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_read70(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: read70 <file> <offset> <length> [-b] [-h]\n"
         "  file             path/to/file\n"
@@ -2274,11 +2445,11 @@ shell_read70(struct shell_ctx *ctx, int argc, char **argv) {
         "  -b               dump bytes in hex\n"
         "  -h               print hash of data read\n";
 
-    shell_read(ctx, argc, argv, F70, usage);
+    cmd_read(ctx, argc, argv, F70, usage);
 }
 
 static void
-shell_read80(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_read80(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: read80 <file> <offset> <length> [-b] [-h]"
             " [-e cp866|utf8|utf16]\n"
@@ -2288,11 +2459,11 @@ shell_read80(struct shell_ctx *ctx, int argc, char **argv) {
         "  -b               dump bytes in hex\n"
         "  -h               print hash of data read\n"
         "  -e               encoding\n";
-    shell_read(ctx, argc, argv, F80, usage);
+    cmd_read(ctx, argc, argv, F80, usage);
 }
 
 static void
-shell_acpi_preload_table(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_acpi_preload_table(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_preload_table <file>\n"
         "  file             path/to/local/file.aml\n";
@@ -2318,7 +2489,7 @@ shell_acpi_preload_table(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_acpi_enable(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_acpi_enable(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_enable\n";
     if (argc != 1) {
@@ -2332,7 +2503,7 @@ shell_acpi_enable(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_acpi_get_node_cnt(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_acpi_get_node_cnt(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: acpi_get_node_cnt\n";
@@ -2345,7 +2516,7 @@ shell_acpi_get_node_cnt(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_acpi_get_node_alloc_cnt(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_acpi_get_node_alloc_cnt(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: acpi_get_node_alloc_cnt\n";
@@ -2357,7 +2528,7 @@ shell_acpi_get_node_alloc_cnt(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_acpi_get_node_free_cnt(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_acpi_get_node_free_cnt(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: acpi_get_node_free_cnt\n";
@@ -2369,7 +2540,7 @@ shell_acpi_get_node_free_cnt(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_acpi_set_usage(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_acpi_set_usage(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_set_usage <num>\n"
         "  num            one of ACPI_USAGE_* constants\n";
@@ -2382,7 +2553,7 @@ shell_acpi_set_usage(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_acpi_get_usage(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_acpi_get_usage(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: acpi_get_usage\n";
@@ -2394,7 +2565,7 @@ shell_acpi_get_usage(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_acpi_call(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_acpi_call(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_call <method> [args...]\n"
         "  method         name of acpi method to call, e.g. \\_SB_PCI0_PRT\n";
@@ -2416,7 +2587,7 @@ shell_acpi_call(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_pci_set_path(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_pci_set_path(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: pci_set_path <path>\n"
         "  path           where aaaa:bb:cc.d dirs are\n";
@@ -2428,7 +2599,7 @@ shell_pci_set_path(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_pci_get_path(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_pci_get_path(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: pci_get_path\n";
@@ -2440,7 +2611,7 @@ shell_pci_get_path(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_load_dll(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_load_dll(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: load_dll <path>\n"
         "  path           /path/to/library.obj in KolibriOS fs\n";
@@ -2459,7 +2630,7 @@ shell_load_dll(struct shell_ctx *ctx, int argc, char **argv) {
 #ifndef _WIN32
 
 static void
-shell_stack_init(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_stack_init(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: stack_init\n";
     if (argc != 1) {
@@ -2473,7 +2644,7 @@ shell_stack_init(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_add_device(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_add_device(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_add_device\n";
     if (argc != 1) {
@@ -2489,7 +2660,7 @@ shell_net_add_device(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_get_dev_count(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_get_dev_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev_count\n";
     if (argc != 1) {
@@ -2504,7 +2675,7 @@ shell_net_get_dev_count(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_get_dev_type(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_get_dev_type(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev_type <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2524,7 +2695,7 @@ shell_net_get_dev_type(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_get_dev_name(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_get_dev_name(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev_name <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2545,7 +2716,7 @@ shell_net_get_dev_name(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_dev_reset(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_dev_reset(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_dev_reset <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2561,7 +2732,7 @@ shell_net_dev_reset(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_dev_stop(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_dev_stop(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_dev_stop <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2577,7 +2748,7 @@ shell_net_dev_stop(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_get_dev(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_get_dev(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2596,7 +2767,7 @@ shell_net_get_dev(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_get_packet_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_get_packet_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_packet_tx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2616,7 +2787,7 @@ shell_net_get_packet_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_get_packet_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_get_packet_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_packet_rx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2636,7 +2807,7 @@ shell_net_get_packet_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_get_byte_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_get_byte_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_byte_tx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2656,7 +2827,7 @@ shell_net_get_byte_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_get_byte_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_get_byte_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_byte_rx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2709,7 +2880,7 @@ print_link_status_names(struct shell_ctx *ctx, uint32_t status) {
 }
 
 static void
-shell_net_get_link_status(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_get_link_status(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_link_status <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2731,7 +2902,7 @@ shell_net_get_link_status(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_open_socket(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_open_socket(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_open_socket <domain> <type> <protocol>\n"
         "  domain         domain\n"
@@ -2753,7 +2924,7 @@ shell_net_open_socket(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_close_socket(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_close_socket(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_close_socket <socket number>\n"
         "  socket number  socket number\n";
@@ -2770,7 +2941,7 @@ shell_net_close_socket(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_bind(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_bind(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_bind <fd> <port> <ip>\n"
         "  fd             socket number\n"
@@ -2798,7 +2969,7 @@ shell_net_bind(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_listen(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_listen(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_listen <fd> <backlog>\n"
         "  fd             socket number\n"
@@ -2817,7 +2988,7 @@ shell_net_listen(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_connect(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_connect(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_connect <fd> <port> <ip>\n"
         "  fd             socket number\n"
@@ -2845,7 +3016,7 @@ shell_net_connect(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_accept(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_accept(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_accept <fd> <port> <ip>\n"
         "  fd             socket number\n"
@@ -2873,7 +3044,7 @@ shell_net_accept(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_eth_read_mac(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_eth_read_mac(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_eth_read_mac <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2896,7 +3067,7 @@ shell_net_eth_read_mac(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_ipv4_get_addr(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_ipv4_get_addr(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_addr <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2918,7 +3089,7 @@ shell_net_ipv4_get_addr(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_ipv4_set_addr(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_ipv4_set_addr(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_addr <dev_num> <addr>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -2941,7 +3112,7 @@ shell_net_ipv4_set_addr(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_ipv4_get_dns(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_ipv4_get_dns(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_dns <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -2963,7 +3134,7 @@ shell_net_ipv4_get_dns(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_ipv4_set_dns(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_ipv4_set_dns(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_dns <dev_num> <dns>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -2985,7 +3156,7 @@ shell_net_ipv4_set_dns(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_ipv4_get_subnet(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_ipv4_get_subnet(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_subnet <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -3007,7 +3178,7 @@ shell_net_ipv4_get_subnet(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_ipv4_set_subnet(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_ipv4_set_subnet(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_subnet <dev_num> <subnet>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -3030,7 +3201,7 @@ shell_net_ipv4_set_subnet(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_ipv4_get_gw(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_ipv4_get_gw(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_get_gw <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -3052,7 +3223,7 @@ shell_net_ipv4_get_gw(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_ipv4_set_gw(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_ipv4_set_gw(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_gw <dev_num> <gw>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -3075,7 +3246,7 @@ shell_net_ipv4_set_gw(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_arp_get_count(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_arp_get_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_get_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device\n";
@@ -3095,7 +3266,7 @@ shell_net_arp_get_count(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_arp_get_entry(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_arp_get_entry(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_get_entry <dev_num> <arp_num>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -3128,7 +3299,7 @@ shell_net_arp_get_entry(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_arp_add_entry(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_arp_add_entry(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_add_entry <dev_num> <addr> <mac> <status> <ttl>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -3158,7 +3329,7 @@ shell_net_arp_add_entry(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_net_arp_del_entry(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_net_arp_del_entry(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_del_entry <dev_num> <arp_num>\n"
         "  dev_num        device number as returned by net_add_device\n"
@@ -3180,7 +3351,7 @@ shell_net_arp_del_entry(struct shell_ctx *ctx, int argc, char **argv) {
 #endif // _WIN32
 
 static void
-shell_bg_set_size(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_bg_set_size(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_set_size <xsize> <ysize>\n"
         "  xsize          in pixels\n"
@@ -3197,7 +3368,7 @@ shell_bg_set_size(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_bg_put_pixel(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_bg_put_pixel(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_put_pixel <offset> <color>\n"
         "  offset         in bytes, (x+y*xsize)*3\n"
@@ -3214,7 +3385,7 @@ shell_bg_put_pixel(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_bg_redraw(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_bg_redraw(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: bg_redraw\n";
@@ -3228,7 +3399,7 @@ shell_bg_redraw(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_bg_set_mode(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_bg_set_mode(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_set_mode <mode>\n"
         "  mode           1 = tile, 2 = stretch\n";
@@ -3243,7 +3414,7 @@ shell_bg_set_mode(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_bg_put_img(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_bg_put_img(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_put_img <image> <offset>\n"
         "  image          file\n"
@@ -3266,7 +3437,7 @@ shell_bg_put_img(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_bg_map(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_bg_map(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
         "usage: bg_map\n";
@@ -3281,7 +3452,7 @@ shell_bg_map(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-shell_bg_unmap(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_bg_unmap(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_unmap <addr>\n"
         "  addr           return value of bg_map\n";
@@ -3296,140 +3467,141 @@ shell_bg_unmap(struct shell_ctx *ctx, int argc, char **argv) {
     fprintf(ctx->fout, "status = %d\n", status);
 }
 
-static void shell_help(struct shell_ctx *ctx, int argc, char **argv);
+static void cmd_help(struct shell_ctx *ctx, int argc, char **argv);
 
-func_table_t shell_cmds[] = {
-    { "send_scancode",                   shell_send_scancode },
-    { "umka_init",                       shell_umka_init },
-    { "umka_set_boot_params",            shell_umka_set_boot_params },
-    { "acpi_call",                       shell_acpi_call },
-    { "acpi_enable",                     shell_acpi_enable },
-    { "acpi_get_usage",                  shell_acpi_get_usage },
-    { "acpi_preload_table",              shell_acpi_preload_table },
-    { "acpi_set_usage",                  shell_acpi_set_usage },
-    { "acpi_get_node_alloc_cnt",         shell_acpi_get_node_alloc_cnt },
-    { "acpi_get_node_free_cnt",          shell_acpi_get_node_free_cnt },
-    { "acpi_get_node_cnt",               shell_acpi_get_node_cnt },
-    { "bg_map",                          shell_bg_map },
-    { "bg_put_img",                      shell_bg_put_img },
-    { "bg_put_pixel",                    shell_bg_put_pixel },
-    { "bg_redraw",                       shell_bg_redraw },
-    { "bg_set_mode",                     shell_bg_set_mode },
-    { "bg_set_size",                     shell_bg_set_size },
-    { "bg_unmap",                        shell_bg_unmap },
-    { "blit_bitmap",                     shell_blit_bitmap },
-    { "button",                          shell_button },
-    { "cd",                              shell_cd },
-    { "set",                             shell_set },
-    { "get",                             shell_get },
-    { "get_key",                         shell_get_key },
-    { "disk_add",                        shell_disk_add },
-    { "disk_del",                        shell_disk_del },
-    { "display_number",                  shell_display_number },
-    { "draw_line",                       shell_draw_line },
-    { "draw_rect",                       shell_draw_rect },
-    { "draw_window",                     shell_draw_window },
-    { "dump_appdata",                    shell_dump_appdata },
-    { "dump_key_buff",                   shell_dump_key_buff },
-    { "dump_win_pos",                    shell_dump_win_pos },
-    { "dump_win_stack",                  shell_dump_win_stack },
-    { "dump_win_map",                    shell_dump_win_map },
-    { "exec",                            shell_exec },
-    { "get_font_size",                   shell_get_font_size },
-    { "get_font_smoothing",              shell_get_font_smoothing },
-    { "get_keyboard_lang",               shell_get_keyboard_lang },
-    { "get_keyboard_layout",             shell_get_keyboard_layout },
-    { "get_keyboard_mode",               shell_get_keyboard_mode },
-    { "get_mouse_buttons_state",         shell_get_mouse_buttons_state },
-    { "get_mouse_buttons_state_events",  shell_get_mouse_buttons_state_events },
-    { "get_mouse_pos_screen",            shell_get_mouse_pos_screen },
-    { "get_mouse_pos_window",            shell_get_mouse_pos_window },
-    { "get_screen_area",                 shell_get_screen_area },
-    { "get_screen_size",                 shell_get_screen_size },
-    { "get_skin_height",                 shell_get_skin_height },
-    { "get_skin_margins",                shell_get_skin_margins },
-    { "get_system_lang",                 shell_get_system_lang },
-    { "get_window_colors",               shell_get_window_colors },
-    { "help",                            shell_help },
-    { "i40",                             shell_i40 },
-    { "load_cursor_from_file",           shell_load_cursor_from_file },
-    { "load_cursor_from_mem",            shell_load_cursor_from_mem },
-    { "load_dll",                        shell_load_dll },
-    { "ls70",                            shell_ls70 },
-    { "ls80",                            shell_ls80 },
-    { "move_window",                     shell_move_window },
-    { "mouse_move",                      shell_mouse_move },
+func_table_t cmd_cmds[] = {
+    { "send_scancode",                  cmd_send_scancode },
+    { "umka_init",                      cmd_umka_init },
+    { "umka_set_boot_params",           cmd_umka_set_boot_params },
+    { "acpi_call",                      cmd_acpi_call },
+    { "acpi_enable",                    cmd_acpi_enable },
+    { "acpi_get_usage",                 cmd_acpi_get_usage },
+    { "acpi_preload_table",             cmd_acpi_preload_table },
+    { "acpi_set_usage",                 cmd_acpi_set_usage },
+    { "acpi_get_node_alloc_cnt",        cmd_acpi_get_node_alloc_cnt },
+    { "acpi_get_node_free_cnt",         cmd_acpi_get_node_free_cnt },
+    { "acpi_get_node_cnt",              cmd_acpi_get_node_cnt },
+    { "bg_map",                         cmd_bg_map },
+    { "bg_put_img",                     cmd_bg_put_img },
+    { "bg_put_pixel",                   cmd_bg_put_pixel },
+    { "bg_redraw",                      cmd_bg_redraw },
+    { "bg_set_mode",                    cmd_bg_set_mode },
+    { "bg_set_size",                    cmd_bg_set_size },
+    { "bg_unmap",                       cmd_bg_unmap },
+    { "blit_bitmap",                    cmd_blit_bitmap },
+    { "button",                         cmd_button },
+    { "cd",                             cmd_cd },
+    { "set",                            cmd_set },
+    { "get",                            cmd_get },
+    { "get_key",                        cmd_get_key },
+    { "disk_add",                       cmd_disk_add },
+    { "disk_del",                       cmd_disk_del },
+    { "display_number",                 cmd_display_number },
+    { "draw_line",                      cmd_draw_line },
+    { "draw_rect",                      cmd_draw_rect },
+    { "draw_window",                    cmd_draw_window },
+    { "dump_appdata",                   cmd_dump_appdata },
+    { "dump_key_buff",                  cmd_dump_key_buff },
+    { "dump_win_pos",                   cmd_dump_win_pos },
+    { "dump_win_stack",                 cmd_dump_win_stack },
+    { "dump_win_map",                   cmd_dump_win_map },
+    { "exec",                           cmd_exec },
+    { "get_font_size",                  cmd_get_font_size },
+    { "get_font_smoothing",             cmd_get_font_smoothing },
+    { "get_keyboard_lang",              cmd_get_keyboard_lang },
+    { "get_keyboard_layout",            cmd_get_keyboard_layout },
+    { "get_keyboard_mode",              cmd_get_keyboard_mode },
+    { "get_mouse_buttons_state",        cmd_get_mouse_buttons_state },
+    { "get_mouse_buttons_state_events", cmd_get_mouse_buttons_state_events },
+    { "get_mouse_pos_screen",           cmd_get_mouse_pos_screen },
+    { "get_mouse_pos_window",           cmd_get_mouse_pos_window },
+    { "get_screen_area",                cmd_get_screen_area },
+    { "get_screen_size",                cmd_get_screen_size },
+    { "get_skin_height",                cmd_get_skin_height },
+    { "get_skin_margins",               cmd_get_skin_margins },
+    { "get_system_lang",                cmd_get_system_lang },
+    { "get_window_colors",              cmd_get_window_colors },
+    { "help",                           cmd_help },
+    { "i40",                            cmd_i40 },
+    { "load_cursor_from_file",          cmd_load_cursor_from_file },
+    { "load_cursor_from_mem",           cmd_load_cursor_from_mem },
+    { "load_dll",                       cmd_load_dll },
+    { "ls70",                           cmd_ls70 },
+    { "ls80",                           cmd_ls80 },
+    { "move_window",                    cmd_move_window },
+    { "mouse_move",                     cmd_mouse_move },
 #ifndef _WIN32
-    { "stack_init",                      shell_stack_init },
-    { "net_accept",                      shell_net_accept },
-    { "net_add_device",                  shell_net_add_device },
-    { "net_arp_add_entry",               shell_net_arp_add_entry },
-    { "net_arp_del_entry",               shell_net_arp_del_entry },
-    { "net_arp_get_count",               shell_net_arp_get_count },
-    { "net_arp_get_entry",               shell_net_arp_get_entry },
-    { "net_bind",                        shell_net_bind },
-    { "net_close_socket",                shell_net_close_socket },
-    { "net_connect",                     shell_net_connect },
-    { "net_dev_reset",                   shell_net_dev_reset },
-    { "net_dev_stop",                    shell_net_dev_stop },
-    { "net_eth_read_mac",                shell_net_eth_read_mac },
-    { "net_get_byte_rx_count",           shell_net_get_byte_rx_count },
-    { "net_get_byte_tx_count",           shell_net_get_byte_tx_count },
-    { "net_get_dev",                     shell_net_get_dev },
-    { "net_get_dev_count",               shell_net_get_dev_count },
-    { "net_get_dev_name",                shell_net_get_dev_name },
-    { "net_get_dev_type",                shell_net_get_dev_type },
-    { "net_get_link_status",             shell_net_get_link_status },
-    { "net_get_packet_rx_count",         shell_net_get_packet_rx_count },
-    { "net_get_packet_tx_count",         shell_net_get_packet_tx_count },
-    { "net_ipv4_get_addr",               shell_net_ipv4_get_addr },
-    { "net_ipv4_get_dns",                shell_net_ipv4_get_dns },
-    { "net_ipv4_get_gw",                 shell_net_ipv4_get_gw },
-    { "net_ipv4_get_subnet",             shell_net_ipv4_get_subnet },
-    { "net_ipv4_set_addr",               shell_net_ipv4_set_addr },
-    { "net_ipv4_set_dns",                shell_net_ipv4_set_dns },
-    { "net_ipv4_set_gw",                 shell_net_ipv4_set_gw },
-    { "net_ipv4_set_subnet",             shell_net_ipv4_set_subnet },
-    { "net_listen",                      shell_net_listen },
-    { "net_open_socket",                 shell_net_open_socket },
+    { "stack_init",                     cmd_stack_init },
+    { "net_accept",                     cmd_net_accept },
+    { "net_add_device",                 cmd_net_add_device },
+    { "net_arp_add_entry",              cmd_net_arp_add_entry },
+    { "net_arp_del_entry",              cmd_net_arp_del_entry },
+    { "net_arp_get_count",              cmd_net_arp_get_count },
+    { "net_arp_get_entry",              cmd_net_arp_get_entry },
+    { "net_bind",                       cmd_net_bind },
+    { "net_close_socket",               cmd_net_close_socket },
+    { "net_connect",                    cmd_net_connect },
+    { "net_dev_reset",                  cmd_net_dev_reset },
+    { "net_dev_stop",                   cmd_net_dev_stop },
+    { "net_eth_read_mac",               cmd_net_eth_read_mac },
+    { "net_get_byte_rx_count",          cmd_net_get_byte_rx_count },
+    { "net_get_byte_tx_count",          cmd_net_get_byte_tx_count },
+    { "net_get_dev",                    cmd_net_get_dev },
+    { "net_get_dev_count",              cmd_net_get_dev_count },
+    { "net_get_dev_name",               cmd_net_get_dev_name },
+    { "net_get_dev_type",               cmd_net_get_dev_type },
+    { "net_get_link_status",            cmd_net_get_link_status },
+    { "net_get_packet_rx_count",        cmd_net_get_packet_rx_count },
+    { "net_get_packet_tx_count",        cmd_net_get_packet_tx_count },
+    { "net_ipv4_get_addr",              cmd_net_ipv4_get_addr },
+    { "net_ipv4_get_dns",               cmd_net_ipv4_get_dns },
+    { "net_ipv4_get_gw",                cmd_net_ipv4_get_gw },
+    { "net_ipv4_get_subnet",            cmd_net_ipv4_get_subnet },
+    { "net_ipv4_set_addr",              cmd_net_ipv4_set_addr },
+    { "net_ipv4_set_dns",               cmd_net_ipv4_set_dns },
+    { "net_ipv4_set_gw",                cmd_net_ipv4_set_gw },
+    { "net_ipv4_set_subnet",            cmd_net_ipv4_set_subnet },
+    { "net_listen",                     cmd_net_listen },
+    { "net_open_socket",                cmd_net_open_socket },
 #endif // _WIN32
-    { "pci_get_path",                    shell_pci_get_path },
-    { "pci_set_path",                    shell_pci_set_path },
-    { "process_info",                    shell_process_info },
-    { "put_image",                       shell_put_image },
-    { "put_image_palette",               shell_put_image_palette },
-    { "pwd",                             shell_pwd },
-    { "ramdisk_init",                    shell_ramdisk_init },
-    { "read70",                          shell_read70 },
-    { "read80",                          shell_read80 },
-    { "scrot",                           shell_scrot },
-    { "write_devices_dat",               shell_write_devices_dat },
-    { "set_button_style",                shell_set_button_style },
-//    { "set_cursor",                      shell_set_cursor },
-    { "set_cwd",                         shell_cd },
-    { "set_font_size",                   shell_set_font_size },
-    { "set_font_smoothing",              shell_set_font_smoothing },
-    { "set_keyboard_lang",               shell_set_keyboard_lang },
-    { "set_keyboard_layout",             shell_set_keyboard_layout },
-    { "set_keyboard_mode",               shell_set_keyboard_mode },
-    { "set_mouse_pos_screen",            shell_set_mouse_pos_screen },
-    { "set_pixel",                       shell_set_pixel },
-    { "set_screen_area",                 shell_set_screen_area },
-    { "set_skin",                        shell_set_skin },
-    { "set_system_lang",                 shell_set_system_lang },
-    { "set_window_caption",              shell_set_window_caption },
-    { "set_window_colors",               shell_set_window_colors },
-    { "stat70",                          shell_stat70 },
-    { "stat80",                          shell_stat80 },
-    { "window_redraw",                   shell_window_redraw },
-    { "write_text",                      shell_write_text },
-    { "switch_to_thread",                shell_switch_to_thread },
-    { "new_sys_thread",                  shell_new_sys_thread },
-    { NULL,                              NULL },
+    { "pci_get_path",                   cmd_pci_get_path },
+    { "pci_set_path",                   cmd_pci_set_path },
+    { "process_info",                   cmd_process_info },
+    { "put_image",                      cmd_put_image },
+    { "put_image_palette",              cmd_put_image_palette },
+    { "pwd",                            cmd_pwd },
+    { "ramdisk_init",                   cmd_ramdisk_init },
+    { "read70",                         cmd_read70 },
+    { "read80",                         cmd_read80 },
+    { "scrot",                          cmd_scrot },
+    { "write_devices_dat",              cmd_write_devices_dat },
+    { "set_button_style",               cmd_set_button_style },
+    { "set_cursor",                     cmd_set_cursor },
+    { "set_cwd",                        cmd_cd },
+    { "set_font_size",                  cmd_set_font_size },
+    { "set_font_smoothing",             cmd_set_font_smoothing },
+    { "set_keyboard_lang",              cmd_set_keyboard_lang },
+    { "set_keyboard_layout",            cmd_set_keyboard_layout },
+    { "set_keyboard_mode",              cmd_set_keyboard_mode },
+    { "set_mouse_pos_screen",           cmd_set_mouse_pos_screen },
+    { "set_pixel",                      cmd_set_pixel },
+    { "set_screen_area",                cmd_set_screen_area },
+    { "set_skin",                       cmd_set_skin },
+    { "set_system_lang",                cmd_set_system_lang },
+    { "set_window_caption",             cmd_set_window_caption },
+    { "set_window_colors",              cmd_set_window_colors },
+    { "stat70",                         cmd_stat70 },
+    { "stat80",                         cmd_stat80 },
+    { "var",                            cmd_var },
+    { "window_redraw",                  cmd_window_redraw },
+    { "write_text",                     cmd_write_text },
+    { "switch_to_thread",               cmd_switch_to_thread },
+    { "new_sys_thread",                 cmd_new_sys_thread },
+    { NULL,                             NULL },
 };
 
 static void
-shell_help(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_help(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: help [command]\n"
         "  command        help on this command usage\n";
@@ -3437,13 +3609,13 @@ shell_help(struct shell_ctx *ctx, int argc, char **argv) {
     case 1:
         fputs(usage, ctx->fout);
         fputs("\navailable commands:\n", ctx->fout);
-        for (func_table_t *ft = shell_cmds; ft->name; ft++) {
+        for (func_table_t *ft = cmd_cmds; ft->name; ft++) {
             fprintf(ctx->fout, "  %s\n", ft->name);
         }
         break;
     case 2: {
         const char *cmd_name = argv[1];
-        for (func_table_t *ft = shell_cmds; ft->name; ft++) {
+        for (func_table_t *ft = cmd_cmds; ft->name; ft++) {
             if (!strcmp(ft->name, cmd_name)) {
                 ft->func(ctx, 0, NULL);
                 return;
@@ -3483,7 +3655,7 @@ run_test(struct shell_ctx *ctx) {
             bestlineHistoryAdd(line);
             int argc = split_args(line, argv);
             func_table_t *ft;
-            for (ft = shell_cmds; ft->name; ft++) {
+            for (ft = cmd_cmds; ft->name; ft++) {
                 if (!strcmp(argv[0], ft->name)) {
                     break;
                 }
