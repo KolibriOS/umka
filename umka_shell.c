@@ -57,8 +57,8 @@ main(int argc, char **argv) {
         "  -r               reproducible logs (without pointers and datetime)\n"
         "  -c               collect coverage";
     const char *infile = NULL, *outfile = NULL;
-    struct shell_ctx ctx = {.fin = stdin, .fout = stdout, .reproducible = 0,
-                            .hist_file = history_filename, .var = NULL};
+    struct shell_ctx ctx = {.reproducible = 0, .hist_file = history_filename,
+                            .var = NULL};
     build_history_filename();
 /*
     kos_boot.memmap_block_cnt = 3;
@@ -98,11 +98,11 @@ main(int argc, char **argv) {
             exit(1);
         }
     }
-    if (infile && !(ctx.fin = freopen(infile, "r", stdin))) {
+    if (infile && !freopen(infile, "r", stdin)) {
         fprintf(stderr, "[!] can't open file for reading: %s", infile);
         exit(1);
     }
-    if (outfile && !(ctx.fout = freopen(outfile, "w", stdout))) {
+    if (outfile && !freopen(outfile, "w", stdout)) {
         fprintf(stderr, "[!] can't open file for writing: %s", outfile);
         exit(1);
     }

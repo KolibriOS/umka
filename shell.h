@@ -19,8 +19,6 @@ struct shell_var {
 };
 
 struct shell_ctx {
-    FILE *fin;
-    FILE *fout;
     int reproducible;
     const char *hist_file;
     struct shell_var *var;
