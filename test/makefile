@@ -67,7 +67,7 @@ else
 endif
 
 collect_coverage:
-	../covpreproc ../umka.lst 0x34 coverage.* > ../umka.cov
+	../tools/covpreproc ../umka.lst coverage.* > ../umka.cov
 
 clean:
 	rm -f *.out.log *.out.png coverage.*

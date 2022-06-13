@@ -3,44 +3,33 @@
 
     UMKa - User-Mode KolibriOS developer tools
 
-    Copyright (C) 2020  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2020,2022  Ivan Baravy <dunkaist@gmail.com>
 */
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <inttypes.h>
 
-#define MAX_COVERED_CODE_SIZE (256*1024)
+#define COVERAGE_TABLE_SIZE (512*1024)
 
-typedef struct {
-    uint64_t to_cnt, from_cnt;
-} branch;
+struct coverage_branch {
+    uint64_t to_cnt;
+    uint64_t from_cnt;
+};
 
-branch branches[MAX_COVERED_CODE_SIZE];
+struct coverage_branch branches[COVERAGE_TABLE_SIZE];
 
-uint32_t coverage_offset, coverage_begin, coverage_end;
+uint32_t coverage_begin = 0x34; // TODD: detect in runtime
 
 void read_coverage_file(const char *fname) {
     FILE *f = fopen(fname, "r");
-    fseeko(f, 0, SEEK_END);
-    off_t fsize = ftello(f);
-    fseeko(f, 0, SEEK_SET);
-    fread(&coverage_begin, sizeof(uint32_t), 1, f);
-    fread(&coverage_end, sizeof(uint32_t), 1, f);
-    size_t branch_cnt = (fsize-4*2)/(2*4);
-    for (size_t i = 0; i < branch_cnt; i++) {
-        uint32_t from, to;
-        fread(&from, sizeof(uint32_t), 1, f);
-        fread(&to, sizeof(uint32_t), 1, f);
-        if (from >= coverage_begin && from < coverage_end) {
-            from = from - coverage_begin + coverage_offset;
-            branches[from].from_cnt++;
-        }
-        if (to >= coverage_begin && to < coverage_end) {
-            to = to - coverage_begin + coverage_offset;
-            branches[to].to_cnt++;
-        }
+    for (size_t i = 0; i < COVERAGE_TABLE_SIZE; i++) {
+        uint64_t from, to;
+        fread(&to, 1, sizeof(uint64_t), f);
+        fread(&from, 1, sizeof(uint64_t), f);
+        branches[i].to_cnt += to;
+        branches[i].from_cnt += from;
     }
     fclose(f);
 }
@@ -98,19 +87,19 @@ int is_cond_jump(const char *s) {
                 || !strncmp(s, "jpe", 3)
                 || !strncmp(s, "jnp", 3)
                 || !strncmp(s, "jpo", 3)
+                || !strncmp(s, "loop", 4)
                 || !strncmp(s, "jcxz", 4)
                 || !strncmp(s, "jecxz", 5);
     return found;
 }
 
 int main(int argc, char **argv) {
-    if (argc < 4) {
-        fprintf(stderr, "usage: covpreproc <listing file> <coverage_begin offset> <coverage files ...>\n");
+    if (argc < 3) {
+        fprintf(stderr, "usage: covpreproc <listing file> <coverage files ...>\n");
         exit(1);
     }
-    sscanf(argv[2], "%" SCNx32, &coverage_offset);
 
-    for (int i = 3; i < argc; i++) {
+    for (int i = 2; i < argc; i++) {
         read_coverage_file(argv[i]);
     }
 
@@ -131,9 +120,10 @@ int main(int argc, char **argv) {
             unsigned long pos = strtoul(tmp, NULL, 16);
             size_t total_to = 0, total_from = 0;
             for (size_t i = 0; i < inst_len; i++) {
-                if (pos + i < coverage_end - coverage_begin + coverage_offset) {
-                    total_to += branches[pos + i].to_cnt;
-                    total_from += branches[pos + i].from_cnt;
+                if (pos + i >= coverage_begin
+                    && pos + i < coverage_begin + COVERAGE_TABLE_SIZE) {
+                    total_to += branches[pos + i - coverage_begin].to_cnt;
+                    total_from += branches[pos + i - coverage_begin].from_cnt;
                 }
             }
             cur += total_to;
@@ -154,7 +144,8 @@ int main(int argc, char **argv) {
                 putchar('-');
             }
             if (is_cond) {
-                int spaces = 19 - printf("%10" PRIu64 "/%" PRIu64, taken, not_taken);
+                int spaces = 19 - printf("%10" PRIu64 "/%" PRIu64, taken,
+                                         not_taken);
                 while (spaces-- > 0)
                     putchar(' ');
             } else {

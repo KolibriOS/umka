@@ -88,12 +88,12 @@ pubsym irq_serv.irq_10, 'kos_irq_serv_irq10'
 pubsym attach_int_handler, 'kos_attach_int_handler', 12
 pubsym fs_execute, 'kos_fs_execute', 4
 pubsym set_keyboard_data, 'kos_set_keyboard_data'
-pubsym KEY_COUNT as 'kos_key_count'
-pubsym KEY_BUFF as 'kos_key_buff'
-pubsym keyboard_mode as 'kos_keyboard_mode'
-pubsym sys_getkey as 'kos_get_key'
-pubsym syslang as 'kos_syslang'
-pubsym keyboard as 'kos_keyboard'
+pubsym KEY_COUNT, 'kos_key_count'
+pubsym KEY_BUFF, 'kos_key_buff'
+pubsym keyboard_mode, 'kos_keyboard_mode'
+pubsym sys_getkey, 'kos_get_key'
+pubsym syslang, 'kos_syslang'
+pubsym keyboard, 'kos_keyboard'
 
 pubsym disk_add, 16
 pubsym disk_del, 4
@@ -989,6 +989,18 @@ purge org,sys_msg_board,delay_ms
 restore org,sys_msg_board,delay_ms
 
 coverage_end:
+
+
+section '.bss.coverage' executable writable align 64
+struct coverage_branch
+    to_cnt DQ ?
+    from_cnt DQ ?
+ends
+
+COVERAGE_TABLE_SIZE = 512*1024  ; 512k should be enough for the kernel
+
+coverage_table rb COVERAGE_TABLE_SIZE * sizeof.coverage_branch
+pubsym coverage_table
 
 
 section '.data.boot' writeable align 0x1000

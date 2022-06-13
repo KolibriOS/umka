@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "optparse.h"
 #include "shell.h"
 #include "umka.h"
@@ -104,8 +105,15 @@ main(int argc, char **argv) {
 
     run_test(&ctx);
 
-    if (coverage)
+    if (coverage) {
         trace_end();
+        char coverage_filename[32];
+        sprintf(coverage_filename, "coverage.%i", getpid());
+        FILE *f = fopen(coverage_filename, "w");
+        fwrite(coverage_table,
+               COVERAGE_TABLE_SIZE * sizeof(struct coverage_branch), 1, f);
+        fclose(f);
+    }
 
     return 0;
 }

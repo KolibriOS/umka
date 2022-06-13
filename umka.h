@@ -833,6 +833,14 @@ umka_cli(void);
 void
 umka_sti(void);
 
+#define COVERAGE_TABLE_SIZE (512*1024)
+
+struct coverage_branch {
+    uint64_t to_cnt;
+    uint64_t from_cnt;
+};
+
+extern struct coverage_branch coverage_table[];
 extern uint8_t coverage_begin[];
 extern uint8_t coverage_end[];
 

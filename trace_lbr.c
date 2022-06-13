@@ -3,7 +3,7 @@
 
     UMKa - User-Mode KolibriOS developer tools
 
-    Copyright (C) 2019-2020  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2019-2020,2022  Ivan Baravy <dunkaist@gmail.com>
     Copyright (C) 2021  Magomed Kostoev <mkostoevr@yandex.ru>
 */
 
@@ -18,11 +18,13 @@
 
 #include "umka.h"
 
-#define MSR_IA32_DEBUGCTLMSR        0x1d9
+#define MSR_IA32_DEBUGCTL           0x1d9
+#define MSR_IA32_DEBUGCTL_LBR       0x1    // enable profiling
+#define MSR_IA32_DEBUGCTL_BTF       0x2    // profile only branches if EFLAGS.TF
 #define MSR_IA32_LASTBRANCHFROMIP   0x1db
 #define MSR_IA32_LASTBRANCHTOIP     0x1dc
 
-int covfd, msrfd;
+int msrfd;
 
 uint64_t rdmsr(uint32_t reg)
 {
@@ -66,13 +68,15 @@ void handle_sigtrap() {
     uint64_t from = rdmsr(MSR_IA32_LASTBRANCHFROMIP);
     uint64_t to = rdmsr(MSR_IA32_LASTBRANCHTOIP);
 
-    if ((from >= (uintptr_t)coverage_begin && from < (uintptr_t)coverage_end) ||
-        (to >= (uintptr_t)coverage_begin && to < (uintptr_t)coverage_end)) {
-        write(covfd, &from, 4);
-        write(covfd, &to, 4);
+    if (from >= (uintptr_t)coverage_begin && from < (uintptr_t)coverage_end) {
+        coverage_table[from - (uintptr_t)coverage_begin].from_cnt++;
     }
 
-    wrmsr(MSR_IA32_DEBUGCTLMSR, 3);
+    if (to >= (uintptr_t)coverage_begin && to < (uintptr_t)coverage_end) {
+        coverage_table[to - (uintptr_t)coverage_begin].to_cnt++;
+    }
+
+    wrmsr(MSR_IA32_DEBUGCTL, MSR_IA32_DEBUGCTL_LBR + MSR_IA32_DEBUGCTL_BTF);
 #else
     printf("STUB: %s:%d", __FILE__, __LINE__);
 #endif
@@ -87,19 +91,12 @@ void trace_lbr_begin() {
     action.sa_flags = SA_SIGINFO;
     sigaction(SIGTRAP, &action, NULL);
 
-    wrmsr(MSR_IA32_DEBUGCTLMSR, 3);
+    wrmsr(MSR_IA32_DEBUGCTL, MSR_IA32_DEBUGCTL_LBR + MSR_IA32_DEBUGCTL_BTF);
     msrfd = open("/dev/cpu/0/msr", O_RDONLY);
     if (msrfd < 0) {
         perror("rdmsr: open");
         exit(1);
     }
-    char coverage_filename[32];
-    sprintf(coverage_filename, "coverage.%i", getpid());
-    covfd = open(coverage_filename, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH | S_IWOTH);
-    void *coverage_begin_addr = coverage_begin;
-    void *coverage_end_addr = coverage_end;
-    write(covfd, &coverage_begin_addr, 4);
-    write(covfd, &coverage_end_addr, 4);
 #else
     printf("STUB: %s:%d", __FILE__, __LINE__);
 #endif
@@ -107,9 +104,8 @@ void trace_lbr_begin() {
 
 void trace_lbr_end() {
 #ifndef _WIN32
-    wrmsr(MSR_IA32_DEBUGCTLMSR, 0);
+    wrmsr(MSR_IA32_DEBUGCTL, 0);
     close(msrfd);
-    close(covfd);
 #else
     printf("STUB: %s:%d", __FILE__, __LINE__);
 #endif

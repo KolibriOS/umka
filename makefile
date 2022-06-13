@@ -44,7 +44,7 @@ endif
 
 ifeq ($(HOST),linux)
 all: umka_shell umka_fuse umka_os umka_gen_devices_dat umka.sym umka.prp \
-     umka.lst tags covpreproc default.skn skin.skn
+     umka.lst tags default.skn skin.skn
 else ifeq ($(HOST),windows)
 all: umka_shell umka.sym umka.prp \
      umka.lst default.skn skin.skn
@@ -56,9 +56,6 @@ endif
 
 test: umka_shell
 	@cd test && make clean all && cd ../
-
-covpreproc: covpreproc.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o vnet.o \
             lodepng.o pci.o thread.o util.o optparse.o bestline.o
