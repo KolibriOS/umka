@@ -38,4 +38,5 @@ t.d
 *.exe
 colors.dtp
 .tup
-hello_board
+board_hello
+board_cycle

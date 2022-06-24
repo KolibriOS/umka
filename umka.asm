@@ -79,6 +79,7 @@ UMKA_OS    = 3
 
 UMKA_MEMORY_BYTES = 256 SHL 20
 
+pubsym fs_execute, 'kos_fs_execute'
 pubsym set_keyboard_data, 'kos_set_keyboard_data'
 pubsym KEY_COUNT as 'kos_key_count'
 pubsym KEY_BUFF as 'kos_key_buff'
@@ -733,7 +734,7 @@ proc idle uses ebx esi edi
         mov     ecx, 10000000
 @@:
         loop    @b
-;        DEBUGF 1, "1 idle\n"
+        DEBUGF 1, "1 idle\n"
         jmp     .loop
 
         ret

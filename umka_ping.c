@@ -40,11 +40,6 @@
 #include "umka.h"
 #include "vnet.h"
 
-uint8_t packet[4096] = {0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 'a','b',
-                        'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-                        'y', 'z', '0', '1', '2', '3', '4', '5'};
-
 static int
 tap_alloc(char *dev) {
     int flags = IFF_TAP | IFF_NO_PI;
@@ -77,51 +72,6 @@ tap_alloc(char *dev) {
     strcpy(dev, ifr.ifr_name);
 
     return fd;
-}
-
-int go_ping = 0;
-
-void
-umka_thread_ping(void) {
-    umka_sti();
-    fprintf(stderr, "[ping] starting\n");
-    while (!go_ping) { /* wait until initialized */ }
-
-    f75ret_t r75;
-    r75 = umka_sys_net_open_socket(AF_INET4, SOCK_STREAM, IPPROTO_TCP);
-    if (r75.value == (uint32_t)-1) {
-        fprintf(stderr, "[ping] open error %u\n", r75.errorcode);
-        exit(1);
-    }
-    uint32_t sockfd = r75.value;
-
-//    uint32_t addr = inet_addr("127.0.0.1");
-//    uint32_t addr = inet_addr("192.243.108.5");
-    uint32_t addr = inet_addr("10.50.0.1");
-//    uint32_t addr = inet_addr("192.168.1.30");
-    uint16_t port = 5000;
-
-    struct sockaddr_in sa;
-    memset(&sa, 0, sizeof(sa));
-    sa.sin_family = AF_INET4;
-    sa.sin_port = htons(port);
-    sa.sin_addr.s_addr = addr;
-
-    r75 = umka_sys_net_connect(sockfd, &sa, sizeof(struct sockaddr_in));
-    if (r75.value == (uint32_t)-1) {
-        fprintf(stderr, "[ping] connect error %u\n", r75.errorcode);
-        return;
-    }
-
-    r75 = umka_sys_net_send(sockfd, packet, 128, 0);
-    if (r75.value == (uint32_t)-1) {
-        fprintf(stderr, "[ping] send error %u\n", r75.errorcode);
-        return;
-    }
-
-    while (true) {}
-
-    return;
 }
 
 void
@@ -169,8 +119,6 @@ umka_thread_net_drv(void) {
         fprintf(stderr, "[net_drv] set ip addr error\n");
         return;
     }
-
-    go_ping = 1;
 
     while(true)
     {

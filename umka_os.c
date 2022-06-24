@@ -43,9 +43,9 @@ static void
 monitor(void) {
     umka_sti();
     fprintf(stderr, "Start monitor thread\n");
+    __asm__ __inline__ __volatile__ ("jmp $");
 }
 
-void umka_thread_ping(void);
 void umka_thread_net_drv(void);
 
 struct itimerval timeout = {.it_value = {.tv_sec = 0, .tv_usec = 10000},
@@ -53,53 +53,27 @@ struct itimerval timeout = {.it_value = {.tv_sec = 0, .tv_usec = 10000},
 
 static void
 thread_start(int is_kernel, void (*entry)(void), size_t stack_size) {
+    fprintf(stderr, "### thread_start: %p\n", (void*)(uintptr_t)entry);
     uint8_t *stack = malloc(stack_size);
     umka_new_sys_threads(is_kernel, entry, stack + stack_size);
 }
 
-/*
-can't get pty working
-may be because of my custom threads and blocking, don't know
-void new_monitor(void) {
-    umka_sti();
-    fprintf(stderr, "Start monitor thread\n");
-
-    int mpty = posix_openpt(O_RDWR | O_NOCTTY);
-    if (mpty == -1) {
-        perror("open master pty");
-        return;
+static void
+dump_procs() {
+    for (int i = 0; i < NR_SCHED_QUEUES; i++) {
+        printf("sched queue #%i:", i);
+        appdata_t *p_begin = kos_scheduler_current[i];
+        appdata_t *p = p_begin;
+        do {
+            printf(" %p", (void*)p);
+            p = p->in_schedule.next;
+        } while (p != p_begin);
+        putchar('\n');
     }
-    if (grantpt(mpty) == -1) {
-        perror("grantpt");
-        return;
-    }
-    if (unlockpt(mpty) == -1) {
-        perror("unlockpt");
-        return;
-    }
-    char *spty_name = ptsname(mpty);
-    if (spty_name == NULL) {
-        perror("open slave pty");
-        return;
-    }
-    fprintf(stderr, "[os] pty=%s\n", spty_name);
-    FILE *fmpty = fdopen(mpty, "r+");
-    if (fmpty == NULL) {
-        perror("fdopen mpty");
-        return;
-    }
-    run_test(ctx);
 }
-*/
-
-struct app_menuet {
-    char signature[8];      // MENUETXX
-    uint32_t    version;    // 1
-    void (*start) (void);   // start
-};
 
 int
-load_app(const char *fname, void *base) {
+load_app_host(const char *fname, void *base) {
     FILE *f = fopen(fname, "r");
     if (!f) {
         perror("Can't open app file");
@@ -114,6 +88,14 @@ load_app(const char *fname, void *base) {
     fprintf(stderr, "\n");
 
     return 0;
+}
+
+int
+load_app(const char *fname) {
+    int32_t result = umka_fs_execute(fname);
+    printf("result: %" PRIi32 "\n", result);
+
+    return result;
 }
 
 void handle_i40(int signo, siginfo_t *info, void *context) {
@@ -164,8 +146,6 @@ main() {
         exit(1);
     }
 
-    load_app("../apps/hello_board", app_base);
-
     printf("pid=%d, kos_lfb_base=%p\n", getpid(), (void*)kos_lfb_base);
 
     kos_boot.bpp = 32;
@@ -174,12 +154,20 @@ main() {
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
 
     umka_init();
+    dump_procs();
     umka_stack_init();
 
+    FILE *f = fopen("../img/kolibri.img", "r");
+    fread(kos_ramdisk, 2880*512, 1, f);
+    fclose(f);
+    kos_ramdisk_init();
+    load_app_host("../apps/board_cycle", app_base);
+    load_app("/rd/1/loader");
+
     thread_start(0, monitor, THREAD_STACK_SIZE);
-    thread_start(0, umka_thread_net_drv, THREAD_STACK_SIZE);
-    thread_start(0, ((struct app_menuet*)app_base)->start, THREAD_STACK_SIZE);
-//    thread_start(0, umka_thread_ping, THREAD_STACK_SIZE);
+//    thread_start(0, umka_thread_net_drv, THREAD_STACK_SIZE);
+
+    dump_procs();
 
     setitimer(ITIMER_PROF, &timeout, NULL);
 

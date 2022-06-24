@@ -25,6 +25,7 @@ kolibri.img: ../default.skn ../fill.cur
 	mcopy -vmoi $@ ../default.skn ::DEFAULT.SKN
 	mcopy -vmoi $@ ../fill.cur ::FILL.CUR
 	mcopy -vmoi $@ ../spray.cur ::SPRAY.CUR
+	mcopy -vmoi $@ ../apps/board_cycle ::LOADER
 	mmd -i $@ ::LIB
 	mcopy -vmoi $@ ../network.obj ::LIB/NETWORK.OBJ
 

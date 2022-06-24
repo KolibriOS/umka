@@ -11,7 +11,7 @@ else
         $(error your OS is not supported)
 endif
 
-all: hello_board
+all: board_hello board_cycle
 
 %: %.asm
 	$(FASM) $< $@
@@ -20,4 +20,4 @@ all: hello_board
 .PHONY: all clean
 
 clean:
-	rm -f hello_board
+	rm -f board_hello board_cycle

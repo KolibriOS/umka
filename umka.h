@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 #include <stddef.h>
+#include <string.h>
 #include <sys/types.h>
 
 #define UMKA_PATH_MAX 4096
@@ -40,6 +41,17 @@ enum kos_lang {
 
 #define BDFE_LEN_CP866 304
 #define BDFE_LEN_UNICODE 560
+
+#define EVENT_REDRAW     0x0001
+#define EVENT_KEY        0x0002
+#define EVENT_BUTTON     0x0004
+#define EVENT_BACKGROUND 0x0010
+#define EVENT_MOUSE      0x0020
+#define EVENT_IPC        0x0040
+#define EVENT_NETWORK    0x0080
+#define EVENT_DEBUG      0x0100
+#define EVENT_NETWORK2   0x0200
+#define EVENT_EXTENDED   0x0400
 
 struct point16s {
     int16_t y, x;
@@ -164,8 +176,8 @@ enum {
 typedef struct lhead lhead_t;
 
 struct lhead {
-    lhead_t *next;
-    lhead_t *prev;
+    void *next;
+    void *prev;
 };
 
 typedef struct {
@@ -528,6 +540,26 @@ umka_mouse_move(int lbheld, int mbheld, int rbheld, int xabs, int32_t xmoving,
 
 STDCALL net_buff_t *
 kos_net_buff_alloc(size_t size);
+
+static inline int32_t
+umka_fs_execute(const char *filename) {
+// edx Flags
+// ecx Commandline
+// ebx Absolute file path
+// eax String length
+    int32_t result;
+    __asm__ __inline__ __volatile__ (
+        "push   %%ebp;"
+        "call   kos_fs_execute;"
+        "pop    %%ebp"
+        : "=a"(result)
+        : "a"(strlen(filename)),
+          "b"(filename),
+          "c"(NULL),
+          "d"(0)
+        : "memory");
+    return result;
+}
 
 static inline size_t
 umka_new_sys_threads(uint32_t flags, void (*entry)(), void *stack) {
@@ -1092,6 +1124,28 @@ umka_sys_process_info(int32_t pid, void *param) {
           "b"(param),
           "c"(pid)
         : "memory");
+}
+
+static inline uint32_t
+umka_sys_wait_for_event() {
+    uint32_t event;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(event)
+        : "a"(10)
+        : "memory");
+    return event;
+}
+
+static inline uint32_t
+umka_sys_check_for_event() {
+    uint32_t event;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(event)
+        : "a"(11)
+        : "memory");
+    return event;
 }
 
 static inline void

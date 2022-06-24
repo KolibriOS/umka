@@ -1055,6 +1055,22 @@ cmd_process_info(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
+cmd_check_for_event(struct shell_ctx *ctx, int argc, char **argv) {
+    (void)ctx;
+    (void)argv;
+    const char *usage = \
+        "usage: check_for_event";
+    if (argc != 1) {
+        puts(usage);
+        return;
+    }
+    COVERAGE_ON();
+    uint32_t event = umka_sys_check_for_event();
+    COVERAGE_OFF();
+    printf("%" PRIu32 "\n", event);
+}
+
+static void
 cmd_display_number(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
@@ -3703,6 +3719,7 @@ func_table_t cmd_cmds[] = {
     { "stat70",                         cmd_stat70 },
     { "stat80",                         cmd_stat80 },
     { "var",                            cmd_var },
+    { "check_for_event",                cmd_check_for_event },
     { "window_redraw",                  cmd_window_redraw },
     { "write_text",                     cmd_write_text },
     { "switch_to_thread",               cmd_switch_to_thread },
