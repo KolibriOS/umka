@@ -79,6 +79,8 @@ UMKA_OS    = 3
 
 UMKA_MEMORY_BYTES = 256 SHL 20
 
+pubsym irq_serv.irq_10, 'kos_irq_serv_irq10'
+pubsym attach_int_handler, 'kos_attach_int_handler', 12
 pubsym fs_execute, 'kos_fs_execute'
 pubsym set_keyboard_data, 'kos_set_keyboard_data'
 pubsym KEY_COUNT as 'kos_key_count'
@@ -191,6 +193,7 @@ macro sti {
 }
 
 iretd equ retd
+iret equ ret
 
 lang fix en
 
@@ -383,7 +386,15 @@ purge call
 ;include 'core/exports.inc'
 include 'core/string.inc'
 ;include 'core/v86.inc'
+macro mov dst, src {
+  if dst eq ds
+  else if dst eq es
+  else
+        mov     dst, src
+  end if
+}
 include 'core/irq.inc'
+purge mov
 include 'core/apic.inc'
 include 'core/hpet.inc'
 include 'core/timers.inc'
@@ -535,6 +546,10 @@ proc umka_init c uses ebx esi edi ebp
 ;        call    mem_test
 ;        call    init_mem
 ;        call    init_page_map
+        mov     [irq_mode], IRQ_APIC
+        mov     [IOAPIC_base], ioapic_data
+        mov     [LAPIC_BASE], lapic_data
+        mov     [ioapic_cnt], 1
 
         mov     [xsave_area_size], 0x1000
 
@@ -724,6 +739,9 @@ proc umka_init c uses ebx esi edi ebp
         mov     ebx, SLOT_BASE + 2*sizeof.APPDATA
         mov     word[cur_dir.path], '/'
         mov     [ebx+APPDATA.cur_dir], cur_dir
+        ; end of set_variables
+
+        call    init_irqs
 
         ret
 endp
@@ -1033,6 +1051,9 @@ ide_channel5_mutex MUTEX
 ide_channel6_mutex MUTEX
 ide_channel7_mutex MUTEX
 ide_channel8_mutex MUTEX
+
+ioapic_data rb 0x400
+lapic_data rb 0x400
 
 lfb_base        rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
 

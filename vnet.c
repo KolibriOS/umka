@@ -17,6 +17,12 @@ typedef struct {
     int fd;
 } vnet_userdata_t;
 
+int vnet_input(void *udata) {
+    vnet_userdata_t *u = udata;
+    fprintf(stderr, "###### vnet_input\n");
+    return 1;
+}
+
 net_device_t *vnet_init(int fd) {
 //    printf("vnet_init\n");
     vnet_userdata_t *u = (vnet_userdata_t*)malloc(sizeof(vnet_userdata_t));
@@ -43,6 +49,8 @@ net_device_t *vnet_init(int fd) {
 
              .userdata = u,
     };
+
+    kos_attach_int_handler(SIGUSR1, vnet_input, u);
 
     return vnet;
 }

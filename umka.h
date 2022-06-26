@@ -541,6 +541,12 @@ umka_mouse_move(int lbheld, int mbheld, int rbheld, int xabs, int32_t xmoving,
 STDCALL net_buff_t *
 kos_net_buff_alloc(size_t size);
 
+STDCALL void
+kos_attach_int_handler(int irq, int (*handler)(void*), void *user_data);
+
+void
+kos_irq_serv_irq10(void);
+
 static inline int32_t
 umka_fs_execute(const char *filename) {
 // edx Flags

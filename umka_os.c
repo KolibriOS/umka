@@ -111,6 +111,13 @@ void handle_i40(int signo, siginfo_t *info, void *context) {
     umka_i40((pushad_t*)(ctx->uc_mcontext.__gregs + REG_EDI));
 }
 
+void handle_irq_net(int signo, siginfo_t *info, void *context) {
+    (void)signo;
+    (void)info;
+    (void)context;
+    kos_irq_serv_irq10();
+}
+
 int
 main() {
     if (coverage)
@@ -135,6 +142,15 @@ main() {
 
     if (sigaction(SIGSEGV, &sa, NULL) == -1) {
         printf("Can't install SIGSEGV handler!\n");
+        return 1;
+    }
+
+    sa.sa_sigaction = handle_irq_net;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_SIGINFO;
+
+    if (sigaction(SIGUSR1, &sa, NULL) == -1) {
+        printf("Can't install SIGUSR1 handler!\n");
         return 1;
     }
 
