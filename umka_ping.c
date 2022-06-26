@@ -21,8 +21,9 @@
 #include <fcntl.h>
 #include <inttypes.h>
 #include <limits.h>
+#include <linux/if.h>
 #include <linux/if_tun.h>
-#include <net/if.h>
+#include <net/if_arp.h>
 #include <netinet/in.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -40,36 +41,69 @@
 #include "umka.h"
 #include "vnet.h"
 
-static int
-tap_alloc(char *dev) {
-    int flags = IFF_TAP | IFF_NO_PI;
-    struct ifreq ifr;
-    int fd, err;
-    char *clonedev = "/dev/net/tun";
+#define TAP_DEV "/dev/net/tun"
+#define UMKA_TAP_NAME "umka%d"
 
-    if( (fd = open(clonedev , O_RDWR | O_NONBLOCK)) < 0 )
-    {
+static int
+tap_alloc() {
+    struct ifreq ifr = {.ifr_name = UMKA_TAP_NAME,
+                        .ifr_flags = IFF_TAP | IFF_NO_PI};
+    int fd, err;
+
+    if( (fd = open(TAP_DEV, O_RDWR | O_NONBLOCK)) < 0 ) {
         perror("Opening /dev/net/tun");
         return fd;
     }
 
-    memset(&ifr, 0, sizeof(ifr));
-
-    ifr.ifr_flags = flags;
-
-    if(*dev)
-    {
-        strncpy(ifr.ifr_name, dev, IFNAMSIZ);
-    }
-
-    if( (err = ioctl(fd, TUNSETIFF, (void *)&ifr)) < 0 )
-    {
+    if( (err = ioctl(fd, TUNSETIFF, &ifr)) < 0 ) {
         perror("ioctl(TUNSETIFF)");
         close(fd);
         return err;
     }
 
-    strcpy(dev, ifr.ifr_name);
+    ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
+    memcpy(ifr.ifr_hwaddr.sa_data, (char[]){0x00, 0x11, 0x00, 0x00, 0x00, 0x00}, 6);
+
+    if( (err = ioctl(fd, SIOCSIFHWADDR, &ifr)) < 0 ) {
+        perror("ioctl(SIOCSIFHWADDR)");
+        close(fd);
+        return err;
+    }
+
+    struct sockaddr_in sai;
+    sai.sin_family = AF_INET;
+    sai.sin_port = 0;
+    sai.sin_addr.s_addr = inet_addr("10.50.0.1");
+    memcpy(&ifr.ifr_addr, &sai, sizeof(struct sockaddr));
+
+    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+    if ( (err = ioctl(sockfd, SIOCSIFADDR, &ifr)) < 0 ) {
+        perror("ioctl(SIOCSIFADDR)");
+        close(fd);
+        return err;
+    }
+
+    sai.sin_addr.s_addr = inet_addr("255.255.255.0");
+    memcpy(&ifr.ifr_netmask, &sai, sizeof(struct sockaddr));
+    if ((err = ioctl(sockfd, SIOCSIFNETMASK, &ifr)) < 0) {
+        perror("ioctl(SIOCSIFNETMASK)");
+        close(fd);
+        return err;
+    }
+
+    if ((err = ioctl(sockfd, SIOCGIFFLAGS, &ifr)) < 0) {
+        perror("ioctl(SIOCGIFFLAGS)");
+        close(fd);
+        return err;
+    }
+    ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
+    ifr.ifr_flags &= ~(IFF_BROADCAST | IFF_LOWER_UP);
+    if ((err = ioctl(sockfd, SIOCSIFFLAGS, &ifr)) < 0) {
+        perror("ioctl(SIOCSIFFLAGS)");
+        close(fd);
+        return err;
+    }
 
     return fd;
 }
@@ -81,8 +115,7 @@ umka_thread_net_drv(void) {
     int tapfd;
     uint8_t buffer[2048];
     int plen = 0;
-    char tapdev[IFNAMSIZ] = "tap0";
-    tapfd = tap_alloc(tapdev);
+    tapfd = tap_alloc();
     net_device_t *vnet = vnet_init(tapfd);
     kos_net_add_device(vnet);
 

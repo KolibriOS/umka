@@ -17,6 +17,7 @@ start:
         btr     dword[esp], BSF EFLAGS.ID
         popfd
 @@:
+jmp $
         mcall   63, 1, '*'
         jmp     @b
 exit:

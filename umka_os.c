@@ -161,11 +161,11 @@ main() {
     fread(kos_ramdisk, 2880*512, 1, f);
     fclose(f);
     kos_ramdisk_init();
-    load_app_host("../apps/board_cycle", app_base);
-    load_app("/rd/1/loader");
+//    load_app_host("../apps/board_cycle", app_base);
+//    load_app("/rd/1/loader");
 
     thread_start(0, monitor, THREAD_STACK_SIZE);
-//    thread_start(0, umka_thread_net_drv, THREAD_STACK_SIZE);
+    thread_start(0, umka_thread_net_drv, THREAD_STACK_SIZE);
 
     dump_procs();
 
