@@ -1,3 +1,13 @@
+/*
+    SPDX-License-Identifier: GPL-2.0-or-later
+
+    UMKa - User-Mode KolibriOS developer tools
+    vnet - virtual network card
+
+    Copyright (C) 2020-2022  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2021  Magomed Kostoev <mkostoevr@yandex.ru>
+*/
+
 #include <arpa/inet.h>
 #include <assert.h>
 #include <errno.h>

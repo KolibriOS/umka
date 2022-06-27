@@ -1,3 +1,12 @@
+/*
+    SPDX-License-Identifier: GPL-2.0-or-later
+
+    UMKa - User-Mode KolibriOS developer tools
+    lfbviewx - framebuffer viewer for X
+
+    Copyright (C) 2020  Ivan Baravy <dunkaist@gmail.com>
+*/
+
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>

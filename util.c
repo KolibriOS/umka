@@ -1,3 +1,11 @@
+/*
+    SPDX-License-Identifier: GPL-2.0-or-later
+
+    UMKa - User-Mode KolibriOS developer tools
+
+    Copyright (C) 2021  Ivan Baravy <dunkaist@gmail.com>
+*/
+
 #include <stdio.h>
 #include "umka.h"
 

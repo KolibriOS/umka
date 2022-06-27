@@ -1,3 +1,11 @@
+/*
+    SPDX-License-Identifier: GPL-2.0-or-later
+
+    UMKa - User-Mode KolibriOS developer tools
+
+    Copyright (C) 2020,2022  Ivan Baravy <dunkaist@gmail.com>
+*/
+
 #include <setjmp.h>
 #define __USE_GNU
 #include <signal.h>

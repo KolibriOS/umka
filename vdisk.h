@@ -1,3 +1,12 @@
+/*
+    SPDX-License-Identifier: GPL-2.0-or-later
+
+    UMKa - User-Mode KolibriOS developer tools
+    vdisk - virtual disk
+
+    Copyright (C) 2020-2022  Ivan Baravy <dunkaist@gmail.com>
+*/
+
 #ifndef VDISK_H_INCLUDED
 #define VDISK_H_INCLUDED
 

@@ -1,3 +1,12 @@
+/*
+    SPDX-License-Identifier: GPL-2.0-or-later
+
+    UMKa - User-Mode KolibriOS developer tools
+    mkdirrange - make directories with names in range
+
+    Copyright (C) 2018-2019  Ivan Baravy <dunkaist@gmail.com>
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>

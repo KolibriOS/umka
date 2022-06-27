@@ -1,4 +1,9 @@
-; TODO: SPDX
+; SPDX-License-Identifier: GPL-2.0-or-later
+;
+; UMKa - User-Mode KolibriOS developer tools
+;
+; Copyright (C) 2017-2022  Ivan Baravy <dunkaist@gmail.com>
+; Copyright (C) 2021  Magomed Kostoev <mkostoevr@yandex.ru>
 
 if HOST eq windows
     format MS COFF

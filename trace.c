@@ -1,3 +1,11 @@
+/*
+    SPDX-License-Identifier: GPL-2.0-or-later
+
+    UMKa - User-Mode KolibriOS developer tools
+
+    Copyright (C) 2019-2020  Ivan Baravy <dunkaist@gmail.com>
+*/
+
 #include "trace_lbr.h"
 
 uint32_t coverage;
