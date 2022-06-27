@@ -2741,7 +2741,7 @@ cmd_net_add_device(struct shell_ctx *ctx, int argc, char **argv) {
         puts(usage);
         return;
     }
-    net_device_t *vnet = vnet_init(42);   // FIXME: tap & list like block devices
+    net_device_t *vnet = vnet_init();   // FIXME: list like block devices
     COVERAGE_ON();
     int32_t dev_num = kos_net_add_device(vnet);
     COVERAGE_OFF();

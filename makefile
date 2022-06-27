@@ -68,7 +68,7 @@ umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs` -T umka.ld
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o trace_lbr.o \
-         pci.o thread.o umka_ping.o util.o bestline.o
+         pci.o thread.o util.o bestline.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o pci.o thread.o util.o
@@ -142,9 +142,6 @@ umka_os.o: umka_os.c umka.h
 
 umka_gen_devices_dat.o: umka_gen_devices_dat.c umka.h
 	$(CC) $(CFLAGS_32) -c $<
-
-umka_ping.o: umka_ping.c umka.h
-	$(CC) $(CFLAGS_32) -D_DEFAULT_SOURCE -c $<
 
 .PHONY: all clean
 

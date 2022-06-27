@@ -17,8 +17,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <arpa/inet.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <netinet/in.h>
 #define __USE_GNU
 #include <signal.h>
 #include <stdio.h>
@@ -27,12 +29,14 @@
 #define __USE_MISC
 #include <sys/mman.h>
 #include <sys/select.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include "umka.h"
 #include "shell.h"
 #include "trace.h"
+#include "vnet.h"
 
 #define UMKA_DEFAULT_DISPLAY_WIDTH 400
 #define UMKA_DEFAULT_DISPLAY_HEIGHT 300
@@ -180,8 +184,46 @@ main() {
 //    load_app_host("../apps/board_cycle", app_base);
 //    load_app("/rd/1/loader");
 
+    net_device_t *vnet = vnet_init();
+    kos_net_add_device(vnet);
+
+    char devname[64];
+    for (size_t i = 0; i < umka_sys_net_get_dev_count(); i++) {
+        umka_sys_net_dev_reset(i);
+        umka_sys_net_get_dev_name(i, devname);
+        uint32_t devtype = umka_sys_net_get_dev_type(i);
+        fprintf(stderr, "[net_drv] device %i: %s %u\n", i, devname, devtype);
+    }
+
+    f76ret_t r76;
+    r76 = umka_sys_net_ipv4_set_subnet(1, inet_addr("255.255.255.0"));
+    if (r76.eax == (uint32_t)-1) {
+        fprintf(stderr, "[net_drv] set subnet error\n");
+        return -1;
+    }
+
+//    r76 = umka_sys_net_ipv4_set_gw(1, inet_addr("192.168.1.1"));
+    r76 = umka_sys_net_ipv4_set_gw(1, inet_addr("10.50.0.1"));
+    if (r76.eax == (uint32_t)-1) {
+        fprintf(stderr, "set gw error\n");
+        return -1;
+    }
+
+    r76 = umka_sys_net_ipv4_set_dns(1, inet_addr("217.10.36.5"));
+    if (r76.eax == (uint32_t)-1) {
+        fprintf(stderr, "[net_drv] set dns error\n");
+        return -1;
+    }
+
+    r76 = umka_sys_net_ipv4_set_addr(1, inet_addr("10.50.0.2"));
+    if (r76.eax == (uint32_t)-1) {
+        fprintf(stderr, "[net_drv] set ip addr error\n");
+        return -1;
+    }
+
+
     thread_start(0, monitor, THREAD_STACK_SIZE);
-    thread_start(0, umka_thread_net_drv, THREAD_STACK_SIZE);
+//    thread_start(0, umka_thread_net_drv, THREAD_STACK_SIZE);
 
     dump_procs();
 

@@ -81,7 +81,7 @@ UMKA_MEMORY_BYTES = 256 SHL 20
 
 pubsym irq_serv.irq_10, 'kos_irq_serv_irq10'
 pubsym attach_int_handler, 'kos_attach_int_handler', 12
-pubsym fs_execute, 'kos_fs_execute'
+pubsym fs_execute, 'kos_fs_execute', 4
 pubsym set_keyboard_data, 'kos_set_keyboard_data'
 pubsym KEY_COUNT as 'kos_key_count'
 pubsym KEY_BUFF as 'kos_key_buff'
@@ -253,7 +253,9 @@ page_tabs equ page_tabs_pew
 ;macro OS_BASE [x] {
 ;  OS_BASE equ os_base
 ;}
+macro tss pew {}
 include 'const.inc'
+purge tss
 restore window_data
 restore CDDataBuf,idts,WIN_STACK,WIN_POS
 restore FDD_BUFF,WIN_TEMP_XY,KEY_COUNT,KEY_BUFF,BTN_COUNT,BTN_BUFF,BTN_ADDR
@@ -338,9 +340,13 @@ macro call target {
   end if
 }
 do_change_task equ hjk
-irq0 equ jhg
+irq0 equ irq0_pew
+tss._io_map_0 equ 0
+tss._io_map_1 equ 0
 include 'core/sched.inc'
-purge call
+restore tss._io_map_0
+restore tss._io_map_1
+;purge mov
 restore irq0
 include 'core/syscall.inc'
 ;include 'core/fpu.inc'
@@ -395,6 +401,7 @@ macro mov dst, src {
 }
 include 'core/irq.inc'
 purge mov
+purge call
 include 'core/apic.inc'
 include 'core/hpet.inc'
 include 'core/timers.inc'
@@ -1054,6 +1061,7 @@ ide_channel8_mutex MUTEX
 
 ioapic_data rb 0x400
 lapic_data rb 0x400
+tss TSS
 
 lfb_base        rd MAX_SCREEN_WIDTH*MAX_SCREEN_HEIGHT
 
@@ -1086,4 +1094,23 @@ macro align x {
 }
 
 macro assert [x] {}
+macro dw [x] {
+forward
+  if x eq tss and 0xFFFF
+        dw 0
+  else if x eq (tss shr 16) and 0xFF00
+        dw 0
+  else
+        dw x
+  end if
+}
+
+macro db [x] {
+forward
+  if x eq (tss shr 16) and 0xFF
+        db 0
+  else
+        db x
+  end if
+}
 include 'data32.inc'

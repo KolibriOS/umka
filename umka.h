@@ -889,7 +889,7 @@ typedef struct {
     uint32_t dbg_state;            // +76
     char *cur_dir;                 // +80
     uint32_t wait_timeout;         // +84
-    uint32_t saved_esp0;           // +88
+    void *saved_esp0;              // +88
     uint32_t wait_begin;           // +92
     int (*wait_test)(void);        // +96
     void *wait_param;              // +100
