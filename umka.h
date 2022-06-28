@@ -437,6 +437,8 @@ struct addrinfo {
 
 typedef struct net_device_t net_device_t;
 
+#define NET_BUFFER_SIZE 0x800
+
 typedef struct {
         void *next;     // pointer to next frame in list
         void *prev;     // pointer to previous frame in list

@@ -164,7 +164,6 @@ main() {
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
 
     umka_init();
-    dump_procs();
     umka_stack_init();
 
     FILE *f = fopen("../img/kolibri.img", "r");
@@ -185,6 +184,7 @@ main() {
         fprintf(stderr, "[net_drv] device %i: %s %u\n", i, devname, devtype);
     }
 
+    // network setup should be done from the userspace app, e.g. via zeroconf
     f76ret_t r76;
     r76 = umka_sys_net_ipv4_set_subnet(1, inet_addr("255.255.255.0"));
     if (r76.eax == (uint32_t)-1) {
@@ -192,7 +192,6 @@ main() {
         return -1;
     }
 
-//    r76 = umka_sys_net_ipv4_set_gw(1, inet_addr("192.168.1.1"));
     r76 = umka_sys_net_ipv4_set_gw(1, inet_addr("10.50.0.1"));
     if (r76.eax == (uint32_t)-1) {
         fprintf(stderr, "set gw error\n");
@@ -213,7 +212,6 @@ main() {
 
 
     thread_start(0, monitor, THREAD_STACK_SIZE);
-//    thread_start(0, umka_thread_net_drv, THREAD_STACK_SIZE);
 
     dump_procs();
 

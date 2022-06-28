@@ -4,25 +4,35 @@ UMKa -- User-Mode KolibriOS developer tools
 This is a common project for a set of KolibriOS developer tools which are based
 on original KolibriOS kernel code wrapped and hacked as to run in the UNIX
 programming environment. The idea is to make userspace UNIX tools that use as
-much unchanged KolibriOS kernel source as possible to test
+much unchanged KolibriOS kernel source as possible to run, test and debug
 architecture-independent parts of the kernel in your favorite developer
 environment.
+
+What works now:
+ * block layer (disk, cache, partition, MBR, GPT),
+ * file systems except iso9660 (fat*, exfat, ext*, xfs),
+ * UI and graphics (geometric primitives, windows, winmap, cursors),
+ * basic network (configuration, ping replies),
+ * interrupts (via signals),
+ * threads and processes,
+ * scheduler,
+ * slab allocator,
+ * events,
+ * synchronization primitives,
+ * unpacker,
+ * string functions,
+ * other minor functions.
 
 
 umka_shell
 ----------
 
 is an interactive shell with commands that are wrappers around KolibriOS kernel
-syscalls and other internal functions. What works now: block layer including
-disk cache, FS, UI and graphics, scheduler, ACPI/AML interpreter,
-synchronization primitives, strings, slab allocator, events, unpacker, other
-minor functions.
-
-It can also be used for automated testing by feeding it a file of commands
-instead of typing them.
+syscalls and other internal functions. It can also be used for automated testing
+by feeding it a file of commands instead of typing them.
 
 Example:
-    $ umka_shell < mytest.t > mytest.out.log
+    $ umka_shell < mytest.t
 
 
 umka_fuse
@@ -43,19 +53,25 @@ including network stack.
 tools
 -----
 
-mkdirrange
+mkdirrange - make directories with names in range
 
-mkfilepattern
+mkfilepattern - make a file with contents of specific pattern
 
-lfbviewx
+lfbviewx - framebuffer viewer for X
 
 
 BUILD
 -----
 
-$ KOLIBRIOS=/path/to/kolibrios make
+Linux:
+
+$ KOLIBRIOS=/path/to/kolibrios HOST=linux CC=gcc make
 
 /path/to/kolibrios is where you checked out 'svn co svn://kolibrios.org'.
+
+Windows:
+
+Same but specify HOST=windows and your favourite C compiler.
 
 
 Architecture
@@ -69,7 +85,21 @@ Framebuffer can be dumped to disk as image file.
 Testing
 -------
 
-sudo cp --parents /sys/firmware/acpi/tables/?SDT* /sys/bus/pci/devices/*/config .
+# Run all the tests
+
+    $ HOST=linux make -B
+
+# Copy ACPI tables and PCI configs
+
+    $ sudo cp --parents /sys/firmware/acpi/tables/?SDT* /sys/bus/pci/devices/*/config .
+
+# Manage tap device
+
+    $ sudo ip tuntap add dev tap0 mode tap
+    $ sudo ip link set tap0 address 00:11:00:00:00:00
+    $ sudo ip addr add 10.50.0.1/24 dev tap0
+    $ sudo ip link set up dev tap0
+    $ sudo ip tuntap del dev tap0 mode tap
 
 
 Troubleshooting
@@ -83,19 +113,11 @@ Allow reading process_vm_readv syscall.
 
 # umka_os
 
-Managing tap devices.
-
-    # ip tuntap add dev tap0 mode tap
-    # ip link set tap0 address 00:11:00:00:00:00
-    # ip addr add 10.50.0.1/24 dev tap0
-    # ip link set up dev tap0
-    # ip tuntap del dev tap0 mode tap
-
 To create tap devices.
 
     # setcap cap_net_admin+ep ../umka_os
 
-Not yet used, but may be one day.
+To load apps at 0 address.
 
     # sysctl -w vm.mmap_min_addr=0
 

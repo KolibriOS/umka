@@ -113,31 +113,30 @@ vnet_input(void *udata) {
     net_device_t *vnet = udata;
     vnet_userdata_t *u = vnet->userdata;
     int tapfd = u->tapfd;
-    uint8_t buffer[2048];
     int plen = 0;
-    fprintf(stderr, "###### vnet_input\n");
-    plen = read(tapfd, buffer, 2*1024);
-    if (plen > 0) {
-        fprintf(stderr, "[net_drv] read %i bytes\n", plen);
-        for (int i = 0; i < plen; i++) {
-            fprintf(stderr, " %2.2x", buffer[i]);
-        }
-        fprintf(stderr, "\n");
-
-        net_buff_t *buf = kos_net_buff_alloc(plen + offsetof(net_buff_t, data));
-        if (!buf) {
-            fprintf(stderr, "[vnet] Can't allocate network buffer!\n");
-            return 1;
-        }
-        buf->length = plen;
-        buf->device = vnet;
-        buf->offset = offsetof(net_buff_t, data);
-        memcpy(buf->data, buffer, plen);
-        kos_eth_input(buf);
+    fprintf(stderr, "[vnet] input interrupt\n");
+    net_buff_t *buf = kos_net_buff_alloc(NET_BUFFER_SIZE);
+    if (!buf) {
+        fprintf(stderr, "[vnet] Can't allocate network buffer!\n");
+        return 1;
     }
+    buf->device = vnet;
+    plen = read(tapfd, buf->data, NET_BUFFER_SIZE - offsetof(net_buff_t, data));
+    if (plen == -1) {
+        plen = 0;   // we have just allocated a buffer, so we have to submit it
+    }
+    fprintf(stderr, "[vnet] read %i bytes\n", plen);
+    for (int i = 0; i < plen; i++) {
+        fprintf(stderr, " %2.2x", buf->data[i]);
+    }
+    fprintf(stderr, "\n");
+
+    buf->length = plen;
+    buf->offset = offsetof(net_buff_t, data);
+    kos_eth_input(buf);
     u->input_processed = true;
 
-    return 1;
+    return 1;   // acknowledge our interrupt
 }
 
 static void
@@ -234,12 +233,13 @@ vnet_init() {
     };
 
     kos_attach_int_handler(SIGUSR1, vnet_input, vnet);
-    fprintf(stderr, "### thread_start: %p\n", (void*)(uintptr_t)vnet_input_monitor);
+    fprintf(stderr, "[vnet] start input_monitor thread\n");
     uint8_t *stack = malloc(STACK_SIZE);
     size_t tid = umka_new_sys_threads(0, vnet_input_monitor, stack + STACK_SIZE);
     appdata_t *t = kos_slot_base + tid;
-    *(void**)((uint8_t*)t->pl0_stack+0x2000-12) = vnet;
-//    t->saved_esp0 = (uint8_t*)t->saved_esp0 - 8;
+    *(void**)((uint8_t*)t->saved_esp0-12) = vnet;   // param for monitor thread
+    // -12 here because in UMKa, unlike real hardware, we don't switch between
+    // kernel and userspace, i.e. stack structure is different
 
     return vnet;
 }
