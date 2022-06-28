@@ -217,7 +217,7 @@ main() {
 
     setitimer(ITIMER_PROF, &timeout, NULL);
 
-    kos_osloop();   // doesn't return
+    umka_osloop();   // doesn't return
 
     if (coverage)
         trace_end();

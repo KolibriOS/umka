@@ -983,7 +983,17 @@ macro format [x] {}
 
 bios32_entry equ bios32_entry_pew
 tmp_page_tabs equ tmp_page_tabs_pew
+macro jmp target {
+  if target eq osloop
+        cmp     [umka_tool], UMKA_SHELL
+        jnz     osloop
+        ret
+  else
+        jmp     target
+  end if
+}
 include 'kernel.asm'
+purge jmp
 restore bios32_entry, tmp_page_tabs
 purge org,sys_msg_board,delay_ms
 restore org,sys_msg_board,delay_ms

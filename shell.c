@@ -3461,6 +3461,21 @@ cmd_net_arp_del_entry(struct shell_ctx *ctx, int argc, char **argv) {
 #endif // _WIN32
 
 static void
+cmd_osloop(struct shell_ctx *ctx, int argc, char **argv) {
+    (void)ctx;
+    (void)argv;
+    const char *usage = \
+        "usage: osloop";
+    if (argc != 1) {
+        puts(usage);
+        return;
+    }
+    COVERAGE_ON();
+    umka_osloop();
+    COVERAGE_OFF();
+}
+
+static void
 cmd_bg_set_size(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
@@ -3681,6 +3696,7 @@ func_table_t cmd_cmds[] = {
     { "net_listen",                     cmd_net_listen },
     { "net_open_socket",                cmd_net_open_socket },
 #endif // _WIN32
+    { "osloop",                         cmd_osloop },
     { "pci_get_path",                   cmd_pci_get_path },
     { "pci_set_path",                   cmd_pci_set_path },
     { "process_info",                   cmd_process_info },

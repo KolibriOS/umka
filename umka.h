@@ -499,8 +499,16 @@ typedef struct {
     size_t el_cnt;
 } kos_node_package_t;
 
-__attribute__((__noreturn__)) void
-kos_osloop(void);
+static inline void
+umka_osloop() {
+    __asm__ __inline__ __volatile__ (
+        "pushad;"
+        "call   kos_osloop;"
+        "popad"
+        :
+        :
+        : "memory", "cc");
+}
 
 void
 irq0(int signo, siginfo_t *info, void *context);
@@ -996,7 +1004,6 @@ umka_scheduler_add_thread(appdata_t *thread, int32_t priority) {
         : "c"(priority),
           "d"(thread)
         : "memory", "cc");
-
 }
 
 #define MAX_PRIORITY    0
