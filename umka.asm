@@ -472,7 +472,9 @@ endp
 proc kos_time_to_epoch c uses ebx esi edi ebp, _time
         mov     esi, [_time]
         call    fsCalculateTime
-        add     eax, 978307200  ; epoch to 2001.01.01
+	xor	edx, edx
+        add     eax, UNIXTIME_TO_KOS_OFFSET
+	adc	edx, 0
         ret
 endp
 

@@ -14,6 +14,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <sys/types.h>
+#include <time.h>
 
 #define UMKA_PATH_MAX 4096
 // TODO: Cleanup
@@ -519,7 +520,7 @@ umka_init(void);
 void
 i40(void);
 
-uint32_t
+time_t
 kos_time_to_epoch(uint32_t *time);
 
 STDCALL disk_t *

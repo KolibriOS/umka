@@ -2381,14 +2381,17 @@ cmd_ls80(struct shell_ctx *ctx, int argc, char **argv) {
 
 static void
 cmd_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
-    (void)ctx;
     const char *usage = \
-        "usage: stat <file>\n"
-        "  file             path/to/file\n";
-    if (argc != 2) {
+        "usage: stat <file> [-c] [-m] [-a]\n"
+        "  file             path/to/file\n"
+        "  [-c]             force show creation time\n"
+        "  [-m]             force show modification time\n"
+        "  [-a]             force show access time";
+    if (argc < 2) {
         puts(usage);
         return;
     }
+    bool force_ctime = false, force_mtime = false, force_atime = false;
     f7080s5arg_t fX0 = {.sf = 5, .flags = 0};
     f7080ret_t r;
     bdfe_t file;
@@ -2413,25 +2416,48 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
         printf("size: %llu\n", file.size);
     }
 
-#if PRINT_DATE_TIME == 1    // TODO: runtime, argv flag
+    int opt;
+    optind = 2; // skip command and file
+    while ((opt = getopt(argc, argv, "cma")) != -1) {
+        switch (opt) {
+        case 'c':
+            force_ctime = true;
+            break;
+        case 'm':
+            force_mtime = true;
+            break;
+        case 'a':
+            force_atime = true;
+            break;
+        default:
+            puts(usage);
+            return;
+        }
+    }
+
     time_t time;
     struct tm *t;
-    time = kos_time_to_epoch(&file.ctime);
-    t = localtime(&time);
-    printf("ctime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
-           t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
-           t->tm_hour, t->tm_min, t->tm_sec);
-    time = kos_time_to_epoch(&file.atime);
-    t = localtime(&time);
-    printf("atime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
-           t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
-           t->tm_hour, t->tm_min, t->tm_sec);
-    time = kos_time_to_epoch(&file.mtime);
-    t = localtime(&time);
-    printf("mtime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
-           t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
-           t->tm_hour, t->tm_min, t->tm_sec);
-#endif
+    if (!ctx->reproducible || force_atime) {
+        time = kos_time_to_epoch(&file.atime);
+        t = localtime(&time);
+        printf("atime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
+               t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+               t->tm_hour, t->tm_min, t->tm_sec);
+    }
+    if (!ctx->reproducible || force_mtime) {
+        time = kos_time_to_epoch(&file.mtime);
+        t = localtime(&time);
+        printf("mtime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
+               t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+               t->tm_hour, t->tm_min, t->tm_sec);
+    }
+    if (!ctx->reproducible || force_ctime) {
+        time = kos_time_to_epoch(&file.ctime);
+        t = localtime(&time);
+        printf("ctime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
+               t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+               t->tm_hour, t->tm_min, t->tm_sec);
+    }
     return;
 }
 

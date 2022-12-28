@@ -57,7 +57,7 @@ acpi: $(acpi_tests)
 input: $(input_tests)
 
 %.out.log: %.t
-	$(UMKA_SHELL) -i $*.t -o $@
+	$(UMKA_SHELL) -ri $*.t -o $@
 ifeq ($(HOST),linux)
 	@ cmp $*.out.log $*.ref.log
 	@ if [ -f "$*.ref.png" ]; then cmp $*.out.png $*.ref.png; fi

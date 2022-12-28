@@ -1,0 +1,50 @@
+/> umka_init
+/> disk_add ../img/xfs_bigtime.img hd0 -c 0
+/hd0/1: xfs
+/> ls70 /hd0/1/
+status = 6 end_of_file, count = 8
+total = 8
+----f .
+----f ..
+----f dira
+----f dirb
+----f dirc
+----f dird
+----f dire
+----f dirf
+/> ls70 /hd0/1/dira
+status = 6 end_of_file, count = 2
+total = 2
+----f .
+----f ..
+/> stat70 /hd0/1/dira -am
+status = 0 success
+attr: ----f
+atime: 2005.04.03 11:22:33
+mtime: 2005.04.03 11:22:44
+/> stat70 /hd0/1/dirb -am
+status = 0 success
+attr: ----f
+atime: 2001.01.01 00:00:00
+mtime: 2035.04.03 11:22:44
+/> stat70 /hd0/1/dirc -am
+status = 0 success
+attr: ----f
+atime: 2001.01.01 00:00:00
+mtime: 2075.04.03 11:22:44
+/> stat70 /hd0/1/dird -am
+status = 0 success
+attr: ----f
+atime: 2001.01.01 00:00:00
+mtime: 2105.04.03 11:22:44
+/> stat70 /hd0/1/dire -am
+status = 0 success
+attr: ----f
+atime: 2001.01.01 00:00:00
+mtime: 2137.02.07 06:28:15
+/> stat70 /hd0/1/dirf -am
+status = 0 success
+attr: ----f
+atime: 2001.01.01 00:00:00
+mtime: 2137.02.07 06:28:15
+/> disk_del hd0

@@ -4,6 +4,7 @@ MKFILEPATTERN=../tools/mkfilepattern
 DIRTOTEST=python3 ../tools/dirtotest.py
 MOUNT_OPT=-t xfs
 TEMP_DIR:=$(shell mktemp -d)
+XFS_MIN_PART_SIZE=300MiB
 
 all: s05k s4k unicode v5 kolibri.img fat32_test0.img coverage
 	rmdir $(TEMP_DIR)
@@ -14,7 +15,7 @@ s4k: xfs_v4_ftype0_s4k_b4k_n8k.img
 
 unicode: xfs_v4_unicode.img
 
-v5: xfs_v5_ftype1_s05k_b2k_n8k.img xfs_v5_files_s05k_b4k_n8k.img
+v5: xfs_v5_ftype1_s05k_b2k_n8k.img xfs_v5_files_s05k_b4k_n8k.img xfs_bigtime.img
 
 coverage: jfs.img xfs_borg_bit.img xfs_short_dir_i8.img
 
@@ -36,8 +37,38 @@ jfs.img:
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
+xfs_bigtime.img:
+	fallocate -l $(XFS_MIN_PART_SIZE) $@
+	mkfs.xfs -m bigtime=1 $@
+	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo chown $$USER $(TEMP_DIR) -R
+#
+	mkdir $(TEMP_DIR)/dira
+	mkdir $(TEMP_DIR)/dirb
+	mkdir $(TEMP_DIR)/dirc
+	mkdir $(TEMP_DIR)/dird
+	mkdir $(TEMP_DIR)/dire
+	mkdir $(TEMP_DIR)/dirf
+	touch -a -t 200504031122.33 $(TEMP_DIR)/dira
+	touch -m -t 200504031122.44 $(TEMP_DIR)/dira
+	touch -a -t 199504031122.33 $(TEMP_DIR)/dirb
+	touch -m -t 203504031122.44 $(TEMP_DIR)/dirb
+	touch -a -t 197504031122.33 $(TEMP_DIR)/dirc
+	touch -m -t 207504031122.44 $(TEMP_DIR)/dirc
+	touch -a -t 192504031122.33 $(TEMP_DIR)/dird
+	touch -m -t 210504031122.44 $(TEMP_DIR)/dird
+	touch -a -t 190004031122.33 $(TEMP_DIR)/dire
+	touch -m -t 220504031122.44 $(TEMP_DIR)/dire
+	touch -a -t 180004031122.33 $(TEMP_DIR)/dirf
+	touch -m -t 220504031122.44 $(TEMP_DIR)/dirf
+#
+	sudo umount $(TEMP_DIR)
+	fallocate -i -o 0 -l 1MiB $@
+	parted --script --align optimal $@ mktable msdos
+	parted --script --align optimal $@ mkpart primary xfs 1MiB 100%
+
 xfs_borg_bit.img:
-	fallocate -l 16MiB $@
+	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -n version=ci $@
 	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
