@@ -15,7 +15,7 @@ s4k: xfs_v4_ftype0_s4k_b4k_n8k.img
 
 unicode: xfs_v4_unicode.img
 
-v5: xfs_v5_ftype1_s05k_b2k_n8k.img xfs_v5_files_s05k_b4k_n8k.img xfs_bigtime.img
+v5: xfs_v5_ftype1_s05k_b2k_n8k.img xfs_v5_files_s05k_b4k_n8k.img xfs_bigtime.img xfs_nrext64.img
 
 coverage: jfs.img xfs_borg_bit.img xfs_short_dir_i8.img
 
@@ -36,6 +36,35 @@ jfs.img:
 	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
+
+xfs_nrext64.img:
+	fallocate -l 3000MiB $@
+	mkfs.xfs -i nrext64=1 $@
+	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo chown $$USER $(TEMP_DIR) -R
+#
+	mkdir $(TEMP_DIR)/dir_sf
+	$(MKDIRRANGE) $(TEMP_DIR)/dir_sf 0 3  0 2
+#
+	mkdir $(TEMP_DIR)/dir_block
+	$(MKDIRRANGE) $(TEMP_DIR)/dir_block 0 5  201 43
+#
+	mkdir $(TEMP_DIR)/dir_leaf
+	$(MKDIRRANGE) $(TEMP_DIR)/dir_leaf 0 50  201 43
+#
+	mkdir $(TEMP_DIR)/dir_node
+	$(MKDIRRANGE) $(TEMP_DIR)/dir_node 0 1000  201 43
+#
+	mkdir $(TEMP_DIR)/dir_btree_l1
+	$(MKDIRRANGE) $(TEMP_DIR)/dir_btree_l1 0 5000  231 13
+#
+	mkdir $(TEMP_DIR)/dir_btree_l2
+	$(MKDIRRANGE) $(TEMP_DIR)/dir_btree_l2 0 1000000  231 13
+#
+	sudo umount $(TEMP_DIR)
+	fallocate -i -o 0 -l 1MiB $@
+	parted --script --align optimal $@ mktable msdos
+	parted --script --align optimal $@ mkpart primary xfs 1MiB 100%
 
 xfs_bigtime.img:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
