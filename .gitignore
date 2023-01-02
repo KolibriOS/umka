@@ -8,10 +8,12 @@ umka_fuse
 umka_os
 umka_ping
 umka_gen_devices_dat
-mkdirrange
-mkfilepattern
-lfbviewx
-randdir
+tools/mkdirrange
+tools/mkdoubledirs
+tools/gensamehash
+tools/mkfilepattern
+tools/lfbviewx
+tools/randdir
 *.img
 *.img.xz
 *.img.gz

@@ -1,5 +1,6 @@
 RANDDIR=../tools/randdir
 MKDIRRANGE=../tools/mkdirrange
+MKDOUBLEDIRS=../tools/mkdoubledirs
 MKFILEPATTERN=../tools/mkfilepattern
 DIRTOTEST=python3 ../tools/dirtotest.py
 MOUNT_OPT=-t xfs
@@ -15,7 +16,7 @@ s4k: xfs_v4_ftype0_s4k_b4k_n8k.img
 
 unicode: xfs_v4_unicode.img
 
-v5: xfs_v5_ftype1_s05k_b2k_n8k.img xfs_v5_files_s05k_b4k_n8k.img xfs_bigtime.img xfs_nrext64.img
+v5: xfs_v5_ftype1_s05k_b2k_n8k.img xfs_v5_files_s05k_b4k_n8k.img xfs_bigtime.img xfs_nrext64.img xfs_lookup_v5.img xfs_lookup_v4.img
 
 coverage: jfs.img xfs_borg_bit.img xfs_short_dir_i8.img
 
@@ -36,6 +37,76 @@ jfs.img:
 	fallocate -i -o 0 -l 1MiB $@
 	parted --script $@ mktable gpt
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
+
+xfs_lookup_v4.img:
+	fallocate -l 10GiB $@
+	mkfs.xfs -m crc=0 $@
+	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo chown $$USER $(TEMP_DIR) -R
+#
+	mkdir $(TEMP_DIR)/dir_sf
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_sf d 5
+#
+	mkdir $(TEMP_DIR)/dir_block
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_block d 50
+#
+	mkdir $(TEMP_DIR)/dir_leaf
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_leaf d 500
+#
+	mkdir $(TEMP_DIR)/dir_node
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_node d 2000
+#
+	mkdir $(TEMP_DIR)/dir_btree_l1a
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_btree_l1a d 5000
+#
+	mkdir $(TEMP_DIR)/dir_btree_l1b
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_btree_l1b d 50000
+#
+	mkdir $(TEMP_DIR)/dir_btree_l1c
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_btree_l1c d 500000
+#
+	mkdir $(TEMP_DIR)/dir_btree_l2
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_btree_l2 d 2000000
+#
+	sudo umount $(TEMP_DIR)
+	fallocate -i -o 0 -l 1MiB $@
+	parted --script --align optimal $@ mktable msdos
+	parted --script --align optimal $@ mkpart primary xfs 1MiB 100%
+
+xfs_lookup_v5.img:
+	fallocate -l 10GiB $@
+	mkfs.xfs -m crc=1 $@
+	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo chown $$USER $(TEMP_DIR) -R
+#
+	mkdir $(TEMP_DIR)/dir_sf
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_sf d 5
+#
+	mkdir $(TEMP_DIR)/dir_block
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_block d 50
+#
+	mkdir $(TEMP_DIR)/dir_leaf
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_leaf d 500
+#
+	mkdir $(TEMP_DIR)/dir_node
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_node d 2000
+#
+	mkdir $(TEMP_DIR)/dir_btree_l1a
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_btree_l1a d 5000
+#
+	mkdir $(TEMP_DIR)/dir_btree_l1b
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_btree_l1b d 50000
+#
+	mkdir $(TEMP_DIR)/dir_btree_l1c
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_btree_l1c d 500000
+#
+	mkdir $(TEMP_DIR)/dir_btree_l2
+	$(MKDOUBLEDIRS) $(TEMP_DIR)/dir_btree_l2 d 2000000
+#
+	sudo umount $(TEMP_DIR)
+	fallocate -i -o 0 -l 1MiB $@
+	parted --script --align optimal $@ mktable msdos
+	parted --script --align optimal $@ mkpart primary xfs 1MiB 100%
 
 xfs_nrext64.img:
 	fallocate -l 3000MiB $@
@@ -118,7 +189,7 @@ xfs_short_dir_i8.img:
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt
+	parted --script $@ mktable gpt	# FIXME: all msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_v4_ftype0_s05k_b2k_n8k.img:

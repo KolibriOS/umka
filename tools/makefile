@@ -7,7 +7,14 @@ CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -O2 \
        -DNDEBUG -D_POSIX_C_SOURCE=200809L -fno-pie
 LDFLAGS=-no-pie
 
-all: mkdirrange mkfilepattern lfbviewx randdir covpreproc
+all: mkdirrange mkfilepattern lfbviewx randdir covpreproc mkdoubledirs \
+     gensamehash
+
+gensamehash: gensamehash.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+
+mkdoubledirs: mkdoubledirs.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
 mkdirrange: mkdirrange.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
@@ -27,4 +34,5 @@ covpreproc: covpreproc.c
 .PHONY: all clean
 
 clean:
-	rm -f *.o mkdirrange mkfilepattern lfbviewx randdir covpreproc
+	rm -f *.o mkdirrange mkfilepattern lfbviewx randdir covpreproc \
+          mkdoubledirs gensamehash
