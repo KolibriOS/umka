@@ -35,7 +35,7 @@ jfs.img:
 	fallocate -l 16MiB $@
 	mkfs.jfs -q $@
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt
+	parted --script $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_lookup_v4.img:
@@ -71,7 +71,7 @@ xfs_lookup_v4.img:
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
 	parted --script --align optimal $@ mktable msdos
-	parted --script --align optimal $@ mkpart primary xfs 1MiB 100%
+	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_lookup_v5.img:
 	fallocate -l 10GiB $@
@@ -106,7 +106,7 @@ xfs_lookup_v5.img:
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
 	parted --script --align optimal $@ mktable msdos
-	parted --script --align optimal $@ mkpart primary xfs 1MiB 100%
+	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_nrext64.img:
 	fallocate -l 3000MiB $@
@@ -135,7 +135,7 @@ xfs_nrext64.img:
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
 	parted --script --align optimal $@ mktable msdos
-	parted --script --align optimal $@ mkpart primary xfs 1MiB 100%
+	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_bigtime.img:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
@@ -165,13 +165,13 @@ xfs_bigtime.img:
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
 	parted --script --align optimal $@ mktable msdos
-	parted --script --align optimal $@ mkpart primary xfs 1MiB 100%
+	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_borg_bit.img:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -n version=ci $@
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt
+	parted --script $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_short_dir_i8.img:
@@ -189,7 +189,7 @@ xfs_short_dir_i8.img:
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt	# FIXME: all msdos
+	parted --script $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_v4_ftype0_s05k_b2k_n8k.img:
@@ -220,7 +220,7 @@ xfs_v4_ftype0_s05k_b2k_n8k.img:
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt
+	parted --script $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_v4_ftype1_s05k_b2k_n8k.img:
@@ -251,7 +251,7 @@ xfs_v4_ftype1_s05k_b2k_n8k.img:
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt
+	parted --script $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_v4_xattr.img:
@@ -274,7 +274,7 @@ xfs_v4_xattr.img:
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt
+	parted --script $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_v4_btrees_l2.img:
@@ -295,7 +295,7 @@ xfs_v4_btrees_l2.img:
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt
+	parted --script $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_v4_files_s05k_b4k_n8k.img:
@@ -330,7 +330,7 @@ xfs_v4_files_s05k_b4k_n8k.img:
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt
+	parted --script $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_v4_ftype0_s4k_b4k_n8k.img:
@@ -362,10 +362,10 @@ xfs_v4_ftype0_s4k_b4k_n8k.img:
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
 	sudo losetup -b 4096 /dev/loop8 $@
-	sudo parted --script /dev/loop8 mktable gpt
+	sudo parted --script /dev/loop8 mktable msdos
 	sudo parted --script --align optimal /dev/loop8 mkpart primary 1MiB 100%
 	sudo losetup -d /dev/loop8
-#	parted --script $@ mktable gpt
+#	parted --script $@ mktable msdos
 #	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_v4_ftype0_s05k_b2k_n8k_xattr.img:
@@ -403,7 +403,7 @@ xfs_v4_ftype0_s05k_b2k_n8k_xattr.img:
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt
+	parted --script $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_v4_unicode.img:
@@ -428,7 +428,7 @@ xfs_v4_unicode.img:
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt
+	parted --script $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_v5_ftype1_s05k_b2k_n8k.img:
@@ -459,7 +459,7 @@ xfs_v5_ftype1_s05k_b2k_n8k.img:
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt
+	parted --script $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 xfs_v5_files_s05k_b4k_n8k.img:
@@ -488,7 +488,7 @@ xfs_v5_files_s05k_b4k_n8k.img:
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
-	parted --script $@ mktable gpt
+	parted --script $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
 fat32_test0.img:

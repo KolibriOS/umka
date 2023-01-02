@@ -1,5 +1,6 @@
 multithreaded: kofu one.t two.t
 make mkfs.xfs use config file via -c option
+tests for ext* and fat*
+writing tests
 compare with reference XFS implementation
 stressing via ref impl
-
