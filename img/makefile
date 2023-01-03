@@ -30,62 +30,60 @@ gpt: gpt_partitions_s05k.img gpt_partitions_s4k.img
 
 gpt_partitions_s05k.img:
 	fallocate -l 1GiB $@
-	parted --script --align optimal $@ mktable gpt
-	parted --script --align optimal $@ mkpart part0 1MiB 2MiB
-	parted --script --align optimal $@ mkpart part1 2MiB 3MiB
-	parted --script --align optimal $@ mkpart part2 4MiB 5MiB
-	parted --script --align optimal $@ mkpart part3 3MiB 4MiB
-	parted --script --align optimal $@ mkpart part4 5MiB 6MiB
-	parted --script --align optimal $@ mkpart part5 6MiB 7MiB
-	parted --script --align optimal $@ mkpart part6 7MiB 8MiB
-	parted --script --align optimal $@ mkpart part7 8MiB 9MiB
-	parted --script --align optimal $@ mkpart part8 9MiB 10MiB
-	parted --script --align optimal $@ mkpart part9 10MiB 11MiB
-	parted --script --align optimal $@ mkpart part10 11MiB 12MiB
-	parted --script --align optimal $@ mkpart part11 12MiB 13MiB
-	parted --script --align optimal $@ mkpart part12 13MiB 14MiB
-	parted --script --align optimal $@ mkpart part13 14MiB 15MiB
-	parted --script --align optimal $@ mkpart part14 15MiB 16MiB
-	parted --script --align optimal $@ mkpart part15 16MiB 17MiB
-	parted --script --align optimal $@ mkpart part16 17MiB 18MiB
-	parted --script --align optimal $@ mkpart part17 18MiB 19MiB
-	parted --script --align optimal $@ mkpart part18 19MiB 20MiB
-	parted --script --align optimal $@ mkpart part19 20MiB 21MiB
-	parted --script --align optimal $@ mkpart part20 21MiB 22MiB
-	parted --script --align optimal $@ mkpart part21 22MiB 23MiB
-	parted --script --align optimal $@ mkpart part22 23MiB 24MiB
-	parted --script --align optimal $@ mkpart part23 24MiB 25MiB
+	parted --script --align optimal $@ mktable gpt \
+		mkpart part0 1MiB 2MiB \
+		mkpart part1 2MiB 3MiB \
+		mkpart part2 4MiB 5MiB \
+		mkpart part3 3MiB 4MiB \
+		mkpart part4 5MiB 6MiB \
+		mkpart part5 6MiB 7MiB \
+		mkpart part6 7MiB 8MiB \
+		mkpart part7 8MiB 9MiB \
+		mkpart part8 9MiB 10MiB \
+		mkpart part9 10MiB 11MiB \
+		mkpart part10 11MiB 12MiB \
+		mkpart part11 12MiB 13MiB \
+		mkpart part12 13MiB 14MiB \
+		mkpart part13 14MiB 15MiB \
+		mkpart part14 15MiB 16MiB \
+		mkpart part15 16MiB 17MiB \
+		mkpart part16 17MiB 18MiB \
+		mkpart part17 18MiB 19MiB \
+		mkpart part18 19MiB 20MiB \
+		mkpart part19 20MiB 21MiB \
+		mkpart part20 21MiB 22MiB \
+		mkpart part21 22MiB 23MiB \
+		mkpart part22 23MiB 24MiB \
+		mkpart part23 24MiB 25MiB
 
 gpt_partitions_s4k.img:
 	fallocate -l 1GiB $@
 	sudo losetup -b 4096 $(LOOP_DEV) $@
-	sudo parted --script --align optimal $(LOOP_DEV) mktable msdos
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart primary 1MiB 100%
-	sudo parted --script --align optimal $(LOOP_DEV) mktable gpt
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part0 1MiB 2MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part1 2MiB 3MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part2 4MiB 5MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part3 3MiB 4MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part4 5MiB 6MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part5 6MiB 7MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part6 7MiB 8MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part7 8MiB 9MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part8 9MiB 10MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part9 10MiB 11MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part10 11MiB 12MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part11 12MiB 13MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part12 13MiB 14MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part13 14MiB 15MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part14 15MiB 16MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part15 16MiB 17MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part16 17MiB 18MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part17 18MiB 19MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part18 19MiB 20MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part19 20MiB 21MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part20 21MiB 22MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part21 22MiB 23MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part22 23MiB 24MiB
-	sudo parted --script --align optimal $(LOOP_DEV) mkpart part23 24MiB 25MiB
+	sudo parted --script --align optimal $(LOOP_DEV) mktable gpt \
+		mkpart part0 1MiB 2MiB \
+		mkpart part1 2MiB 3MiB \
+		mkpart part2 4MiB 5MiB \
+		mkpart part3 3MiB 4MiB \
+		mkpart part4 5MiB 6MiB \
+		mkpart part5 6MiB 7MiB \
+		mkpart part6 7MiB 8MiB \
+		mkpart part7 8MiB 9MiB \
+		mkpart part8 9MiB 10MiB \
+		mkpart part9 10MiB 11MiB \
+		mkpart part10 11MiB 12MiB \
+		mkpart part11 12MiB 13MiB \
+		mkpart part12 13MiB 14MiB \
+		mkpart part13 14MiB 15MiB \
+		mkpart part14 15MiB 16MiB \
+		mkpart part15 16MiB 17MiB \
+		mkpart part16 17MiB 18MiB \
+		mkpart part17 18MiB 19MiB \
+		mkpart part18 19MiB 20MiB \
+		mkpart part19 20MiB 21MiB \
+		mkpart part20 21MiB 22MiB \
+		mkpart part21 22MiB 23MiB \
+		mkpart part22 23MiB 24MiB \
+		mkpart part23 24MiB 25MiB
 	sudo losetup -d $(LOOP_DEV)
 
 kolibri.img: ../default.skn ../fill.cur
@@ -429,10 +427,10 @@ xfs_v4_ftype0_s4k_b4k_n8k.img:
 #
 	sudo umount $(TEMP_DIR)
 	fallocate -i -o 0 -l 1MiB $@
-	sudo losetup -b 4096 /dev/loop8 $@	# FIXME: --find --show, add gpt test
-	sudo parted --script --align optimal /dev/loop8 mktable msdos
-	sudo parted --script --align optimal /dev/loop8 mkpart primary 1MiB 100%
-	sudo losetup -d /dev/loop8
+	sudo losetup -b 4096 $(LOOP_DEV) $@
+	sudo parted --script --align optimal $(LOOP_DEV) mktable msdos \
+		mkpart primary 1MiB 100%
+	sudo losetup -d $(LOOP_DEV)
 
 xfs_v4_ftype0_s05k_b2k_n8k_xattr.img:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
