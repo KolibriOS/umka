@@ -1,6 +1,7 @@
 /> umka_init
 /> disk_add ../img/xfs_v4_unicode.img hd0 -c 0
-/hd0/1: xfs
+/hd0: sector_size=512, capacity=616448 (301 MiB), num_partitions=1
+/hd0/1: fs=xfs, start=2048, length=614400 (300 MiB)
 /> 
 /> stat80 /hd0/1/dir0
 status = 0 success

@@ -267,7 +267,7 @@ typedef struct {
     uint32_t mtime;
     uint32_t mdate;
     uint64_t size;
-    char name[0x7777];  // how to handle this properly? FIXME
+    char name[0x777];  // how to handle this properly? FIXME
 } bdfe_t;
 
 typedef struct {

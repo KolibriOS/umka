@@ -477,22 +477,63 @@ cmd_i40(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
+bytes_to_kmgt(uint64_t *bytes, const char **kmg) {
+    *kmg = "B";
+    lldiv_t d = lldiv(*bytes, 1024);
+    if (d.rem != 0) {
+        return;
+    }
+    *bytes = d.quot;
+    *kmg = "kiB";
+    d = lldiv(*bytes, 1024);
+    if (d.rem != 0) {
+        return;
+    }
+    *bytes = d.quot;
+    *kmg = "MiB";
+    d = lldiv(*bytes, 1024);
+    if (d.rem != 0) {
+        return;
+    }
+    *bytes = d.quot;
+    *kmg = "GiB";
+    d = lldiv(*bytes, 1024);
+    if (d.rem != 0) {
+        return;
+    }
+    *bytes = d.quot;
+    *kmg = "TiB";
+}
+
+static void
 disk_list_partitions(disk_t *d) {
+    uint64_t kmgt_count = d->media_info.sector_size * d->media_info.capacity;
+    const char *kmgt = NULL;
+    bytes_to_kmgt(&kmgt_count, &kmgt);
+    printf("/%s: sector_size=%u, capacity=%" PRIu64 " (%" PRIu64 " %s), "
+           "num_partitions=%u\n", d->name, d->media_info.sector_size,
+           d->media_info.capacity, kmgt_count, kmgt, d->num_partitions);
     for (size_t i = 0; i < d->num_partitions; i++) {
-        printf("/%s/%d: ", d->name, i+1);
-        if (d->partitions[i]->fs_user_functions == xfs_user_functions) {
-            puts("xfs");
-        } else if (d->partitions[i]->fs_user_functions == ext_user_functions) {
-            puts("ext");
-        } else if (d->partitions[i]->fs_user_functions == fat_user_functions) {
-            puts("fat");
-        } else if (d->partitions[i]->fs_user_functions == exfat_user_functions) {
-            puts("exfat");
-        } else if (d->partitions[i]->fs_user_functions == ntfs_user_functions) {
-            puts("ntfs");
+        partition_t *p = d->partitions[i];
+        const char *fsname;
+        if (p->fs_user_functions == xfs_user_functions) {
+            fsname = "xfs";
+        } else if (p->fs_user_functions == ext_user_functions) {
+            fsname = "ext";
+        } else if (p->fs_user_functions == fat_user_functions) {
+            fsname = "fat";
+        } else if (p->fs_user_functions == exfat_user_functions) {
+            fsname = "exfat";
+        } else if (p->fs_user_functions == ntfs_user_functions) {
+            fsname = "ntfs";
         } else {
-            puts("???");
+            fsname = "???";
         }
+        kmgt_count = d->media_info.sector_size * p->length;
+        bytes_to_kmgt(&kmgt_count, &kmgt);
+        printf("/%s/%d: fs=%s, start=%" PRIu64 ", length=%" PRIu64
+               " (%" PRIu64 " %s)\n", d->name, i+1, fsname, p->first_sector,
+               p->length, kmgt_count, kmgt);
     }
 }
 

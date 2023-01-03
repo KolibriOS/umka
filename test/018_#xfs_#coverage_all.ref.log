@@ -1,7 +1,9 @@
 /> umka_init
 /> disk_add ../img/jfs.img hd0 -c 0
-/hd0/1: ???
+/hd0: sector_size=512, capacity=34816 (17 MiB), num_partitions=1
+/hd0/1: fs=???, start=2048, length=32768 (16 MiB)
 /> disk_del hd0
 /> disk_add ../img/xfs_borg_bit.img hd0 -c 0
-/hd0/1: ???
+/hd0: sector_size=512, capacity=616448 (301 MiB), num_partitions=1
+/hd0/1: fs=???, start=2048, length=614400 (300 MiB)
 /> disk_del hd0
