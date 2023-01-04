@@ -4,7 +4,7 @@
     UMKa - User-Mode KolibriOS developer tools
     umka_shell - the shell
 
-    Copyright (C) 2017-2022  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2017-2023  Ivan Baravy <dunkaist@gmail.com>
     Copyright (C) 2021  Magomed Kostoev <mkostoevr@yandex.ru>
 */
 
@@ -477,7 +477,7 @@ cmd_i40(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-bytes_to_kmgt(uint64_t *bytes, const char **kmg) {
+bytes_to_kmgtpe(uint64_t *bytes, const char **kmg) {
     *kmg = "B";
     lldiv_t d = lldiv(*bytes, 1024);
     if (d.rem != 0) {
@@ -503,16 +503,28 @@ bytes_to_kmgt(uint64_t *bytes, const char **kmg) {
     }
     *bytes = d.quot;
     *kmg = "TiB";
+    d = lldiv(*bytes, 1024);
+    if (d.rem != 0) {
+        return;
+    }
+    *bytes = d.quot;
+    *kmg = "PiB";
+    d = lldiv(*bytes, 1024);
+    if (d.rem != 0) {
+        return;
+    }
+    *bytes = d.quot;
+    *kmg = "EiB";
 }
 
 static void
 disk_list_partitions(disk_t *d) {
-    uint64_t kmgt_count = d->media_info.sector_size * d->media_info.capacity;
-    const char *kmgt = NULL;
-    bytes_to_kmgt(&kmgt_count, &kmgt);
+    uint64_t kmgtpe_count = d->media_info.sector_size * d->media_info.capacity;
+    const char *kmgtpe = NULL;
+    bytes_to_kmgtpe(&kmgtpe_count, &kmgtpe);
     printf("/%s: sector_size=%u, capacity=%" PRIu64 " (%" PRIu64 " %s), "
            "num_partitions=%u\n", d->name, d->media_info.sector_size,
-           d->media_info.capacity, kmgt_count, kmgt, d->num_partitions);
+           d->media_info.capacity, kmgtpe_count, kmgtpe, d->num_partitions);
     for (size_t i = 0; i < d->num_partitions; i++) {
         partition_t *p = d->partitions[i];
         const char *fsname;
@@ -529,11 +541,14 @@ disk_list_partitions(disk_t *d) {
         } else {
             fsname = "???";
         }
-        kmgt_count = d->media_info.sector_size * p->length;
-        bytes_to_kmgt(&kmgt_count, &kmgt);
-        printf("/%s/%d: fs=%s, start=%" PRIu64 ", length=%" PRIu64
-               " (%" PRIu64 " %s)\n", d->name, i+1, fsname, p->first_sector,
-               p->length, kmgt_count, kmgt);
+        kmgtpe_count = d->media_info.sector_size * p->first_sector;
+        bytes_to_kmgtpe(&kmgtpe_count, &kmgtpe);
+        printf("/%s/%d: fs=%s, start=%" PRIu64 " (%" PRIu64 " %s)",
+               d->name, i+1, fsname, p->first_sector, kmgtpe_count, kmgtpe);
+        kmgtpe_count = d->media_info.sector_size * p->length;
+        bytes_to_kmgtpe(&kmgtpe_count, &kmgtpe);
+        printf(", length=%" PRIu64 " (%" PRIu64 " %s)\n",
+               p->length, kmgtpe_count, kmgtpe);
     }
 }
 
