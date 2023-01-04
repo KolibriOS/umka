@@ -527,7 +527,7 @@ STDCALL disk_t *
 disk_add(diskfunc_t *disk, const char *name, void *userdata, uint32_t flags);
 
 STDCALL void *
-disk_media_changed(diskfunc_t *disk, int inserted);
+disk_media_changed(disk_t *disk, int inserted);
 
 STDCALL void
 disk_del(disk_t *disk);

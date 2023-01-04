@@ -151,8 +151,8 @@ main(int argc, char *argv[]) {
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
 
     umka_init();
-    void *userdata = vdisk_init(argv[2], 1, 0u);
-    void *vdisk = disk_add(&vdisk_functions, "hd0", userdata, 0);
-    disk_media_changed(vdisk, 1);
+    struct vdisk *umka_disk = vdisk_init(argv[2], 1, 0u);
+    disk_t *disk = disk_add(&umka_disk->diskfunc, "hd0", umka_disk, 0);
+    disk_media_changed(disk, 1);
     return fuse_main(argc-1, argv, &umka_oper, NULL);
 }

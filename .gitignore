@@ -3,6 +3,8 @@
 .umka
 .exrc
 *.o
+*.a
+*.gch
 umka_shell
 umka_fuse
 umka_os

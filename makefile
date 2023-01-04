@@ -2,13 +2,11 @@ ifndef KOLIBRIOS
         $(error "Set KOLIBRIOS environment variable to KolibriOS root")
 endif
 
-ifndef HOST
-        $(error "Set HOST variable to linux/windows")
-endif
-
 FASM_EXE ?= fasm
 FASM_FLAGS=-dUEFI=1 -dextended_primary_loader=1 -dUMKA=1 -dHOST=$(HOST) -m 2000000
 
+HOST ?= linux
+AR ?= ar
 CC ?= gcc
 WARNINGS_COMMON=-Wall -Wextra \
          -Wnull-dereference -Wshadow -Wformat=2 -Wswitch -Wswitch-enum \
@@ -57,18 +55,22 @@ endif
 test: umka_shell
 	@cd test && make clean all && cd ../
 
-umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o vnet.o \
-            lodepng.o pci.o thread.o util.o optparse.o bestline.o
+umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
+            vdisk/raw.o vdisk/qcow2.o vdisk/miniz/miniz.a vnet.o lodepng.o \
+            $(HOST)/pci.o $(HOST)/thread.o util.o optparse.o bestline.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
-umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o pci.o thread.o
+umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
+           vdisk/qcow2.o vdisk/miniz/miniz.a $(HOST)/pci.o $(HOST)/thread.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs` -T umka.ld
 
-umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vnet.o trace.o trace_lbr.o \
-         pci.o thread.o util.o bestline.o
+umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vdisk/raw.o vdisk/qcow2.o \
+         vdisk/miniz/miniz.a vnet.o trace.o trace_lbr.o $(HOST)/pci.o \
+         $(HOST)/thread.o util.o bestline.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
-umka_gen_devices_dat: umka_gen_devices_dat.o umka.o pci.o thread.o util.o
+umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
+                      $(HOST)/thread.o util.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka.o umka.fas: umka.asm
@@ -77,11 +79,11 @@ umka.o umka.fas: umka.asm
 shell.o: shell.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
 
-thread.o: $(HOST)/thread.c
-	$(CC) $(CFLAGS_32) -c $<
+$(HOST)/thread.o: $(HOST)/thread.c
+	$(CC) $(CFLAGS_32) -c $< -o $@
 
-pci.o: $(HOST)/pci.c
-	$(CC) $(CFLAGS_32) -std=gnu11 -c $<
+$(HOST)/pci.o: $(HOST)/pci.c
+	$(CC) $(CFLAGS_32) -std=gnu11 -c $< -o $@
 
 lodepng.o: lodepng.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
@@ -122,8 +124,26 @@ trace.o: trace.c trace.h trace_lbr.h
 trace_lbr.o: trace_lbr.c trace_lbr.h umka.h
 	$(CC) $(CFLAGS_32) -c $<
 
-vdisk.o: vdisk.c
+vdisk.o: vdisk.c vdisk/raw.h vdisk/qcow2.h
 	$(CC) $(CFLAGS_32) -c $<
+
+vdisk/raw.o: vdisk/raw.c vdisk/raw.h
+	$(CC) $(CFLAGS_32) -c $< -o $@
+
+vdisk/qcow2.o: vdisk/qcow2.c vdisk/qcow2.h
+	$(CC) $(CFLAGS_32) -c $< -o $@
+
+vdisk/miniz/miniz_tinfl.o: vdisk/miniz/miniz_tinfl.c vdisk/miniz/miniz_tinfl.h
+	$(CC) $(CFLAGS_32) -c $< -o $@
+
+vdisk/miniz/miniz_tdef.o: vdisk/miniz/miniz_tdef.c vdisk/miniz/miniz_tdef.h
+	$(CC) $(CFLAGS_32) -c $< -o $@
+
+vdisk/miniz/miniz.o: vdisk/miniz/miniz.c vdisk/miniz/miniz.h
+	$(CC) $(CFLAGS_32) -DMINIZ_NO_ARCHIVE_APIS -Wno-type-limits -c $< -o $@
+
+vdisk/miniz/miniz.a: vdisk/miniz/miniz.o vdisk/miniz/miniz_tinfl.o vdisk/miniz/miniz_tdef.o
+	$(AR) --target=elf32-i386 r $@ $^
 
 vnet.o: vnet.c
 	$(CC) $(CFLAGS_32) -c $<
@@ -143,5 +163,7 @@ umka_gen_devices_dat.o: umka_gen_devices_dat.c umka.h
 .PHONY: all clean
 
 clean:
-	rm -f *.o umka_shell umka_fuse umka_os umka_gen_devices_dat umka.fas \
-          umka.sym umka.lst umka.prp coverage
+	rm -f umka_shell umka_fuse umka_os umka_gen_devices_dat umka.fas \
+          umka.sym umka.lst umka.prp umka.cov coverage *.skn colors.dtp
+	find . -name "*.o" -delete
+	find . -name "*.a" -delete

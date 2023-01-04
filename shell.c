@@ -598,16 +598,17 @@ cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
         }
     }
 
-    void *userdata = vdisk_init(file_name, adjust_cache_size, cache_size);
-    if (userdata) {
+    struct vdisk *umka_disk = vdisk_init(file_name, adjust_cache_size,
+                                         cache_size);
+    if (umka_disk) {
         COVERAGE_ON();
-        void *vdisk = disk_add(&vdisk_functions, disk_name, userdata, 0);
+        disk_t *disk = disk_add(&umka_disk->diskfunc, disk_name, umka_disk, 0);
         COVERAGE_OFF();
-        if (vdisk) {
+        if (disk) {
             COVERAGE_ON();
-            disk_media_changed(vdisk, 1);
+            disk_media_changed(disk, 1);
             COVERAGE_OFF();
-            disk_list_partitions(vdisk);
+            disk_list_partitions(disk);
             return;
         }
     }
