@@ -1,5 +1,5 @@
 umka_init
-disk_add ../img/xfs_v5_files_s05k_b4k_n8k.img hd0 -c 0
+disk_add ../img/xfs_v5_files_s05k_b4k_n8k.raw hd0 -c 0
 # hole begin
 # zero length
 read70 /hd0/1/hole_begin 0 0 -b

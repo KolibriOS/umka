@@ -1,5 +1,5 @@
 umka_init
-disk_add ../img/xfs_nrext64.img hd0 -c 0
+disk_add ../img/xfs_nrext64.raw hd0 -c 0
 stat70 /hd0/1/dir_sf
 stat70 /hd0/1/dir_block
 stat70 /hd0/1/dir_leaf

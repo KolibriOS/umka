@@ -1,5 +1,5 @@
 /> umka_init
-/> disk_add ../img/gpt_partitions_s05k.img hd0 -c 0
+/> disk_add ../img/gpt_partitions_s05k.raw hd0 -c 0
 /hd0: sector_size=512, capacity=2097152 (1 GiB), num_partitions=24
 /hd0/1: fs=???, start=2048, length=2048 (1 MiB)
 /hd0/2: fs=???, start=4096, length=2048 (1 MiB)
@@ -26,7 +26,7 @@
 /hd0/23: fs=???, start=47104, length=2048 (1 MiB)
 /hd0/24: fs=???, start=49152, length=2048 (1 MiB)
 /> disk_del hd0
-/> disk_add ../img/gpt_partitions_s4k.img hd0 -c 0
+/> disk_add ../img/gpt_partitions_s4k.raw hd0 -c 0
 /hd0: sector_size=4096, capacity=262144 (1 GiB), num_partitions=24
 /hd0/1: fs=???, start=256, length=256 (1 MiB)
 /hd0/2: fs=???, start=512, length=256 (1 MiB)

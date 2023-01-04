@@ -1,6 +1,6 @@
 /> umka_init
 /> 
-/> ramdisk_init ../img/kolibri.img
+/> ramdisk_init ../img/kolibri.raw
 /rd: sector_size=512, capacity=2880 (1440 kiB), num_partitions=1
 /rd/1: fs=fat, start=0, length=2880 (1440 kiB)
 /> set_skin /sys/DEFAULT.SKN

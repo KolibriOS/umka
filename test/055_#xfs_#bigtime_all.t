@@ -1,5 +1,5 @@
 umka_init
-disk_add ../img/xfs_bigtime.img hd0 -c 0
+disk_add ../img/xfs_bigtime.raw hd0 -c 0
 ls70 /hd0/1/
 ls70 /hd0/1/dira
 stat70 /hd0/1/dira -am

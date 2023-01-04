@@ -3,6 +3,11 @@
 #include "../trace.h"
 #include "raw.h"
 
+#ifdef _WIN32
+#define fseeko _fseeki64
+#define ftello _ftelli64
+#endif
+
 STDCALL void
 vdisk_raw_close(void *userdata) {
     COVERAGE_OFF();

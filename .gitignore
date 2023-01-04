@@ -17,10 +17,7 @@ tools/mkfilepattern
 tools/lfbviewx
 tools/randdir
 *.img
-*.img.xz
-*.img.gz
-*.img.lz4
-*.img.info
+*.raw
 *.out.???
 *.out.indent
 .gdb_history

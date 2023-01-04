@@ -1,6 +1,6 @@
 umka_init
 
-ramdisk_init ../img/kolibri.img
+ramdisk_init ../img/kolibri.raw
 set_skin /sys/DEFAULT.SKN
 
 window_redraw 1

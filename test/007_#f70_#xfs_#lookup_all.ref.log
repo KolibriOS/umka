@@ -1,5 +1,5 @@
 /> umka_init
-/> disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.img hd0 -c 0
+/> disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.raw hd0 -c 0
 /hd0: sector_size=512, capacity=616448 (301 MiB), num_partitions=1
 /hd0/1: fs=xfs, start=2048, length=614400 (300 MiB)
 /> stat70 /hd0/1/sf_empty

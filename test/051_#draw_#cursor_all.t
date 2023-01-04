@@ -1,6 +1,6 @@
 umka_init
 #set_mouse_pos_screen 40 30
-ramdisk_init ../img/kolibri.img
+ramdisk_init ../img/kolibri.raw
 set_skin /sys/DEFAULT.SKN
 
 load_cursor_from_file /sys/fill.cur

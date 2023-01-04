@@ -1,5 +1,5 @@
 umka_init
-disk_add ../img/fat32_test0.img hd0 -c 0
+disk_add ../img/fat32_test0.raw hd0 -c 0
 ls80 /hd0/1/
 read70 /hd0/1/A 0 16388096 -h
 ls80 /hd0/1/AJF/

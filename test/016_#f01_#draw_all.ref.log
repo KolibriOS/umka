@@ -1,7 +1,7 @@
 /> umka_init
 /> set_mouse_pos_screen 40 30
-/> #disk_add ../img/kolibri.img rd -c 0
-/> ramdisk_init ../img/kolibri.img
+/> #disk_add ../img/kolibri.raw rd -c 0
+/> ramdisk_init ../img/kolibri.raw
 /rd: sector_size=512, capacity=2880 (1440 kiB), num_partitions=1
 /rd/1: fs=fat, start=0, length=2880 (1440 kiB)
 /> set_skin /sys/DEFAULT.SKN

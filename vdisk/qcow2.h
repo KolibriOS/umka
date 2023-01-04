@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include "../vdisk.h"
 
+#define QCOW2_SUFFIX ".qcow2"
+
 struct vdisk_qcow2 {
     struct vdisk vdisk;
     FILE *file;

@@ -19,11 +19,6 @@
 #include "vdisk/raw.h"
 #include "vdisk/qcow2.h"
 
-#ifdef _WIN32
-#define fseeko _fseeki64
-#define ftello _ftelli64
-#endif
-
 STDCALL int
 vdisk_querymedia(void *userdata, diskmediainfo_t *minfo) {
     COVERAGE_OFF();
@@ -47,10 +42,15 @@ vdisk_adjust_cache_size(void *userdata, size_t suggested_size) {
 
 struct vdisk*
 vdisk_init(const char *fname, int adjust_cache_size, size_t cache_size) {
+    size_t fname_len = strlen(fname);
+    size_t dot_raw_len = strlen(RAW_SUFFIX);
+    size_t dot_qcow2_len = strlen(QCOW2_SUFFIX);
     struct vdisk *disk;
-    if (strstr(fname, ".img")) {
+    if (fname_len > dot_raw_len
+        && !strcmp(fname + fname_len - dot_raw_len, RAW_SUFFIX)) {
         disk = (struct vdisk*)vdisk_init_raw(fname);
-    } else if (strstr(fname, ".qcow2")) {
+    } else if (fname_len > dot_qcow2_len
+               && !strcmp(fname, QCOW2_SUFFIX)) {
         disk = (struct vdisk*)vdisk_init_qcow2(fname);
     } else {
         fprintf(stderr, "[vdisk] file has unknown format: %s\n", fname);

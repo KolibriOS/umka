@@ -8,27 +8,27 @@ TEMP_DIR:=$(shell mktemp -d)
 LOOP_DEV=$(shell losetup --find)
 XFS_MIN_PART_SIZE=300MiB
 
-all: s05k s4k unicode v5 kolibri.img fat32_test0.img coverage gpt
+all: s05k s4k unicode v5 kolibri.raw fat32_test0.raw coverage gpt
 	rmdir $(TEMP_DIR)
 
-s05k: xfs_v4_ftype0_s05k_b2k_n8k.img xfs_v4_ftype1_s05k_b2k_n8k.img \
-      xfs_v4_xattr.img xfs_v4_files_s05k_b4k_n8k.img \
-      xfs_v4_ftype0_s05k_b2k_n8k_xattr.img xfs_v4_btrees_l2.img \
-      xfs_short_dir_i8.img exfat_s05k_c8k_b8k.img exfat_s05k_c16k_b16k.img \
-      gpt_partitions_s05k.img
+s05k: xfs_v4_ftype0_s05k_b2k_n8k.raw xfs_v4_ftype1_s05k_b2k_n8k.raw \
+      xfs_v4_xattr.raw xfs_v4_files_s05k_b4k_n8k.raw \
+      xfs_v4_ftype0_s05k_b2k_n8k_xattr.raw xfs_v4_btrees_l2.raw \
+      xfs_short_dir_i8.raw exfat_s05k_c8k_b8k.raw exfat_s05k_c16k_b16k.raw \
+      gpt_partitions_s05k.raw
 
-s4k: xfs_v4_ftype0_s4k_b4k_n8k.img gpt_partitions_s4k.img
+s4k: xfs_v4_ftype0_s4k_b4k_n8k.raw gpt_partitions_s4k.raw
 
-unicode: xfs_v4_unicode.img
+unicode: xfs_v4_unicode.raw
 
-v5: xfs_v5_ftype1_s05k_b2k_n8k.img xfs_v5_files_s05k_b4k_n8k.img \
-    xfs_bigtime.img xfs_nrext64.img xfs_lookup_v5.img xfs_lookup_v4.img
+v5: xfs_v5_ftype1_s05k_b2k_n8k.raw xfs_v5_files_s05k_b4k_n8k.raw \
+    xfs_bigtime.raw xfs_nrext64.raw xfs_lookup_v5.raw xfs_lookup_v4.raw
 
-coverage: jfs.img xfs_borg_bit.img xfs_short_dir_i8.img
+coverage: jfs.raw xfs_borg_bit.raw xfs_short_dir_i8.raw
 
-gpt: gpt_partitions_s05k.img gpt_partitions_s4k.img
+gpt: gpt_partitions_s05k.raw gpt_partitions_s4k.raw
 
-gpt_partitions_s05k.img:
+gpt_partitions_s05k.raw:
 	fallocate -l 1GiB $@
 	parted --script --align optimal $@ mktable gpt \
 		mkpart part0 1MiB 2MiB \
@@ -56,7 +56,7 @@ gpt_partitions_s05k.img:
 		mkpart part22 23MiB 24MiB \
 		mkpart part23 24MiB 25MiB
 
-gpt_partitions_s4k.img:
+gpt_partitions_s4k.raw:
 	fallocate -l 1GiB $@
 	sudo losetup -b 4096 $(LOOP_DEV) $@
 	sudo parted --script --align optimal $(LOOP_DEV) mktable gpt \
@@ -86,7 +86,7 @@ gpt_partitions_s4k.img:
 		mkpart part23 24MiB 25MiB
 	sudo losetup -d $(LOOP_DEV)
 
-kolibri.img: ../default.skn ../fill.cur
+kolibri.raw: ../default.skn ../fill.cur
 	touch $@
 	fallocate -z -o 0 -l 1440KiB $@
 	mkfs.vfat -n KOLIBRIOS -F 12 $@
@@ -97,14 +97,14 @@ kolibri.img: ../default.skn ../fill.cur
 	mmd -i $@ ::LIB
 	mcopy -vmoi $@ ../network.obj ::LIB/NETWORK.OBJ
 
-jfs.img:
+jfs.raw:
 	fallocate -l 16MiB $@
 	mkfs.jfs -q $@
 	fallocate -i -o 0 -l 1MiB $@
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_lookup_v4.img:
+xfs_lookup_v4.raw:
 	fallocate -l 10GiB $@
 	mkfs.xfs -m crc=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -139,7 +139,7 @@ xfs_lookup_v4.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_lookup_v5.img:
+xfs_lookup_v5.raw:
 	fallocate -l 10GiB $@
 	mkfs.xfs -m crc=1 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -174,7 +174,7 @@ xfs_lookup_v5.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_nrext64.img:
+xfs_nrext64.raw:
 	fallocate -l 3000MiB $@
 	mkfs.xfs -i nrext64=1 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -203,7 +203,7 @@ xfs_nrext64.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_bigtime.img:
+xfs_bigtime.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -m bigtime=1 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -233,14 +233,14 @@ xfs_bigtime.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_borg_bit.img:
+xfs_borg_bit.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -n version=ci $@
 	fallocate -i -o 0 -l 1MiB $@
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_short_dir_i8.img:
+xfs_short_dir_i8.raw:
 	echo -en "\x00" > $@
 	fallocate -i -o 0 -l 42TiB $@
 	mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100,size=256 -n size=8k,ftype=0 $@
@@ -258,7 +258,7 @@ xfs_short_dir_i8.img:
 	parted --script --align optimal $@ mktable gpt
 	parted --script --align optimal $@ mkpart part0 1MiB 99%
 
-xfs_v4_ftype0_s05k_b2k_n8k.img:
+xfs_v4_ftype0_s05k_b2k_n8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -289,7 +289,7 @@ xfs_v4_ftype0_s05k_b2k_n8k.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_v4_ftype1_s05k_b2k_n8k.img:
+xfs_v4_ftype1_s05k_b2k_n8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=1 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -320,7 +320,7 @@ xfs_v4_ftype1_s05k_b2k_n8k.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_v4_xattr.img:
+xfs_v4_xattr.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n ftype=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR) -o attr2
@@ -343,7 +343,7 @@ xfs_v4_xattr.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_v4_btrees_l2.img:
+xfs_v4_btrees_l2.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=1k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=4k,ftype=1 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -364,7 +364,7 @@ xfs_v4_btrees_l2.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_v4_files_s05k_b4k_n8k.img:
+xfs_v4_files_s05k_b4k_n8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -399,7 +399,7 @@ xfs_v4_files_s05k_b4k_n8k.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_v4_ftype0_s4k_b4k_n8k.img:
+xfs_v4_ftype0_s4k_b4k_n8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=4k -i maxpct=100 -n size=8k,ftype=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -432,7 +432,7 @@ xfs_v4_ftype0_s4k_b4k_n8k.img:
 		mkpart primary 1MiB 100%
 	sudo losetup -d $(LOOP_DEV)
 
-xfs_v4_ftype0_s05k_b2k_n8k_xattr.img:
+xfs_v4_ftype0_s05k_b2k_n8k_xattr.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -470,7 +470,7 @@ xfs_v4_ftype0_s05k_b2k_n8k_xattr.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_v4_unicode.img:
+xfs_v4_unicode.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -495,7 +495,7 @@ xfs_v4_unicode.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_v5_ftype1_s05k_b2k_n8k.img:
+xfs_v5_ftype1_s05k_b2k_n8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=2k -m crc=1,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=1 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -526,7 +526,7 @@ xfs_v5_ftype1_s05k_b2k_n8k.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-xfs_v5_files_s05k_b4k_n8k.img:
+xfs_v5_files_s05k_b4k_n8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=4k -m crc=1,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=1 $@
 	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
@@ -555,17 +555,17 @@ xfs_v5_files_s05k_b4k_n8k.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-fat32_test0.img:
+fat32_test0.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.fat -n KOLIBRIOS -F 32 $@
 	sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $@ $(TEMP_DIR)
 	$(RANDDIR) $(TEMP_DIR) 1000 8 255 65536
-	$(DIRTOTEST) $(TEMP_DIR) fat32_test0.img hd0 > ../test/045_#f70_#fat32_test0.t
+	$(DIRTOTEST) $(TEMP_DIR) fat32_test0.raw hd0 > ../test/045_#f70_#fat32_test0.t
 	tree $(TEMP_DIR)
 	du -sh $(TEMP_DIR)
 	sudo umount $(TEMP_DIR)
 
-exfat_s05k_c16k_b16k.img:
+exfat_s05k_c16k_b16k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.exfat -L KOLIBRIOS -c 16k -b 16k $@
 	sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $@ $(TEMP_DIR)
@@ -583,7 +583,7 @@ exfat_s05k_c16k_b16k.img:
 	parted --script --align optimal $@ mktable msdos
 	parted --script --align optimal $@ mkpart primary 1MiB 100%
 
-exfat_s05k_c8k_b8k.img:
+exfat_s05k_c8k_b8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.exfat -L KOLIBRIOS -c 8k -b 8k $@
 	sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $@ $(TEMP_DIR)

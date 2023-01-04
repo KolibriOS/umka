@@ -1,5 +1,5 @@
 /> umka_init
-/> disk_add ../img/xfs_nrext64.img hd0 -c 0
+/> disk_add ../img/xfs_nrext64.raw hd0 -c 0
 /hd0: sector_size=512, capacity=6146048 (3001 MiB), num_partitions=1
 /hd0/1: fs=xfs, start=2048, length=6144000 (3000 MiB)
 /> stat70 /hd0/1/dir_sf

@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include "../vdisk.h"
 
+#define RAW_SUFFIX ".raw"
+
 struct vdisk_raw {
     struct vdisk vdisk;
     FILE *file;
