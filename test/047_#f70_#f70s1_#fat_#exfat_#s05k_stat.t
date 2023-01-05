@@ -1,5 +1,5 @@
 umka_init
-disk_add ../img/exfat_s05k_c8k_b8k.raw hd0 -c 0
+disk_add ../img/exfat_s05k_c8k_b8k.qcow2 hd0 -c 524288
 
 stat70 /hd0/1/dir_000
 stat70 /hd0/1/dir_000/file_000

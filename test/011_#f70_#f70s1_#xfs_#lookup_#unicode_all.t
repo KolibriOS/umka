@@ -1,5 +1,5 @@
 umka_init
-disk_add ../img/xfs_v4_unicode.raw hd0 -c 0
+disk_add ../img/xfs_v4_unicode.qcow2 hd0 -c 524288
 
 stat80 /hd0/1/dir0
 stat80 /hd0/1/dir0/

@@ -3,30 +3,46 @@ MKDIRRANGE=../tools/mkdirrange
 MKDOUBLEDIRS=../tools/mkdoubledirs
 MKFILEPATTERN=../tools/mkfilepattern
 DIRTOTEST=python3 ../tools/dirtotest.py
-MOUNT_OPT=-t xfs
+XFS_MOUNT_OPT=-t xfs
 TEMP_DIR:=$(shell mktemp -d)
 LOOP_DEV=$(shell losetup --find)
+NBD_DEV=/dev/nbd0
 XFS_MIN_PART_SIZE=300MiB
+QCOW2_OPTS=compat=v3,compression_type=zlib,encryption=off,extended_l2=off,preallocation=off
 
 all: s05k s4k unicode v5 kolibri.raw fat32_test0.raw coverage gpt
 	rmdir $(TEMP_DIR)
 
-s05k: xfs_v4_ftype0_s05k_b2k_n8k.raw xfs_v4_ftype1_s05k_b2k_n8k.raw \
-      xfs_v4_xattr.raw xfs_v4_files_s05k_b4k_n8k.raw \
-      xfs_v4_ftype0_s05k_b2k_n8k_xattr.raw xfs_v4_btrees_l2.raw \
-      xfs_short_dir_i8.raw exfat_s05k_c8k_b8k.raw exfat_s05k_c16k_b16k.raw \
-      gpt_partitions_s05k.raw
+s05k: xfs_v4_ftype0_s05k_b2k_n8k.qcow2 xfs_v4_ftype1_s05k_b2k_n8k.qcow2 \
+      xfs_v4_xattr.qcow2 xfs_v4_files_s05k_b4k_n8k.qcow2 \
+      xfs_v4_ftype0_s05k_b2k_n8k_xattr.qcow2 xfs_v4_btrees_l2.qcow2 \
+      xfs_short_dir_i8.qcow2 exfat_s05k_c8k_b8k.qcow2 \
+      exfat_s05k_c16k_b16k.qcow2 gpt_partitions_s05k.qcow2
 
-s4k: xfs_v4_ftype0_s4k_b4k_n8k.raw gpt_partitions_s4k.raw
+s4k: xfs_v4_ftype0_s4k_b4k_n8k.qcow2 gpt_partitions_s4k.qcow2
 
-unicode: xfs_v4_unicode.raw
+unicode: xfs_v4_unicode.qcow2
 
-v5: xfs_v5_ftype1_s05k_b2k_n8k.raw xfs_v5_files_s05k_b4k_n8k.raw \
-    xfs_bigtime.raw xfs_nrext64.raw xfs_lookup_v5.raw xfs_lookup_v4.raw
+v5: xfs_v5_ftype1_s05k_b2k_n8k.qcow2 xfs_v5_files_s05k_b4k_n8k.qcow2 \
+    xfs_bigtime.qcow2 xfs_nrext64.qcow2 xfs_lookup_v5.qcow2 xfs_lookup_v4.qcow2
 
-coverage: jfs.raw xfs_borg_bit.raw xfs_short_dir_i8.raw
+coverage: jfs.qcow2 xfs_borg_bit.qcow2 xfs_short_dir_i8.qcow2
 
-gpt: gpt_partitions_s05k.raw gpt_partitions_s4k.raw
+gpt: gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2 gpt_large.qcow2
+
+%.qcow2: %.raw
+	qemu-img convert -m 2 -O qcow2 -o $(QCOW2_OPTS) $< $@
+	rm $<
+
+gpt_large.qcow2:
+	qemu-img create -f qcow2 -o $(QCOW2_OPTS),cluster_size=2097152 $@ 2E
+	sudo qemu-nbd -c $(NBD_DEV) $@
+	sudo parted --script --align optimal $(NBD_DEV) mktable gpt \
+		mkpart part0 1MiB 1GiB \
+		mkpart part1 1GiB 1TiB \
+		mkpart part2 1TiB 1024TiB \
+		mkpart part3 1024TiB 1048576TiB
+	sudo qemu-nbd -d $(NBD_DEV)
 
 gpt_partitions_s05k.raw:
 	fallocate -l 1GiB $@
@@ -107,7 +123,7 @@ jfs.raw:
 xfs_lookup_v4.raw:
 	fallocate -l 10GiB $@
 	mkfs.xfs -m crc=0 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/dir_sf
@@ -142,7 +158,7 @@ xfs_lookup_v4.raw:
 xfs_lookup_v5.raw:
 	fallocate -l 10GiB $@
 	mkfs.xfs -m crc=1 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/dir_sf
@@ -177,7 +193,7 @@ xfs_lookup_v5.raw:
 xfs_nrext64.raw:
 	fallocate -l 3000MiB $@
 	mkfs.xfs -i nrext64=1 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/dir_sf
@@ -206,7 +222,7 @@ xfs_nrext64.raw:
 xfs_bigtime.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -m bigtime=1 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/dira
@@ -245,7 +261,7 @@ xfs_short_dir_i8.raw:
 	fallocate -i -o 0 -l 42TiB $@
 	mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100,size=256 -n size=8k,ftype=0 $@
 #
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/sf
@@ -261,7 +277,7 @@ xfs_short_dir_i8.raw:
 xfs_v4_ftype0_s05k_b2k_n8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=0 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/sf_empty
@@ -292,7 +308,7 @@ xfs_v4_ftype0_s05k_b2k_n8k.raw:
 xfs_v4_ftype1_s05k_b2k_n8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=1 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/sf_empty
@@ -323,7 +339,7 @@ xfs_v4_ftype1_s05k_b2k_n8k.raw:
 xfs_v4_xattr.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n ftype=0 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR) -o attr2
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR) -o attr2
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/sf
@@ -346,7 +362,7 @@ xfs_v4_xattr.raw:
 xfs_v4_btrees_l2.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=1k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=4k,ftype=1 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/dir_btree_l2
@@ -367,7 +383,7 @@ xfs_v4_btrees_l2.raw:
 xfs_v4_files_s05k_b4k_n8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=0 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	$(MKFILEPATTERN) $(TEMP_DIR)/no_hole 0 65536
@@ -402,7 +418,7 @@ xfs_v4_files_s05k_b4k_n8k.raw:
 xfs_v4_ftype0_s4k_b4k_n8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=4k -i maxpct=100 -n size=8k,ftype=0 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/sf_empty
@@ -435,7 +451,7 @@ xfs_v4_ftype0_s4k_b4k_n8k.raw:
 xfs_v4_ftype0_s05k_b2k_n8k_xattr.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=0 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/sf_empty
@@ -473,7 +489,7 @@ xfs_v4_ftype0_s05k_b2k_n8k_xattr.raw:
 xfs_v4_unicode.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -m crc=0,finobt=0,rmapbt=0,reflink=0 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir -p $(TEMP_DIR)/dir0
@@ -498,7 +514,7 @@ xfs_v4_unicode.raw:
 xfs_v5_ftype1_s05k_b2k_n8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=2k -m crc=1,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i maxpct=100 -n size=8k,ftype=1 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	mkdir $(TEMP_DIR)/sf_empty
@@ -529,7 +545,7 @@ xfs_v5_ftype1_s05k_b2k_n8k.raw:
 xfs_v5_files_s05k_b4k_n8k.raw:
 	fallocate -l $(XFS_MIN_PART_SIZE) $@
 	mkfs.xfs -b size=4k -m crc=1,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=1 $@
-	sudo mount $(MOUNT_OPT) $@ $(TEMP_DIR)
+	sudo mount $(XFS_MOUNT_OPT) $@ $(TEMP_DIR)
 	sudo chown $$USER $(TEMP_DIR) -R
 #
 	$(MKFILEPATTERN) $(TEMP_DIR)/no_hole 0 65536

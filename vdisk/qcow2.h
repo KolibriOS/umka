@@ -15,12 +15,7 @@
 
 #define QCOW2_SUFFIX ".qcow2"
 
-struct vdisk_qcow2 {
-    struct vdisk vdisk;
-    FILE *file;
-};
-
-struct vdisk_qcow2*
+struct vdisk*
 vdisk_init_qcow2(const char *fname);
 
 #endif  // VDISK_QCOW2_H_INCLUDED

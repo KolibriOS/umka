@@ -1,5 +1,5 @@
 umka_init
-disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.raw hd0 -c 0
+disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.qcow2 hd0 -c 524288
 stat70 /hd0/1/sf_empty
 stat70 /hd0/1/sf_empty/.
 stat70 /hd0/1/sf_empty/..

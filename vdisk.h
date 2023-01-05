@@ -4,7 +4,7 @@
     UMKa - User-Mode KolibriOS developer tools
     vdisk - virtual disk
 
-    Copyright (C) 2020-2022  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2020-2023  Ivan Baravy <dunkaist@gmail.com>
 */
 
 #ifndef VDISK_H_INCLUDED

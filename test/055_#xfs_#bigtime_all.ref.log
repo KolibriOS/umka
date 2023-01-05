@@ -1,7 +1,7 @@
 /> umka_init
-/> disk_add ../img/xfs_bigtime.raw hd0 -c 0
+/> disk_add ../img/xfs_bigtime.qcow2 hd0 -c 0
 /hd0: sector_size=512, capacity=616448 (301 MiB), num_partitions=1
-/hd0/1: fs=xfs, start=2048, length=614400 (300 MiB)
+/hd0/1: fs=xfs, start=2048 (1 MiB), length=614400 (300 MiB)
 /> ls70 /hd0/1/
 status = 6 end_of_file, count = 8
 total = 8

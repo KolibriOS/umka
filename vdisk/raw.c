@@ -1,3 +1,12 @@
+/*
+    SPDX-License-Identifier: GPL-2.0-or-later
+
+    UMKa - User-Mode KolibriOS developer tools
+    vdisk - virtual disk, raw format
+
+    Copyright (C) 2023  Ivan Baravy <dunkaist@gmail.com>
+*/
+
 #include <errno.h>
 #include <stdlib.h>
 #include "../trace.h"
@@ -7,6 +16,11 @@
 #define fseeko _fseeki64
 #define ftello _ftelli64
 #endif
+
+struct vdisk_raw {
+    struct vdisk vdisk;
+    FILE *file;
+};
 
 STDCALL void
 vdisk_raw_close(void *userdata) {
@@ -39,7 +53,7 @@ vdisk_raw_write(void *userdata, void *buffer, off_t startsector,
     return ERROR_SUCCESS;
 }
 
-struct vdisk_raw*
+struct vdisk*
 vdisk_init_raw(const char *fname) {
     FILE *f = fopen(fname, "r+");
     if (!f) {
@@ -65,5 +79,5 @@ vdisk_init_raw(const char *fname) {
                      },
             .file = f,
             };
-    return disk;
+    return (struct vdisk*)disk;
 }

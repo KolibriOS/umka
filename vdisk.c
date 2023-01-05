@@ -4,7 +4,7 @@
     UMKa - User-Mode KolibriOS developer tools
     vdisk - virtual disk
 
-    Copyright (C) 2020-2022  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2020-2023  Ivan Baravy <dunkaist@gmail.com>
     Copyright (C) 2021  Magomed Kostoev <mkostoevr@yandex.ru>
 */
 
@@ -50,7 +50,7 @@ vdisk_init(const char *fname, int adjust_cache_size, size_t cache_size) {
         && !strcmp(fname + fname_len - dot_raw_len, RAW_SUFFIX)) {
         disk = (struct vdisk*)vdisk_init_raw(fname);
     } else if (fname_len > dot_qcow2_len
-               && !strcmp(fname, QCOW2_SUFFIX)) {
+               && !strcmp(fname + fname_len - dot_qcow2_len, QCOW2_SUFFIX)) {
         disk = (struct vdisk*)vdisk_init_qcow2(fname);
     } else {
         fprintf(stderr, "[vdisk] file has unknown format: %s\n", fname);

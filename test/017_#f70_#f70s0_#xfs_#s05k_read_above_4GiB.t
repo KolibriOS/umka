@@ -1,5 +1,5 @@
 umka_init
-disk_add ../img/xfs_v4_files_s05k_b4k_n8k.raw hd0 -c 0
+disk_add ../img/xfs_v4_files_s05k_b4k_n8k.qcow2 hd0 -c 524288
 
 read70 /hd0/1/4GiB_plus 0x3ff4 11 -b
 read70 /hd0/1/4GiB_plus 0x3ff5 11 -b

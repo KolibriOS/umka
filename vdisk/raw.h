@@ -15,12 +15,7 @@
 
 #define RAW_SUFFIX ".raw"
 
-struct vdisk_raw {
-    struct vdisk vdisk;
-    FILE *file;
-};
-
-struct vdisk_raw*
+struct vdisk*
 vdisk_init_raw(const char *fname);
 
 #endif  // VDISK_RAW_H_INCLUDED
