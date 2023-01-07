@@ -92,11 +92,11 @@ main(int argc, char **argv) {
         }
     }
     if (infile && !freopen(infile, "r", stdin)) {
-        fprintf(stderr, "[!] can't open file for reading: %s", infile);
+        fprintf(stderr, "[!] can't open file for reading: %s\n", infile);
         exit(1);
     }
     if (outfile && !freopen(outfile, "w", stdout)) {
-        fprintf(stderr, "[!] can't open file for writing: %s", outfile);
+        fprintf(stderr, "[!] can't open file for writing: %s\n", outfile);
         exit(1);
     }
 
