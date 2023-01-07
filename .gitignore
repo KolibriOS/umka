@@ -13,6 +13,7 @@ umka_gen_devices_dat
 tools/mkdirrange
 tools/mkdoubledirs
 tools/gensamehash
+tools/mksamehash
 tools/mkfilepattern
 tools/lfbviewx
 tools/randdir

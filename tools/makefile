@@ -8,12 +8,15 @@ CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -O2 \
 LDFLAGS=-no-pie
 
 all: mkdirrange mkfilepattern lfbviewx randdir covpreproc mkdoubledirs \
-     gensamehash
+     gensamehash mksamehash
 
 gensamehash: gensamehash.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
 mkdoubledirs: mkdoubledirs.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+
+mksamehash: mksamehash.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
 mkdirrange: mkdirrange.c
@@ -35,4 +38,4 @@ covpreproc: covpreproc.c
 
 clean:
 	rm -f *.o mkdirrange mkfilepattern lfbviewx randdir covpreproc \
-          mkdoubledirs gensamehash
+          mkdoubledirs gensamehash mksamehash
