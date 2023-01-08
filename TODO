@@ -1,6 +1,10 @@
-multithreaded: kofu one.t two.t
+switch from parted to gdisk
+lsstat to decrease tests size
+separate dirs for each image and test
+library loader
+custom test runner
 make mkfs.xfs use config file via -c option
-tests for ext* and fat*
 writing tests
 compare with reference XFS implementation
 stressing via ref impl
+multithreaded: kofu one.t two.t

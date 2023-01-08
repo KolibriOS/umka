@@ -1,0 +1,19 @@
+/> umka_init
+/> disk_add ../img/ext4_s05k.qcow2 hd0 -c 524288
+/hd0: sector_size=512, capacity=10487808 (5121 MiB), num_partitions=1
+/hd0/1: fs=???, start=2048 (1 MiB), length=10485760 (5 GiB)
+/> ls70 /hd0/1/dir_a
+status = 3 unknown_fs
+/> ls70 /hd0/1/dir_b
+status = 3 unknown_fs
+/> ls70 /hd0/1/dir_c
+status = 3 unknown_fs
+/> ls70 /hd0/1/dir_d
+status = 3 unknown_fs
+/> ls70 /hd0/1/dir_e
+status = 3 unknown_fs
+/> ls70 /hd0/1/dir_f
+status = 3 unknown_fs
+/> ls70 /hd0/1/dir_g
+status = 3 unknown_fs
+/> disk_del hd0

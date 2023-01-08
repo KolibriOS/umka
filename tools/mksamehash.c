@@ -8,6 +8,7 @@
 */
 
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -16,7 +17,11 @@
 #include <errno.h>
 #include <string.h>
 
-char xfs_samehash[1000][12] = {
+#define XFS_NAMES_CNT 1000
+#define XFS_NAME_SEGMENT_LEN 12
+#define XFS_MAX_COUNTERS 4
+
+char xfs_samehash[XFS_NAMES_CNT][XFS_NAME_SEGMENT_LEN] = {
     "000000000000", "000000100008", "000001000080", "000001100088",
     "000010000800", "000010100808", "000011000880", "000011100888",
     "000100008000", "000100108008", "000101008080", "000101108088",
@@ -269,40 +274,207 @@ char xfs_samehash[1000][12] = {
     "118108808004", "118109808084", "118118808804", "118119808884",
 };
 
+/*
+#define XFS_NAMES_CNT 1000
+#define XFS_NAME_SEGMENT_LEN 7
+#define XFS_MAX_COUNTERS 4
+
+char xfs_samehash[XFS_NAMES_CNT][XFS_NAME_SEGMENT_LEN] = {
+	"0000000", "00P0006", "00p0004", "0100008", "080000p", "08P000v", "08p000t",
+	"090000x", "0A00078", "0H0007p", "0HP007v", "0Hp007t", "0I0007x", "0JP007f",
+	"0Jp007d", "0K0007h", "0KP007n", "0Kp007l", "0L0007P", "0LP007V", "0Lp007T",
+	"0M0007X", "0NP007F", "0Np007D", "0O0007H", "0OP007N", "0Op007L", "0P00060",
+	"0PP0066", "0Pp0064", "0Q00068", "0X0006p", "0XP006v", "0Xp006t", "0Y0006x",
+	"0ZP006f", "0Zp006d", "0a00058", "0h0005p", "0hP005v", "0hp005t", "0i0005x",
+	"0jP005f", "0jp005d", "0k0005h", "0kP005n", "0kp005l", "0l0005P", "0lP005V",
+	"0lp005T", "0m0005X", "0nP005F", "0np005D", "0o0005H", "0oP005N", "0op005L",
+	"0p00040", "0pP0046", "0pp0044", "0q00048", "0x0004p", "0xP004v", "0xp004t",
+	"0y0004x", "0zP004f", "0zp004d", "1000080", "10P0086", "10p0084", "1100088",
+	"180008p", "18P008v", "18p008t", "190008x", "80000p0", "80P00p6", "80p00p4",
+	"81000p8", "88000pp", "88P00pv", "88p00pt", "89000px", "8A000w8", "8H000wp",
+	"8HP00wv", "8Hp00wt", "8I000wx", "8JP00wf", "8Jp00wd", "8K000wh", "8KP00wn",
+	"8Kp00wl", "8L000wP", "8LP00wV", "8Lp00wT", "8M000wX", "8NP00wF", "8Np00wD",
+	"8O000wH", "8OP00wN", "8Op00wL", "8P000v0", "8PP00v6", "8Pp00v4", "8Q000v8",
+	"8X000vp", "8XP00vv", "8Xp00vt", "8Y000vx", "8ZP00vf", "8Zp00vd", "8a000u8",
+	"8h000up", "8hP00uv", "8hp00ut", "8i000ux", "8jP00uf", "8jp00ud", "8k000uh",
+	"8kP00un", "8kp00ul", "8l000uP", "8lP00uV", "8lp00uT", "8m000uX", "8nP00uF",
+	"8np00uD", "8o000uH", "8oP00uN", "8op00uL", "8p000t0", "8pP00t6", "8pp00t4",
+	"8q000t8", "8x000tp", "8xP00tv", "8xp00tt", "8y000tx", "8zP00tf", "8zp00td",
+	"90000x0", "90P00x6", "90p00x4", "91000x8", "98000xp", "98P00xv", "98p00xt",
+	"99000xx", "A000780", "A0P0786", "A0p0784", "A100788", "A80078p", "A8P078v",
+	"A8p078t", "A90078x", "H0007p0", "H0P07p6", "H0p07p4", "H1007p8", "H8007pp",
+	"H8P07pv", "H8p07pt", "H9007px", "HA007w8", "HH007wp", "HHP07wv", "HHp07wt",
+	"HI007wx", "HJP07wf", "HJp07wd", "HK007wh", "HKP07wn", "HKp07wl", "HL007wP",
+	"HLP07wV", "HLp07wT", "HM007wX", "HNP07wF", "HNp07wD", "HO007wH", "HOP07wN",
+	"HOp07wL", "HP007v0", "HPP07v6", "HPp07v4", "HQ007v8", "HX007vp", "HXP07vv",
+	"HXp07vt", "HY007vx", "HZP07vf", "HZp07vd", "Ha007u8", "Hh007up", "HhP07uv",
+	"Hhp07ut", "Hi007ux", "HjP07uf", "Hjp07ud", "Hk007uh", "HkP07un", "Hkp07ul",
+	"Hl007uP", "HlP07uV", "Hlp07uT", "Hm007uX", "HnP07uF", "Hnp07uD", "Ho007uH",
+	"HoP07uN", "Hop07uL", "Hp007t0", "HpP07t6", "Hpp07t4", "Hq007t8", "Hx007tp",
+	"HxP07tv", "Hxp07tt", "Hy007tx", "HzP07tf", "Hzp07td", "I0007x0", "I0P07x6",
+	"I0p07x4", "I1007x8", "I8007xp", "I8P07xv", "I8p07xt", "I9007xx", "JA007g8",
+	"JH007gp", "JHP07gv", "JHp07gt", "JI007gx", "JJP07gf", "JJp07gd", "JK007gh",
+	"JKP07gn", "JKp07gl", "JL007gP", "JLP07gV", "JLp07gT", "JM007gX", "JNP07gF",
+	"JNp07gD", "JO007gH", "JOP07gN", "JOp07gL", "JP007f0", "JPP07f6", "JPp07f4",
+	"JQ007f8", "JX007fp", "JXP07fv", "JXp07ft", "JY007fx", "JZP07ff", "JZp07fd",
+	"Ja007e8", "Jh007ep", "JhP07ev", "Jhp07et", "Ji007ex", "JjP07ef", "Jjp07ed",
+	"Jk007eh", "JkP07en", "Jkp07el", "Jl007eP", "JlP07eV", "Jlp07eT", "Jm007eX",
+	"JnP07eF", "Jnp07eD", "Jo007eH", "JoP07eN", "Jop07eL", "Jp007d0", "JpP07d6",
+	"Jpp07d4", "Jq007d8", "Jx007dp", "JxP07dv", "Jxp07dt", "Jy007dx", "JzP07df",
+	"Jzp07dd", "K0007h0", "K0P07h6", "K0p07h4", "K1007h8", "K8007hp", "K8P07hv",
+	"K8p07ht", "K9007hx", "KA007o8", "KH007op", "KHP07ov", "KHp07ot", "KI007ox",
+	"KJP07of", "KJp07od", "KK007oh", "KKP07on", "KKp07ol", "KL007oP", "KLP07oV",
+	"KLp07oT", "KM007oX", "KNP07oF", "KNp07oD", "KO007oH", "KOP07oN", "KOp07oL",
+	"KP007n0", "KPP07n6", "KPp07n4", "KQ007n8", "KX007np", "KXP07nv", "KXp07nt",
+	"KY007nx", "KZP07nf", "KZp07nd", "Ka007m8", "Kh007mp", "KhP07mv", "Khp07mt",
+	"Ki007mx", "KjP07mf", "Kjp07md", "Kk007mh", "KkP07mn", "Kkp07ml", "Kl007mP",
+	"KlP07mV", "Klp07mT", "Km007mX", "KnP07mF", "Knp07mD", "Ko007mH", "KoP07mN",
+	"Kop07mL", "Kp007l0", "KpP07l6", "Kpp07l4", "Kq007l8", "Kx007lp", "KxP07lv",
+	"Kxp07lt", "Ky007lx", "KzP07lf", "Kzp07ld", "L0007P0", "L0P07P6", "L0p07P4",
+	"L1007P8", "L8007Pp", "L8P07Pv", "L8p07Pt", "L9007Px", "LA007W8", "LH007Wp",
+	"LHP07Wv", "LHp07Wt", "LI007Wx", "LJP07Wf", "LJp07Wd", "LK007Wh", "LKP07Wn",
+	"LKp07Wl", "LL007WP", "LLP07WV", "LLp07WT", "LM007WX", "LNP07WF", "LNp07WD",
+	"LO007WH", "LOP07WN", "LOp07WL", "LP007V0", "LPP07V6", "LPp07V4", "LQ007V8",
+	"LX007Vp", "LXP07Vv", "LXp07Vt", "LY007Vx", "LZP07Vf", "LZp07Vd", "La007U8",
+	"Lh007Up", "LhP07Uv", "Lhp07Ut", "Li007Ux", "LjP07Uf", "Ljp07Ud", "Lk007Uh",
+	"LkP07Un", "Lkp07Ul", "Ll007UP", "LlP07UV", "Llp07UT", "Lm007UX", "LnP07UF",
+	"Lnp07UD", "Lo007UH", "LoP07UN", "Lop07UL", "Lp007T0", "LpP07T6", "Lpp07T4",
+	"Lq007T8", "Lx007Tp", "LxP07Tv", "Lxp07Tt", "Ly007Tx", "LzP07Tf", "Lzp07Td",
+	"M0007X0", "M0P07X6", "M0p07X4", "M1007X8", "M8007Xp", "M8P07Xv", "M8p07Xt",
+	"M9007Xx", "NA007G8", "NH007Gp", "NHP07Gv", "NHp07Gt", "NI007Gx", "NJP07Gf",
+	"NJp07Gd", "NK007Gh", "NKP07Gn", "NKp07Gl", "NL007GP", "NLP07GV", "NLp07GT",
+	"NM007GX", "NNP07GF", "NNp07GD", "NO007GH", "NOP07GN", "NOp07GL", "NP007F0",
+	"NPP07F6", "NPp07F4", "NQ007F8", "NX007Fp", "NXP07Fv", "NXp07Ft", "NY007Fx",
+	"NZP07Ff", "NZp07Fd", "Na007E8", "Nh007Ep", "NhP07Ev", "Nhp07Et", "Ni007Ex",
+	"NjP07Ef", "Njp07Ed", "Nk007Eh", "NkP07En", "Nkp07El", "Nl007EP", "NlP07EV",
+	"Nlp07ET", "Nm007EX", "NnP07EF", "Nnp07ED", "No007EH", "NoP07EN", "Nop07EL",
+	"Np007D0", "NpP07D6", "Npp07D4", "Nq007D8", "Nx007Dp", "NxP07Dv", "Nxp07Dt",
+	"Ny007Dx", "NzP07Df", "Nzp07Dd", "O0007H0", "O0P07H6", "O0p07H4", "O1007H8",
+	"O8007Hp", "O8P07Hv", "O8p07Ht", "O9007Hx", "OA007O8", "OH007Op", "OHP07Ov",
+	"OHp07Ot", "OI007Ox", "OJP07Of", "OJp07Od", "OK007Oh", "OKP07On", "OKp07Ol",
+	"OL007OP", "OLP07OV", "OLp07OT", "OM007OX", "ONP07OF", "ONp07OD", "OO007OH",
+	"OOP07ON", "OOp07OL", "OP007N0", "OPP07N6", "OPp07N4", "OQ007N8", "OX007Np",
+	"OXP07Nv", "OXp07Nt", "OY007Nx", "OZP07Nf", "OZp07Nd", "Oa007M8", "Oh007Mp",
+	"OhP07Mv", "Ohp07Mt", "Oi007Mx", "OjP07Mf", "Ojp07Md", "Ok007Mh", "OkP07Mn",
+	"Okp07Ml", "Ol007MP", "OlP07MV", "Olp07MT", "Om007MX", "OnP07MF", "Onp07MD",
+	"Oo007MH", "OoP07MN", "Oop07ML", "Op007L0", "OpP07L6", "Opp07L4", "Oq007L8",
+	"Ox007Lp", "OxP07Lv", "Oxp07Lt", "Oy007Lx", "OzP07Lf", "Ozp07Ld", "P000600",
+	"P0P0606", "P0p0604", "P100608", "P80060p", "P8P060v", "P8p060t", "P90060x",
+	"PA00678", "PH0067p", "PHP067v", "PHp067t", "PI0067x", "PJP067f", "PJp067d",
+	"PK0067h", "PKP067n", "PKp067l", "PL0067P", "PLP067V", "PLp067T", "PM0067X",
+	"PNP067F", "PNp067D", "PO0067H", "POP067N", "POp067L", "PP00660", "PPP0666",
+	"PPp0664", "PQ00668", "PX0066p", "PXP066v", "PXp066t", "PY0066x", "PZP066f",
+	"PZp066d", "Pa00658", "Ph0065p", "PhP065v", "Php065t", "Pi0065x", "PjP065f",
+	"Pjp065d", "Pk0065h", "PkP065n", "Pkp065l", "Pl0065P", "PlP065V", "Plp065T",
+	"Pm0065X", "PnP065F", "Pnp065D", "Po0065H", "PoP065N", "Pop065L", "Pp00640",
+	"PpP0646", "Ppp0644", "Pq00648", "Px0064p", "PxP064v", "Pxp064t", "Py0064x",
+	"PzP064f", "Pzp064d", "Q000680", "Q0P0686", "Q0p0684", "Q100688", "Q80068p",
+	"Q8P068v", "Q8p068t", "Q90068x", "X0006p0", "X0P06p6", "X0p06p4", "X1006p8",
+	"X8006pp", "X8P06pv", "X8p06pt", "X9006px", "XA006w8", "XH006wp", "XHP06wv",
+	"XHp06wt", "XI006wx", "XJP06wf", "XJp06wd", "XK006wh", "XKP06wn", "XKp06wl",
+	"XL006wP", "XLP06wV", "XLp06wT", "XM006wX", "XNP06wF", "XNp06wD", "XO006wH",
+	"XOP06wN", "XOp06wL", "XP006v0", "XPP06v6", "XPp06v4", "XQ006v8", "XX006vp",
+	"XXP06vv", "XXp06vt", "XY006vx", "XZP06vf", "XZp06vd", "Xa006u8", "Xh006up",
+	"XhP06uv", "Xhp06ut", "Xi006ux", "XjP06uf", "Xjp06ud", "Xk006uh", "XkP06un",
+	"Xkp06ul", "Xl006uP", "XlP06uV", "Xlp06uT", "Xm006uX", "XnP06uF", "Xnp06uD",
+	"Xo006uH", "XoP06uN", "Xop06uL", "Xp006t0", "XpP06t6", "Xpp06t4", "Xq006t8",
+	"Xx006tp", "XxP06tv", "Xxp06tt", "Xy006tx", "XzP06tf", "Xzp06td", "Y0006x0",
+	"Y0P06x6", "Y0p06x4", "Y1006x8", "Y8006xp", "Y8P06xv", "Y8p06xt", "Y9006xx",
+	"ZA006g8", "ZH006gp", "ZHP06gv", "ZHp06gt", "ZI006gx", "ZJP06gf", "ZJp06gd",
+	"ZK006gh", "ZKP06gn", "ZKp06gl", "ZL006gP", "ZLP06gV", "ZLp06gT", "ZM006gX",
+	"ZNP06gF", "ZNp06gD", "ZO006gH", "ZOP06gN", "ZOp06gL", "ZP006f0", "ZPP06f6",
+	"ZPp06f4", "ZQ006f8", "ZX006fp", "ZXP06fv", "ZXp06ft", "ZY006fx", "ZZP06ff",
+	"ZZp06fd", "Za006e8", "Zh006ep", "ZhP06ev", "Zhp06et", "Zi006ex", "ZjP06ef",
+	"Zjp06ed", "Zk006eh", "ZkP06en", "Zkp06el", "Zl006eP", "ZlP06eV", "Zlp06eT",
+	"Zm006eX", "ZnP06eF", "Znp06eD", "Zo006eH", "ZoP06eN", "Zop06eL", "Zp006d0",
+	"ZpP06d6", "Zpp06d4", "Zq006d8", "Zx006dp", "ZxP06dv", "Zxp06dt", "Zy006dx",
+	"ZzP06df", "Zzp06dd", "a000580", "a0P0586", "a0p0584", "a100588", "a80058p",
+	"a8P058v", "a8p058t", "a90058x", "h0005p0", "h0P05p6", "h0p05p4", "h1005p8",
+	"h8005pp", "h8P05pv", "h8p05pt", "h9005px", "hA005w8", "hH005wp", "hHP05wv",
+	"hHp05wt", "hI005wx", "hJP05wf", "hJp05wd", "hK005wh", "hKP05wn", "hKp05wl",
+	"hL005wP", "hLP05wV", "hLp05wT", "hM005wX", "hNP05wF", "hNp05wD", "hO005wH",
+	"hOP05wN", "hOp05wL", "hP005v0", "hPP05v6", "hPp05v4", "hQ005v8", "hX005vp",
+	"hXP05vv", "hXp05vt", "hY005vx", "hZP05vf", "hZp05vd", "ha005u8", "hh005up",
+	"hhP05uv", "hhp05ut", "hi005ux", "hjP05uf", "hjp05ud", "hk005uh", "hkP05un",
+	"hkp05ul", "hl005uP", "hlP05uV", "hlp05uT", "hm005uX", "hnP05uF", "hnp05uD",
+	"ho005uH", "hoP05uN", "hop05uL", "hp005t0", "hpP05t6", "hpp05t4", "hq005t8",
+	"hx005tp", "hxP05tv", "hxp05tt", "hy005tx", "hzP05tf", "hzp05td", "i0005x0",
+	"i0P05x6", "i0p05x4", "i1005x8", "i8005xp", "i8P05xv", "i8p05xt", "i9005xx",
+	"jA005g8", "jH005gp", "jHP05gv", "jHp05gt", "jI005gx", "jJP05gf", "jJp05gd",
+	"jK005gh", "jKP05gn", "jKp05gl", "jL005gP", "jLP05gV", "jLp05gT", "jM005gX",
+	"jNP05gF", "jNp05gD", "jO005gH", "jOP05gN", "jOp05gL", "jP005f0", "jPP05f6",
+	"jPp05f4", "jQ005f8", "jX005fp", "jXP05fv", "jXp05ft", "jY005fx", "jZP05ff",
+	"jZp05fd", "ja005e8", "jh005ep", "jhP05ev", "jhp05et", "ji005ex", "jjP05ef",
+	"jjp05ed", "jk005eh", "jkP05en", "jkp05el", "jl005eP", "jlP05eV", "jlp05eT",
+	"jm005eX", "jnP05eF", "jnp05eD", "jo005eH", "joP05eN", "jop05eL", "jp005d0",
+	"jpP05d6", "jpp05d4", "jq005d8", "jx005dp", "jxP05dv", "jxp05dt", "jy005dx",
+	"jzP05df", "jzp05dd", "k0005h0", "k0P05h6", "k0p05h4", "k1005h8", "k8005hp",
+	"k8P05hv", "k8p05ht", "k9005hx", "kA005o8", "kH005op", "kHP05ov", "kHp05ot",
+	"kI005ox", "kJP05of", "kJp05od", "kK005oh", "kKP05on", "kKp05ol", "kL005oP",
+	"kLP05oV", "kLp05oT", "kM005oX", "kNP05oF", "kNp05oD", "kO005oH", "kOP05oN",
+	"kOp05oL", "kP005n0", "kPP05n6", "kPp05n4", "kQ005n8", "kX005np", "kXP05nv",
+	"kXp05nt", "kY005nx", "kZP05nf", "kZp05nd", "ka005m8", "kh005mp", "khP05mv",
+	"khp05mt", "ki005mx", "kjP05mf", "kjp05md", "kk005mh", "kkP05mn", "kkp05ml",
+	"kl005mP", "klP05mV", "klp05mT", "km005mX", "knP05mF", "knp05mD", "ko005mH",
+	"koP05mN", "kop05mL", "kp005l0", "kpP05l6", "kpp05l4", "kq005l8", "kx005lp",
+	"kxP05lv", "kxp05lt", "ky005lx", "kzP05lf", "kzp05ld", "l0005P0", "l0P05P6",
+	"l0p05P4", "l1005P8", "l8005Pp", "l8P05Pv", "l8p05Pt", "l9005Px", "lA005W8",
+	"lH005Wp", "lHP05Wv", "lHp05Wt", "lI005Wx", "lJP05Wf", "lJp05Wd", "lK005Wh",
+	"lKP05Wn", "lKp05Wl", "lL005WP", "lLP05WV", "lLp05WT", "lM005WX", "lNP05WF",
+	"lNp05WD", "lO005WH", "lOP05WN", "lOp05WL", "lP005V0", "lPP05V6", "lPp05V4",
+	"lQ005V8", "lX005Vp", "lXP05Vv", "lXp05Vt", "lY005Vx", "lZP05Vf",
+};
+*/
+
+bool quiet = false;
+
+void xfs_iterate_name_segment(int dirfd, char *dirname, size_t cidx,
+                              size_t ccnt, uint64_t *left) {
+    for (size_t i = 0; i < XFS_NAMES_CNT; i++) {
+        memcpy(dirname + 2 + (1 + XFS_NAME_SEGMENT_LEN)*cidx, xfs_samehash + i,
+               XFS_NAME_SEGMENT_LEN);
+        if (cidx + 1 < ccnt) {
+            xfs_iterate_name_segment(dirfd, dirname, cidx+1, ccnt, left);
+        } else {
+            if (!left[0]) {
+                return;
+            }
+            if(mkdirat(dirfd, dirname, 0755)) {
+                fprintf(stderr, "Can't mkdir %s: %s\n", dirname, strerror(errno));
+                exit(1);
+            }
+            left[0]--;
+        }
+    }
+}
+
 int main(int argc, char *argv[])
 {
     const char *path;
-    uint64_t count, total;
-    if (argc != 3) {
+    uint64_t left;
+    if (argc < 3) {
         fprintf(stderr, "mkdirrange <directory> <count>\n");
         exit(1);
     }
     path = argv[1];
-    sscanf(argv[2], "%" SCNu64, &total);
+    sscanf(argv[2], "%" SCNu64, &left);
+    if (argc > 3 && !strcmp(argv[3], "-q")) {
+        quiet = true;
+    }
 
     int dirfd = open(path, O_DIRECTORY);
     if (dirfd == -1) {
         fprintf(stderr, "Can't open %s: %s\n", path, strerror(errno));
         exit(1);
     }
-    char dirname[256];
-    strcpy(dirname, "d_xxxxxxxxxxxx_xxxxxxxxxxxx_xxxxxxxxxxxx");
+    char dirname[128] = "d_____________________________________________";
 
-    count = 0;
-    for(unsigned i = 0; i < 1000 && count < total; i++) {
-        memcpy(dirname + 2, xfs_samehash + i, 12);
-        for(unsigned j = 0; j < 1000 && count < total; j++) {
-            memcpy(dirname + 15, xfs_samehash + j, 12);
-//            printf("count: %" PRIu64 "\n", count);
-            for(unsigned k = 0; k < 1000 && count < total; k++, count++) {
-                memcpy(dirname + 28, xfs_samehash + k, 12);
-                if(mkdirat(dirfd, dirname, 0755)) {
-                    fprintf(stderr, "Can't mkdir %s: %s\n", dirname, strerror(errno));
-                    exit(1);
-                }
-            }
-        }
-    }
+    size_t ccnt = 1;
+    for (uint64_t last_name = XFS_NAMES_CNT;
+         last_name < left;
+         last_name *= XFS_NAMES_CNT, ccnt++) {}
+    dirname[1 + (1 + XFS_NAME_SEGMENT_LEN)*ccnt] = '\0';
+    xfs_iterate_name_segment(dirfd, dirname, 0, ccnt, &left);
 
     return 0;
 }

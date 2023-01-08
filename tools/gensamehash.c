@@ -21,7 +21,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define NUM_LEN 18
+#define NUM_LEN 10
 #define rol32(x,y)  (((x) << (y)) | ((x) >> (32 - (y))))
 
 // the hash function has been taken from XFS docs with minor edits
@@ -55,12 +55,20 @@ char name[256];
 char hash_filename[256];
 
 void increment(char *num) {
-    for (char *d = num + NUM_LEN; d > num; d--) {
-        if (*d < '9') {
-            d[0]++;
+    for (char *d = num + NUM_LEN - 1; d >= num; d--) {
+        switch (d[0]) {
+        case '9':
+            d[0] = 'A';
+            return;
+        case 'Z':
+            d[0] = 'a';
+            return;
+        case 'z':
+            d[0] = '0';
             break;
-        } else {
-            *d = '0';
+        default:
+            d[0]++;
+            return;
         }
     }
 }
@@ -89,7 +97,7 @@ int main(int argc, char *argv[])
     fprintf(stderr, "pid: %u\n", getpid());
     sprintf(hash_filename, "hash_0x%8.8" PRIx32 ".%u", hash, getpid());
 
-    sprintf(name, "d%18.18" PRIu64, start_num);
+    sprintf(name, "%10.10" PRIu64, start_num);
 
     struct sigaction sa;
     sa.sa_sigaction = int_handler;
@@ -102,10 +110,10 @@ int main(int argc, char *argv[])
     }
 
     while (true) {
-        uint32_t h = xfs_da_hashname(name, NUM_LEN+1);
+        uint32_t h = xfs_da_hashname(name, NUM_LEN);
         if (h == hash) {
             FILE *f = fopen(hash_filename, "a+");
-            fprintf(f, "%7.7i %s\n", hash_cnt, name);
+            fprintf(f, "%7.7u %s\n", hash_cnt, name);
             fclose(f);
             hash_cnt++;
         }
