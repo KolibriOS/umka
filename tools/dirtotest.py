@@ -38,7 +38,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 2:
         img_name = sys.argv[2]
     else:
-        img_name = "fat32_test0.img"
+        img_name = "fat32_test0.raw"
 
     if len(sys.argv) > 3:
         virtual_disk_name = sys.argv[3]

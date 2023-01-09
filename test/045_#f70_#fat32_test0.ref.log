@@ -1,7 +1,7 @@
 /> umka_init
 /> disk_add ../img/fat32_test0.raw hd0 -c 0
 /hd0: sector_size=512, capacity=131072 (64 MiB), num_partitions=1
-/hd0/1: fs=fat, start=0 (0 EiB), length=131072 (64 MiB)
+/hd0/1: fs=fat, start=2048 (1 MiB), length=126976 (62 MiB)
 /> ls80 /hd0/1/
 status = 0 success, count = 100
 total = 107

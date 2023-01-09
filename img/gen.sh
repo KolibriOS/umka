@@ -6,56 +6,50 @@ MKFILEPATTERN=../tools/mkfilepattern
 DIRTOTEST=../tools/dirtotest.py
 MKSAMEHASH=../tools/mksamehash
 MKDIRRANGE=../tools/mkdirrange
-XFS_MIN_PART_SIZE="300MiB"
+
+MKFS_XFS="sudo mkfs.xfs"
+XFS_MIN_DISK_SIZE="302MiB"
 XFS_MKFS_OPTS="-q -i maxpct=0"
 XFS_MOUNT_OPTS="-t xfs"
+
+MKFS_EXT2="sudo mkfs.ext2"
+MKFS_EXT4="sudo mkfs.ext4"
 EXT_HASH_SEED="01234567-abcd-abcd-abcd-001122334455"
 EXT_MKFS_OPTS="-q"
+
+MKFS_FAT="sudo mkfs.fat"
 FAT_MOUNT_OPTS="umask=111,dmask=000"
+
+MKFS_EXFAT="sudo mkfs.exfat"
+
 QCOW2_OPTS="compat=v3,compression_type=zlib,encryption=off,extended_l2=off,preallocation=off"
 NBD_DEV=/dev/nbd0   # FIXME
+SGDISK="sgdisk --align-end --disk-guid=abcdefff-0123-4554-3210-ffeeddccbbaa"
 
 gpt_large.qcow2 () {
     local img=$FUNCNAME
     qemu-img create -f qcow2 -o $QCOW2_OPTS,cluster_size=2097152 $img 2E > /dev/null
     sudo qemu-nbd -c $NBD_DEV $img
-    sudo parted --script --align optimal $NBD_DEV mktable gpt \
-        mkpart part0 1MiB 1GiB \
-        mkpart part1 1GiB 1TiB \
-        mkpart part2 1TiB 1024TiB \
-        mkpart part3 1024TiB 1048576TiB
+
+    $SGDISK --clear --new=0:0:+1023MiB --new=0:0:+1023GiB --new=0:0:+1023TiB \
+        --new=0:0:+1023PiB $NBD_DEV > /dev/null
+
     sudo qemu-nbd -d $NBD_DEV > /dev/null
 }
 
 gpt_partitions_s05k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
     fallocate -l 1GiB $img_raw
-    parted --script --align optimal $img_raw mktable gpt \
-        mkpart part0 1MiB 2MiB \
-        mkpart part1 2MiB 3MiB \
-        mkpart part2 4MiB 5MiB \
-        mkpart part3 3MiB 4MiB \
-        mkpart part4 5MiB 6MiB \
-        mkpart part5 6MiB 7MiB \
-        mkpart part6 7MiB 8MiB \
-        mkpart part7 8MiB 9MiB \
-        mkpart part8 9MiB 10MiB \
-        mkpart part9 10MiB 11MiB \
-        mkpart part10 11MiB 12MiB \
-        mkpart part11 12MiB 13MiB \
-        mkpart part12 13MiB 14MiB \
-        mkpart part13 14MiB 15MiB \
-        mkpart part14 15MiB 16MiB \
-        mkpart part15 16MiB 17MiB \
-        mkpart part16 17MiB 18MiB \
-        mkpart part17 18MiB 19MiB \
-        mkpart part18 19MiB 20MiB \
-        mkpart part19 20MiB 21MiB \
-        mkpart part20 21MiB 22MiB \
-        mkpart part21 22MiB 23MiB \
-        mkpart part22 23MiB 24MiB \
-        mkpart part23 24MiB 25MiB
+
+    $SGDISK --clear --new=0:0:+1MiB --new=0:0:+1MiB --new=0:4MiB:+1MiB \
+        --new=0:3MiB:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB \
+        --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB \
+        --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB \
+        --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB \
+        --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB \
+        --new=0:0:+1MiB $img_raw > /dev/null
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -64,33 +58,18 @@ gpt_partitions_s05k.qcow2 () {
 gpt_partitions_s4k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
     fallocate -l 1GiB $img_raw
     sudo losetup -b 4096 $LOOP_DEV $img_raw
-    sudo parted --script --align optimal $LOOP_DEV mktable gpt \
-        mkpart part0 1MiB 2MiB \
-        mkpart part1 2MiB 3MiB \
-        mkpart part2 4MiB 5MiB \
-        mkpart part3 3MiB 4MiB \
-        mkpart part4 5MiB 6MiB \
-        mkpart part5 6MiB 7MiB \
-        mkpart part6 7MiB 8MiB \
-        mkpart part7 8MiB 9MiB \
-        mkpart part8 9MiB 10MiB \
-        mkpart part9 10MiB 11MiB \
-        mkpart part10 11MiB 12MiB \
-        mkpart part11 12MiB 13MiB \
-        mkpart part12 13MiB 14MiB \
-        mkpart part13 14MiB 15MiB \
-        mkpart part14 15MiB 16MiB \
-        mkpart part15 16MiB 17MiB \
-        mkpart part16 17MiB 18MiB \
-        mkpart part17 18MiB 19MiB \
-        mkpart part18 19MiB 20MiB \
-        mkpart part19 20MiB 21MiB \
-        mkpart part20 21MiB 22MiB \
-        mkpart part21 22MiB 23MiB \
-        mkpart part22 23MiB 24MiB \
-        mkpart part23 24MiB 25MiB
+
+    $SGDISK --clear --new=0:0:+1MiB --new=0:0:+1MiB --new=0:4MiB:+1MiB \
+        --new=0:3MiB:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB \
+        --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB \
+        --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB \
+        --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB \
+        --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB \
+        --new=0:0:+1MiB $LOOP_DEV > /dev/null
+
     sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
@@ -113,11 +92,15 @@ kolibri.raw () {
 jfs.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
     fallocate -l 16MiB $img_raw
-    mkfs.jfs -q $img_raw > /dev/null
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    mkfs.jfs -q $p1  > /dev/null
+
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -127,9 +110,13 @@ xfs_lookup_v4.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l 10GiB $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -m crc=0 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l 7GiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -m crc=0 $p1 
+    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/dir_sf
@@ -157,9 +144,7 @@ xfs_lookup_v4.qcow2 () {
     $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l2 d 2000000
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -169,9 +154,13 @@ xfs_lookup_v5.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l 10GiB $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -m crc=1 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l 7GiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -m crc=1 $p1 
+    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/dir_sf
@@ -199,9 +188,7 @@ xfs_lookup_v5.qcow2 () {
     $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l2 d 2000000
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -211,9 +198,13 @@ xfs_nrext64.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l 3000MiB $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -i nrext64=1 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l 3GiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -i nrext64=1 $p1 
+    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/dir_sf
@@ -235,9 +226,7 @@ xfs_nrext64.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/dir_btree_l2 0 1000000  231 13
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -247,9 +236,13 @@ xfs_bigtime.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -m bigtime=1 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -m bigtime=1 $p1 
+    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/dira
@@ -272,9 +265,7 @@ xfs_bigtime.qcow2 () {
     touch -m -t 220504031122.44 $TEMP_DIR/dirf
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -284,11 +275,14 @@ xfs_borg_bit.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -n version=ci $img_raw
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -n version=ci $p1 
+
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -298,11 +292,17 @@ xfs_short_dir_i8.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    echo -en "\x00" > $img_raw
+#    echo -en "\x00" > $img_raw
+    fallocate -l 1MiB $img_raw
     fallocate -i -o 0 -l 42TiB $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -i size=256 -n size=8k,ftype=0 $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
+        -d sectsize=512 -i size=256 -n size=8k,ftype=0 $p1 
 #
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/sf
@@ -311,9 +311,7 @@ xfs_short_dir_i8.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/sf/d0000000002_xx 7 10  0 244
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable gpt
-    parted --script --align optimal $img_raw mkpart part0 1MiB 99%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -323,9 +321,14 @@ xfs_v4_ftype0_s05k_b2k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=0 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
+        -d sectsize=512 -n size=8k,ftype=0 $p1 
+    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/sf_empty
@@ -349,9 +352,7 @@ xfs_v4_ftype0_s05k_b2k_n8k.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/btree_leaf_free 0 1200  201 43
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -361,9 +362,14 @@ xfs_v4_ftype1_s05k_b2k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=1 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
+        -d sectsize=512 -n size=8k,ftype=1 $p1 
+    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/sf_empty
@@ -387,9 +393,7 @@ xfs_v4_ftype1_s05k_b2k_n8k.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/btree_leaf_free 0 1200  201 43
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -399,9 +403,14 @@ xfs_v4_xattr.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n ftype=0 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR -o attr2
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -m crc=0,finobt=0,rmapbt=0,reflink=0 \
+        -d sectsize=512 -n ftype=0 $p1 
+    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR -o attr2
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/sf
@@ -417,9 +426,7 @@ xfs_v4_xattr.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/btree 0 600  0 244
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -429,9 +436,14 @@ xfs_v4_btrees_l2.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -b size=1k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=4k,ftype=1 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -b size=1k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
+        -d sectsize=512 -n size=4k,ftype=1 $p1 
+    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/dir_btree_l2
@@ -445,9 +457,7 @@ xfs_v4_btrees_l2.qcow2 () {
     $MKFILEPATTERN $TEMP_DIR/file_btree_l2 0 16388096
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -457,9 +467,14 @@ xfs_v4_files_s05k_b4k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=0 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
+        -d sectsize=512 -n size=8k,ftype=0 $p1 
+    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     $MKFILEPATTERN $TEMP_DIR/no_hole 0 65536
@@ -487,9 +502,7 @@ xfs_v4_files_s05k_b4k_n8k.qcow2 () {
     $MKFILEPATTERN $TEMP_DIR/4GiB_plus 0x4000 0x4000
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -499,9 +512,16 @@ xfs_v4_ftype0_s4k_b4k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=4k -n size=8k,ftype=0 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    sudo losetup -b 4096 $LOOP_DEV $img_raw
+    $SGDISK --clear --new=0:0:0 $LOOP_DEV > /dev/null
+    sudo losetup -d $LOOP_DEV
+    sudo losetup -b 4096 -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
+        -d sectsize=4k -n size=8k,ftype=0 $p1
+    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/sf_empty
@@ -525,10 +545,6 @@ xfs_v4_ftype0_s4k_b4k_n8k.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/btree_leaf_free 0 1200  201 43
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    sudo losetup -b 4096 $LOOP_DEV $img_raw
-    sudo parted --script --align optimal $LOOP_DEV mktable msdos \
-        mkpart primary 1MiB 100%
     sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
@@ -539,9 +555,14 @@ xfs_v4_ftype0_s05k_b2k_n8k_xattr.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=0 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
+        -d sectsize=512 -n size=8k,ftype=0 $p1 
+    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/sf_empty
@@ -572,9 +593,7 @@ xfs_v4_ftype0_s05k_b2k_n8k_xattr.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/btree_leaf_free 0 1200  201 43
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -584,9 +603,13 @@ xfs_v4_unicode.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -m crc=0,finobt=0,rmapbt=0,reflink=0 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -m crc=0,finobt=0,rmapbt=0,reflink=0 $p1
+    sudo mount $XFS_MOUNT_OPTS $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir -p $TEMP_DIR/dir0
@@ -604,9 +627,7 @@ xfs_v4_unicode.qcow2 () {
     echo привет❦💗мир > $TEMP_DIR/дир3/файл33
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -616,9 +637,14 @@ xfs_v5_ftype1_s05k_b2k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -b size=2k -m crc=1,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=1 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -b size=2k -m crc=1,finobt=0,rmapbt=0,reflink=0 \
+        -d sectsize=512 -n size=8k,ftype=1 $p1
+    sudo mount $XFS_MOUNT_OPTS $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/sf_empty
@@ -642,9 +668,7 @@ xfs_v5_ftype1_s05k_b2k_n8k.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/btree_leaf_free 0 1200  201 43
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -654,9 +678,14 @@ xfs_v5_files_s05k_b4k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -b size=4k -m crc=1,finobt=0,rmapbt=0,reflink=0 -d sectsize=512 -n size=8k,ftype=1 $img_raw
-    sudo mount $XFS_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -b size=4k -m crc=1,finobt=0,rmapbt=0,reflink=0 \
+        -d sectsize=512 -n size=8k,ftype=1 $p1
+    sudo mount $XFS_MOUNT_OPTS $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     $MKFILEPATTERN $TEMP_DIR/no_hole 0 65536
@@ -678,9 +707,7 @@ xfs_v5_files_s05k_b4k_n8k.qcow2 () {
     $MKFILEPATTERN $TEMP_DIR/btree_l1_no_hole 0 8196096
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -688,23 +715,37 @@ xfs_v5_files_s05k_b4k_n8k.qcow2 () {
 
 fat32_test0.raw () {
     local img=$FUNCNAME
+
     fallocate -l 64MiB $img
-    mkfs.fat -n KOLIBRIOS -F 32 $img > /dev/null
-    sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $img $TEMP_DIR
+    $SGDISK --clear --new=0:0:0 $img > /dev/null
+    sudo losetup -P $LOOP_DEV $img
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_FAT -n KOLIBRIOS -F 32 $p1 > /dev/null
+    sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $p1 $TEMP_DIR
+
     $RANDDIR $TEMP_DIR 1000 8 255 65536
     $DIRTOTEST $TEMP_DIR $img hd0 > "../test/045_#f70_#fat32_test0.t"
-    tree $TEMP_DIR
-    du -sh $TEMP_DIR
+
+#    tree $TEMP_DIR
+#    du -sh $TEMP_DIR
+
     sudo umount $TEMP_DIR
+    sudo losetup -d $LOOP_DEV
 }
 
 exfat_s05k_c16k_b16k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.exfat -L KOLIBRIOS -c 16k -b 16k $img_raw > /dev/null
-    sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $img_raw $TEMP_DIR
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXFAT -L KOLIBRIOS -c 16k -b 16k $p1 > /dev/null
+    sudo mount -o umask=111,dmask=000 $p1 $TEMP_DIR
+
     mkdir $TEMP_DIR/dir_0
     mkdir $TEMP_DIR/dir_1
     touch $TEMP_DIR/dir_1/file000
@@ -714,10 +755,9 @@ exfat_s05k_c16k_b16k.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/dir_10000 0 10000  201 43
 #   mkdir $TEMP_DIR/dir_100000
 #   $MKDIRRANGE $TEMP_DIR/dir_100000 0 100000  201 43
+
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -727,9 +767,13 @@ exfat_s05k_c8k_b8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l $XFS_MIN_PART_SIZE $img_raw
-    mkfs.exfat -L KOLIBRIOS -c 8k -b 8k $img_raw > /dev/null
-    sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $img_raw $TEMP_DIR
+    fallocate -l $XFS_MIN_DISK_SIZE $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXFAT -L KOLIBRIOS -c 8k -b 8k $p1 > /dev/null
+    sudo mount -o umask=111,dmask=000 $p1 $TEMP_DIR
     mkdir $TEMP_DIR/dir_000
     echo -n '' > $TEMP_DIR/dir_000/file_000
     mkdir $TEMP_DIR/dir_001
@@ -794,10 +838,9 @@ exfat_s05k_c8k_b8k.qcow2 () {
     echo -n 'x' > $TEMP_DIR/dir_030/file_030
     mkdir $TEMP_DIR/dir_031
     echo -n 'x' > $TEMP_DIR/dir_031/file_031
+
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -809,8 +852,12 @@ xfs_samehash_s05k.raw () {
     local img_raw=$img
 
     fallocate -l 1GiB $img_raw
-    mkfs.xfs $XFS_MKFS_OPTS -b size=1k -m crc=1 $img_raw
-    sudo mount $img_raw $TEMP_DIR
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_XFS $XFS_MKFS_OPTS -b size=1k -m crc=1 $p1
+    sudo mount $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/dir_sf
@@ -832,9 +879,7 @@ xfs_samehash_s05k.raw () {
     $MKSAMEHASH $TEMP_DIR/dir_btree_l2 500000 -q
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
 #    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
 }
@@ -844,9 +889,13 @@ ext2_s05k.qcow2 () {
     local img_raw=$(basename $img .qcow2).raw
 
     fallocate -l 5GiB $img_raw
-    mkfs.ext2 $EXT_MKFS_OPTS -N 1200000 $img_raw
-    debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $img_raw > /dev/null
-    sudo mount $img_raw $TEMP_DIR
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXT2 $EXT_MKFS_OPTS -N 1200000 $p1
+    debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1 > /dev/null
+    sudo mount $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/dir_a
@@ -868,9 +917,7 @@ ext2_s05k.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/dir_f 0 64998  0 1
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -881,9 +928,13 @@ ext4_s05k.qcow2 () {
     local img_raw=$(basename $img .qcow2).raw
 
     fallocate -l 5GiB $img_raw
-    mkfs.ext4 $EXT_MKFS_OPTS -N 1200000 $img_raw
-    debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $img_raw > /dev/null
-    sudo mount $img_raw $TEMP_DIR
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXT4 $EXT_MKFS_OPTS -N 1200000 $p1
+    debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1 > /dev/null
+    sudo mount $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/dir_a
@@ -908,9 +959,7 @@ ext4_s05k.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/dir_g 0 1000000  0 1
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -920,9 +969,13 @@ fat12_s05k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l 200MiB $img_raw
-    mkfs.fat -F 12 $img_raw > /dev/null
-    sudo mount -o $FAT_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l 256MiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_FAT -F 12 $p1 > /dev/null
+    sudo mount -o $FAT_MOUNT_OPTS $p1 $TEMP_DIR
 #
     mkdir $TEMP_DIR/dir_a
     $MKDIRRANGE $TEMP_DIR/dir_a 0 3  0 1
@@ -940,9 +993,7 @@ fat12_s05k.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/dir_e 0 2000  0 1
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw
@@ -952,9 +1003,13 @@ fat16_s05k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l 4095MiB $img_raw
-    mkfs.fat -F 16 $img_raw > /dev/null
-    sudo mount -o $FAT_MOUNT_OPTS $img_raw $TEMP_DIR
+    fallocate -l 4GiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_FAT -F 16 $p1 > /dev/null
+    sudo mount -o $FAT_MOUNT_OPTS $p1 $TEMP_DIR
 #
     mkdir $TEMP_DIR/dir_a
     $MKDIRRANGE $TEMP_DIR/dir_a 0 3  0 1
@@ -975,9 +1030,7 @@ fat16_s05k.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/dir_f 0 30000  0 1
 #
     sudo umount $TEMP_DIR
-    fallocate -i -o 0 -l 1MiB $img_raw
-    parted --script --align optimal $img_raw mktable msdos
-    parted --script --align optimal $img_raw mkpart primary 1MiB 100%
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw

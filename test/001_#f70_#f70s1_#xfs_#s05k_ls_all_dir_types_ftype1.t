@@ -1,6 +1,6 @@
 umka_init
-disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.img hd0 -c 0
-disk_add ../img/xfs_short_dir_i8.img hd1 -c 0
+disk_add ../img/xfs_v4_ftype1_s05k_b2k_n8k.qcow2 hd0 -c 0
+disk_add ../img/xfs_short_dir_i8.qcow2 hd1 -c 0
 
 ls70 /hd0/1/sf_empty
 ls70 /hd0/1/sf

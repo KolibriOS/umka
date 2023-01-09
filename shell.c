@@ -478,8 +478,12 @@ cmd_i40(struct shell_ctx *ctx, int argc, char **argv) {
 
 static void
 bytes_to_kmgtpe(uint64_t *bytes, const char **kmg) {
+    lldiv_t d;
     *kmg = "B";
-    lldiv_t d = lldiv(*bytes, 1024);
+    if (*bytes == 0) {
+        return;
+    }
+    d = lldiv(*bytes, 1024);
     if (d.rem != 0) {
         return;
     }

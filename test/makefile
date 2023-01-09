@@ -9,7 +9,10 @@ UMKA_SHELL ?= sudo taskset 1 ../umka_shell -c
 endif
 
 xfs_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#xfs_*.t)))
+xfsv5_tests    := $(addsuffix .out.log, $(basename $(wildcard *\#xfsv5_*.t)))
 exfat_tests    := $(addsuffix .out.log, $(basename $(wildcard *\#exfat_*.t)))
+fat_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#fat_*.t)))
+ext_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#ext_*.t)))
 s05k_tests     := $(addsuffix .out.log, $(basename $(wildcard *\#s05k_*.t)))
 s4k_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#s4k_*.t)))
 f30_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#f30_*.t)))
@@ -21,7 +24,6 @@ lookup_tests   := $(addsuffix .out.log, $(basename $(wildcard *\#lookup_*.t)))
 bug_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#bug_*.t)))
 xattr_tests    := $(addsuffix .out.log, $(basename $(wildcard *\#xattr_*.t)))
 unicode_tests  := $(addsuffix .out.log, $(basename $(wildcard *\#unicode_*.t)))
-v5_tests       := $(addsuffix .out.log, $(basename $(wildcard *\#v5_*.t)))
 draw_tests     := $(addsuffix .out.log, $(basename $(wildcard *\#draw_*.t)))
 coverage_tests := $(addsuffix .out.log, $(basename $(wildcard *\#coverage_*.t)))
 i40_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#i40_*.t)))
@@ -31,12 +33,15 @@ acpi_tests     := $(addsuffix .out.log, $(basename $(wildcard *\#acpi_*.t)))
 input_tests    := $(addsuffix .out.log, $(basename $(wildcard *\#input_*.t)))
 gpt_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#gpt_*.t)))
 
-all: xfs exfat s05k s4k f30 f70 f70s0 f70s1 f70s5 lookup bug xattr unicode v5 \
-     draw coverage i40 net arp acpi input gpt
+all: xfs xfsv5 exfat fat ext s05k s4k f30 f70 f70s0 f70s1 f70s5 lookup bug \
+     xattr unicode draw coverage i40 net arp acpi input gpt
 	@echo all tests passed
 
 xfs: $(xfs_tests)
+xfsv5: $(xfsv5_tests)
 exfat: $(exfat_tests)
+fat: $(fat_tests)
+ext: $(ext_tests)
 s05k: $(s05k_tests)
 s4k: $(s4k_tests)
 f30: $(f30_tests)
@@ -48,7 +53,6 @@ lookup: $(lookup_tests)
 bug: $(bug_tests)
 xattr: $(xattr_tests)
 unicode: $(unicode_tests)
-v5: $(v5_tests)
 draw: $(draw_tests)
 coverage: $(coverage_tests)
 i40: $(i40_tests)

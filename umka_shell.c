@@ -48,7 +48,7 @@ main(int argc, char **argv) {
         "  -i infile        file with commands\n"
         "  -o outfile       file for logs\n"
         "  -r               reproducible logs (without pointers and datetime)\n"
-        "  -c               collect coverage";
+        "  -c               collect coverage\n";
     const char *infile = NULL, *outfile = NULL;
     struct shell_ctx ctx = {.reproducible = 0, .hist_file = history_filename,
                             .var = NULL};

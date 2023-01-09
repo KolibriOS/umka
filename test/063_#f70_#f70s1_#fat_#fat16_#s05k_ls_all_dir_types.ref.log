@@ -1,7 +1,7 @@
 /> umka_init
 /> disk_add ../img/fat16_s05k.qcow2 hd0 -c 524288
 /hd0: sector_size=512, capacity=8388608 (4 GiB), num_partitions=1
-/hd0/1: fs=fat, start=2048 (1 MiB), length=8386560 (4095 MiB)
+/hd0/1: fs=fat, start=2048 (1 MiB), length=8384481 (4292854272 B)
 /> ls70 /hd0/1/dir_a
 status = 6 end_of_file, count = 5
 total = 5
