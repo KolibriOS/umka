@@ -110,12 +110,12 @@ xfs_lookup_v4.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l 7GiB $img_raw
+    fallocate -l 3GiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
     local p1="$LOOP_DEV"p1
 
-    $MKFS_XFS $XFS_MKFS_OPTS -m crc=0 $p1 
+    $MKFS_XFS $XFS_MKFS_OPTS -b size=1k -m crc=0 $p1
     sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
@@ -135,13 +135,10 @@ xfs_lookup_v4.qcow2 () {
     $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l1a d 5000
 #
     mkdir $TEMP_DIR/dir_btree_l1b
-    $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l1b d 50000
-#
-    mkdir $TEMP_DIR/dir_btree_l1c
-    $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l1c d 500000
+    $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l1b d 200000
 #
     mkdir $TEMP_DIR/dir_btree_l2
-    $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l2 d 2000000
+    $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l2 d 1000000
 #
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
@@ -154,12 +151,12 @@ xfs_lookup_v5.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l 7GiB $img_raw
+    fallocate -l 3GiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
     local p1="$LOOP_DEV"p1
 
-    $MKFS_XFS $XFS_MKFS_OPTS -m crc=1 $p1 
+    $MKFS_XFS $XFS_MKFS_OPTS -b size=1k -m crc=1 $p1
     sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
@@ -179,13 +176,10 @@ xfs_lookup_v5.qcow2 () {
     $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l1a d 5000
 #
     mkdir $TEMP_DIR/dir_btree_l1b
-    $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l1b d 50000
-#
-    mkdir $TEMP_DIR/dir_btree_l1c
-    $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l1c d 500000
+    $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l1b d 200000
 #
     mkdir $TEMP_DIR/dir_btree_l2
-    $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l2 d 2000000
+    $MKDOUBLEDIRS $TEMP_DIR/dir_btree_l2 d 1000000
 #
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
@@ -203,7 +197,7 @@ xfs_nrext64.qcow2 () {
     sudo losetup -P $LOOP_DEV $img_raw
     local p1="$LOOP_DEV"p1
 
-    $MKFS_XFS $XFS_MKFS_OPTS -i nrext64=1 $p1 
+    $MKFS_XFS $XFS_MKFS_OPTS -i nrext64=1 $p1
     sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
@@ -241,7 +235,7 @@ xfs_bigtime.qcow2 () {
     sudo losetup -P $LOOP_DEV $img_raw
     local p1="$LOOP_DEV"p1
 
-    $MKFS_XFS $XFS_MKFS_OPTS -m bigtime=1 $p1 
+    $MKFS_XFS $XFS_MKFS_OPTS -m bigtime=1 $p1
     sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
@@ -280,7 +274,7 @@ xfs_borg_bit.qcow2 () {
     sudo losetup -P $LOOP_DEV $img_raw
     local p1="$LOOP_DEV"p1
 
-    $MKFS_XFS $XFS_MKFS_OPTS -n version=ci $p1 
+    $MKFS_XFS $XFS_MKFS_OPTS -n version=ci $p1
 
     sudo losetup -d $LOOP_DEV
 
@@ -300,7 +294,7 @@ xfs_short_dir_i8.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_XFS $XFS_MKFS_OPTS -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
-        -d sectsize=512 -i size=256 -n size=8k,ftype=0 $p1 
+        -d sectsize=512 -i size=256 -n size=8k,ftype=0 $p1
 #
     sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
@@ -327,7 +321,7 @@ xfs_v4_ftype0_s05k_b2k_n8k.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_XFS $XFS_MKFS_OPTS -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
-        -d sectsize=512 -n size=8k,ftype=0 $p1 
+        -d sectsize=512 -n size=8k,ftype=0 $p1
     sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
@@ -368,7 +362,7 @@ xfs_v4_ftype1_s05k_b2k_n8k.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_XFS $XFS_MKFS_OPTS -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
-        -d sectsize=512 -n size=8k,ftype=1 $p1 
+        -d sectsize=512 -n size=8k,ftype=1 $p1
     sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
@@ -409,7 +403,7 @@ xfs_v4_xattr.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_XFS $XFS_MKFS_OPTS -m crc=0,finobt=0,rmapbt=0,reflink=0 \
-        -d sectsize=512 -n ftype=0 $p1 
+        -d sectsize=512 -n ftype=0 $p1
     sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR -o attr2
     sudo chown $USER $TEMP_DIR -R
 #
@@ -442,7 +436,7 @@ xfs_v4_btrees_l2.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_XFS $XFS_MKFS_OPTS -b size=1k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
-        -d sectsize=512 -n size=4k,ftype=1 $p1 
+        -d sectsize=512 -n size=4k,ftype=1 $p1
     sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
@@ -473,7 +467,7 @@ xfs_v4_files_s05k_b4k_n8k.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_XFS $XFS_MKFS_OPTS -b size=4k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
-        -d sectsize=512 -n size=8k,ftype=0 $p1 
+        -d sectsize=512 -n size=8k,ftype=0 $p1
     sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
@@ -561,7 +555,7 @@ xfs_v4_ftype0_s05k_b2k_n8k_xattr.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_XFS $XFS_MKFS_OPTS -b size=2k -m crc=0,finobt=0,rmapbt=0,reflink=0 \
-        -d sectsize=512 -n size=8k,ftype=0 $p1 
+        -d sectsize=512 -n size=8k,ftype=0 $p1
     sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
