@@ -151,7 +151,7 @@ xfs_lookup_v5.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l 3GiB $img_raw
+    fallocate -l 5GiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
     local p1="$LOOP_DEV"p1

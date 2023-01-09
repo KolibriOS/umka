@@ -115,7 +115,7 @@ Allow reading process_vm_readv syscall.
 
 To create tap devices.
 
-    # setcap cap_net_admin+ep ../umka_os
+    # setcap cap_net_admin+ep umka_os
 
 To load apps at 0 address.
 
