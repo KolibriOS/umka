@@ -1121,6 +1121,16 @@ umka_sys_write_text(size_t x, size_t y, uint32_t color, int asciiz,
 }
 
 static inline void
+umka_sys_delay(size_t cs) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(5),
+          "b"(cs)
+        : "memory");
+}
+
+static inline void
 umka_sys_put_image(void *image, size_t xsize, size_t ysize, size_t x,
                    size_t y) {
     __asm__ __inline__ __volatile__ (

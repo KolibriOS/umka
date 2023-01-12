@@ -164,17 +164,18 @@ main() {
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
 
     umka_init();
-    umka_stack_init();
+//    umka_stack_init();
 
-    FILE *f = fopen("../img/kolibri.img", "r");
+    FILE *f = fopen("../img/kolibri.raw", "r");
     fread(kos_ramdisk, 2880*512, 1, f);
     fclose(f);
     kos_ramdisk_init();
 //    load_app_host("../apps/board_cycle", app_base);
+    load_app_host("../apps/lsdir", app_base);
 //    load_app("/rd/1/loader");
 
-    net_device_t *vnet = vnet_init();
-    kos_net_add_device(vnet);
+//    net_device_t *vnet = vnet_init();
+//    kos_net_add_device(vnet);
 
     char devname[64];
     for (size_t i = 0; i < umka_sys_net_get_dev_count(); i++) {
@@ -184,6 +185,7 @@ main() {
         fprintf(stderr, "[net_drv] device %i: %s %u\n", i, devname, devtype);
     }
 
+/*
     // network setup should be done from the userspace app, e.g. via zeroconf
     f76ret_t r76;
     r76 = umka_sys_net_ipv4_set_subnet(1, inet_addr("255.255.255.0"));
@@ -209,9 +211,10 @@ main() {
         fprintf(stderr, "[net_drv] set ip addr error\n");
         return -1;
     }
+*/
 
-
-    thread_start(0, monitor, THREAD_STACK_SIZE);
+//    thread_start(0, monitor, THREAD_STACK_SIZE);
+    thread_start(0, app_base, THREAD_STACK_SIZE);
 
     dump_procs();
 

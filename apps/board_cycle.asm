@@ -16,10 +16,17 @@ start:
         pushfd
         btr     dword[esp], BSF EFLAGS.ID
         popfd
+        mov     ecx, '0'
+next_char:
+        cmp     ecx, '9'
+        jbe     @f
+        mov     ecx, '0'
 @@:
-jmp $
-        mcall   63, 1, '*'
-        jmp     @b
+        mcall   63, 1
+;jmp $
+        mcall   5, 10
+        inc     ecx
+        jmp     next_char
 exit:
         mcall   18, 9, 2
         mcall   -1

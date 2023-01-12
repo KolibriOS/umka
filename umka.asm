@@ -336,14 +336,16 @@ purge cmp
 purge mov
 restore OS_BASE
 include 'core/sync.inc'
-;include 'core/sys32.inc'
 macro call target {
   if target eq do_change_task
         call    _do_change_task
+  else if target eq page_fault_handler
+        call    _page_fault_handler
   else
         call    target
   end if
 }
+include 'core/sys32.inc'
 do_change_task equ hjk
 irq0 equ irq0_pew
 tss._io_map_0 equ 0
@@ -762,11 +764,12 @@ endp
 
 pubsym skin_udata
 proc idle uses ebx esi edi
+        sti
 .loop:
         mov     ecx, 10000000
 @@:
         loop    @b
-        DEBUGF 1, "1 idle\n"
+;        DEBUGF 1, "1 idle\n"
         jmp     .loop
 
         ret
@@ -790,6 +793,10 @@ proc _pci_read_reg uses ebx esi edi
         movzx   edx, ah
         push    edx     ; bus
         call    pci_read
+        ret
+endp
+
+proc _page_fault_handler
         ret
 endp
 
@@ -901,8 +908,6 @@ check_fdd_motor_status:
 check_ATAPI_device_event:
 check_fdd_motor_status_has_work?:
 check_ATAPI_device_event_has_work?:
-request_terminate:
-terminate:
 LoadMedium:
 clear_CD_cache:
 allow_medium_removal:
@@ -913,23 +918,28 @@ init_sys_v86:
 usb_init:
 fdc_init:
 mtrr_validate:
-protect_from_terminate:
-unprotect_from_terminate:
+; sys32.inc
+;terminate:
+;protect_from_terminate:
+;unprotect_from_terminate:
+;lock_application_table:
+;unlock_application_table:
+;build_interrupt_table:
+;sys_resize_app_memory:
+;request_terminate:
+v86_exc_c:
+except_7:
 ReadCDWRetr:
 WaitUnitReady:
 prevent_medium_removal:
 Read_TOC:
-lock_application_table:
-unlock_application_table:
 free_page:
-build_interrupt_table:
 init_fpu:
 init_mtrr:
 create_trampoline_pgmap:
 alloc_page:
 
 ;sys_IPC:
-sys_resize_app_memory:
 ;f68:
 v86_irq:
 ;test_cpu:
@@ -1128,6 +1138,10 @@ forward
   if x eq tss and 0xFFFF
         dw 0
   else if x eq (tss shr 16) and 0xFF00
+        dw 0
+  else if x eq i40 and 0xFFFF
+        dw 0
+  else if x eq i40 shr 16
         dw 0
   else
         dw x
