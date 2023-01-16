@@ -41,5 +41,6 @@ t.d
 *.exe
 colors.dtp
 .tup
-board_hello
-board_cycle
+apps/board_hello
+apps/board_cycle
+apps/readdir

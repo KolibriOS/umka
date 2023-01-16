@@ -63,6 +63,24 @@ enum kos_lang {
 #define EVENT_NETWORK2   0x0200
 #define EVENT_EXTENDED   0x0400
 
+#define KOS_APP_BASE 0
+#define MENUET01_MAGIC "MENUET01"
+
+struct app_hdr {
+    union {
+        struct {
+            char magic[8];
+            uint32_t version;
+            uint32_t start;
+            uint32_t i_end;
+            uint32_t mem_size;
+            uint32_t stack_top;
+            uint32_t i_param;
+            uint32_t i_icon;
+        } menuet;
+    };
+};
+
 struct point16s {
     int16_t y, x;
 };
@@ -566,6 +584,69 @@ kos_attach_int_handler(int irq, int (*handler)(void*), void *user_data);
 
 void
 kos_irq_serv_irq10(void);
+
+struct ret_create_event {
+    uint32_t event; // (=0 => fail)
+    uint32_t uid;
+};
+
+static inline struct ret_create_event
+kos_create_event(void *data, uint32_t flags) {
+    struct ret_create_event ret;
+    __asm__ __inline__ __volatile__ (
+        "push   ebx esi edi ebp;"
+        "call   _kos_create_event;"
+        "pop    ebp edi esi ebx"
+        : "=a"(ret.event),
+          "=d"(ret.uid)
+        : "S"(data),
+          "c"(flags)
+        : "memory", "cc");
+    return ret;
+}
+
+static inline void*
+kos_destroy_event(void *event, uint32_t uid) {
+    void *ret;
+    __asm__ __inline__ __volatile__ (
+        "push   ebx esi edi ebp;"
+        "call   _kos_destroy_event;"
+        "pop    ebp edi esi ebx"
+        : "=a"(ret)
+        : "a"(event),
+          "b"(uid)
+        : "memory", "cc");
+    return ret;
+
+}
+
+static inline void
+kos_wait_event(void *event, uint32_t uid) {
+    __asm__ __inline__ __volatile__ (
+        "push   ebx esi edi ebp;"
+        "call   _kos_wait_event;"
+        "pop    ebp edi esi ebx"
+        :
+        : "a"(event),
+          "b"(uid)
+        : "memory", "cc");
+}
+
+typedef uint32_t (*wait_test_t)(void *);
+
+static inline void*
+kos_wait_events(wait_test_t wait_test, void *wait_param) {
+    void *res;
+    __asm__ __inline__ __volatile__ (
+        "push   ebx esi edi ebp;"
+        "call   _kos_wait_events;"
+        "pop    ebp edi esi ebx"
+        : "=a"(res)
+        : "c"(wait_param),
+          "d"(wait_test)
+        : "memory", "cc");
+    return res;
+}
 
 static inline int32_t
 umka_fs_execute(const char *filename) {

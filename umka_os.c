@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <netinet/in.h>
 #define __USE_GNU
 #include <signal.h>
@@ -24,26 +25,42 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include "umka.h"
+#include "optparse.h"
 #include "shell.h"
 #include "trace.h"
 #include "vnet.h"
 
+#define HIST_FILE_BASENAME ".umka_shell.history"
 #define UMKA_DEFAULT_DISPLAY_WIDTH 400
 #define UMKA_DEFAULT_DISPLAY_HEIGHT 300
 
 #define THREAD_STACK_SIZE 0x100000
 
+char history_filename[PATH_MAX];
+
+void build_history_filename() {
+    const char *dir_name;
+    if (!(dir_name = getenv("HOME"))) {
+        dir_name = ".";
+    }
+    sprintf(history_filename, "%s/%s", dir_name, HIST_FILE_BASENAME);
+}
+
+/*
 static void
 monitor(void) {
     umka_sti();
     fprintf(stderr, "Start monitor thread\n");
     __asm__ __inline__ __volatile__ ("jmp $");
 }
+*/
 
 void umka_thread_net_drv(void);
 
 struct itimerval timeout = {.it_value = {.tv_sec = 0, .tv_usec = 10000},
                             .it_interval = {.tv_sec = 0, .tv_usec = 10000}};
+
+typedef void (*kos_thread_t)(void);
 
 static void
 thread_start(int is_kernel, void (*entry)(void), size_t stack_size) {
@@ -55,7 +72,7 @@ thread_start(int is_kernel, void (*entry)(void), size_t stack_size) {
 static void
 dump_procs() {
     for (int i = 0; i < NR_SCHED_QUEUES; i++) {
-        printf("sched queue #%i:", i);
+        fprintf(stderr, "sched queue #%i:", i);
         appdata_t *p_begin = kos_scheduler_current[i];
         appdata_t *p = p_begin;
         do {
@@ -73,7 +90,7 @@ load_app_host(const char *fname, void *base) {
         perror("Can't open app file");
         exit(1);
     }
-    fread(base, 1, 0x4000, f);
+    fread(base, 1, 0x100000, f);
     fclose(f);
 
     for (size_t i = 0; i < 0x64; i++) {
@@ -113,12 +130,48 @@ void handle_irq_net(int signo, siginfo_t *info, void *context) {
 }
 
 int
-main() {
-    if (coverage)
+main(int argc, char *argv[]) {
+    (void)argc;
+    const char *usage = "umka_os [-i <infile>] [-o <outfile>]\n";
+    if (coverage) {
         trace_begin();
+    }
 
     umka_tool = UMKA_OS;
     umka_sti();
+
+    const char *infile = NULL, *outfile = NULL;
+    struct shell_ctx ctx = {.reproducible = 0, .hist_file = history_filename,
+                            .var = NULL};
+    build_history_filename();
+
+    struct optparse options;
+    int opt;
+    optparse_init(&options, argv);
+
+    while ((opt = optparse(&options, "i:o:")) != -1) {
+        switch (opt) {
+        case 'i':
+            infile = options.optarg;
+            break;
+        case 'o':
+            outfile = options.optarg;
+            break;
+        default:
+            fprintf(stderr, "bad option: %c\n", opt);
+            fputs(usage, stderr);
+            exit(1);
+        }
+    }
+
+    if (infile && !freopen(infile, "r", stdin)) {
+        fprintf(stderr, "[!] can't open file for reading: %s\n", infile);
+        exit(1);
+    }
+    if (outfile && !freopen(outfile, "w", stdout)) {
+        fprintf(stderr, "[!] can't open file for writing: %s\n", outfile);
+        exit(1);
+    }
 
     struct sigaction sa;
     sa.sa_sigaction = irq0;
@@ -126,7 +179,7 @@ main() {
     sa.sa_flags = SA_SIGINFO;
 
     if (sigaction(SIGPROF, &sa, NULL) == -1) {
-        printf("Can't install SIGPROF handler!\n");
+        fprintf(stderr, "Can't install SIGPROF handler!\n");
         return 1;
     }
 
@@ -135,7 +188,7 @@ main() {
     sa.sa_flags = SA_SIGINFO;
 
     if (sigaction(SIGSEGV, &sa, NULL) == -1) {
-        printf("Can't install SIGSEGV handler!\n");
+        fprintf(stderr, "Can't install SIGSEGV handler!\n");
         return 1;
     }
 
@@ -144,14 +197,13 @@ main() {
     sa.sa_flags = SA_SIGINFO;
 
     if (sigaction(SIGUSR1, &sa, NULL) == -1) {
-        printf("Can't install SIGUSR1 handler!\n");
+        fprintf(stderr, "Can't install SIGUSR1 handler!\n");
         return 1;
     }
 
-    void *app_base = mmap((void*)0, 16*0x100000, PROT_READ | PROT_WRITE |
-                          PROT_EXEC, MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
-                          -1, 0);
-    if (app_base == MAP_FAILED) {
+    struct app_hdr *app = mmap(KOS_APP_BASE, 16*0x100000, PROT_READ | PROT_WRITE |
+        PROT_EXEC, MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (app == MAP_FAILED) {
         perror("mmap failed");
         exit(1);
     }
@@ -163,15 +215,11 @@ main() {
     kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
 
-    umka_init();
+    run_test(&ctx);
 //    umka_stack_init();
 
-    FILE *f = fopen("../img/kolibri.raw", "r");
-    fread(kos_ramdisk, 2880*512, 1, f);
-    fclose(f);
-    kos_ramdisk_init();
-//    load_app_host("../apps/board_cycle", app_base);
-    load_app_host("../apps/lsdir", app_base);
+//    load_app_host("../apps/board_cycle", app);
+    load_app_host("../apps/readdir", app);
 //    load_app("/rd/1/loader");
 
 //    net_device_t *vnet = vnet_init();
@@ -214,7 +262,8 @@ main() {
 */
 
 //    thread_start(0, monitor, THREAD_STACK_SIZE);
-    thread_start(0, app_base, THREAD_STACK_SIZE);
+    kos_thread_t start = (kos_thread_t)(KOS_APP_BASE + app->menuet.start);
+    thread_start(0, start, THREAD_STACK_SIZE);
 
     dump_procs();
 

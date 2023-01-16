@@ -175,6 +175,11 @@ pubsym acpi_dev_size, "kos_acpi_dev_size"
 pubsym acpi_dev_next, "kos_acpi_dev_next"
 pubsym kernel_alloc, "kos_kernel_alloc"
 
+pubsym create_event, "_kos_create_event"
+pubsym destroy_event, "_kos_destroy_event"
+pubsym wait_event, "_kos_wait_event"
+pubsym Wait_events, "_kos_wait_events"
+
 pubsym window._.set_screen, 'kos_window_set_screen'
 pubsym _display, 'kos_display'
 

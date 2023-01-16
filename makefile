@@ -66,7 +66,7 @@ umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vdisk/raw.o vdisk/qcow2.o \
          vdisk/miniz/miniz.a vnet.o trace.o trace_lbr.o $(HOST)/pci.o \
-         $(HOST)/thread.o util.o bestline.o
+         $(HOST)/thread.o util.o bestline.o optparse.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \

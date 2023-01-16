@@ -1,0 +1,3 @@
+umka_init
+ramdisk_init ../img/kolibri.raw
+disk_add ../img/xfs_samehash_s05k.raw  hd0 -c 0
