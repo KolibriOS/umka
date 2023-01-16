@@ -1,4 +1,4 @@
-umka_init
+umka_init shell
 
 ramdisk_init ../img/kolibri.raw
 set_skin /sys/DEFAULT.SKN

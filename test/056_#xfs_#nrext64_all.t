@@ -1,4 +1,4 @@
-umka_init
+umka_init shell
 disk_add ../img/xfs_nrext64.qcow2 hd0 -c 524288
 stat70 /hd0/1/dir_sf
 stat70 /hd0/1/dir_block

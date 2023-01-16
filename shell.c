@@ -408,14 +408,27 @@ static void
 cmd_umka_init(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
-        "usage: umka_init";
-    (void)argv;
-    if (argc != 1) {
+        "usage: umka_init <tool>\n"
+        "  <tool>           number or string: 1=shell, 2=fuse, 3=os";
+    if (argc != 2) {
         puts(usage);
         return;
     }
+    const char *tool_str = argv[1];
+    unsigned tool;
+    if (!strcmp(tool_str, "1") || !strcmp(tool_str, "shell")) {
+        tool = UMKA_SHELL;
+    } else if (!strcmp(tool_str, "2") || !strcmp(tool_str, "fuse")) {
+        tool = UMKA_FUSE;
+    } else if (!strcmp(tool_str, "3") || !strcmp(tool_str, "os")) {
+        tool = UMKA_OS;
+    } else {
+        printf("[!] bad tool value: '%s'\n", tool_str);
+        return;
+    }
+
     COVERAGE_ON();
-    umka_init();
+    umka_init(tool);
     COVERAGE_OFF();
 }
 

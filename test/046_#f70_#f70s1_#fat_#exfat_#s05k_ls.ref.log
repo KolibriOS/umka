@@ -1,4 +1,4 @@
-/> umka_init
+/> umka_init shell
 /> disk_add ../img/exfat_s05k_c16k_b16k.qcow2 hd0 -c 524288
 /hd0: sector_size=512, capacity=618496 (302 MiB), num_partitions=1
 /hd0/1: fs=exfat, start=2048 (1 MiB), length=614400 (300 MiB)

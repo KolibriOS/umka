@@ -1,4 +1,4 @@
-/> umka_init
+/> umka_init shell
 /> disk_add ../img/gpt_partitions_s05k.qcow2 hd0 -c 524288
 /hd0: sector_size=512, capacity=2097152 (1 GiB), num_partitions=24
 /hd0/1: fs=???, start=2048 (1 MiB), length=2048 (1 MiB)

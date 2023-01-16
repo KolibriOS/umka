@@ -1,4 +1,4 @@
-umka_init
+umka_init shell
 set_mouse_pos_screen 40 30
 #disk_add ../img/kolibri.raw rd -c 0
 ramdisk_init ../img/kolibri.raw

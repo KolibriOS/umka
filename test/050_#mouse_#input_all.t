@@ -1,4 +1,4 @@
-umka_init
+umka_init shell
 
 get_mouse_pos_screen
 get_mouse_pos_window

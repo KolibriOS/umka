@@ -555,7 +555,9 @@ proc kos_eth_input c uses ebx esi edi ebp, buffer_ptr
         ret
 endp
 
-proc umka_init c uses ebx esi edi ebp
+proc umka_init c uses ebx esi edi ebp, _tool
+        mov     eax, [_tool]
+        mov     [umka_tool], eax
         mov     [umka_initialized], 1
         call    umka._.check_alignment
 

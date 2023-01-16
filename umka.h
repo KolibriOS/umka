@@ -533,7 +533,7 @@ void
 irq0(int signo, siginfo_t *info, void *context);
 
 void
-umka_init(void);
+umka_init(int tool);
 
 void
 i40(void);
@@ -1037,9 +1037,10 @@ typedef struct {
 
 _Static_assert(sizeof(appdata_t) == 256, "must be 0x100 bytes long");
 
-#define UMKA_SHELL 1u
-#define UMKA_FUSE  2u
-#define UMKA_OS    3u
+#define UMKA_SHELL           1
+#define UMKA_FUSE            2
+#define UMKA_OS              3
+#define UMKA_GEN_DEVICES_DAT 4
 
 #define MAX_PRIORITY    0 // highest, used for kernel tasks
 #define USER_PRIORITY   1 // default

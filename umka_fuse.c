@@ -150,7 +150,7 @@ main(int argc, char *argv[]) {
     kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
 
-    umka_init();
+    umka_init(UMKA_FUSE);
     struct vdisk *umka_disk = vdisk_init(argv[2], 1, 0u, 0);
     disk_t *disk = disk_add(&umka_disk->diskfunc, "hd0", umka_disk, 0);
     disk_media_changed(disk, 1);

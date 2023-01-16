@@ -1,4 +1,4 @@
-/> umka_init
+/> umka_init shell
 /> disk_add ../img/fat12_s05k.qcow2 hd0 -c 524288
 /hd0: sector_size=512, capacity=524288 (256 MiB), num_partitions=1
 /hd0/1: fs=fat, start=2048 (1 MiB), length=520192 (254 MiB)

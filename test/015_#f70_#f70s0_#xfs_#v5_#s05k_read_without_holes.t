@@ -1,4 +1,4 @@
-umka_init
+umka_init shell
 disk_add ../img/xfs_v5_files_s05k_b4k_n8k.qcow2 hd0 -c 524288
 # zero length
 read70 /hd0/1/no_hole 0 0 -b
