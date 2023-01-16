@@ -618,7 +618,7 @@ cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
     }
 
     struct vdisk *umka_disk = vdisk_init(file_name, adjust_cache_size,
-                                         cache_size);
+                                         cache_size, umka_tool == UMKA_OS);
     if (umka_disk) {
         COVERAGE_ON();
         disk_t *disk = disk_add(&umka_disk->diskfunc, disk_name, umka_disk, 0);

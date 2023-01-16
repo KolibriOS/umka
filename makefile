@@ -57,16 +57,18 @@ test: umka_shell
 
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
             vdisk/raw.o vdisk/qcow2.o vdisk/miniz/miniz.a vnet.o lodepng.o \
-            $(HOST)/pci.o $(HOST)/thread.o util.o optparse.o bestline.o
+            $(HOST)/pci.o $(HOST)/thread.o $(HOST)/io.o util.o optparse.o \
+            bestline.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
-           vdisk/qcow2.o vdisk/miniz/miniz.a $(HOST)/pci.o $(HOST)/thread.o
+           vdisk/qcow2.o vdisk/miniz/miniz.a $(HOST)/pci.o $(HOST)/thread.o \
+           $(HOST)/io.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs` -T umka.ld
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vdisk/raw.o vdisk/qcow2.o \
          vdisk/miniz/miniz.a vnet.o trace.o trace_lbr.o $(HOST)/pci.o \
-         $(HOST)/thread.o util.o bestline.o optparse.o
+         $(HOST)/thread.o $(HOST)/io.o util.o bestline.o optparse.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
@@ -78,6 +80,9 @@ umka.o umka.fas: umka.asm
 
 shell.o: shell.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
+
+$(HOST)/io.o: $(HOST)/io.c $(HOST)/io.h
+	$(CC) $(CFLAGS_32) -c $< -o $@
 
 $(HOST)/thread.o: $(HOST)/thread.c
 	$(CC) $(CFLAGS_32) -c $< -o $@

@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "../trace.h"
+#include "io.h"
 #include "raw.h"
 
 struct vdisk_raw {
@@ -34,7 +35,8 @@ vdisk_raw_read(void *userdata, void *buffer, off_t startsector,
     COVERAGE_OFF();
     struct vdisk_raw *disk = userdata;
     lseek(disk->fd, startsector * disk->vdisk.sect_size, SEEK_SET);
-    read(disk->fd, buffer, *numsectors * disk->vdisk.sect_size);
+    io_read(disk->fd, buffer, *numsectors * disk->vdisk.sect_size,
+            disk->vdisk.change_task);
     COVERAGE_ON();
     return ERROR_SUCCESS;
 }
@@ -45,7 +47,8 @@ vdisk_raw_write(void *userdata, void *buffer, off_t startsector,
     COVERAGE_OFF();
     struct vdisk_raw *disk = userdata;
     lseek(disk->fd, startsector * disk->vdisk.sect_size, SEEK_SET);
-    write(disk->fd, buffer, *numsectors * disk->vdisk.sect_size);
+    io_write(disk->fd, buffer, *numsectors * disk->vdisk.sect_size,
+             disk->vdisk.change_task);
     COVERAGE_ON();
     return ERROR_SUCCESS;
 }
