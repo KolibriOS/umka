@@ -24,9 +24,9 @@ else
         $(error your compiler is not supported)
 endif
 
-CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -g -O0 -D_FILE_OFFSET_BITS=64 \
-       -DNDEBUG -masm=intel -D_POSIX_C_SOURCE=200809L -I$(HOST) -fno-pie
-CFLAGS_32=$(CFLAGS) -m32 -D__USE_TIME_BITS64
+CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -g -O0 -DNDEBUG -masm=intel \
+        -D_POSIX_C_SOURCE=200809L -I$(HOST) -fno-pie
+CFLAGS_32=$(CFLAGS) -m32 -D_FILE_OFFSET_BITS=64 -D__USE_TIME_BITS64
 LDFLAGS=-no-pie
 LDFLAGS_32=$(LDFLAGS) -m32
 

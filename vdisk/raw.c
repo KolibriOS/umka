@@ -8,25 +8,22 @@
 */
 
 #include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "../trace.h"
 #include "raw.h"
 
-#ifdef _WIN32
-#define fseeko _fseeki64
-#define ftello _ftelli64
-#endif
-
 struct vdisk_raw {
     struct vdisk vdisk;
-    FILE *file;
+    int fd;
 };
 
 STDCALL void
 vdisk_raw_close(void *userdata) {
     COVERAGE_OFF();
     struct vdisk_raw *disk = userdata;
-    fclose(disk->file);
+    close(disk->fd);
     free(disk);
     COVERAGE_ON();
 }
@@ -36,8 +33,8 @@ vdisk_raw_read(void *userdata, void *buffer, off_t startsector,
                size_t *numsectors) {
     COVERAGE_OFF();
     struct vdisk_raw *disk = userdata;
-    fseeko(disk->file, startsector * disk->vdisk.sect_size, SEEK_SET);
-    fread(buffer, *numsectors * disk->vdisk.sect_size, 1, disk->file);
+    lseek(disk->fd, startsector * disk->vdisk.sect_size, SEEK_SET);
+    read(disk->fd, buffer, *numsectors * disk->vdisk.sect_size);
     COVERAGE_ON();
     return ERROR_SUCCESS;
 }
@@ -47,22 +44,21 @@ vdisk_raw_write(void *userdata, void *buffer, off_t startsector,
                 size_t *numsectors) {
     COVERAGE_OFF();
     struct vdisk_raw *disk = userdata;
-    fseeko(disk->file, startsector * disk->vdisk.sect_size, SEEK_SET);
-    fwrite(buffer, *numsectors * disk->vdisk.sect_size, 1, disk->file);
+    lseek(disk->fd, startsector * disk->vdisk.sect_size, SEEK_SET);
+    write(disk->fd, buffer, *numsectors * disk->vdisk.sect_size);
     COVERAGE_ON();
     return ERROR_SUCCESS;
 }
 
 struct vdisk*
 vdisk_init_raw(const char *fname) {
-    FILE *f = fopen(fname, "r+");
-    if (!f) {
+    int fd = open(fname, O_RDWR);
+    if (!fd) {
         printf("[vdisk.raw]: can't open file '%s': %s\n", fname, strerror(errno));
         return NULL;
     }
-    fseeko(f, 0, SEEK_END);
-    off_t fsize = ftello(f);
-    fseeko(f, 0, SEEK_SET);
+    off_t fsize = lseek(fd, 0, SEEK_END);
+    lseek(fd, 0, SEEK_SET);
     size_t sect_size = 512;
     if (strstr(fname, "s4096") != NULL || strstr(fname, "s4k") != NULL) {
         sect_size = 4096;
@@ -77,7 +73,7 @@ vdisk_init_raw(const char *fname) {
                       .sect_size = sect_size,
                       .sect_cnt = (uint64_t)fsize / sect_size,
                      },
-            .file = f,
+            .fd = fd,
             };
     return (struct vdisk*)disk;
 }

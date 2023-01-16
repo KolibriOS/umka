@@ -8,14 +8,16 @@
 */
 
 #include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "../trace.h"
 #include "qcow2.h"
 #include "miniz/miniz.h"
 
 struct vdisk_qcow2 {
     struct vdisk vdisk;
-    FILE *file;
+    int fd;
     size_t cluster_bits;
     size_t cluster_size;
     uint8_t *cluster;
@@ -93,8 +95,8 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
     uint64_t l1_entry;
     uint64_t l2_entry;
     uint64_t l1_entry_offset = d->l1_table_offset + l1_index*sizeof(l1_entry);
-    fseeko(d->file, l1_entry_offset, SEEK_SET);
-    if (!fread(&l1_entry, 1, sizeof(l1_entry), d->file)) {
+    lseek(d->fd, l1_entry_offset, SEEK_SET);
+    if (!read(d->fd, &l1_entry, sizeof(l1_entry))) {
         fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                 strerror(errno));
         return;
@@ -106,8 +108,8 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
         memset(buf, 0, d->vdisk.sect_size);
         return;
     }
-    fseeko(d->file, l2_table_offset + l2_index*sizeof(l2_entry), SEEK_SET);
-    if (!fread(&l2_entry, 1, sizeof(l2_entry), d->file)) {
+    lseek(d->fd, l2_table_offset + l2_index*sizeof(l2_entry), SEEK_SET);
+    if (!read(d->fd, &l2_entry, sizeof(l2_entry))) {
         fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                 strerror(errno));
         return;
@@ -121,8 +123,8 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
             return;
         }
         cluster_offset = l2_entry & L2_ENTRY_STD_OFFSET;
-        fseeko(d->file, cluster_offset, SEEK_SET);
-        if (!fread(d->cluster, 1, d->cluster_size, d->file)) {
+        lseek(d->fd, cluster_offset, SEEK_SET);
+        if (!read(d->fd, d->cluster, d->cluster_size)) {
             fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                     strerror(errno));
             return;
@@ -133,11 +135,11 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
     } else {
         off_t cmp_offset = d->l2_entry_cmp_offset_mask & l2_entry;
         printf("cmp_offset: 0x%" PRIx64 "\n", cmp_offset);
-        fseeko(d->file, cmp_offset, SEEK_SET);
+        lseek(d->fd, cmp_offset, SEEK_SET);
         size_t additional_sectors = (l2_entry & d->l2_entry_cmp_sect_cnt_mask)
                                     >> d->l2_entry_cmp_x;
         size_t cmp_size = 512 - (cmp_offset & 511) + additional_sectors*512;
-        if (!fread(d->cmp_cluster, 1, d->cluster_size, d->file)) {
+        if (!read(d->fd, d->cmp_cluster, d->cluster_size)) {
             fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                     strerror(errno));
             return;
@@ -154,8 +156,8 @@ STDCALL void
 vdisk_qcow2_close(void *userdata) {
     COVERAGE_OFF();
     struct vdisk_qcow2 *d = userdata;
-    if (d->file) {
-        fclose(d->file);
+    if (d->fd) {
+        close(d->fd);
     }
     free(d->cluster);
     free(d->cmp_cluster);
@@ -205,7 +207,7 @@ vdisk_init_qcow2(const char *fname) {
         return NULL;
     }
 
-    if (!(d->file = fopen(fname, "r+"))) {
+    if (!(d->fd = open(fname, O_RDONLY))) {
         fprintf(stderr, "[vdisk.qcow2] can't open file '%s': %s\n", fname,
                 strerror(errno));
         vdisk_qcow2_close(d);
@@ -217,7 +219,7 @@ vdisk_init_qcow2(const char *fname) {
     }
 
     struct qcow2_header header;
-    if (!fread(&header, 1, sizeof(struct qcow2_header), d->file)) {
+    if (!read(d->fd, &header, sizeof(struct qcow2_header))) {
         fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                 strerror(errno));
         vdisk_qcow2_close(d);
