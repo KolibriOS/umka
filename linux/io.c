@@ -27,22 +27,24 @@ io_init(int change_task) {
 }
 
 void
-io_close(void *userdata) {
-    struct umka_io *io = (struct umka_io*)userdata;
+io_close(void *arg) {
+    struct umka_io *io = arg;
     free(io);
 }
 
 ssize_t
-io_read(int fd, void *buf, size_t count, int change_task) {
-    (void)change_task;
+io_read(int fd, void *buf, size_t count, void *arg) {
+    struct umka_io *io = arg;
+    (void)io;
     ssize_t res;
     res = read(fd, buf, count);
     return res;
 }
 
 ssize_t
-io_write(int fd, const void *buf, size_t count, int change_task) {
-    (void)change_task;
+io_write(int fd, const void *buf, size_t count, void *arg) {
+    struct umka_io *io = arg;
+    (void)io;
     ssize_t res;
     res = write(fd, buf, count);
     return res;

@@ -4,7 +4,7 @@
     UMKa - User-Mode KolibriOS developer tools
     umka_shell - the shell
 
-    Copyright (C) 2017-2022  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2017-2023  Ivan Baravy <dunkaist@gmail.com>
     Copyright (C) 2021  Magomed Kostoev <mkostoevr@yandex.ru>
 */
 
@@ -16,14 +16,28 @@
 #include <unistd.h>
 #include "optparse.h"
 #include "shell.h"
+#include "io.h"
 #include "umka.h"
 #include "trace.h"
 
 #define HIST_FILE_BASENAME ".umka_shell.history"
-#define UMKA_DEFAULT_DISPLAY_WIDTH 400
-#define UMKA_DEFAULT_DISPLAY_HEIGHT 300
+
+struct umka_shell_ctx {
+    struct umka_ctx *umka;
+    struct umka_io *io;
+    struct shell_ctx *shell;
+};
 
 char history_filename[PATH_MAX];
+
+struct umka_shell_ctx *
+umka_shell_init(int reproducible) {
+    struct umka_shell_ctx *ctx = malloc(sizeof(struct umka_shell_ctx));
+    ctx->umka = NULL;
+    ctx->io = io_init(IO_DONT_CHANGE_TASK);
+    ctx->shell = shell_init(reproducible, history_filename, ctx->io);
+    return ctx;
+}
 
 void build_history_filename() {
     const char *dir_name;
@@ -42,7 +56,6 @@ uint8_t mem2[256*1024*1024];
 int
 main(int argc, char **argv) {
     (void)argc;
-    umka_tool = UMKA_SHELL;
     const char *usage = \
         "usage: umka_shell [-i infile] [-o outfile] [-r] [-c] [-h]\n"
         "  -i infile        file with commands\n"
@@ -50,8 +63,6 @@ main(int argc, char **argv) {
         "  -r               reproducible logs (without pointers and datetime)\n"
         "  -c               collect coverage\n";
     const char *infile = NULL, *outfile = NULL;
-    struct shell_ctx ctx = {.reproducible = 0, .hist_file = history_filename,
-                            .var = NULL};
     build_history_filename();
 /*
     kos_boot.memmap_block_cnt = 3;
@@ -59,10 +70,12 @@ main(int argc, char **argv) {
     kos_boot.memmap_blocks[1] = (e820entry_t){(uintptr_t)mem1, 128*1024*1024, 1};
     kos_boot.memmap_blocks[2] = (e820entry_t){(uintptr_t)mem2, 256*1024*1024, 1};
 */
-    kos_boot.bpp = 32;
+    kos_boot.bpp = UMKA_DEFAULT_DISPLAY_BPP;
     kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
     kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
-    kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
+    kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH * UMKA_DEFAULT_DISPLAY_BPP / 8;
+
+    int reproducible = 0;
 
     struct optparse options;
     int opt;
@@ -77,7 +90,7 @@ main(int argc, char **argv) {
             outfile = options.optarg;
             break;
         case 'r':
-            ctx.reproducible = 1;
+            reproducible = 1;
             break;
         case 'c':
             coverage = 1;
@@ -100,10 +113,12 @@ main(int argc, char **argv) {
         exit(1);
     }
 
+    struct umka_shell_ctx *ctx = umka_shell_init(reproducible);
+
     if (coverage)
         trace_begin();
 
-    run_test(&ctx);
+    run_test(ctx->shell);
 
     if (coverage) {
         trace_end();

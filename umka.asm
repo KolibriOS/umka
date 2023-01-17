@@ -2,7 +2,7 @@
 ;
 ; UMKa - User-Mode KolibriOS developer tools
 ;
-; Copyright (C) 2017-2022  Ivan Baravy <dunkaist@gmail.com>
+; Copyright (C) 2017-2023  Ivan Baravy <dunkaist@gmail.com>
 ; Copyright (C) 2021  Magomed Kostoev <mkostoevr@yandex.ru>
 
 if HOST eq windows
@@ -113,7 +113,8 @@ pubsym coverage_end
 
 pubsym sha3_256_oneshot, 'hash_oneshot'
 pubsym kos_time_to_epoch
-pubsym umka_init
+pubsym umka_init, 4
+pubsym umka_close, 4
 
 pubsym current_process, 'kos_current_process'
 pubsym current_slot, 'kos_current_slot'
@@ -555,12 +556,28 @@ proc kos_eth_input c uses ebx esi edi ebp, buffer_ptr
         ret
 endp
 
-proc umka_init c uses ebx esi edi ebp, _tool
-        mov     eax, [_tool]
-        mov     [umka_tool], eax
-        mov     [umka_initialized], 1
-        call    umka._.check_alignment
+struct umka_ctx
+        tool dd ?
+        initialized dd ?
+ends
 
+proc umka_init c uses ebx esi edi ebp, _tool
+        call    umka._.check_alignment
+        stdcall kos_init
+        stdcall kernel_alloc, sizeof.umka_ctx
+        mov     ecx, [_tool]
+        mov     [umka_tool], ecx
+        mov     [eax+umka_ctx.tool], ecx
+        mov     [eax+umka_ctx.initialized], 1
+        ret
+endp
+
+proc umka_close c, _ctx
+        xor     eax, eax
+        ret
+endp
+
+proc kos_init uses ebx esi edi ebp
         mov     edi, endofcode
         mov     ecx, uglobals_size
         xor     eax, eax
@@ -1047,10 +1064,8 @@ else if HOST eq linux
 else
     error "Your OS is not supported"
 end if
-pubsym umka_tool
+
 umka_tool dd ?
-pubsym umka_initialized
-umka_initialized dd 0
 fpu_owner dd ?
 
 uglobal

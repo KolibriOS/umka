@@ -12,10 +12,19 @@
 
 #include <unistd.h>
 
-ssize_t
-io_read(int fd, void *buf, size_t count, int change_task);
+#define IO_DONT_CHANGE_TASK 0
+#define IO_CHANGE_TASK 1
+
+void *
+io_init(int change_task);
+
+void
+io_close(void *arg);
 
 ssize_t
-io_write(int fd, const void *buf, size_t count, int change_task);
+io_read(int fd, void *buf, size_t count, void *arg);
+
+ssize_t
+io_write(int fd, const void *buf, size_t count, void *arg);
 
 #endif  // IO_H_INCLUDED

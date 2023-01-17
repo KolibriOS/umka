@@ -4,7 +4,7 @@
     UMKa - User-Mode KolibriOS developer tools
     umka_os - kind of KolibriOS rump kernel
 
-    Copyright (C) 2018-2022  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2018-2023  Ivan Baravy <dunkaist@gmail.com>
 */
 
 #include <arpa/inet.h>
@@ -30,13 +30,27 @@
 #include "trace.h"
 #include "vnet.h"
 
-#define HIST_FILE_BASENAME ".umka_shell.history"
-#define UMKA_DEFAULT_DISPLAY_WIDTH 400
-#define UMKA_DEFAULT_DISPLAY_HEIGHT 300
+#define HIST_FILE_BASENAME ".umka_os.history"
 
 #define THREAD_STACK_SIZE 0x100000
 
+struct umka_os_ctx {
+    struct umka_ctx *umka;
+    struct umka_io *io;
+    struct shell_ctx *shell;
+};
+
 char history_filename[PATH_MAX];
+
+struct umka_os_ctx *
+umka_os_init() {
+    struct umka_os_ctx *ctx = malloc(sizeof(struct umka_os_ctx));
+    ctx->umka = NULL;
+    ctx->io = io_init(IO_DONT_CHANGE_TASK);
+    ctx->shell = shell_init(SHELL_LOG_NONREPRODUCIBLE, history_filename,
+                            ctx->io);
+    return ctx;
+}
 
 void build_history_filename() {
     const char *dir_name;
@@ -137,12 +151,9 @@ main(int argc, char *argv[]) {
         trace_begin();
     }
 
-    umka_tool = UMKA_OS;
     umka_sti();
 
     const char *infile = NULL, *outfile = NULL;
-    struct shell_ctx ctx = {.reproducible = 0, .hist_file = history_filename,
-                            .var = NULL};
     build_history_filename();
 
     struct optparse options;
@@ -173,6 +184,8 @@ main(int argc, char *argv[]) {
         exit(1);
     }
 
+    struct umka_os_ctx *ctx = umka_os_init();
+
     struct sigaction sa;
     sa.sa_sigaction = irq0;
     sigemptyset(&sa.sa_mask);
@@ -201,8 +214,8 @@ main(int argc, char *argv[]) {
         return 1;
     }
 
-    struct app_hdr *app = mmap(KOS_APP_BASE, 16*0x100000, PROT_READ | PROT_WRITE |
-        PROT_EXEC, MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    struct app_hdr *app = mmap(KOS_APP_BASE, 16*0x100000, PROT_READ | PROT_WRITE
+        | PROT_EXEC, MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (app == MAP_FAILED) {
         perror("mmap failed");
         exit(1);
@@ -210,12 +223,12 @@ main(int argc, char *argv[]) {
 
     printf("pid=%d, kos_lfb_base=%p\n", getpid(), (void*)kos_lfb_base);
 
-    kos_boot.bpp = 32;
+    kos_boot.bpp = UMKA_DEFAULT_DISPLAY_BPP;
     kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
     kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
-    kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
+    kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH * UMKA_DEFAULT_DISPLAY_BPP / 8;
 
-    run_test(&ctx);
+    run_test(ctx->shell);
 //    umka_stack_init();
 
 //    load_app_host("../apps/board_cycle", app);

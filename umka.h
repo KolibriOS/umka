@@ -3,7 +3,7 @@
 
     UMKa - User-Mode KolibriOS developer tools
 
-    Copyright (C) 2017-2022  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2017-2023  Ivan Baravy <dunkaist@gmail.com>
     Copyright (C) 2021  Magomed Kostoev <mkostoevr@yandex.ru>
 */
 
@@ -27,6 +27,15 @@ typedef void siginfo_t;
 #endif
 
 #define STDCALL __attribute__((__stdcall__))
+
+struct umka_ctx {
+    uint32_t tool;
+    uint32_t initialized;
+};
+
+#define UMKA_DEFAULT_DISPLAY_BPP 32
+#define UMKA_DEFAULT_DISPLAY_WIDTH 400
+#define UMKA_DEFAULT_DISPLAY_HEIGHT 300
 
 #define KEYBOARD_MODE_ASCII     0
 #define KEYBOARD_MODE_SCANCODES 1
@@ -532,8 +541,11 @@ umka_osloop() {
 void
 irq0(int signo, siginfo_t *info, void *context);
 
-void
+struct umka_ctx *
 umka_init(int tool);
+
+void
+umka_close(struct umka_ctx *ctx);
 
 void
 i40(void);
@@ -1049,8 +1061,6 @@ _Static_assert(sizeof(appdata_t) == 256, "must be 0x100 bytes long");
 
 extern appdata_t *kos_scheduler_current[NR_SCHED_QUEUES];
 
-extern uint32_t umka_tool;
-extern uint32_t umka_initialized;
 extern uint8_t kos_redraw_background;
 extern size_t kos_task_count;
 extern wdata_t kos_window_data[];

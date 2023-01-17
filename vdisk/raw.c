@@ -36,7 +36,7 @@ vdisk_raw_read(void *userdata, void *buffer, off_t startsector,
     struct vdisk_raw *disk = userdata;
     lseek(disk->fd, startsector * disk->vdisk.sect_size, SEEK_SET);
     io_read(disk->fd, buffer, *numsectors * disk->vdisk.sect_size,
-            disk->vdisk.change_task);
+            disk->vdisk.io);
     COVERAGE_ON();
     return ERROR_SUCCESS;
 }
@@ -48,7 +48,7 @@ vdisk_raw_write(void *userdata, void *buffer, off_t startsector,
     struct vdisk_raw *disk = userdata;
     lseek(disk->fd, startsector * disk->vdisk.sect_size, SEEK_SET);
     io_write(disk->fd, buffer, *numsectors * disk->vdisk.sect_size,
-             disk->vdisk.change_task);
+             disk->vdisk.io);
     COVERAGE_ON();
     return ERROR_SUCCESS;
 }

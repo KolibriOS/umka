@@ -321,9 +321,9 @@ get_last_dir(const char *path) {
 }
 
 static void
-prompt() {
+prompt(struct shell_ctx *ctx) {
     if (cur_dir_changed) {
-        if (umka_initialized) {
+        if (ctx->umka && ctx->umka->initialized) {
             COVERAGE_ON();
             umka_sys_get_cwd(cur_dir, PATH_MAX);
             COVERAGE_OFF();
@@ -406,7 +406,6 @@ cmd_send_scancode(struct shell_ctx *ctx, int argc, char **argv) {
 
 static void
 cmd_umka_init(struct shell_ctx *ctx, int argc, char **argv) {
-    (void)ctx;
     const char *usage = \
         "usage: umka_init <tool>\n"
         "  <tool>           number or string: 1=shell, 2=fuse, 3=os";
@@ -428,8 +427,12 @@ cmd_umka_init(struct shell_ctx *ctx, int argc, char **argv) {
     }
 
     COVERAGE_ON();
-    umka_init(tool);
+    ctx->umka = umka_init(tool);
     COVERAGE_OFF();
+
+    if (!ctx->umka) {
+        printf("![shell] can't init umka\n");
+    }
 }
 
 static void
@@ -631,7 +634,7 @@ cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
     }
 
     struct vdisk *umka_disk = vdisk_init(file_name, adjust_cache_size,
-                                         cache_size, umka_tool == UMKA_OS);
+                                         cache_size, ctx->io);
     if (umka_disk) {
         COVERAGE_ON();
         disk_t *disk = disk_add(&umka_disk->diskfunc, disk_name, umka_disk, 0);
@@ -3875,7 +3878,7 @@ run_test(struct shell_ctx *ctx) {
     char *line;
     while((line = bestline(prompt_line))) {
         if (!is_tty) {
-            prompt();
+            prompt(ctx);
             printf("%s\n", line);
         }
         if (!strcmp(line, "X") || !strcmp(line, "q")) {
@@ -3906,4 +3909,24 @@ run_test(struct shell_ctx *ctx) {
     bestlineHistorySave(ctx->hist_file);
 
     return NULL;
+}
+
+struct shell_ctx *
+shell_init(int reproducible, const char *hist_file, struct umka_io *io) {
+    struct shell_ctx *ctx = malloc(sizeof(struct shell_ctx));
+    ctx->umka = NULL;
+    ctx->io = io;
+    ctx->reproducible = reproducible;
+    ctx->hist_file = hist_file;
+    ctx->var = NULL;
+    return ctx;
+}
+
+void
+shell_close(struct shell_ctx *ctx) {
+    struct shell_var *next;
+    for (struct shell_var *var = ctx->var; var; var = next) {
+        next = var->next;
+        free(var);
+    }
 }

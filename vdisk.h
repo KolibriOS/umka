@@ -19,11 +19,11 @@ struct vdisk {
     uint64_t sect_cnt;
     unsigned cache_size;
     int adjust_cache_size;
-    int change_task;
+    void *io;
 };
 
 struct vdisk*
 vdisk_init(const char *fname, int adjust_cache_size, size_t cache_size,
-           int change_task);
+           void *io);
 
 #endif  // VDISK_H_INCLUDED

@@ -4,7 +4,7 @@
     UMKa - User-Mode KolibriOS developer tools
     umka_fuse - FUSE <-> KolibriOS FS calls converter
 
-    Copyright (C) 2017-2021  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2017-2023  Ivan Baravy <dunkaist@gmail.com>
 */
 
 #define FUSE_USE_VERSION 31
@@ -22,13 +22,31 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "io.h"
 #include "vdisk.h"
 #include "umka.h"
 
-#define UMKA_DEFAULT_DISPLAY_WIDTH 400
-#define UMKA_DEFAULT_DISPLAY_HEIGHT 300
-
 #define DIRENTS_TO_READ 100
+
+struct umka_fuse_ctx {
+    struct umka_ctx *umka;
+    struct umka_io *io;
+};
+
+static struct umka_fuse_ctx *
+umka_fuse_init() {
+    struct umka_fuse_ctx *ctx = malloc(sizeof(struct umka_fuse_ctx));
+    ctx->umka = NULL;
+    ctx->io = io_init(IO_DONT_CHANGE_TASK);
+    return ctx;
+}
+
+static void
+umka_fuse_close(struct umka_fuse_ctx *ctx) {
+    umka_close(ctx->umka);
+    io_close(ctx->io);
+    free(ctx);
+}
 
 static void
 bdfe_to_stat(bdfe_t *kf, struct stat *st) {
@@ -47,14 +65,19 @@ bdfe_to_stat(bdfe_t *kf, struct stat *st) {
 }
 
 static void *
-umka_fuse_init(struct fuse_conn_info *conn, struct fuse_config *cfg) {
+fs_init(struct fuse_conn_info *conn, struct fuse_config *cfg) {
         (void) conn;
         cfg->kernel_cache = 1;
         return NULL;
 }
 
+static void
+fs_destroy(void *private_data) {
+    struct umka_fuse_ctx *ctx = private_data;
+    umka_fuse_close(ctx);
+}
 static int
-umka_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi) {
+fs_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi) {
     (void) fi;
     int res = 0;
 
@@ -76,7 +99,7 @@ umka_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi) {
 }
 
 static int
-umka_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset,
+fs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset,
              struct fuse_file_info *fi, enum fuse_readdir_flags flags) {
     (void) offset;      // TODO
     (void) fi;
@@ -106,7 +129,7 @@ umka_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset,
 }
 
 static int
-umka_open(const char *path, struct fuse_file_info *fi) {
+fs_open(const char *path, struct fuse_file_info *fi) {
 //    if (strcmp(path+1, "blah") != 0)
 //        return -ENOENT;
     (void) path;
@@ -118,7 +141,7 @@ umka_open(const char *path, struct fuse_file_info *fi) {
 }
 
 static int
-umka_read(const char *path, char *buf, size_t size, off_t offset,
+fs_read(const char *path, char *buf, size_t size, off_t offset,
           struct fuse_file_info *fi) {
     (void) fi;
 
@@ -130,29 +153,30 @@ umka_read(const char *path, char *buf, size_t size, off_t offset,
 }
 
 static struct fuse_operations umka_oper = {
-    .init           = umka_fuse_init,
-    .getattr        = umka_getattr,
-    .readdir        = umka_readdir,
-    .open           = umka_open,
-    .read           = umka_read,
+    .init    = fs_init,
+    .destroy = fs_destroy,
+    .getattr = fs_getattr,
+    .readdir = fs_readdir,
+    .open    = fs_open,
+    .read    = fs_read,
 };
 
 int
 main(int argc, char *argv[]) {
-    umka_tool = UMKA_FUSE;
     if (argc != 3) {
         printf("usage: umka_fuse dir img\n");
         exit(1);
     }
 
-    kos_boot.bpp = 32;
+    kos_boot.bpp = UMKA_DEFAULT_DISPLAY_BPP;
     kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
     kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
-    kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH*4;  // 32bpp
+    kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH * UMKA_DEFAULT_DISPLAY_BPP / 8;
 
-    umka_init(UMKA_FUSE);
+    struct umka_fuse_ctx *ctx = umka_fuse_init();
+
     struct vdisk *umka_disk = vdisk_init(argv[2], 1, 0u, 0);
     disk_t *disk = disk_add(&umka_disk->diskfunc, "hd0", umka_disk, 0);
     disk_media_changed(disk, 1);
-    return fuse_main(argc-1, argv, &umka_oper, NULL);
+    return fuse_main(argc-1, argv, &umka_oper, ctx);
 }
