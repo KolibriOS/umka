@@ -16,6 +16,9 @@
 #include "miniz/miniz.h"
 #include "io.h"
 
+#define L1_MAX_LEN (32u*1024u*1024u)
+#define L1_MAX_ENTRIES (L1_MAX_LEN / sizeof(uint64_t))
+
 struct vdisk_qcow2 {
     struct vdisk vdisk;
     int fd;
@@ -33,6 +36,7 @@ struct vdisk_qcow2 {
     off_t refcount_table_offset;
     size_t l1_size;
     uint64_t sector_idx_mask;
+    uint64_t *l1;
 };
 
 #define QCOW2_MAGIC "QFI\xfb"
@@ -93,16 +97,8 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
     uint64_t cluster_index = offset / d->cluster_size;
     uint64_t l1_index = (cluster_index) / l2_entries;
     uint64_t l2_index = (cluster_index) % l2_entries;
-    uint64_t l1_entry;
+    uint64_t l1_entry = d->l1[l1_index];
     uint64_t l2_entry;
-    uint64_t l1_entry_offset = d->l1_table_offset + l1_index*sizeof(l1_entry);
-    lseek(d->fd, l1_entry_offset, SEEK_SET);
-    if (!io_read(d->fd, &l1_entry, sizeof(l1_entry), d->vdisk.io)) {
-        fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
-                strerror(errno));
-        return;
-    }
-    l1_entry = be64(&l1_entry);
 
     uint64_t l2_table_offset = l1_entry & L1_ENTRY_OFFSET_MASK;
     if (!l2_table_offset) {
@@ -162,6 +158,7 @@ vdisk_qcow2_close(void *userdata) {
     }
     free(d->cluster);
     free(d->cmp_cluster);
+    free(d->l1);
     free(d);
     COVERAGE_ON();
 }
@@ -304,6 +301,26 @@ vdisk_init_qcow2(const char *fname, struct umka_io *io) {
                 strerror(errno));
         vdisk_qcow2_close(d);
         return NULL;
+    }
+
+    d->l1 = (uint64_t*)malloc(d->l1_size * sizeof(uint64_t));
+    if (!d->l1) {
+        fprintf(stderr, "[vdisk.qcow2] can't allocate memory: %s\n",
+                strerror(errno));
+        vdisk_qcow2_close(d);
+        return NULL;
+    }
+
+    lseek(d->fd, d->l1_table_offset, SEEK_SET);
+    if (!io_read(d->fd, d->l1, d->l1_size * sizeof(uint64_t), d->vdisk.io)) {
+        fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
+                strerror(errno));
+        vdisk_qcow2_close(d);
+        return NULL;
+    }
+
+    for (uint64_t *x = d->l1; x < d->l1 + d->l1_size; x++) {
+        *x = be64(x);
     }
 
     return (struct vdisk*)d;

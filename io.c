@@ -25,7 +25,7 @@ io_init(int *running) {
 
 void
 io_close(struct umka_io *io) {
-	io_async_close(io->async);
+    io_async_close(io->async);
     free(io);
 }
 
@@ -44,8 +44,8 @@ ssize_t
 io_write(int fd, const void *buf, size_t count, struct umka_io *io) {
     ssize_t res;
     if (!*io->running) {
-    	res = write(fd, buf, count);
-	} else {
+        res = write(fd, buf, count);
+    } else {
         res = io_async_write(fd, buf, count, io->async);
     }
     return res;
