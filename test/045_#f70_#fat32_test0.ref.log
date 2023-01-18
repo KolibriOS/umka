@@ -1,4 +1,4 @@
-/> umka_init shell
+/> umka_boot
 /> disk_add ../img/fat32_test0.raw hd0 -c 0
 /hd0: sector_size=512, capacity=131072 (64 MiB), num_partitions=1
 /hd0/1: fs=fat, start=2048 (1 MiB), length=126976 (62 MiB)

@@ -323,7 +323,7 @@ get_last_dir(const char *path) {
 static void
 prompt(struct shell_ctx *ctx) {
     if (cur_dir_changed) {
-        if (ctx->umka && ctx->umka->initialized) {
+        if (ctx->umka->booted) {
             COVERAGE_ON();
             umka_sys_get_cwd(cur_dir, PATH_MAX);
             COVERAGE_OFF();
@@ -405,34 +405,19 @@ cmd_send_scancode(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-cmd_umka_init(struct shell_ctx *ctx, int argc, char **argv) {
+cmd_umka_boot(struct shell_ctx *ctx, int argc, char **argv) {
+    (void)ctx;
+    (void)argv;
     const char *usage = \
-        "usage: umka_init <tool>\n"
-        "  <tool>           number or string: 1=shell, 2=fuse, 3=os";
-    if (argc != 2) {
+        "usage: umka_boot";
+    if (argc != 1) {
         puts(usage);
-        return;
-    }
-    const char *tool_str = argv[1];
-    unsigned tool;
-    if (!strcmp(tool_str, "1") || !strcmp(tool_str, "shell")) {
-        tool = UMKA_SHELL;
-    } else if (!strcmp(tool_str, "2") || !strcmp(tool_str, "fuse")) {
-        tool = UMKA_FUSE;
-    } else if (!strcmp(tool_str, "3") || !strcmp(tool_str, "os")) {
-        tool = UMKA_OS;
-    } else {
-        printf("[!] bad tool value: '%s'\n", tool_str);
         return;
     }
 
     COVERAGE_ON();
-    ctx->umka = umka_init(tool);
+    umka_boot();
     COVERAGE_OFF();
-
-    if (!ctx->umka) {
-        printf("![shell] can't init umka\n");
-    }
 }
 
 static void
@@ -3706,7 +3691,7 @@ static void cmd_help(struct shell_ctx *ctx, int argc, char **argv);
 
 func_table_t cmd_cmds[] = {
     { "send_scancode",                  cmd_send_scancode },
-    { "umka_init",                      cmd_umka_init },
+    { "umka_boot",                      cmd_umka_boot },
     { "umka_set_boot_params",           cmd_umka_set_boot_params },
     { "acpi_call",                      cmd_acpi_call },
     { "acpi_enable",                    cmd_acpi_enable },
@@ -3912,9 +3897,10 @@ run_test(struct shell_ctx *ctx) {
 }
 
 struct shell_ctx *
-shell_init(int reproducible, const char *hist_file, struct umka_io *io) {
+shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
+           struct umka_io *io) {
     struct shell_ctx *ctx = malloc(sizeof(struct shell_ctx));
-    ctx->umka = NULL;
+    ctx->umka = umka;
     ctx->io = io;
     ctx->reproducible = reproducible;
     ctx->hist_file = hist_file;

@@ -116,6 +116,7 @@ pubsym sha3_256_oneshot, 'hash_oneshot'
 pubsym kos_time_to_epoch
 pubsym umka_init, 4
 pubsym umka_close, 4
+pubsym umka_boot
 
 pubsym current_process, 'kos_current_process'
 pubsym current_slot, 'kos_current_slot'
@@ -570,18 +571,15 @@ proc kos_eth_input c uses ebx esi edi ebp, buffer_ptr
 endp
 
 struct umka_ctx
-        tool dd ?
-        initialized dd ?
+        booted dd ?
+        running dd ?
 ends
 
-proc umka_init c uses ebx esi edi ebp, _tool
+proc umka_init c uses ebx esi edi ebp
         call    umka._.check_alignment
-        stdcall kos_init
-        stdcall kernel_alloc, sizeof.umka_ctx
-        mov     ecx, [_tool]
-        mov     [umka_tool], ecx
-        mov     [eax+umka_ctx.tool], ecx
-        mov     [eax+umka_ctx.initialized], 1
+        mov     eax, umka
+        mov     [eax+umka_ctx.booted], 0
+        mov     [eax+umka_ctx.running], 0
         ret
 endp
 
@@ -590,7 +588,8 @@ proc umka_close c, _ctx
         ret
 endp
 
-proc kos_init uses ebx esi edi ebp
+proc umka_boot uses ebx esi edi ebp
+        mov     [umka.booted], 1
         mov     edi, endofcode
         mov     ecx, uglobals_size
         xor     eax, eax
@@ -1035,8 +1034,8 @@ bios32_entry equ bios32_entry_pew
 tmp_page_tabs equ tmp_page_tabs_pew
 macro jmp target {
   if target eq osloop
-        cmp     [umka_tool], UMKA_SHELL
-        jnz     osloop
+        cmp     [umka.running], 1
+        jz      osloop
         ret
   else
         jmp     target
@@ -1079,7 +1078,7 @@ else
     error "Your OS is not supported"
 end if
 
-umka_tool dd ?
+umka umka_ctx
 fpu_owner dd ?
 
 uglobal

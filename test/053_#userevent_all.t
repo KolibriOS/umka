@@ -1,3 +1,3 @@
-umka_init shell
+umka_boot
 check_for_event
 check_for_event

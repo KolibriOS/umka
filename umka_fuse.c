@@ -36,8 +36,8 @@ struct umka_fuse_ctx {
 static struct umka_fuse_ctx *
 umka_fuse_init() {
     struct umka_fuse_ctx *ctx = malloc(sizeof(struct umka_fuse_ctx));
-    ctx->umka = NULL;
-    ctx->io = io_init(IO_DONT_CHANGE_TASK);
+    ctx->umka = umka_init(UMKA_FUSE);
+    ctx->io = io_init(&ctx->umka->running);
     return ctx;
 }
 

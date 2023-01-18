@@ -1,4 +1,4 @@
-umka_init shell
+umka_boot
 disk_add ../img/ext4_s05k.qcow2 hd0 -c 524288
 ls70 /hd0/1/dir_a
 ls70 /hd0/1/dir_b

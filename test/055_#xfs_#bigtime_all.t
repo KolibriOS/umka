@@ -1,4 +1,4 @@
-umka_init shell
+umka_boot
 disk_add ../img/xfs_bigtime.qcow2 hd0 -c 0
 ls70 /hd0/1/
 ls70 /hd0/1/dira

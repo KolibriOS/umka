@@ -1,4 +1,4 @@
-/> umka_init shell
+/> umka_boot
 /> 
 /> ramdisk_init ../img/kolibri.raw
 /rd: sector_size=512, capacity=2880 (1440 kiB), num_partitions=1

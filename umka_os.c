@@ -52,10 +52,10 @@ hw_int_mouse(void *arg) {
 struct umka_os_ctx *
 umka_os_init() {
     struct umka_os_ctx *ctx = malloc(sizeof(struct umka_os_ctx));
-    ctx->umka = NULL;
-    ctx->io = io_init(IO_DONT_CHANGE_TASK);
+    ctx->umka = umka_init(UMKA_OS);
+    ctx->io = io_init(&ctx->umka->running);
     ctx->shell = shell_init(SHELL_LOG_NONREPRODUCIBLE, history_filename,
-                            ctx->io);
+                            ctx->umka, ctx->io);
     return ctx;
 }
 
@@ -315,6 +315,7 @@ main(int argc, char *argv[]) {
 
     setitimer(ITIMER_PROF, &timeout, NULL);
 
+    ctx->umka->running = 1;
     umka_osloop();   // doesn't return
 
     if (coverage)

@@ -11,11 +11,12 @@
 #define VDISK_RAW_H_INCLUDED
 
 #include <stdio.h>
-#include "../vdisk.h"
+#include "vdisk.h"
+#include "io.h"
 
 #define RAW_SUFFIX ".raw"
 
 struct vdisk*
-vdisk_init_raw(const char *fname);
+vdisk_init_raw(const char *fname, struct umka_io *io);
 
 #endif  // VDISK_RAW_H_INCLUDED

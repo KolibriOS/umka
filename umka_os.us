@@ -1,4 +1,4 @@
-umka_init os
+umka_boot
 ramdisk_init ../img/kolibri.raw
 set_skin /sys/DEFAULT.SKN
 disk_add ../img/xfs_samehash_s05k.raw  hd0 -c 0

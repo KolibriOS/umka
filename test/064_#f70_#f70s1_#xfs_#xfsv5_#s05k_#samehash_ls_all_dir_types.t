@@ -1,4 +1,4 @@
-umka_init shell
+umka_boot
 disk_add ../img/xfs_samehash_s05k.raw hd0 -c 0
 ls70 /hd0/1/dir_sf
 ls70 /hd0/1/dir_block

@@ -1,5 +1,5 @@
 umka_set_boot_params --x_res 44 --y_res 44
-umka_init shell
+umka_boot
 ramdisk_init ../img/kolibri.raw
 set_skin /sys/DEFAULT.SKN
 

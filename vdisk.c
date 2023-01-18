@@ -49,10 +49,10 @@ vdisk_init(const char *fname, int adjust_cache_size, size_t cache_size,
     struct vdisk *disk;
     if (fname_len > dot_raw_len
         && !strcmp(fname + fname_len - dot_raw_len, RAW_SUFFIX)) {
-        disk = (struct vdisk*)vdisk_init_raw(fname);
+        disk = (struct vdisk*)vdisk_init_raw(fname, io);
     } else if (fname_len > dot_qcow2_len
                && !strcmp(fname + fname_len - dot_qcow2_len, QCOW2_SUFFIX)) {
-        disk = (struct vdisk*)vdisk_init_qcow2(fname);
+        disk = (struct vdisk*)vdisk_init_qcow2(fname, io);
     } else {
         fprintf(stderr, "[vdisk] file has unknown format: %s\n", fname);
         return NULL;

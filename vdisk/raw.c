@@ -54,8 +54,8 @@ vdisk_raw_write(void *userdata, void *buffer, off_t startsector,
 }
 
 struct vdisk*
-vdisk_init_raw(const char *fname) {
-    int fd = open(fname, O_RDWR);
+vdisk_init_raw(const char *fname, struct umka_io *io) {
+    int fd = open(fname, O_RDONLY);
     if (!fd) {
         printf("[vdisk.raw]: can't open file '%s': %s\n", fname, strerror(errno));
         return NULL;
@@ -75,6 +75,7 @@ vdisk_init_raw(const char *fname) {
                                   },
                       .sect_size = sect_size,
                       .sect_cnt = (uint64_t)fsize / sect_size,
+                      .io = io,
                      },
             .fd = fd,
             };

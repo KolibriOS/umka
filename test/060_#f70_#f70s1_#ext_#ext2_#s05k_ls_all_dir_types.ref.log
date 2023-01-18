@@ -1,4 +1,4 @@
-/> umka_init shell
+/> umka_boot
 /> disk_add ../img/ext2_s05k.qcow2 hd0 -c 524288
 /hd0: sector_size=512, capacity=10485760 (5 GiB), num_partitions=1
 /hd0/1: fs=ext, start=2048 (1 MiB), length=10481664 (5118 MiB)

@@ -1,4 +1,4 @@
-umka_init shell
+umka_boot
 #set_mouse_pos_screen 40 30
 ramdisk_init ../img/kolibri.raw
 set_skin /sys/DEFAULT.SKN

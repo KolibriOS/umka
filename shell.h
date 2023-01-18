@@ -33,7 +33,7 @@ struct shell_var {
 };
 
 struct shell_ctx {
-    struct umka_ctx *umka;
+    const struct umka_ctx *umka;
     struct umka_io *io;
     int reproducible;
     const char *hist_file;
@@ -41,7 +41,8 @@ struct shell_ctx {
 };
 
 struct shell_ctx *
-shell_init(int reproducible, const char *hist_file, struct umka_io *io);
+shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
+           struct umka_io *io);
 
 void
 shell_close(struct shell_ctx *shell);

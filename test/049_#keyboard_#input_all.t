@@ -1,4 +1,4 @@
-umka_init shell
+umka_boot
 
 get_keyboard_mode
 get_keyboard_lang

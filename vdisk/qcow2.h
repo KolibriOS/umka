@@ -11,11 +11,12 @@
 #define VDISK_QCOW2_H_INCLUDED
 
 #include <stdio.h>
-#include "../vdisk.h"
+#include "vdisk.h"
+#include "io.h"
 
 #define QCOW2_SUFFIX ".qcow2"
 
 struct vdisk*
-vdisk_init_qcow2(const char *fname);
+vdisk_init_qcow2(const char *fname, struct umka_io *io);
 
 #endif  // VDISK_QCOW2_H_INCLUDED

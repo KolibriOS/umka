@@ -33,9 +33,9 @@ char history_filename[PATH_MAX];
 struct umka_shell_ctx *
 umka_shell_init(int reproducible) {
     struct umka_shell_ctx *ctx = malloc(sizeof(struct umka_shell_ctx));
-    ctx->umka = NULL;
-    ctx->io = io_init(IO_DONT_CHANGE_TASK);
-    ctx->shell = shell_init(reproducible, history_filename, ctx->io);
+    ctx->umka = umka_init(UMKA_SHELL);
+    ctx->io = io_init(&ctx->umka->running);
+    ctx->shell = shell_init(reproducible, history_filename, ctx->umka, ctx->io);
     return ctx;
 }
 

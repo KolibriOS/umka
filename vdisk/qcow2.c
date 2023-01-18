@@ -14,6 +14,7 @@
 #include "../trace.h"
 #include "qcow2.h"
 #include "miniz/miniz.h"
+#include "io.h"
 
 struct vdisk_qcow2 {
     struct vdisk vdisk;
@@ -96,7 +97,7 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
     uint64_t l2_entry;
     uint64_t l1_entry_offset = d->l1_table_offset + l1_index*sizeof(l1_entry);
     lseek(d->fd, l1_entry_offset, SEEK_SET);
-    if (!read(d->fd, &l1_entry, sizeof(l1_entry))) {
+    if (!io_read(d->fd, &l1_entry, sizeof(l1_entry), d->vdisk.io)) {
         fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                 strerror(errno));
         return;
@@ -109,7 +110,7 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
         return;
     }
     lseek(d->fd, l2_table_offset + l2_index*sizeof(l2_entry), SEEK_SET);
-    if (!read(d->fd, &l2_entry, sizeof(l2_entry))) {
+    if (!io_read(d->fd, &l2_entry, sizeof(l2_entry), d->vdisk.io)) {
         fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                 strerror(errno));
         return;
@@ -124,7 +125,7 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
         }
         cluster_offset = l2_entry & L2_ENTRY_STD_OFFSET;
         lseek(d->fd, cluster_offset, SEEK_SET);
-        if (!read(d->fd, d->cluster, d->cluster_size)) {
+        if (!io_read(d->fd, d->cluster, d->cluster_size, d->vdisk.io)) {
             fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                     strerror(errno));
             return;
@@ -139,7 +140,7 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
         size_t additional_sectors = (l2_entry & d->l2_entry_cmp_sect_cnt_mask)
                                     >> d->l2_entry_cmp_x;
         size_t cmp_size = 512 - (cmp_offset & 511) + additional_sectors*512;
-        if (!read(d->fd, d->cmp_cluster, d->cluster_size)) {
+        if (!io_read(d->fd, d->cmp_cluster, d->cluster_size, d->vdisk.io)) {
             fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                     strerror(errno));
             return;
@@ -193,7 +194,7 @@ vdisk_qcow2_write(void *userdata, void *buffer, off_t startsector,
 }
 
 struct vdisk*
-vdisk_init_qcow2(const char *fname) {
+vdisk_init_qcow2(const char *fname, struct umka_io *io) {
     struct vdisk_qcow2 *d =
         (struct vdisk_qcow2*)calloc(1, sizeof(struct vdisk_qcow2));
     d->vdisk.diskfunc = (diskfunc_t) {.strucsize = sizeof(diskfunc_t),
@@ -201,6 +202,7 @@ vdisk_init_qcow2(const char *fname) {
                                       .read = vdisk_qcow2_read,
                                       .write = vdisk_qcow2_write,
                                      };
+    d->vdisk.io = io;
     if (!d) {
         fprintf(stderr, "[vdisk.qcow2] can't allocate memory: %s\n",
                 strerror(errno));
@@ -219,7 +221,7 @@ vdisk_init_qcow2(const char *fname) {
     }
 
     struct qcow2_header header;
-    if (!read(d->fd, &header, sizeof(struct qcow2_header))) {
+    if (!io_read(d->fd, &header, sizeof(struct qcow2_header), d->vdisk.io)) {
         fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                 strerror(errno));
         vdisk_qcow2_close(d);

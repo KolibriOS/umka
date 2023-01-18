@@ -1,4 +1,4 @@
-/> umka_init shell
+/> umka_boot
 /> 
 /> get_mouse_pos_screen
 x y: 200 150

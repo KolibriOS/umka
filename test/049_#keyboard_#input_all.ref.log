@@ -1,4 +1,4 @@
-/> umka_init shell
+/> umka_boot
 /> 
 /> get_keyboard_mode
 keyboard_mode: 0 - ASCII

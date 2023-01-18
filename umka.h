@@ -29,8 +29,8 @@ typedef void siginfo_t;
 #define STDCALL __attribute__((__stdcall__))
 
 struct umka_ctx {
-    uint32_t tool;
-    uint32_t initialized;
+    int booted;
+    int running;
 };
 
 #define UMKA_DEFAULT_DISPLAY_BPP 32
@@ -546,6 +546,9 @@ umka_init(int tool);
 
 void
 umka_close(struct umka_ctx *ctx);
+
+void
+umka_boot(void);
 
 void
 i40(void);
