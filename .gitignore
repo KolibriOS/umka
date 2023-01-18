@@ -16,6 +16,7 @@ tools/gensamehash
 tools/mksamehash
 tools/mkfilepattern
 tools/lfbviewx
+tools/lfbview
 tools/randdir
 *.qcow2
 *.img

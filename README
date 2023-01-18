@@ -125,23 +125,35 @@ To load apps at 0 address.
 Links & Acknowledgements
 ------------------------
 
-[1] Filesystem in Userspace library
-    https://github.com/libfuse/libfuse
+[ 1] Filesystem in Userspace
+     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/fs/fuse
 
-[2] LodePNG by Lode Vandevenne
-    https://lodev.org/lodepng/
+[ 2] Filesystem in Userspace library
+     https://github.com/libfuse/libfuse
 
-[3] Optparse by Christopher Wellons
-    https://github.com/skeeto/optparse
+[ 3] LodePNG by Lode Vandevenne
+     https://lodev.org/lodepng/
 
-[4] Universal TUN/TAP device driver by Maxim Krasnyansky and others
-    https://www.kernel.org/doc/html/v5.12/networking/tuntap.html
+[ 4] Optparse by Christopher Wellons
+     https://github.com/skeeto/optparse
 
-[5] Bestline by Justine Tunney
-    https://github.com/jart/bestline
+[ 5] Universal TUN/TAP device driver by Maxim Krasnyansky and others
+     https://www.kernel.org/doc/html/v5.12/networking/tuntap.html
 
-[6] Miniz by Rich Geldreich
-    https://github.com/richgel999/miniz
+[ 6] Bestline by Justine Tunney
+     https://github.com/jart/bestline
 
-[7] QEMU by Fabrice Bellard and others
-    https://www.qemu.org
+[ 7] Miniz by Rich Geldreich
+     https://github.com/richgel999/miniz
+
+[ 8] qemu-nbd by Anthony Liguori and others
+     https://www.qemu.org/docs/master/tools/qemu-nbd.html
+
+[ 9] io_uring by Jens Axboe and others
+     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/io_uring
+
+[10] io_uring-by-example by Shuveb Hussain
+     https://github.com/shuveb/io_uring-by-example
+
+[11] Simple DirectMedia Layer library aka SDL2
+     https://libsdl.org
