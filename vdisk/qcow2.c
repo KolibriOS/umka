@@ -37,6 +37,7 @@ struct vdisk_qcow2 {
     size_t l1_size;
     uint64_t sector_idx_mask;
     uint64_t *l1;
+    uint64_t prev_cluster_index;
 };
 
 #define QCOW2_MAGIC "QFI\xfb"
@@ -100,6 +101,14 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
     uint64_t l1_entry = d->l1[l1_index];
     uint64_t l2_entry;
 
+    if (cluster_index == d->prev_cluster_index) {
+        memcpy(buf,
+               d->cluster + (sector & d->sector_idx_mask) * d->vdisk.sect_size,
+               d->vdisk.sect_size);
+        return;
+    }
+    d->prev_cluster_index = cluster_index;
+
     uint64_t l2_table_offset = l1_entry & L1_ENTRY_OFFSET_MASK;
     if (!l2_table_offset) {
         memset(buf, 0, d->vdisk.sect_size);
@@ -126,9 +135,6 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
                     strerror(errno));
             return;
         }
-        memcpy(buf,
-               d->cluster + (sector & d->sector_idx_mask) * d->vdisk.sect_size,
-               d->vdisk.sect_size);
     } else {
         off_t cmp_offset = d->l2_entry_cmp_offset_mask & l2_entry;
         printf("cmp_offset: 0x%" PRIx64 "\n", cmp_offset);
@@ -143,10 +149,10 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
         }
         unsigned long dest_size = d->cluster_size;
         uncompress(d->cluster, &dest_size, d->cmp_cluster, cmp_size);
-        memcpy(buf,
-               d->cluster + (sector & d->sector_idx_mask) * d->vdisk.sect_size,
-               d->vdisk.sect_size);
     }
+    memcpy(buf,
+           d->cluster + (sector & d->sector_idx_mask) * d->vdisk.sect_size,
+           d->vdisk.sect_size);
 }
 
 STDCALL void
@@ -194,18 +200,19 @@ struct vdisk*
 vdisk_init_qcow2(const char *fname, struct umka_io *io) {
     struct vdisk_qcow2 *d =
         (struct vdisk_qcow2*)calloc(1, sizeof(struct vdisk_qcow2));
-    d->vdisk.diskfunc = (diskfunc_t) {.strucsize = sizeof(diskfunc_t),
-                                      .close = vdisk_qcow2_close,
-                                      .read = vdisk_qcow2_read,
-                                      .write = vdisk_qcow2_write,
-                                     };
-    d->vdisk.io = io;
     if (!d) {
         fprintf(stderr, "[vdisk.qcow2] can't allocate memory: %s\n",
                 strerror(errno));
         return NULL;
     }
 
+    d->vdisk.diskfunc = (diskfunc_t) {.strucsize = sizeof(diskfunc_t),
+                                      .close = vdisk_qcow2_close,
+                                      .read = vdisk_qcow2_read,
+                                      .write = vdisk_qcow2_write,
+                                     };
+    d->vdisk.io = io;
+    d->prev_cluster_index = ~(uint64_t)0;
     if (!(d->fd = open(fname, O_RDONLY))) {
         fprintf(stderr, "[vdisk.qcow2] can't open file '%s': %s\n", fname,
                 strerror(errno));
