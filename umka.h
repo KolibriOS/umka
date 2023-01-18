@@ -591,8 +591,19 @@ umka_mouse_move(int lbheld, int mbheld, int rbheld, int xabs, int32_t xmoving,
 STDCALL net_buff_t *
 kos_net_buff_alloc(size_t size);
 
+struct idt_entry {
+    uint16_t addr_lo;
+    uint16_t segment;
+    uint16_t flags;
+    uint16_t addr_hi;
+};
+
+typedef int (*hw_int_handler_t)(void*);
+
+extern struct idt_entry kos_idts[];
+
 STDCALL void
-kos_attach_int_handler(int irq, int (*handler)(void*), void *user_data);
+kos_attach_int_handler(int irq, hw_int_handler_t handler, void *userdata);
 
 void
 kos_irq_serv_irq10(void);
@@ -621,23 +632,34 @@ static inline void*
 kos_destroy_event(void *event, uint32_t uid) {
     void *ret;
     __asm__ __inline__ __volatile__ (
-        "push   ebx esi edi ebp;"
+        "push   ebx;"
+        "push   esi;"
+        "push   edi;"
+        "push   ebp;"
         "call   _kos_destroy_event;"
-        "pop    ebp edi esi ebx"
+        "pop    ebp;"
+        "pop    edi;"
+        "pop    esi;"
+        "pop    ebx"
         : "=a"(ret)
         : "a"(event),
           "b"(uid)
         : "memory", "cc");
     return ret;
-
 }
 
 static inline void
 kos_wait_event(void *event, uint32_t uid) {
     __asm__ __inline__ __volatile__ (
-        "push   ebx esi edi ebp;"
+        "push   ebx;"
+        "push   esi;"
+        "push   edi;"
+        "push   ebp;"
         "call   _kos_wait_event;"
-        "pop    ebp edi esi ebx"
+        "pop    ebp;"
+        "pop    edi;"
+        "pop    esi;"
+         "pop   ebx"
         :
         : "a"(event),
           "b"(uid)
@@ -646,13 +668,19 @@ kos_wait_event(void *event, uint32_t uid) {
 
 typedef uint32_t (*wait_test_t)(void *);
 
-static inline void*
+static inline void *
 kos_wait_events(wait_test_t wait_test, void *wait_param) {
     void *res;
     __asm__ __inline__ __volatile__ (
-        "push   ebx esi edi ebp;"
+        "push   %%ebx;"
+        "push   %%esi;"
+        "push   %%edi;"
+        "push   %%ebp;"
         "call   _kos_wait_events;"
-        "pop    ebp edi esi ebx"
+        "pop    %%ebp;"
+        "pop    %%edi;"
+        "pop    %%esi;"
+        "pop    %%ebx"
         : "=a"(res)
         : "c"(wait_param),
           "d"(wait_test)

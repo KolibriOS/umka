@@ -85,6 +85,7 @@ UMKA_OS    = 3
 UMKA_MEMORY_BYTES = 256 SHL 20
 
 pubsym irq_serv.irq_10, 'kos_irq_serv_irq10'
+pubsym idts, 'kos_idts'
 pubsym attach_int_handler, 'kos_attach_int_handler', 12
 pubsym fs_execute, 'kos_fs_execute', 4
 pubsym set_keyboard_data, 'kos_set_keyboard_data'
@@ -188,6 +189,9 @@ pubsym BOOT, 'kos_boot'
 
 EFLAGS.ID = 1 SHL 21
 
+macro lidt x {
+}
+
 macro invlpg addr {
 }
 
@@ -264,6 +268,15 @@ page_tabs equ page_tabs_pew
 ;macro OS_BASE [x] {
 ;  OS_BASE equ os_base
 ;}
+struct idt_entry
+        addr_lo dw ?
+        seg     dw ?
+        flags   dw ?
+        addr_hi dw ?
+ends
+
+NUM_EXCEPTIONS = 32
+
 macro tss pew {}
 include 'const.inc'
 purge tss
@@ -630,6 +643,8 @@ proc kos_init uses ebx esi edi ebp
         mov     [pg_data.kernel_pages], eax
         shr     eax, 10
         mov     [pg_data.kernel_tables], eax
+
+        call    build_interrupt_table
         call    init_kernel_heap
         call    init_malloc
 
@@ -948,7 +963,6 @@ mtrr_validate:
 ;unprotect_from_terminate:
 ;lock_application_table:
 ;unlock_application_table:
-;build_interrupt_table:
 ;sys_resize_app_memory:
 ;request_terminate:
 v86_exc_c:
@@ -1073,7 +1087,7 @@ align 64
 os_base:        rb PAGE_SIZE
 window_data:    rb sizeof.WDATA * 256
 CDDataBuf:      rb 0x1000
-idts            rb IRQ_RESERVED * 8     ; IDT descriptor is 8 bytes long
+idts            rb (NUM_EXCEPTIONS + IRQ_RESERVED) * sizeof.idt_entry
 WIN_STACK       rw 0x200        ; why not 0x100?
 WIN_POS         rw 0x200
 FDD_BUFF:       rb 0x400

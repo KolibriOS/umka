@@ -42,6 +42,13 @@ struct umka_os_ctx {
 
 char history_filename[PATH_MAX];
 
+static int
+hw_int_mouse(void *arg) {
+    (void)arg;
+    kos_set_mouse_data(0, -50, 50, 0, 0);
+    return 1;   // our interrupt
+}
+
 struct umka_os_ctx *
 umka_os_init() {
     struct umka_os_ctx *ctx = malloc(sizeof(struct umka_os_ctx));
@@ -115,15 +122,18 @@ load_app_host(const char *fname, void *base) {
     return 0;
 }
 
-int
+/*
+static int
 load_app(const char *fname) {
     int32_t result = umka_fs_execute(fname);
     printf("result: %" PRIi32 "\n", result);
 
     return result;
 }
+*/
 
-void handle_i40(int signo, siginfo_t *info, void *context) {
+static void
+handle_i40(int signo, siginfo_t *info, void *context) {
     (void)signo;
     (void)info;
     ucontext_t *ctx = context;
@@ -136,11 +146,23 @@ void handle_i40(int signo, siginfo_t *info, void *context) {
     umka_i40((pushad_t*)(ctx->uc_mcontext.__gregs + REG_EDI));
 }
 
-void handle_irq_net(int signo, siginfo_t *info, void *context) {
+static void
+handle_irq_net(int signo, siginfo_t *info, void *context) {
     (void)signo;
     (void)info;
     (void)context;
     kos_irq_serv_irq10();
+}
+
+static void
+hw_int(int signo, siginfo_t *info, void *context) {
+    (void)signo;
+    (void)context;
+    struct idt_entry *e = kos_idts + info->si_value.sival_int + 0x20;
+    void (*handler)(void) = (void(*)(void)) (((uintptr_t)e->addr_hi << 16)
+                                             + e->addr_lo);
+    handler();
+    umka_sti();
 }
 
 int
@@ -214,6 +236,15 @@ main(int argc, char *argv[]) {
         return 1;
     }
 
+    sa.sa_sigaction = hw_int;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_SIGINFO;
+
+    if (sigaction(SIGUSR2, &sa, NULL) == -1) {
+        fprintf(stderr, "Can't install SIGUSR2 handler!\n");
+        return 1;
+    }
+
     struct app_hdr *app = mmap(KOS_APP_BASE, 16*0x100000, PROT_READ | PROT_WRITE
         | PROT_EXEC, MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (app == MAP_FAILED) {
@@ -273,6 +304,8 @@ main(int argc, char *argv[]) {
         return -1;
     }
 */
+
+    kos_attach_int_handler(14, hw_int_mouse, NULL);
 
 //    thread_start(0, monitor, THREAD_STACK_SIZE);
     kos_thread_t start = (kos_thread_t)(KOS_APP_BASE + app->menuet.start);

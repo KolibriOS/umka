@@ -17,6 +17,19 @@ start:
         btr     dword[esp], BSF EFLAGS.ID
         popfd
 
+        mcall   12, 1
+        mcall   0, <100,200>, <100,100>, 0x34888888, , window_title
+        mcall   12, 2
+        mcall   18, 19, 4, 0
+.next:
+        mcall   37, 0
+        add     eax, 0x00030003
+        mov     edx, eax
+        mcall   18, 19, 4
+        mcall   5, 1
+;        mov     ecx, 0x1000000
+;        loopnz  $
+        jmp     .next
         DEBUGF 1, "abcde\n"
         mcall   70, fs70
         DEBUGF 1, "files in dir: %d\n", ebx
@@ -37,6 +50,8 @@ fs70:
         dd dir_name
 
 dir_name db '/hd0/1/',0
+window_title db 'readdir test',0
+
 i_end:
 dir_buf:
 rb 0x10000
