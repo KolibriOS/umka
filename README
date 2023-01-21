@@ -57,8 +57,6 @@ mkdirrange - make directories with names in range
 
 mkfilepattern - make a file with contents of specific pattern
 
-lfbviewx - framebuffer viewer for X
-
 
 BUILD
 -----
@@ -105,7 +103,7 @@ Testing
 Troubleshooting
 ---------------
 
-# lfbviewx
+# umka_monitor
 
 Allow reading process_vm_readv syscall.
 

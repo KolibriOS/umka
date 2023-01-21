@@ -7,8 +7,8 @@ CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -O2 \
        -DNDEBUG -D_POSIX_C_SOURCE=200809L -fno-pie
 LDFLAGS=-no-pie
 
-all: mkdirrange mkfilepattern lfbviewx randdir covpreproc mkdoubledirs \
-     gensamehash mksamehash lfbview
+all: mkdirrange mkfilepattern randdir covpreproc mkdoubledirs gensamehash \
+     mksamehash
 
 gensamehash: gensamehash.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
@@ -25,11 +25,6 @@ mkdirrange: mkdirrange.c
 mkfilepattern: mkfilepattern.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
-lfbviewx: lfbviewx.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@ -lX11 -lXext -D_GNU_SOURCE
-
-lfbview: lfbview.c
-	$(CC) `sdl2-config --cflags --libs` -o $@ $< -D_GNU_SOURCE
 randdir: randdir.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
@@ -39,5 +34,5 @@ covpreproc: covpreproc.c
 .PHONY: all clean
 
 clean:
-	rm -f *.o mkdirrange mkfilepattern lfbviewx randdir covpreproc \
-          mkdoubledirs gensamehash mksamehash lfbview
+	rm -f *.o mkdirrange mkfilepattern randdir covpreproc mkdoubledirs \
+          gensamehash mksamehash
