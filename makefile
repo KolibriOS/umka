@@ -41,8 +41,8 @@ else
 endif
 
 ifeq ($(HOST),linux)
-all: umka_shell umka_fuse umka_os umka_gen_devices_dat umka.sym umka.prp \
-     umka.lst tags default.skn skin.skn
+all: umka_shell umka_fuse umka_os umka_monitor umka_gen_devices_dat umka.sym \
+     umka.prp umka.lst tags default.skn skin.skn
 else ifeq ($(HOST),windows)
 all: umka_shell umka.sym umka.prp \
      umka.lst default.skn skin.skn
@@ -58,7 +58,7 @@ test: umka_shell
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
             vdisk/raw.o vdisk/qcow2.o vdisk/miniz/miniz.a vnet.o lodepng.o \
             $(HOST)/pci.o $(HOST)/thread.o io.o $(HOST)/io_async.o util.o \
-            optparse.o bestline.o
+            optparse32.o bestline32.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
@@ -68,8 +68,11 @@ umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vdisk/raw.o vdisk/qcow2.o \
          vdisk/miniz/miniz.a vnet.o trace.o trace_lbr.o $(HOST)/pci.o \
-         $(HOST)/thread.o io.o $(HOST)/io_async.o util.o bestline.o optparse.o
+         $(HOST)/thread.o io.o $(HOST)/io_async.o util.o bestline32.o optparse32.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
+
+umka_monitor: umka_monitor.o optparse.o bestline.o
+	$(CC) $(LDFLAGS) `sdl2-config --libs` $^ -o $@
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
                       $(HOST)/thread.o util.o
@@ -96,11 +99,17 @@ $(HOST)/pci.o: $(HOST)/pci.c
 lodepng.o: lodepng.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
 
+bestline32.o: bestline.c bestline.h
+	$(CC) $(CFLAGS_32) -U_POSIX_C_SOURCE -Wno-logical-op -Wno-switch-enum -c $< -o $@
+
 bestline.o: bestline.c bestline.h
-	$(CC) $(CFLAGS_32) -U_POSIX_C_SOURCE -Wno-logical-op -Wno-switch-enum -c $<
+	$(CC) $(CFLAGS) -U_POSIX_C_SOURCE -Wno-logical-op -Wno-switch-enum -c $< -o $@
+
+optparse32.o: optparse.c optparse.h
+	$(CC) $(CFLAGS_32) -c $< -o $@
 
 optparse.o: optparse.c optparse.h
-	$(CC) $(CFLAGS_32) -c $<
+	$(CC) $(CFLAGS) -c $< -o $@
 
 util.o: util.c util.h umka.h
 	$(CC) $(CFLAGS_32) -c $<
@@ -162,8 +171,11 @@ umka_shell.o: umka_shell.c umka.h trace.h
 umka_fuse.o: umka_fuse.c umka.h
 	$(CC) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $<
 
-umka_os.o: umka_os.c umka.h
+umka_os.o: umka_os.c umka.h umka_os.h
 	$(CC) $(CFLAGS_32) -c $<
+
+umka_monitor.o: umka_monitor.c umka_os.h
+	$(CC) $(CFLAGS) `sdl2-config --cflags` -c $< -D_GNU_SOURCE
 
 umka_gen_devices_dat.o: umka_gen_devices_dat.c umka.h
 	$(CC) $(CFLAGS_32) -c $<

@@ -17,6 +17,8 @@ start:
         btr     dword[esp], BSF EFLAGS.ID
         popfd
 
+        mcall   68, 11
+
         mcall   12, 1
         mcall   0, <100,200>, <100,100>, 0x34888888, , window_title
         mcall   12, 2
@@ -25,13 +27,33 @@ start:
         mcall   70, fs70
         DEBUGF 1, "files in dir: %d\n", ebx
 
+        mcall   15, 1, 2, 2
+        mcall   15, 4, 1
+        mcall   15, 6
+        mov     ecx, 0
+        mov     edx, 0xff
+        mov     [eax+0], cl
+        mov     [eax+1], cl
+        mov     [eax+2], cl
+        mov     [eax+3], dl
+        mov     [eax+4], dl
+        mov     [eax+5], dl
+        mov     [eax+6], dl
+        mov     [eax+7], dl
+        mov     [eax+8], dl
+        mov     [eax+9], cl
+        mov     [eax+10], cl
+        mov     [eax+11], cl
+        mcall   15, 7, eax
+        mcall   15, 3
+
         mcall   18, 19, 4, 0
 .next:
         mcall   37, 0
-        add     eax, 0x00020002
+        add     eax, 0x00010001
         mov     edx, eax
         mcall   18, 19, 4
-        mcall   5, 1
+        mcall   5, 10
 ;        mov     ecx, 0x1000000
 ;        loopnz  $
         jmp     .next

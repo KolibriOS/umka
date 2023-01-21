@@ -3,7 +3,7 @@ SYS_READ    = 3
 SYS_WRITE   = 4
 SYS_OPEN    = 5
 SYS_CLOSE   = 6
-;SYS_LSEEK   = 19
+SYS_PAUSE   = 29
 SYS_LLSEEK  = 140
 
 SEEK_SET    = 0

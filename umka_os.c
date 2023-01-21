@@ -2,7 +2,7 @@
     SPDX-License-Identifier: GPL-2.0-or-later
 
     UMKa - User-Mode KolibriOS developer tools
-    umka_os - kind of KolibriOS rump kernel
+    umka_os - kind of KolibriOS anykernel
 
     Copyright (C) 2018-2023  Ivan Baravy <dunkaist@gmail.com>
 */
@@ -25,6 +25,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include "umka.h"
+#include "umka_os.h"
 #include "optparse.h"
 #include "shell.h"
 #include "trace.h"
@@ -168,13 +169,15 @@ hw_int(int signo, siginfo_t *info, void *context) {
 int
 main(int argc, char *argv[]) {
     (void)argc;
-    const char *usage = "umka_os [-i <infile>] [-o <outfile>]\n";
+    const char *usage = "umka_os [-i <infile>] [-o <outfile>] [-s <shname>]\n";
     if (coverage) {
         trace_begin();
     }
 
     umka_sti();
 
+    const char *shname = "/umka";
+    int shfd = 0;
     const char *infile = NULL, *outfile = NULL;
     build_history_filename();
 
@@ -182,13 +185,16 @@ main(int argc, char *argv[]) {
     int opt;
     optparse_init(&options, argv);
 
-    while ((opt = optparse(&options, "i:o:")) != -1) {
+    while ((opt = optparse(&options, "i:o:s:")) != -1) {
         switch (opt) {
         case 'i':
             infile = options.optarg;
             break;
         case 'o':
             outfile = options.optarg;
+            break;
+        case 's':
+            shname = options.optarg;
             break;
         default:
             fprintf(stderr, "bad option: %c\n", opt);
@@ -197,6 +203,13 @@ main(int argc, char *argv[]) {
         }
     }
 
+    if (shname) {
+        shfd = shm_open(shname, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+        if (!shfd) {
+            perror("[!] can't open shared memory");
+            exit(1);
+        }
+    }
     if (infile && !freopen(infile, "r", stdin)) {
         fprintf(stderr, "[!] can't open file for reading: %s\n", infile);
         exit(1);
@@ -213,8 +226,8 @@ main(int argc, char *argv[]) {
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_SIGINFO;
 
-    if (sigaction(SIGPROF, &sa, NULL) == -1) {
-        fprintf(stderr, "Can't install SIGPROF handler!\n");
+    if (sigaction(SIGALRM, &sa, NULL) == -1) {
+        fprintf(stderr, "Can't install SIGALRM handler!\n");
         return 1;
     }
 
@@ -252,12 +265,22 @@ main(int argc, char *argv[]) {
         exit(1);
     }
 
-    printf("pid=%d, kos_lfb_base=%p\n", getpid(), (void*)kos_lfb_base);
-
     kos_boot.bpp = UMKA_DEFAULT_DISPLAY_BPP;
     kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
     kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH * UMKA_DEFAULT_DISPLAY_BPP / 8;
+
+    struct shared_info sinfo = (struct shared_info) {
+        .pid = getpid(),
+        .lfb_base = (uintptr_t)kos_lfb_base,
+        .lfb_bpp = kos_boot.bpp,
+        .lfb_width = kos_boot.x_res,
+        .lfb_height = kos_boot.y_res,
+        .cmd_buf = (uintptr_t)cmd_buf,
+    };
+    ftruncate(shfd, sizeof(sinfo));
+    write(shfd, &sinfo, sizeof(sinfo));
+//    printf("pid=%d, kos_lfb_base=%p\n", getpid(), (void*)kos_lfb_base);
 
     run_test(ctx->shell);
 //    umka_stack_init();
@@ -313,7 +336,7 @@ main(int argc, char *argv[]) {
 
     dump_procs();
 
-    setitimer(ITIMER_PROF, &timeout, NULL);
+    setitimer(ITIMER_REAL, &timeout, NULL);
 
     ctx->umka->running = 1;
     umka_osloop();   // doesn't return

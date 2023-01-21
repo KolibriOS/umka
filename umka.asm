@@ -803,12 +803,11 @@ endp
 pubsym skin_udata
 proc idle uses ebx esi edi
         sti
-.loop:
-        mov     ecx, 10000000
 @@:
-        loop    @b
 ;        DEBUGF 1, "1 idle\n"
-        jmp     .loop
+        movi    eax, SYS_PAUSE
+        int     0x80
+        jmp     @b
 
         ret
 endp
