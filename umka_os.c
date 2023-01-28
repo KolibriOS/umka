@@ -24,8 +24,13 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#define __USE_GNU
+#include <sys/uio.h>
+#include <threads.h>
+#include <SDL2/SDL.h>
 #include "umka.h"
 #include "umka_os.h"
+#include "bestline.h"
 #include "optparse.h"
 #include "shell.h"
 #include "trace.h"
@@ -40,6 +45,8 @@ struct umka_os_ctx {
     struct umka_io *io;
     struct shell_ctx *shell;
 };
+
+struct shared_info sinfo;
 
 char history_filename[PATH_MAX];
 
@@ -167,17 +174,101 @@ hw_int(int signo, siginfo_t *info, void *context) {
 }
 
 int
+sdlthr(void *arg) {
+    (void)arg;
+    sigset_t set;
+    pthread_sigmask(SIG_BLOCK, NULL, &set);
+    pthread_sigmask(SIG_BLOCK, &set, NULL);
+    if(SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        fprintf(stderr, "Failed to initialize the SDL2 library\n");
+        return -1;
+    }
+
+    SDL_Window *window = SDL_CreateWindow("LFB Viewer SDL2",
+                                          SDL_WINDOWPOS_CENTERED,
+                                          SDL_WINDOWPOS_CENTERED,
+                                          sinfo.lfb_width, sinfo.lfb_height,
+                                          0);
+
+    if(!window)
+    {
+        fprintf(stderr, "Failed to create window\n");
+        return -1;
+    }
+
+    SDL_Surface *window_surface = SDL_GetWindowSurface(window);
+
+    if(!window_surface)
+    {
+        fprintf(stderr, "Failed to get the surface from the window\n");
+        return -1;
+    }
+
+    uint32_t *lfb = (uint32_t*)malloc(sinfo.lfb_width*sinfo.lfb_height*sizeof(uint32_t));
+
+    struct iovec remote = {.iov_base = (void*)(uintptr_t)sinfo.lfb_base,
+                           .iov_len = sinfo.lfb_width*sinfo.lfb_height*4};
+    struct iovec local = {.iov_base = lfb,
+                          .iov_len = sinfo.lfb_width*sinfo.lfb_height*4};
+
+
+    uint32_t *p = window_surface->pixels;
+    while (1) {
+        process_vm_readv(sinfo.pid, &local, 1, &remote, 1, 0);
+        memcpy(window_surface->pixels, lfb, 400*300*4);
+        SDL_LockSurface(window_surface);
+        for (ssize_t y = 0; y < window_surface->h; y++) {
+            for (ssize_t x = 0; x < window_surface->w; x++) {
+                p[y*window_surface->pitch/4+x] = lfb[y*400+x];
+            }
+        }
+        SDL_UnlockSurface(window_surface);
+        SDL_UpdateWindowSurface(window);
+        sleep(1);
+    }
+
+
+    return 0;
+}
+
+int
+umka_monitor(void *arg) {
+    (void)arg;
+    sigset_t set;
+    pthread_sigmask(SIG_BLOCK, NULL, &set);
+    pthread_sigmask(SIG_BLOCK, &set, NULL);
+/*
+    printf("read umka_os configuration:\n"
+           "  pid: %d\n"
+           "  lfb_base: %p\n"
+           "  lfb_bpp: %u"
+           "  lfb_width: %u"
+           "  lfb_height: %u"
+           "  cmd: %p\n",
+           (pid_t)sinfo.pid, (void*)(uintptr_t)sinfo.lfb_base, sinfo.lfb_bpp,
+           sinfo.lfb_width, sinfo.lfb_height, (void*)(uintptr_t)sinfo.cmd_buf);
+*/
+    union sigval sval = (union sigval){.sival_int = 14};
+
+    while (1) {
+//        getchar();
+//        sigqueue(sinfo.pid, SIGUSR2, sval);
+        pause();
+    }
+    return 0;
+}
+
+int
 main(int argc, char *argv[]) {
     (void)argc;
-    const char *usage = "umka_os [-i <infile>] [-o <outfile>] [-s <shname>]\n";
+    const char *usage = "umka_os [-i <infile>] [-o <outfile>]\n";
     if (coverage) {
         trace_begin();
     }
 
     umka_sti();
 
-    const char *shname = "/umka";
-    int shfd = 0;
     const char *infile = NULL, *outfile = NULL;
     build_history_filename();
 
@@ -193,9 +284,6 @@ main(int argc, char *argv[]) {
         case 'o':
             outfile = options.optarg;
             break;
-        case 's':
-            shname = options.optarg;
-            break;
         default:
             fprintf(stderr, "bad option: %c\n", opt);
             fputs(usage, stderr);
@@ -203,13 +291,6 @@ main(int argc, char *argv[]) {
         }
     }
 
-    if (shname) {
-        shfd = shm_open(shname, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
-        if (!shfd) {
-            perror("[!] can't open shared memory");
-            exit(1);
-        }
-    }
     if (infile && !freopen(infile, "r", stdin)) {
         fprintf(stderr, "[!] can't open file for reading: %s\n", infile);
         exit(1);
@@ -270,7 +351,7 @@ main(int argc, char *argv[]) {
     kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH * UMKA_DEFAULT_DISPLAY_BPP / 8;
 
-    struct shared_info sinfo = (struct shared_info) {
+    sinfo = (struct shared_info) {
         .pid = getpid(),
         .lfb_base = (uintptr_t)kos_lfb_base,
         .lfb_bpp = kos_boot.bpp,
@@ -278,8 +359,6 @@ main(int argc, char *argv[]) {
         .lfb_height = kos_boot.y_res,
         .cmd_buf = (uintptr_t)cmd_buf,
     };
-    ftruncate(shfd, sizeof(sinfo));
-    write(shfd, &sinfo, sizeof(sinfo));
 //    printf("pid=%d, kos_lfb_base=%p\n", getpid(), (void*)kos_lfb_base);
 
     run_test(ctx->shell);
@@ -335,6 +414,15 @@ main(int argc, char *argv[]) {
     thread_start(0, start, THREAD_STACK_SIZE);
 
     dump_procs();
+
+    fflush(stdin);
+    fflush(stdout);
+    fflush(stderr);
+    thrd_t thrd_monitor;
+    thrd_create(&thrd_monitor, umka_monitor, NULL);
+
+    thrd_t thrd_screen;
+    thrd_create(&thrd_screen, sdlthr, NULL);
 
     setitimer(ITIMER_REAL, &timeout, NULL);
 
