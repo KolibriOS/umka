@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 typedef struct bestlineCompletions {
   unsigned long len;
   char **cvec;
@@ -17,6 +19,7 @@ void bestlineSetFreeHintsCallback(bestlineFreeHintsCallback *);
 void bestlineAddCompletion(bestlineCompletions *, const char *);
 void bestlineSetXlatCallback(bestlineXlatCallback *);
 
+char *bestlineFile(const char *, FILE *, FILE *);
 char *bestline(const char *);
 char *bestlineRaw(const char *, int, int);
 char *bestlineWithHistory(const char *, const char *);

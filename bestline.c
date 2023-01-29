@@ -132,7 +132,9 @@
 #include "bestline.h"
 
 #ifndef __COSMOPOLITAN__
+#ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE  1 /* so GCC builds in ANSI mode */
+#endif
 #define _XOPEN_SOURCE  700 /* so GCC builds in ANSI mode */
 #define _DARWIN_C_SOURCE 1 /* so SIGWINCH / IUTF8 on XNU */
 #include <termios.h>
@@ -2187,12 +2189,10 @@ static void bestlineRingRotate(void) {
 static char *bestlineRefreshHints(struct bestlineState *l) {
     char *hint;
     struct abuf ab;
-    const char *ansi1, *ansi2;
+    const char *ansi1 = "\033[90m", *ansi2 = "\033[39m";
     if (!hintsCallback) return 0;
     if (!(hint = hintsCallback(l->buf, &ansi1, &ansi2))) return 0;
     abInit(&ab);
-    ansi1 = "\033[90m";
-    ansi2 = "\033[39m";
     if (ansi1) abAppends(&ab, ansi1);
     abAppends(&ab, hint);
     if (ansi2) abAppends(&ab, ansi2);
@@ -3403,33 +3403,36 @@ char *bestlineRaw(const char *prompt, int infd, int outfd) {
  *     contain ansi escape sequences, color, utf8, etc.
  * @return chomped allocated string of read line or null on eof/error
  */
-char *bestline(const char *prompt) {
+char *bestlineFile(const char *prompt, FILE *fin, FILE *fout) {
     if (prompt && *prompt &&
         (strchr(prompt, '\n') || strchr(prompt, '\t') ||
          strchr(prompt + 1, '\r'))) {
         errno = EINVAL;
         return 0;
     }
-    if ((!isatty(fileno(stdin)) ||
-         !isatty(fileno(stdout)))) {
-        if (prompt && *prompt && (IsCharDev(fileno(stdin)) &&
-                                  IsCharDev(fileno(stdout)))) {
-            fputs(prompt,stdout);
-            fflush(stdout);
+    if ((!isatty(fileno(fin)) ||
+         !isatty(fileno(fout)))) {
+        if (prompt && *prompt && (IsCharDev(fileno(fin)) &&
+                                  IsCharDev(fileno(fout)))) {
+            fputs(prompt,fout);
+            fflush(fout);
         }
-        return GetLine(stdin, stdout);
+        return GetLine(fin, fout);
     } else if (bestlineIsUnsupportedTerm()) {
         if (prompt && *prompt) {
-            fputs(prompt,stdout);
-            fflush(stdout);
+            fputs(prompt,fout);
+            fflush(fout);
         }
-        return GetLine(stdin, stdout);
+        return GetLine(fin, fout);
     } else {
-        fflush(stdout);
-        return bestlineRaw(prompt,fileno(stdin),fileno(stdout));
+        fflush(fout);
+        return bestlineRaw(prompt,fileno(fin),fileno(fout));
     }
 }
 
+char *bestline(const char *prompt) {
+    return bestlineFile(prompt, stdin, stdout);
+}
 /**
  * Reads line intelligently w/ history, e.g.
  *
