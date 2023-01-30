@@ -10,6 +10,7 @@
 #ifndef UMKA_H_INCLUDED
 #define UMKA_H_INCLUDED
 
+#include <assert.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
@@ -151,8 +152,8 @@ typedef struct {
     uint8_t pad3[1024-71];
 } __attribute__((packed)) process_information_t;
 
-_Static_assert(sizeof(process_information_t) == 0x400,
-               "must be 0x400 bytes long");
+static_assert(sizeof(process_information_t) == 0x400,
+              "must be 0x400 bytes long");
 
 typedef struct {
     box_t box;
@@ -165,8 +166,7 @@ typedef struct {
     uint8_t fl_redraw;
 } __attribute__((packed)) wdata_t;
 
-_Static_assert(sizeof(wdata_t) == 0x20,
-               "must be 0x20 bytes long");
+static_assert(sizeof(wdata_t) == 0x20, "must be 0x20 bytes long");
 
 typedef struct {
     uint32_t frame;
@@ -1027,7 +1027,7 @@ typedef struct {
     void *pdt_0[1024];
 } proc_t;
 
-_Static_assert(sizeof(proc_t) == 0x1400, "must be 0x1400 bytes long");
+static_assert(sizeof(proc_t) == 0x1400, "must be 0x1400 bytes long");
 
 typedef struct {
     char app_name[11];
@@ -1086,7 +1086,7 @@ typedef struct {
     uint32_t pad4;                 // +252
 } appdata_t;
 
-_Static_assert(sizeof(appdata_t) == 256, "must be 0x100 bytes long");
+static_assert(sizeof(appdata_t) == 256, "must be 0x100 bytes long");
 
 #define UMKA_SHELL           1
 #define UMKA_FUSE            2
