@@ -222,6 +222,11 @@ typedef struct {
     uint32_t count;
 } mutex_t;
 
+struct board_get_ret {
+    uint32_t value;
+    uint32_t status;
+};
+
 typedef mutex_t rwsem_t;
 
 typedef struct {
@@ -542,7 +547,7 @@ void
 irq0(int signo, siginfo_t *info, void *context);
 
 struct umka_ctx *
-umka_init(int tool);
+umka_init(void);
 
 void
 umka_close(struct umka_ctx *ctx);
@@ -957,6 +962,9 @@ typedef struct {
     e820entry_t memmap_blocks[MAX_MEMMAP_BLOCKS];
     uint8_t acpi_usage;
 } __attribute__((packed)) boot_data_t;
+
+extern uint8_t kos_msg_board_data[];
+extern uint32_t kos_msg_board_count;
 
 extern boot_data_t kos_boot;
 
@@ -1820,6 +1828,30 @@ umka_sys_set_font_size(uint32_t size) {
           "b"(12),
           "c"(size)
         : "memory");
+}
+
+static inline void
+umka_sys_board_put(char c) {
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        :
+        : "a"(63),
+          "b"(1),
+          "c"(c)
+        : "memory");
+}
+
+static inline struct board_get_ret
+umka_sys_board_get() {
+    struct board_get_ret ret;
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(ret.value),
+          "=b"(ret.status)
+        : "a"(63),
+          "b"(2)
+        : "memory");
+    return ret;
 }
 
 static inline void

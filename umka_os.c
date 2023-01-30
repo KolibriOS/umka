@@ -9,6 +9,7 @@
 
 #include <arpa/inet.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <netinet/in.h>
@@ -29,6 +30,7 @@
 #include <threads.h>
 #include <SDL2/SDL.h>
 #include "umka.h"
+#include "util.h"
 #include "umka_os.h"
 #include "bestline.h"
 #include "optparse.h"
@@ -40,15 +42,38 @@
 
 #define THREAD_STACK_SIZE 0x100000
 
+#define CMD_BUF_LEN 0x10000
+
 struct umka_os_ctx {
     struct umka_ctx *umka;
     struct umka_io *io;
     struct shell_ctx *shell;
+    FILE *fboardlog;
 };
 
-struct shared_info sinfo;
+struct umka_os_ctx *os;
+
+uint8_t cmd_buf[CMD_BUF_LEN];
 
 char history_filename[PATH_MAX];
+
+static void
+completion(const char *buf, bestlineCompletions *lc) {
+    if (buf[0] == 'h') {
+        bestlineAddCompletion(lc,"hello");
+        bestlineAddCompletion(lc,"hello there");
+    }
+}
+
+static char *
+hints(const char *buf, const char **ansi1, const char **ansi2) {
+    if (!strcmp(buf,"hello")) {
+        *ansi1 = "\033[35m";    /* magenta foreground */
+        *ansi2 = "\033[39m";    /* reset foreground */
+        return " World";
+    }
+    return NULL;
+}
 
 static int
 hw_int_mouse(void *arg) {
@@ -58,12 +83,13 @@ hw_int_mouse(void *arg) {
 }
 
 struct umka_os_ctx *
-umka_os_init() {
+umka_os_init(FILE *fin, FILE *fout, FILE *fboardlog) {
     struct umka_os_ctx *ctx = malloc(sizeof(struct umka_os_ctx));
-    ctx->umka = umka_init(UMKA_OS);
+    ctx->fboardlog = fboardlog;
+    ctx->umka = umka_init();
     ctx->io = io_init(&ctx->umka->running);
     ctx->shell = shell_init(SHELL_LOG_NONREPRODUCIBLE, history_filename,
-                            ctx->umka, ctx->io);
+                            ctx->umka, ctx->io, fin, fout);
     return ctx;
 }
 
@@ -150,7 +176,7 @@ handle_i40(int signo, siginfo_t *info, void *context) {
     if (*(uint16_t*)ip == 0x40cd) {
         ctx->uc_mcontext.__gregs[REG_EIP] += 2; // skip int 0x40
     }
-    printf("i40: %i %p\n", eax, ip);
+    fprintf(os->fboardlog, "i40: %i %p\n", eax, ip);
     umka_i40((pushad_t*)(ctx->uc_mcontext.__gregs + REG_EDI));
 }
 
@@ -176,9 +202,6 @@ hw_int(int signo, siginfo_t *info, void *context) {
 int
 sdlthr(void *arg) {
     (void)arg;
-    sigset_t set;
-    pthread_sigmask(SIG_BLOCK, NULL, &set);
-    pthread_sigmask(SIG_BLOCK, &set, NULL);
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         fprintf(stderr, "Failed to initialize the SDL2 library\n");
@@ -186,9 +209,10 @@ sdlthr(void *arg) {
     }
 
     SDL_Window *window = SDL_CreateWindow("LFB Viewer SDL2",
-                                          SDL_WINDOWPOS_CENTERED,
-                                          SDL_WINDOWPOS_CENTERED,
-                                          sinfo.lfb_width, sinfo.lfb_height,
+                                          SDL_WINDOWPOS_UNDEFINED,
+                                          SDL_WINDOWPOS_UNDEFINED,
+                                          kos_display.width,
+                                          kos_display.height,
                                           0);
 
     if(!window)
@@ -205,79 +229,86 @@ sdlthr(void *arg) {
         return -1;
     }
 
-    uint32_t *lfb = (uint32_t*)malloc(sinfo.lfb_width*sinfo.lfb_height*sizeof(uint32_t));
+    void (*copy_display)(void *);
 
-    struct iovec remote = {.iov_base = (void*)(uintptr_t)sinfo.lfb_base,
-                           .iov_len = sinfo.lfb_width*sinfo.lfb_height*4};
-    struct iovec local = {.iov_base = lfb,
-                          .iov_len = sinfo.lfb_width*sinfo.lfb_height*4};
+    switch (window_surface->format->format) {
+    case SDL_PIXELFORMAT_RGB888:
+        copy_display = copy_display_to_rgb888;
+        break;
+    default:
+        printf("unknown SDL_PIXELFORMAT_* value: 0x%8.8x\n",
+               window_surface->format->format);
+        break;
+    }
 
-
-    uint32_t *p = window_surface->pixels;
     while (1) {
-        process_vm_readv(sinfo.pid, &local, 1, &remote, 1, 0);
-        memcpy(window_surface->pixels, lfb, 400*300*4);
         SDL_LockSurface(window_surface);
-        for (ssize_t y = 0; y < window_surface->h; y++) {
-            for (ssize_t x = 0; x < window_surface->w; x++) {
-                p[y*window_surface->pitch/4+x] = lfb[y*400+x];
-            }
-        }
+        copy_display(window_surface->pixels);
         SDL_UnlockSurface(window_surface);
         SDL_UpdateWindowSurface(window);
         sleep(1);
     }
-
-
     return 0;
 }
 
 int
 umka_monitor(void *arg) {
     (void)arg;
-    sigset_t set;
-    pthread_sigmask(SIG_BLOCK, NULL, &set);
-    pthread_sigmask(SIG_BLOCK, &set, NULL);
-/*
-    printf("read umka_os configuration:\n"
-           "  pid: %d\n"
-           "  lfb_base: %p\n"
-           "  lfb_bpp: %u"
-           "  lfb_width: %u"
-           "  lfb_height: %u"
-           "  cmd: %p\n",
-           (pid_t)sinfo.pid, (void*)(uintptr_t)sinfo.lfb_base, sinfo.lfb_bpp,
-           sinfo.lfb_width, sinfo.lfb_height, (void*)(uintptr_t)sinfo.cmd_buf);
-*/
     union sigval sval = (union sigval){.sival_int = 14};
 
-    while (1) {
-//        getchar();
-//        sigqueue(sinfo.pid, SIGUSR2, sval);
-        pause();
+    pid_t mypid = getpid();
+    char *line;
+    while((line = bestline(">"))) {
+        sigqueue(mypid, SIGUSR2, sval);
     }
     return 0;
+}
+
+static void
+umka_thread_board() {
+    struct board_get_ret c;
+    while (1) {
+        c = umka_sys_board_get();
+        if (c.status) {
+            fprintf(os->fboardlog, "%c", c.value);
+        } else {
+            umka_sys_delay(50);
+        }
+    }
 }
 
 int
 main(int argc, char *argv[]) {
     (void)argc;
-    const char *usage = "umka_os [-i <infile>] [-o <outfile>]\n";
+    const char *usage = "umka_os [-i <infile>] [-o <outfile>]"
+                        " [-b <boardlog>]\n";
     if (coverage) {
         trace_begin();
     }
 
     umka_sti();
 
-    const char *infile = NULL, *outfile = NULL;
     build_history_filename();
+    bestlineSetCompletionCallback(completion);
+    bestlineSetHintsCallback(hints);
+    bestlineHistoryLoad(history_filename);
+
+    const char *infile = NULL;
+    const char *outfile = NULL;
+    const char *boardlogfile = NULL;
+    FILE *fin = stdin;
+    FILE *fout = stdout;
+    FILE *fboardlog;
 
     struct optparse options;
     int opt;
     optparse_init(&options, argv);
 
-    while ((opt = optparse(&options, "i:o:s:")) != -1) {
+    while ((opt = optparse(&options, "b:i:o:s:")) != -1) {
         switch (opt) {
+        case 'b':
+            boardlogfile = options.optarg;
+            break;
         case 'i':
             infile = options.optarg;
             break;
@@ -291,16 +322,31 @@ main(int argc, char *argv[]) {
         }
     }
 
-    if (infile && !freopen(infile, "r", stdin)) {
-        fprintf(stderr, "[!] can't open file for reading: %s\n", infile);
-        exit(1);
+    if (infile) {
+        fin = fopen(infile, "r");
+        if (!fin) {
+            fprintf(stderr, "[!] can't open file for reading: %s\n", infile);
+            exit(1);
+        }
     }
-    if (outfile && !freopen(outfile, "w", stdout)) {
-        fprintf(stderr, "[!] can't open file for writing: %s\n", outfile);
-        exit(1);
+    if (outfile) {
+        fout = fopen(outfile, "w");
+        if (!fout) {
+            fprintf(stderr, "[!] can't open file for writing: %s\n", outfile);
+            exit(1);
+        }
+    }
+    if (boardlogfile) {
+        fboardlog = fopen(boardlogfile, "w");
+        if (!fboardlog) {
+            fprintf(stderr, "[!] can't open file for writing: %s\n", outfile);
+            exit(1);
+        }
+    } else {
+        fboardlog = fout;
     }
 
-    struct umka_os_ctx *ctx = umka_os_init();
+    os = umka_os_init(fin, fout, fboardlog);
 
     struct sigaction sa;
     sa.sa_sigaction = irq0;
@@ -351,17 +397,7 @@ main(int argc, char *argv[]) {
     kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH * UMKA_DEFAULT_DISPLAY_BPP / 8;
 
-    sinfo = (struct shared_info) {
-        .pid = getpid(),
-        .lfb_base = (uintptr_t)kos_lfb_base,
-        .lfb_bpp = kos_boot.bpp,
-        .lfb_width = kos_boot.x_res,
-        .lfb_height = kos_boot.y_res,
-        .cmd_buf = (uintptr_t)cmd_buf,
-    };
-//    printf("pid=%d, kos_lfb_base=%p\n", getpid(), (void*)kos_lfb_base);
-
-    run_test(ctx->shell);
+    run_test(os->shell);
 //    umka_stack_init();
 
 //    load_app_host("../apps/board_cycle", app);
@@ -410,6 +446,7 @@ main(int argc, char *argv[]) {
     kos_attach_int_handler(14, hw_int_mouse, NULL);
 
 //    thread_start(0, monitor, THREAD_STACK_SIZE);
+    thread_start(1, umka_thread_board, THREAD_STACK_SIZE);
     kos_thread_t start = (kos_thread_t)(KOS_APP_BASE + app->menuet.start);
     thread_start(0, start, THREAD_STACK_SIZE);
 
@@ -426,7 +463,7 @@ main(int argc, char *argv[]) {
 
     setitimer(ITIMER_REAL, &timeout, NULL);
 
-    ctx->umka->running = 1;
+    os->umka->running = 1;
     umka_osloop();   // doesn't return
 
     if (coverage)

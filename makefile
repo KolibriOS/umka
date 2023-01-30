@@ -69,10 +69,7 @@ umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vdisk/raw.o vdisk/qcow2.o \
          vdisk/miniz/miniz.a vnet.o trace.o trace_lbr.o $(HOST)/pci.o \
          $(HOST)/thread.o io.o $(HOST)/io_async.o util.o bestline32.o optparse32.o
-	$(CC) $(LDFLAGS_32) `sdl2-config --libs` -lpthread $^ -o $@ -T umka.ld
-
-#umka_monitor: umka_monitor.o optparse.o bestline.o
-#	$(CC) $(LDFLAGS) `sdl2-config --libs` $^ -o $@
+	$(CC) $(LDFLAGS_32) `sdl2-config --libs` $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
                       $(HOST)/thread.o util.o
@@ -100,10 +97,10 @@ lodepng.o: lodepng.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
 
 bestline32.o: bestline.c bestline.h
-	$(CC) $(CFLAGS_32) -U_POSIX_C_SOURCE -Wno-logical-op -Wno-switch-enum -c $< -o $@
+	$(CC) $(CFLAGS_32) -Wno-logical-op -Wno-switch-enum -c $< -o $@
 
 bestline.o: bestline.c bestline.h
-	$(CC) $(CFLAGS) -U_POSIX_C_SOURCE -Wno-logical-op -Wno-switch-enum -c $< -o $@
+	$(CC) $(CFLAGS) -Wno-logical-op -Wno-switch-enum -c $< -o $@
 
 optparse32.o: optparse.c optparse.h
 	$(CC) $(CFLAGS_32) -c $< -o $@
@@ -173,9 +170,6 @@ umka_fuse.o: umka_fuse.c umka.h
 
 umka_os.o: umka_os.c umka.h umka_os.h
 	$(CC) $(CFLAGS_32) `sdl2-config --cflags` -c $<
-
-#umka_monitor.o: umka_monitor.c umka_os.h
-#	$(CC) $(CFLAGS) `sdl2-config --cflags` -c $< -D_GNU_SOURCE
 
 umka_gen_devices_dat.o: umka_gen_devices_dat.c umka.h
 	$(CC) $(CFLAGS_32) -c $<

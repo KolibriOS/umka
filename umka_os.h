@@ -9,20 +9,6 @@
 
 #include "umka.h"
 
-struct shared_info {
-    uint64_t pid;
-    uint32_t lfb_base;
-    uint32_t lfb_bpp;
-    uint32_t lfb_width;
-    uint32_t lfb_height;
-    uint32_t cmd_buf;
-    uint32_t pad;
-};
-
-#define CMD_BUF_LEN 0x10000
-
-uint8_t cmd_buf[CMD_BUF_LEN];
-
 enum {
     UMKA_CMD_NONE,
     UMKA_CMD_SET_MOUSE_DATA,

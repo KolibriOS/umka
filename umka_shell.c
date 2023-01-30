@@ -8,6 +8,8 @@
     Copyright (C) 2021  Magomed Kostoev <mkostoevr@yandex.ru>
 */
 
+#include <errno.h>
+#include <fcntl.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <stdio.h>
@@ -31,11 +33,12 @@ struct umka_shell_ctx {
 char history_filename[PATH_MAX];
 
 struct umka_shell_ctx *
-umka_shell_init(int reproducible) {
+umka_shell_init(int reproducible, FILE *fin, FILE *fout) {
     struct umka_shell_ctx *ctx = malloc(sizeof(struct umka_shell_ctx));
-    ctx->umka = umka_init(UMKA_SHELL);
+    ctx->umka = umka_init();
     ctx->io = io_init(&ctx->umka->running);
-    ctx->shell = shell_init(reproducible, history_filename, ctx->umka, ctx->io);
+    ctx->shell = shell_init(reproducible, history_filename, ctx->umka, ctx->io,
+                            fin, fout);
     return ctx;
 }
 
@@ -62,7 +65,10 @@ main(int argc, char **argv) {
         "  -o outfile       file for logs\n"
         "  -r               reproducible logs (without pointers and datetime)\n"
         "  -c               collect coverage\n";
+
     const char *infile = NULL, *outfile = NULL;
+    FILE *fin = stdin;
+    FILE *fout = stdout;
     build_history_filename();
 /*
     kos_boot.memmap_block_cnt = 3;
@@ -104,16 +110,23 @@ main(int argc, char **argv) {
             exit(1);
         }
     }
-    if (infile && !freopen(infile, "r", stdin)) {
-        fprintf(stderr, "[!] can't open file for reading: %s\n", infile);
-        exit(1);
+
+    if (infile) {
+        fin = fopen(infile, "r");
+        if (!fin) {
+            fprintf(stderr, "[!] can't open file for reading: %s\n", infile);
+            exit(1);
+        }
     }
-    if (outfile && !freopen(outfile, "w", stdout)) {
-        fprintf(stderr, "[!] can't open file for writing: %s\n", outfile);
-        exit(1);
+    if (outfile) {
+        fout = fopen(outfile, "w");
+        if (!fout) {
+            fprintf(stderr, "[!] can't open file for writing: %s\n", outfile);
+            exit(1);
+        }
     }
 
-    struct umka_shell_ctx *ctx = umka_shell_init(reproducible);
+    struct umka_shell_ctx *ctx = umka_shell_init(reproducible, fin, fout);
 
     if (coverage)
         trace_begin();

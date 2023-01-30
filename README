@@ -103,12 +103,6 @@ Testing
 Troubleshooting
 ---------------
 
-# umka_monitor
-
-Allow reading process_vm_readv syscall.
-
-    # sysctl -w kernel.yama.ptrace_scope=0
-
 # umka_os
 
 To create tap devices.
@@ -118,6 +112,10 @@ To create tap devices.
 To load apps at 0 address.
 
     # sysctl -w vm.mmap_min_addr=0
+
+Allow reading process_vm_readv syscall.
+
+    # sysctl -w kernel.yama.ptrace_scope=0
 
 
 Links & Acknowledgements

@@ -186,6 +186,9 @@ pubsym Wait_events, "_kos_wait_events"
 pubsym window._.set_screen, 'kos_window_set_screen'
 pubsym _display, 'kos_display'
 
+pubsym msg_board_data, "kos_msg_board_data"
+pubsym msg_board_count, "kos_msg_board_count"
+
 pubsym BOOT, 'kos_boot'
 
 EFLAGS.ID = 1 SHL 21
@@ -837,7 +840,7 @@ proc _page_fault_handler
         ret
 endp
 
-proc sys_msg_board
+proc s2ys_msg_board
         cmp     cl, 0x0d
         jz      @f
 if HOST eq windows
@@ -885,7 +888,7 @@ extrn reset_procmask
 extrn get_fake_if
 pubsym irq0
 proc irq0 c, _signo, _info, _context
-        DEBUGF 2, "### irq0\n"
+        DEBUGF 1, "### irq0\n"
         pushfd
         cli
         pushad
@@ -896,7 +899,7 @@ proc irq0 c, _signo, _info, _context
         ccall   get_fake_if, [_context]
         test    eax, eax
         jnz     @f
-        DEBUGF 2, "### cli\n"
+        DEBUGF 1, "### cli\n"
         jmp     .done
 @@:
 
@@ -917,7 +920,7 @@ proc _do_change_task
         mov     ecx, ebx
         sub     ecx, SLOT_BASE
         shr     ecx, 8
-        DEBUGF 2, "### switching task from %d to %d\n",eax,ecx
+        DEBUGF 1, "### switching task from %d to %d\n",eax,ecx
 
         mov     esi, ebx
         xchg    esi, [current_slot]
@@ -1020,7 +1023,7 @@ acpi_root dd ?
 acpi_dev_next dd ?
 endg
 
-sys_msg_board equ __pex0
+;sys_msg_board equ __pex0
 delay_ms equ __pex1
 
 include fix pew
@@ -1043,8 +1046,10 @@ macro jmp target {
 include 'kernel.asm'
 purge jmp
 restore bios32_entry, tmp_page_tabs
-purge org,sys_msg_board,delay_ms
-restore org,sys_msg_board,delay_ms
+purge org,delay_ms
+;purge sys_msg_board
+restore org,delay_ms
+;restore sys_msg_board
 
 coverage_end:
 

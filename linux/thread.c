@@ -16,7 +16,7 @@ sigset_t mask;
 
 void reset_procmask(void) {
     sigemptyset (&mask);
-	sigaddset (&mask, SIGPROF);
+	sigaddset (&mask, SIGALRM);
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
 }
 

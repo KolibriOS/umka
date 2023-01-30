@@ -37,6 +37,8 @@
 #include "optparse.h"
 #include "bestline.h"
 
+char *bestlineFile(const char *prompt, FILE *fin, FILE *fout);
+
 #define MAX_COMMAND_ARGS 42
 #define PRINT_BYTES_PER_LINE 32
 #define MAX_DIRENTS_TO_READ 100
@@ -105,13 +107,14 @@ convert_f70_file_attr(uint32_t attr, char s[KF_ATTR_CNT+1]) {
 }
 
 static void
-print_f70_status(f7080ret_t *r, int use_ebx) {
-    printf("status = %d %s", r->status, get_f70_status_name(r->status));
+print_f70_status(struct shell_ctx *ctx, f7080ret_t *r, int use_ebx) {
+    fprintf(ctx->fout, "status = %d %s", r->status,
+            get_f70_status_name(r->status));
     if (use_ebx
         && (r->status == ERROR_SUCCESS || r->status == ERROR_END_OF_FILE)) {
-        printf(", count = %d", r->count);
+        fprintf(ctx->fout, ", count = %d", r->count);
     }
-    putchar('\n');
+    fprintf(ctx->fout, "\n");
 }
 
 static bool
@@ -123,25 +126,25 @@ parse_uintmax(const char *str, uintmax_t *res) {
 }
 
 static bool
-parse_uint32(const char *str, uint32_t *res) {
+parse_uint32(struct shell_ctx *ctx, const char *str, uint32_t *res) {
     uintmax_t x;
     if (parse_uintmax(str, &x) && x <= UINT32_MAX) {
         *res = (uint32_t)x;
         return true;
     } else {
-        printf("invalid number: %s\n", str);
+        fprintf(ctx->fout, "invalid number: %s\n", str);
         return false;
     }
 }
 
 static bool
-parse_uint64(const char *str, uint64_t *res) {
+parse_uint64(struct shell_ctx *ctx, const char *str, uint64_t *res) {
     uintmax_t x;
     if (parse_uintmax(str, &x) && x <= UINT64_MAX) {
         *res = x;
         return true;
     } else {
-        printf("invalid number: %s\n", str);
+        fprintf(ctx->fout, "invalid number: %s\n", str);
         return false;
     }
 }
@@ -275,24 +278,24 @@ shell_var_add_ptr(struct shell_ctx *ctx, void *value) {
 }
 
 static void
-print_bytes(uint8_t *x, size_t len) {
+print_bytes(struct shell_ctx *ctx, uint8_t *x, size_t len) {
     for (size_t i = 0; i < len; i++) {
         if (i % PRINT_BYTES_PER_LINE == 0 && i != 0) {
-            putchar('\n');
+            fprintf(ctx->fout, "\n");
         }
-        printf("%2.2x", x[i]);
+        fprintf(ctx->fout, "%2.2x", x[i]);
     }
-    putchar('\n');
+    fprintf(ctx->fout, "\n");
 }
 
 static void
-print_hash(uint8_t *x, size_t len) {
+print_hash(struct shell_ctx *ctx, uint8_t *x, size_t len) {
     hash_context hash;
     hash_oneshot(&hash, x, len);
     for (size_t i = 0; i < HASH_SIZE; i++) {
-        printf("%2.2x", hash.hash[i]);
+        fprintf(ctx->fout, "%2.2x", hash.hash[i]);
     }
-    putchar('\n');
+    fprintf(ctx->fout, "\n");
 }
 
 void *host_load_file(const char *fname) {
@@ -331,7 +334,7 @@ prompt(struct shell_ctx *ctx) {
         last_dir = get_last_dir(cur_dir);
         cur_dir_changed = false;
     }
-    printf("%s> ", last_dir);
+    fprintf(ctx->fout, "%s> ", last_dir);
     fflush(stdout);
 }
 
@@ -367,12 +370,12 @@ cmd_var(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: var <$name>\n"
         "  $name            variable name, must start with $ sign";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     bool status = shell_var_name(ctx, argv[1]);
     if (!status) {
-        printf("fail\n");
+        fprintf(ctx->fout, "fail\n");
     }
 }
 
@@ -383,7 +386,7 @@ cmd_send_scancode(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: send_scancode <code>...\n"
         "  code             dec or hex number";
     if (argc < 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     argc -= 1;
@@ -397,8 +400,8 @@ cmd_send_scancode(struct shell_ctx *ctx, int argc, char **argv) {
             argc--;
             argv++;
         } else {
-            printf("not an integer: %s\n", argv[0]);
-            puts(usage);
+            fprintf(ctx->fout, "not an integer: %s\n", argv[0]);
+            fputs(usage, ctx->fout);
             return;
         }
     }
@@ -409,9 +412,9 @@ cmd_umka_boot(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: umka_boot";
+        "usage: umka_boot\n";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
 
@@ -422,18 +425,19 @@ cmd_umka_boot(struct shell_ctx *ctx, int argc, char **argv) {
 
 static void
 cmd_umka_set_boot_params(struct shell_ctx *ctx, int argc, char **argv) {
-    (void)ctx;
     const char *usage = \
         "usage: umka_set_boot_params [--x_res <num>] [--y_res <num>]\n"
         "  --x_res <num>    screen width\n"
-        "  --y_res <num>    screen height";
+        "  --y_res <num>    screen height\n"
+        "  --bpp <num>      screen bits per pixel\n"
+        "  --pitch <num>    screen line length in bytes\n";
     argc -= 1;
     argv += 1;
 
     while (argc) {
         if (!strcmp(argv[0], "--x_res") && argc > 1) {
             kos_boot.x_res = strtoul(argv[1], NULL, 0);
-            kos_boot.pitch = kos_boot.x_res * 4;    // assume 32bpp
+            kos_boot.pitch = kos_boot.x_res * kos_boot.bpp/8;
             argc -= 2;
             argv += 2;
             continue;
@@ -442,9 +446,20 @@ cmd_umka_set_boot_params(struct shell_ctx *ctx, int argc, char **argv) {
             argc -= 2;
             argv += 2;
             continue;
+        } else if (!strcmp(argv[0], "--bpp") && argc > 1) {
+            kos_boot.bpp = strtoul(argv[1], NULL, 0);
+            kos_boot.pitch = kos_boot.x_res * kos_boot.bpp/8;
+            argc -= 2;
+            argv += 2;
+            continue;
+        } else if (!strcmp(argv[0], "--pitch") && argc > 1) {
+            kos_boot.pitch = strtoul(argv[1], NULL, 0);
+            argc -= 2;
+            argv += 2;
+            continue;
         } else {
-            printf("bad option: %s\n", argv[0]);
-            puts(usage);
+            fprintf(ctx->fout, "bad option: %s\n", argv[0]);
+            fputs(usage, ctx->fout);
             return;
         }
     }
@@ -457,7 +472,7 @@ cmd_i40(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: i40 <eax> [ebx [ecx [edx [esi [edi [ebp]]]]]]...\n"
         "  see '/kernel/docs/sysfuncs.txt' for details";
     if (argc < 2 || argc > 8) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     pushad_t regs = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -471,7 +486,7 @@ cmd_i40(struct shell_ctx *ctx, int argc, char **argv) {
     COVERAGE_ON();
     umka_i40(&regs);
     COVERAGE_OFF();
-    printf("eax = %8.8x  %" PRIu32 "  %" PRIi32 "\n"
+    fprintf(ctx->fout, "eax = %8.8x  %" PRIu32 "  %" PRIi32 "\n"
            "ebx = %8.8x  %" PRIu32 "  %" PRIi32 "\n",
            regs.eax, regs.eax, (int32_t)regs.eax,
            regs.ebx, regs.ebx, (int32_t)regs.ebx);
@@ -523,13 +538,13 @@ bytes_to_kmgtpe(uint64_t *bytes, const char **kmg) {
 }
 
 static void
-disk_list_partitions(disk_t *d) {
+disk_list_partitions(struct shell_ctx *ctx, disk_t *d) {
     uint64_t kmgtpe_count = d->media_info.sector_size * d->media_info.capacity;
     const char *kmgtpe = NULL;
     bytes_to_kmgtpe(&kmgtpe_count, &kmgtpe);
-    printf("/%s: sector_size=%u, capacity=%" PRIu64 " (%" PRIu64 " %s), "
-           "num_partitions=%u\n", d->name, d->media_info.sector_size,
-           d->media_info.capacity, kmgtpe_count, kmgtpe, d->num_partitions);
+    fprintf(ctx->fout, "/%s: sector_size=%u, capacity=%" PRIu64 " (%" PRIu64
+            " %s), num_partitions=%u\n", d->name, d->media_info.sector_size,
+            d->media_info.capacity, kmgtpe_count, kmgtpe, d->num_partitions);
     for (size_t i = 0; i < d->num_partitions; i++) {
         partition_t *p = d->partitions[i];
         const char *fsname;
@@ -548,12 +563,12 @@ disk_list_partitions(disk_t *d) {
         }
         kmgtpe_count = d->media_info.sector_size * p->first_sector;
         bytes_to_kmgtpe(&kmgtpe_count, &kmgtpe);
-        printf("/%s/%d: fs=%s, start=%" PRIu64 " (%" PRIu64 " %s)",
-               d->name, i+1, fsname, p->first_sector, kmgtpe_count, kmgtpe);
+        fprintf(ctx->fout, "/%s/%d: fs=%s, start=%" PRIu64 " (%" PRIu64 " %s)",
+                d->name, i+1, fsname, p->first_sector, kmgtpe_count, kmgtpe);
         kmgtpe_count = d->media_info.sector_size * p->length;
         bytes_to_kmgtpe(&kmgtpe_count, &kmgtpe);
-        printf(", length=%" PRIu64 " (%" PRIu64 " %s)\n",
-               p->length, kmgtpe_count, kmgtpe);
+        fprintf(ctx->fout, ", length=%" PRIu64 " (%" PRIu64 " %s)\n",
+                p->length, kmgtpe_count, kmgtpe);
     }
 }
 
@@ -564,19 +579,19 @@ cmd_ramdisk_init(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: ramdisk_init <file>\n"
         "  <file>           absolute or relative path";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *fname = argv[1];
     FILE *f = fopen(fname, "rb");
     if (!f) {
-        printf("[!] can't open file '%s': %s\n", fname, strerror(errno));
+        fprintf(ctx->fout, "[!] can't open file '%s': %s\n", fname, strerror(errno));
         return;
     }
     fseek(f, 0, SEEK_END);
     size_t fsize = ftell(f);
     if (fsize > 2880*512) {
-        printf("[!] file '%s' is too big, max size is 1474560 bytes\n", fname);
+        fprintf(ctx->fout, "[!] file '%s' is too big, max size is 1474560 bytes\n", fname);
         return;
     }
     rewind(f);
@@ -585,7 +600,7 @@ cmd_ramdisk_init(struct shell_ctx *ctx, int argc, char **argv) {
     COVERAGE_ON();
     void *ramdisk = kos_ramdisk_init();
     COVERAGE_OFF();
-    disk_list_partitions(ramdisk);
+    disk_list_partitions(ctx, ramdisk);
 }
 
 static void
@@ -597,7 +612,7 @@ cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
         "  <name>           disk name, e.g. hd0 or rd\n"
         "  -c cache size    size of disk cache in bytes";
     if (argc < 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t cache_size = 0;
@@ -613,7 +628,7 @@ cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
             adjust_cache_size = 1;
             break;
         default:
-            puts(usage);
+            fputs(usage, ctx->fout);
             return;
         }
     }
@@ -628,16 +643,16 @@ cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
             COVERAGE_ON();
             disk_media_changed(disk, 1);
             COVERAGE_OFF();
-            disk_list_partitions(disk);
+            disk_list_partitions(ctx, disk);
             return;
         }
     }
-    printf("umka: can't add file '%s' as disk '%s'\n", file_name, disk_name);
+    fprintf(ctx->fout, "umka: can't add file '%s' as disk '%s'\n", file_name, disk_name);
     return;
 }
 
 static void
-disk_del_by_name(const char *name) {
+disk_del_by_name(struct shell_ctx *ctx, const char *name) {
     for(disk_t *d = disk_list.next; d != &disk_list; d = d->next) {
         if (!strcmp(d->name, name)) {
             COVERAGE_ON();
@@ -646,7 +661,7 @@ disk_del_by_name(const char *name) {
             return;
         }
     }
-    printf("umka: can't find disk '%s'\n", name);
+    fprintf(ctx->fout, "umka: can't find disk '%s'\n", name);
 }
 
 static void
@@ -656,11 +671,11 @@ cmd_disk_del(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: disk_del <name>\n"
         "  name             disk name, i.e. rd or hd0";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *name = argv[1];
-    disk_del_by_name(name);
+    disk_del_by_name(ctx, name);
     return;
 }
 
@@ -670,7 +685,7 @@ cmd_pwd(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: pwd";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
@@ -679,7 +694,7 @@ cmd_pwd(struct shell_ctx *ctx, int argc, char **argv) {
     COVERAGE_ON();
     umka_sys_get_cwd(cur_dir, PATH_MAX);
     COVERAGE_OFF();
-    printf("%s%s%s\n", quote, cur_dir, quote);
+    fprintf(ctx->fout, "%s%s%s\n", quote, cur_dir, quote);
 }
 
 static void
@@ -692,7 +707,7 @@ cmd_set_pixel(struct shell_ctx *ctx, int argc, char **argv) {
         "  color            argb in hex\n"
         "  -i               inverted color";
     if (argc < 4) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x = strtoul(argv[1], NULL, 0);
@@ -722,7 +737,7 @@ cmd_write_text(struct shell_ctx *ctx, int argc, char **argv) {
         "  length           length of the string if it is non-asciiz\n"
         "  bg_color_or_buf  argb or pointer";
     if (argc != 12) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x = strtoul(argv[1], NULL, 0);
@@ -750,10 +765,10 @@ cmd_get_key(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_key";
     if (argc > 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
-    printf("0x%8.8" PRIx32 "\n", umka_get_key());
+    fprintf(ctx->fout, "0x%8.8" PRIx32 "\n", umka_get_key());
 }
 
 static void
@@ -763,7 +778,7 @@ cmd_dump_key_buff(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: dump_key_buff [count]\n"
         "  count            how many items to dump (all by default)";
     if (argc > 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int count = INT_MAX;
@@ -771,7 +786,7 @@ cmd_dump_key_buff(struct shell_ctx *ctx, int argc, char **argv) {
         count = strtol(argv[1], NULL, 0);
     }
     for (int i = 0; i < count && i < kos_key_count; i++) {
-        printf("%3i 0x%2.2x 0x%2.2x\n", i, kos_key_buff[i],
+        fprintf(ctx->fout, "%3i 0x%2.2x 0x%2.2x\n", i, kos_key_buff[i],
                kos_key_buff[120+2+i]);
     }
 }
@@ -783,7 +798,7 @@ cmd_dump_win_stack(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: dump_win_stack [count]\n"
         "  count            how many items to dump";
     if (argc > 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int depth = 5;
@@ -791,7 +806,7 @@ cmd_dump_win_stack(struct shell_ctx *ctx, int argc, char **argv) {
         depth = strtol(argv[1], NULL, 0);
     }
     for (int i = 0; i < depth; i++) {
-        printf("%3i: %3u\n", i, kos_win_stack[i]);
+        fprintf(ctx->fout, "%3i: %3u\n", i, kos_win_stack[i]);
     }
 }
 
@@ -802,7 +817,7 @@ cmd_dump_win_pos(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: dump_win_pos [count]\n"
         "  count            how many items to dump";
     if (argc < 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int depth = 5;
@@ -810,7 +825,7 @@ cmd_dump_win_pos(struct shell_ctx *ctx, int argc, char **argv) {
         depth = strtol(argv[1], NULL, 0);
     }
     for (int i = 0; i < depth; i++) {
-        printf("%3i: %3u\n", i, kos_win_pos[i]);
+        fprintf(ctx->fout, "%3i: %3u\n", i, kos_win_pos[i]);
     }
 }
 
@@ -822,14 +837,15 @@ cmd_dump_win_map(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: dump_win_map";
     if (argc < 0) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     for (size_t y = 0; y < kos_display.height; y++) {
         for (size_t x = 0; x < kos_display.width; x++) {
-            putchar(kos_display.win_map[y * kos_display.width + x] + '0');
+            fprintf(ctx->fout, "%c",
+                    kos_display.win_map[y * kos_display.width + x] + '0');
         }
-        putchar('\n');
+        fprintf(ctx->fout, "\n");
     }
 }
 
@@ -841,7 +857,7 @@ cmd_dump_appdata(struct shell_ctx *ctx, int argc, char **argv) {
         "  index            index into appdata array to dump\n"
         "  -p               print fields that are pointers";
     if (argc < 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int show_pointers = 0;
@@ -850,49 +866,49 @@ cmd_dump_appdata(struct shell_ctx *ctx, int argc, char **argv) {
         show_pointers = 1;
     }
     appdata_t *a = kos_slot_base + idx;
-    printf("app_name: %s\n", a->app_name);
+    fprintf(ctx->fout, "app_name: %s\n", a->app_name);
     if (show_pointers) {
-        printf("process: %p\n", (void*)a->process);
-        printf("fpu_state: %p\n", (void*)a->fpu_state);
-        printf("exc_handler: %p\n", (void*)a->exc_handler);
+        fprintf(ctx->fout, "process: %p\n", (void*)a->process);
+        fprintf(ctx->fout, "fpu_state: %p\n", (void*)a->fpu_state);
+        fprintf(ctx->fout, "exc_handler: %p\n", (void*)a->exc_handler);
     }
-    printf("except_mask: %" PRIx32 "\n", a->except_mask);
+    fprintf(ctx->fout, "except_mask: %" PRIx32 "\n", a->except_mask);
     if (show_pointers) {
-        printf("pl0_stack: %p\n", (void*)a->pl0_stack);
-        printf("cursor: %p\n", (void*)a->cursor);
-        printf("fd_ev: %p\n", (void*)a->fd_ev);
-        printf("bk_ev: %p\n", (void*)a->bk_ev);
-        printf("fd_obj: %p\n", (void*)a->fd_obj);
-        printf("bk_obj: %p\n", (void*)a->bk_obj);
-        printf("saved_esp: %p\n", (void*)a->saved_esp);
+        fprintf(ctx->fout, "pl0_stack: %p\n", (void*)a->pl0_stack);
+        fprintf(ctx->fout, "cursor: %p\n", (void*)a->cursor);
+        fprintf(ctx->fout, "fd_ev: %p\n", (void*)a->fd_ev);
+        fprintf(ctx->fout, "bk_ev: %p\n", (void*)a->bk_ev);
+        fprintf(ctx->fout, "fd_obj: %p\n", (void*)a->fd_obj);
+        fprintf(ctx->fout, "bk_obj: %p\n", (void*)a->bk_obj);
+        fprintf(ctx->fout, "saved_esp: %p\n", (void*)a->saved_esp);
     }
-    printf("dbg_state: %u\n", a->dbg_state);
-    printf("cur_dir: %s\n", a->cur_dir);
-    printf("draw_bgr_x: %u\n", a->draw_bgr_x);
-    printf("draw_bgr_y: %u\n", a->draw_bgr_y);
-    printf("event_mask: %" PRIx32 "\n", a->event_mask);
-    printf("tid: %" PRId32 "\n", a->tid);
-    printf("state: 0x%" PRIx8 "\n", a->state);
-    printf("wnd_number: %" PRIu8 "\n", a->wnd_number);
-    printf("terminate_protection: %u\n", a->terminate_protection);
-    printf("keyboard_mode: %u\n", a->keyboard_mode);
-    printf("captionEncoding: %u\n", a->captionEncoding);
-    printf("exec_params: %s\n", a->exec_params);
-    printf("wnd_caption: %s\n", a->wnd_caption);
-    printf("wnd_clientbox (ltwh): %u %u %u %u\n", a->wnd_clientbox.left,
+    fprintf(ctx->fout, "dbg_state: %u\n", a->dbg_state);
+    fprintf(ctx->fout, "cur_dir: %s\n", a->cur_dir);
+    fprintf(ctx->fout, "draw_bgr_x: %u\n", a->draw_bgr_x);
+    fprintf(ctx->fout, "draw_bgr_y: %u\n", a->draw_bgr_y);
+    fprintf(ctx->fout, "event_mask: %" PRIx32 "\n", a->event_mask);
+    fprintf(ctx->fout, "tid: %" PRId32 "\n", a->tid);
+    fprintf(ctx->fout, "state: 0x%" PRIx8 "\n", a->state);
+    fprintf(ctx->fout, "wnd_number: %" PRIu8 "\n", a->wnd_number);
+    fprintf(ctx->fout, "terminate_protection: %u\n", a->terminate_protection);
+    fprintf(ctx->fout, "keyboard_mode: %u\n", a->keyboard_mode);
+    fprintf(ctx->fout, "captionEncoding: %u\n", a->captionEncoding);
+    fprintf(ctx->fout, "exec_params: %s\n", a->exec_params);
+    fprintf(ctx->fout, "wnd_caption: %s\n", a->wnd_caption);
+    fprintf(ctx->fout, "wnd_clientbox (ltwh): %u %u %u %u\n", a->wnd_clientbox.left,
            a->wnd_clientbox.top, a->wnd_clientbox.width,
            a->wnd_clientbox.height);
-    printf("priority: %u\n", a->priority);
+    fprintf(ctx->fout, "priority: %u\n", a->priority);
 
-    printf("in_schedule: prev");
+    fprintf(ctx->fout, "in_schedule: prev");
     if (show_pointers) {
-        printf(" %p", (void*)a->in_schedule.prev);
+        fprintf(ctx->fout, " %p", (void*)a->in_schedule.prev);
     }
-    printf(" (%u), next", (appdata_t*)a->in_schedule.prev - kos_slot_base);
+    fprintf(ctx->fout, " (%u), next", (appdata_t*)a->in_schedule.prev - kos_slot_base);
     if (show_pointers) {
-        printf(" %p", (void*)a->in_schedule.next);
+        fprintf(ctx->fout, " %p", (void*)a->in_schedule.next);
     }
-    printf(" (%u)\n", (appdata_t*)a->in_schedule.next - kos_slot_base);
+    fprintf(ctx->fout, " (%u)\n", (appdata_t*)a->in_schedule.next - kos_slot_base);
 }
 
 static void
@@ -902,7 +918,7 @@ cmd_switch_to_thread(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: switch_to_thread <tid>\n"
         "  <tid>          thread id to switch to";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t tid = strtoul(argv[1], NULL, 0);
@@ -917,23 +933,23 @@ cmd_get(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: get <var>\n"
         "  <var>          variable to get";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *var = argv[1];
     if (!strcmp(var, "redraw_background")) {
-        printf("%i\n", kos_redraw_background);
+        fprintf(ctx->fout, "%i\n", kos_redraw_background);
     } else if (!strcmp(var, "key_count")) {
-        printf("%i\n", kos_key_count);
+        fprintf(ctx->fout, "%i\n", kos_key_count);
     } else if (!strcmp(var, "syslang")) {
-        printf("%i\n", kos_syslang);
+        fprintf(ctx->fout, "%i\n", kos_syslang);
     } else if (!strcmp(var, "keyboard")) {
-        printf("%i\n", kos_keyboard);
+        fprintf(ctx->fout, "%i\n", kos_keyboard);
     } else if (!strcmp(var, "keyboard_mode")) {
-        printf("%i\n", kos_keyboard_mode);
+        fprintf(ctx->fout, "%i\n", kos_keyboard_mode);
     } else {
-        printf("no such variable: %s\n", var);
-        puts(usage);
+        fprintf(ctx->fout, "no such variable: %s\n", var);
+        fputs(usage, ctx->fout);
         return;
     }
 }
@@ -946,7 +962,7 @@ cmd_set(struct shell_ctx *ctx, int argc, char **argv) {
         "  <var>          variable to set\n"
         "  <value>        decimal or hex value";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *var = argv[1];
@@ -954,7 +970,7 @@ cmd_set(struct shell_ctx *ctx, int argc, char **argv) {
     char *endptr;
     ssize_t value = strtol(val_str, &endptr, 0);
     if (*endptr != '\0') {
-        printf("integer required: %s\n", val_str);
+        fprintf(ctx->fout, "integer required: %s\n", val_str);
         return;
     }
     if (!strcmp(var, "redraw_background")) {
@@ -966,8 +982,8 @@ cmd_set(struct shell_ctx *ctx, int argc, char **argv) {
     } else if (!strcmp(var, "keyboard_mode")) {
         kos_keyboard_mode = value;
     } else {
-        printf("bad option: %s\n", argv[1]);
-        puts(usage);
+        fprintf(ctx->fout, "bad option: %s\n", argv[1]);
+        fputs(usage, ctx->fout);
         return;
     }
 }
@@ -980,11 +996,11 @@ cmd_new_sys_thread(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: new_sys_thread";
     if (!argc) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t tid = umka_new_sys_threads(0, NULL, NULL);
-    printf("tid: %u\n", tid);
+    fprintf(ctx->fout, "tid: %u\n", tid);
 }
 
 static void
@@ -1001,7 +1017,7 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
         "  -h             scroll horizontally\n"
         "  -v             scroll vertically";
     if (!argc) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int lbheld = 0, mbheld = 0, rbheld = 0, xabs = 0, yabs = 0;
@@ -1031,7 +1047,7 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
                 xmoving = -strtol(optarg, NULL, 0);
                 break;
             default:
-                puts(usage);
+                fputs(usage, ctx->fout);
                 return;
             }
             break;
@@ -1047,26 +1063,26 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
                 ymoving = -strtol(optarg, NULL, 0);
                 break;
             default:
-                puts(usage);
+                fputs(usage, ctx->fout);
                 return;
             }
             break;
         case 'h':
             if ((optarg[0] != '+') && (optarg[0] != '-')) {
-                puts(usage);
+                fputs(usage, ctx->fout);
                 return;
             }
             hscroll = strtol(optarg, NULL, 0);
             break;
         case 'v':
             if ((optarg[0] != '+') && (optarg[0] != '-')) {
-                puts(usage);
+                fputs(usage, ctx->fout);
                 return;
             }
             vscroll = strtol(optarg, NULL, 0);
             break;
         default:
-            puts(usage);
+            fputs(usage, ctx->fout);
             return;
         }
     }
@@ -1082,7 +1098,7 @@ cmd_process_info(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: process_info <pid>\n"
         "  pid              process id to dump, -1 for self";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     process_information_t info;
@@ -1091,20 +1107,20 @@ cmd_process_info(struct shell_ctx *ctx, int argc, char **argv) {
     COVERAGE_ON();
     umka_sys_process_info(pid, &info);
     COVERAGE_OFF();
-    printf("cpu_usage: %u\n", info.cpu_usage);
-    printf("window_stack_position: %u\n", info.window_stack_position);
-    printf("window_stack_value: %u\n", info.window_stack_value);
-    printf("process_name: %s\n", info.process_name);
-    printf("memory_start: 0x%.8" PRIx32 "\n", info.memory_start);
-    printf("used_memory: %u (0x%x)\n", info.used_memory,
+    fprintf(ctx->fout, "cpu_usage: %u\n", info.cpu_usage);
+    fprintf(ctx->fout, "window_stack_position: %u\n", info.window_stack_position);
+    fprintf(ctx->fout, "window_stack_value: %u\n", info.window_stack_value);
+    fprintf(ctx->fout, "process_name: %s\n", info.process_name);
+    fprintf(ctx->fout, "memory_start: 0x%.8" PRIx32 "\n", info.memory_start);
+    fprintf(ctx->fout, "used_memory: %u (0x%x)\n", info.used_memory,
            info.used_memory);
-    printf("pid: %u\n", info.pid);
-    printf("box: %u %u %u %u\n", info.box.left, info.box.top,
+    fprintf(ctx->fout, "pid: %u\n", info.pid);
+    fprintf(ctx->fout, "box: %u %u %u %u\n", info.box.left, info.box.top,
            info.box.width, info.box.height);
-    printf("slot_state: %u\n", info.slot_state);
-    printf("client_box: %u %u %u %u\n", info.client_box.left,
+    fprintf(ctx->fout, "slot_state: %u\n", info.slot_state);
+    fprintf(ctx->fout, "client_box: %u %u %u %u\n", info.client_box.left,
            info.client_box.top, info.client_box.width, info.client_box.height);
-    printf("wnd_state: 0x%.2" PRIx8 "\n", info.wnd_state);
+    fprintf(ctx->fout, "wnd_state: 0x%.2" PRIx8 "\n", info.wnd_state);
 }
 
 static void
@@ -1114,13 +1130,13 @@ cmd_check_for_event(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: check_for_event";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     uint32_t event = umka_sys_check_for_event();
     COVERAGE_OFF();
-    printf("%" PRIu32 "\n", event);
+    fprintf(ctx->fout, "%" PRIu32 "\n", event);
 }
 
 static void
@@ -1145,7 +1161,7 @@ cmd_display_number(struct shell_ctx *ctx, int argc, char **argv) {
         "  scale_factor     0 = x1, ..., 7 = x8\n"
         "  bg_color_or_buf  depending on flags fill_bg and draw_to_buf";
     if (argc != 15) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int is_pointer = strtoul(argv[1], NULL, 0);
@@ -1183,7 +1199,7 @@ cmd_set_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
             " <work_graph>\n"
         "  *                all colors are in hex";
     if (argc != (1 + sizeof(system_colors_t)/4)) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     system_colors_t colors;
@@ -1209,7 +1225,7 @@ cmd_get_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_window_colors";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     system_colors_t colors;
@@ -1217,17 +1233,17 @@ cmd_get_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
     COVERAGE_ON();
     umka_sys_get_window_colors(&colors);
     COVERAGE_OFF();
-    printf("0x%.8" PRIx32 " frame\n", colors.frame);
-    printf("0x%.8" PRIx32 " grab\n", colors.grab);
-    printf("0x%.8" PRIx32 " work_3d_dark\n", colors.work_3d_dark);
-    printf("0x%.8" PRIx32 " work_3d_light\n", colors.work_3d_light);
-    printf("0x%.8" PRIx32 " grab_text\n", colors.grab_text);
-    printf("0x%.8" PRIx32 " work\n", colors.work);
-    printf("0x%.8" PRIx32 " work_button\n", colors.work_button);
-    printf("0x%.8" PRIx32 " work_button_text\n",
+    fprintf(ctx->fout, "0x%.8" PRIx32 " frame\n", colors.frame);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " grab\n", colors.grab);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work_3d_dark\n", colors.work_3d_dark);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work_3d_light\n", colors.work_3d_light);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " grab_text\n", colors.grab_text);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work\n", colors.work);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work_button\n", colors.work_button);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work_button_text\n",
            colors.work_button_text);
-    printf("0x%.8" PRIx32 " work_text\n", colors.work_text);
-    printf("0x%.8" PRIx32 " work_graph\n", colors.work_graph);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work_text\n", colors.work_text);
+    fprintf(ctx->fout, "0x%.8" PRIx32 " work_graph\n", colors.work_graph);
 }
 
 static void
@@ -1237,13 +1253,13 @@ cmd_get_skin_height(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_skin_height";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     uint32_t skin_height = umka_sys_get_skin_height();
     COVERAGE_OFF();
-    printf("%" PRIu32 "\n", skin_height);
+    fprintf(ctx->fout, "%" PRIu32 "\n", skin_height);
 }
 
 static void
@@ -1253,17 +1269,17 @@ cmd_get_screen_area(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_screen_area";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     rect_t wa;
     COVERAGE_ON();
     umka_sys_get_screen_area(&wa);
     COVERAGE_OFF();
-    printf("%" PRIu32 " left\n", wa.left);
-    printf("%" PRIu32 " top\n", wa.top);
-    printf("%" PRIu32 " right\n", wa.right);
-    printf("%" PRIu32 " bottom\n", wa.bottom);
+    fprintf(ctx->fout, "%" PRIu32 " left\n", wa.left);
+    fprintf(ctx->fout, "%" PRIu32 " top\n", wa.top);
+    fprintf(ctx->fout, "%" PRIu32 " right\n", wa.right);
+    fprintf(ctx->fout, "%" PRIu32 " bottom\n", wa.bottom);
 }
 
 static void
@@ -1276,7 +1292,7 @@ cmd_set_screen_area(struct shell_ctx *ctx, int argc, char **argv) {
         "  right            right x coord (not length!)\n"
         "  bottom           bottom y coord";
     if (argc != 5) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     rect_t wa;
@@ -1296,17 +1312,17 @@ cmd_get_skin_margins(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_skin_margins";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     rect_t wa;
     COVERAGE_ON();
     umka_sys_get_skin_margins(&wa);
     COVERAGE_OFF();
-    printf("%" PRIu32 " left\n", wa.left);
-    printf("%" PRIu32 " top\n", wa.top);
-    printf("%" PRIu32 " right\n", wa.right);
-    printf("%" PRIu32 " bottom\n", wa.bottom);
+    fprintf(ctx->fout, "%" PRIu32 " left\n", wa.left);
+    fprintf(ctx->fout, "%" PRIu32 " top\n", wa.top);
+    fprintf(ctx->fout, "%" PRIu32 " right\n", wa.right);
+    fprintf(ctx->fout, "%" PRIu32 " bottom\n", wa.bottom);
 }
 
 static void
@@ -1316,7 +1332,7 @@ cmd_set_button_style(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: set_button_style <style>\n"
         "  style            0 - flat, 1 - 3d";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t style = strtoul(argv[1], NULL, 0);
@@ -1332,14 +1348,14 @@ cmd_set_skin(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: set_skin <path>\n"
         "  path             i.e. /rd/1/DEFAULT.SKN";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *path = argv[1];
     COVERAGE_ON();
     int32_t status = umka_sys_set_skin(path);
     COVERAGE_OFF();
-    printf("status: %" PRIi32 "\n", status);
+    fprintf(ctx->fout, "status: %" PRIi32 "\n", status);
 }
 
 char *lang_id_map[] = {"en", "fi", "ge", "ru", "fr", "et", "ua", "it", "be",
@@ -1353,7 +1369,7 @@ cmd_get_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
         "  -t type          layout type: 1 - normal, 2 - shift, 3 - alt\n"
         "  -f file          file name to save layout to";
     if (argc < 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int type;
@@ -1369,8 +1385,8 @@ cmd_get_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
             } else if (!strcmp(type_str, "alt")) {
                 type = 3;
             } else {
-                printf("no such layout type: %s\n", type_str);
-                puts(usage);
+                fprintf(ctx->fout, "no such layout type: %s\n", type_str);
+                fputs(usage, ctx->fout);
                 return;
             }
         }
@@ -1383,29 +1399,29 @@ cmd_get_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
 #define NUM_COLS 16 // produces nice output, 80 chars
         for (size_t row = 0; row < KOS_LAYOUT_SIZE/NUM_COLS; row++) {
             for (size_t col = 0; col < NUM_COLS; col++) {
-                printf(" 0x%2.2x", layout[row*NUM_COLS+col]);
+                fprintf(ctx->fout, " 0x%2.2x", layout[row*NUM_COLS+col]);
             }
-            putchar('\n');
+            fprintf(ctx->fout, "\n");
         }
 #undef COLS
     } else if (argc == 5 && !strcmp(argv[3], "-f")) {
         const char *fname = argv[4];
         FILE *f = fopen(fname, "w");
         if (!f) {
-            printf("can't open file for writing: %s\n", fname);
-            puts(usage);
+            fprintf(ctx->fout, "can't open file for writing: %s\n", fname);
+            fputs(usage, ctx->fout);
             return;
         }
         size_t nread = fwrite(layout, 1, KOS_LAYOUT_SIZE, f);
         fclose(f);
         if (nread != KOS_LAYOUT_SIZE) {
-            printf("can't write %i bytes of layout, only %i\n",
+            fprintf(ctx->fout, "can't write %i bytes of layout, only %i\n",
                    KOS_LAYOUT_SIZE, nread);
-            puts(usage);
+            fputs(usage, ctx->fout);
             return;
         }
     } else {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
 }
@@ -1419,7 +1435,7 @@ cmd_set_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
         "  -f file          file name to read layout from\n"
         "  code             i-th ASCII code for the scancode i";
     if (argc != 5 && argc != 131) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int type;
@@ -1435,8 +1451,8 @@ cmd_set_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
             } else if (!strcmp(type_str, "alt")) {
                 type = 3;
             } else {
-                printf("no such layout type: %s\n", type_str);
-                puts(usage);
+                fprintf(ctx->fout, "no such layout type: %s\n", type_str);
+                fputs(usage, ctx->fout);
                 return;
             }
         }
@@ -1446,16 +1462,16 @@ cmd_set_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
         const char *fname = argv[4];
         FILE *f = fopen(fname, "r");
         if (!f) {
-            printf("can't open file: %s\n", fname);
-            puts(usage);
+            fprintf(ctx->fout, "can't open file: %s\n", fname);
+            fputs(usage, ctx->fout);
             return;
         }
         size_t nread = fread(layout, 1, KOS_LAYOUT_SIZE, f);
         fclose(f);
         if (nread != KOS_LAYOUT_SIZE) {
-            printf("can't read %i bytes of layout, only %i\n",
+            fprintf(ctx->fout, "can't read %i bytes of layout, only %i\n",
                    KOS_LAYOUT_SIZE, nread);
-            puts(usage);
+            fputs(usage, ctx->fout);
             return;
         }
     } else {
@@ -1464,8 +1480,8 @@ cmd_set_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
         for (size_t i = 0; i < KOS_LAYOUT_SIZE; i++) {
             long code = strtol(ascii_codes[i], &endptr, 0);
             if (*endptr != '\0' || code > 0xff) {
-                printf("bad number: %s\n", ascii_codes[i]);
-                puts(usage);
+                fprintf(ctx->fout, "bad number: %s\n", ascii_codes[i]);
+                fputs(usage, ctx->fout);
                 return;
             }
             layout[i] = code;
@@ -1474,7 +1490,7 @@ cmd_set_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
     COVERAGE_ON();
     int status = umka_sys_set_keyboard_layout(type, layout);
     COVERAGE_OFF();
-    printf("status: %i\n", status);
+    fprintf(ctx->fout, "status: %i\n", status);
 }
 
 static void
@@ -1484,16 +1500,16 @@ cmd_get_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_keyboard_lang";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     int lang = umka_sys_get_keyboard_lang();
     COVERAGE_OFF();
     if (lang >= KOS_LANG_FIRST && lang <= KOS_LANG_LAST) {
-        printf("%i - %s\n", lang, lang_id_map[lang - KOS_LANG_FIRST]);
+        fprintf(ctx->fout, "%i - %s\n", lang, lang_id_map[lang - KOS_LANG_FIRST]);
     } else {
-        printf("invalid lang: %i\n", lang);
+        fprintf(ctx->fout, "invalid lang: %i\n", lang);
     }
     shell_var_add_sint(ctx, lang);
 }
@@ -1505,16 +1521,16 @@ cmd_get_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_system_lang";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     int lang = umka_sys_get_system_lang();
     COVERAGE_OFF();
     if (lang >= KOS_LANG_FIRST && lang <= KOS_LANG_LAST) {
-        printf("%i - %s\n", lang, lang_id_map[lang - KOS_LANG_FIRST]);
+        fprintf(ctx->fout, "%i - %s\n", lang, lang_id_map[lang - KOS_LANG_FIRST]);
     } else {
-        printf("invalid lang: %i\n", lang);
+        fprintf(ctx->fout, "invalid lang: %i\n", lang);
     }
     shell_var_add_uint(ctx, lang);
 }
@@ -1528,7 +1544,7 @@ cmd_set_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
         "                   1 - en, 2 - fi, 3 - ge, 4 - ru, 5 - fr, 6 - et,\n"
         "                   7 - ua, 8 - it, 9 - be, 10 - sp, 11 - ca";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     char *endptr;
@@ -1541,8 +1557,8 @@ cmd_set_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
             }
         }
         if (lang == KOS_LANG_LAST) {
-            printf("no such lang: %s\n", lang_str);
-            puts(usage);
+            fprintf(ctx->fout, "no such lang: %s\n", lang_str);
+            fputs(usage, ctx->fout);
             return;
         }
         lang += KOS_LANG_FIRST;
@@ -1561,7 +1577,7 @@ cmd_set_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
         "                   1 - en, 2 - fi, 3 - ge, 4 - ru, 5 - fr, 6 - et,\n"
         "                   7 - ua, 8 - it, 9 - be, 10 - sp, 11 - ca";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     char *endptr;
@@ -1574,8 +1590,8 @@ cmd_set_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
             }
         }
         if (lang == KOS_LANG_LAST) {
-            printf("no such lang: %s\n", lang_str);
-            puts(usage);
+            fprintf(ctx->fout, "no such lang: %s\n", lang_str);
+            fputs(usage, ctx->fout);
             return;
         }
         lang += KOS_LANG_FIRST;  // not zero-based
@@ -1592,14 +1608,14 @@ cmd_get_keyboard_mode(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_keyboard_mode";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *names[] = {"ASCII", "scancodes"};
     COVERAGE_ON();
     int type = umka_sys_get_keyboard_mode();
     COVERAGE_OFF();
-    printf("keyboard_mode: %i - %s\n", type,
+    fprintf(ctx->fout, "keyboard_mode: %i - %s\n", type,
            type < 2 ? names[type] : "invalid!");
 }
 
@@ -1610,7 +1626,7 @@ cmd_set_keyboard_mode(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: set_keyboard_mode <mode>\n"
         "  mode             0 - ASCII, 1 - scancodes";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int type = strtol(argv[1], NULL, 0);
@@ -1626,14 +1642,14 @@ cmd_get_font_smoothing(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_font_smoothing";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *names[] = {"off", "anti-aliasing", "subpixel"};
     COVERAGE_ON();
     int type = umka_sys_get_font_smoothing();
     COVERAGE_OFF();
-    printf("font smoothing: %i - %s\n", type, names[type]);
+    fprintf(ctx->fout, "font smoothing: %i - %s\n", type, names[type]);
 }
 
 static void
@@ -1643,7 +1659,7 @@ cmd_set_font_smoothing(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: set_font_smoothing <mode>\n"
         "  mode             0 - off, 1 - gray AA, 2 - subpixel AA";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int type = strtol(argv[1], NULL, 0);
@@ -1658,14 +1674,14 @@ cmd_get_font_size(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_font_size";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
     COVERAGE_ON();
     size_t size = umka_sys_get_font_size();
     COVERAGE_OFF();
-    printf("%upx\n", size);
+    fprintf(ctx->fout, "%upx\n", size);
 }
 
 static void
@@ -1675,7 +1691,7 @@ cmd_set_font_size(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: set_font_size <size>\n"
         "  size             in pixels";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t size = strtoul(argv[1], NULL, 0);
@@ -1692,7 +1708,7 @@ cmd_set_mouse_pos_screen(struct shell_ctx *ctx, int argc, char **argv) {
         "  x                in pixels\n"
         "  y                in pixels";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     struct point16s pos;
@@ -1710,13 +1726,13 @@ cmd_get_mouse_pos_screen(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_mouse_pos_screen";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     struct point16s pos = umka_sys_get_mouse_pos_screen();
     COVERAGE_OFF();
-    printf("x y: %" PRIi16 " %" PRIi16 "\n", pos.x, pos.y);
+    fprintf(ctx->fout, "x y: %" PRIi16 " %" PRIi16 "\n", pos.x, pos.y);
 }
 
 static void
@@ -1726,7 +1742,7 @@ cmd_get_mouse_pos_window(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_mouse_pos_window";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
@@ -1735,7 +1751,7 @@ cmd_get_mouse_pos_window(struct shell_ctx *ctx, int argc, char **argv) {
     if (pos.y < 0) {
         pos.x++;
     }
-    printf("x y: %" PRIi16 " %" PRIi16 "\n", pos.x, pos.y);
+    fprintf(ctx->fout, "x y: %" PRIi16 " %" PRIi16 "\n", pos.x, pos.y);
 }
 
 static void
@@ -1745,13 +1761,13 @@ cmd_get_mouse_buttons_state(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_mouse_buttons_state";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     struct mouse_state m = umka_sys_get_mouse_buttons_state();
     COVERAGE_OFF();
-    printf("buttons held (left right middle 4th 5th): %u %u %u %u %u\n",
+    fprintf(ctx->fout, "buttons held (left right middle 4th 5th): %u %u %u %u %u\n",
            m.bl_held, m.br_held, m.bm_held, m.b4_held, m.b5_held);
 }
 
@@ -1762,21 +1778,21 @@ cmd_get_mouse_buttons_state_events(struct shell_ctx *ctx, int argc, char **argv)
     const char *usage = \
         "usage: get_mouse_buttons_state_events";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     struct mouse_state_events m = umka_sys_get_mouse_buttons_state_events();
     COVERAGE_OFF();
-    printf("buttons held (left right middle 4th 5th): %u %u %u %u %u\n",
+    fprintf(ctx->fout, "buttons held (left right middle 4th 5th): %u %u %u %u %u\n",
            m.st.bl_held, m.st.br_held, m.st.bm_held, m.st.b4_held,
            m.st.b5_held);
-    printf("buttons pressed (left right middle): %u %u %u\n",
+    fprintf(ctx->fout, "buttons pressed (left right middle): %u %u %u\n",
            m.ev.bl_pressed, m.ev.br_pressed, m.ev.bm_pressed);
-    printf("buttons released (left right middle): %u %u %u\n",
+    fprintf(ctx->fout, "buttons released (left right middle): %u %u %u\n",
            m.ev.bl_released, m.ev.br_released, m.ev.bm_released);
-    printf("left button double click: %u\n", m.ev.bl_dbclick);
-    printf("scrolls used (vertical horizontal): %u %u\n",
+    fprintf(ctx->fout, "left button double click: %u\n", m.ev.bl_dbclick);
+    fprintf(ctx->fout, "scrolls used (vertical horizontal): %u %u\n",
            m.ev.vscroll_used, m.ev.hscroll_used);
 }
 
@@ -1794,7 +1810,7 @@ cmd_button(struct shell_ctx *ctx, int argc, char **argv) {
         "  draw_button      0/1\n"
         "  draw_frame       0/1";
     if (argc != 9) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x;
@@ -1818,7 +1834,7 @@ cmd_load_cursor_from_file(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: load_cursor_from_file <file>\n"
         "  file             file in .cur format in kolibri fs\n";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int show_pointers = 0;
@@ -1826,9 +1842,9 @@ cmd_load_cursor_from_file(struct shell_ctx *ctx, int argc, char **argv) {
     void *handle = umka_sys_load_cursor_from_file(argv[1]);
     COVERAGE_OFF();
     if (show_pointers) {
-        printf("handle = %p\n", handle);
+        fprintf(ctx->fout, "handle = %p\n", handle);
     } else {
-        printf("handle = %s\n", handle ? "non-zero" : "0");
+        fprintf(ctx->fout, "handle = %s\n", handle ? "non-zero" : "0");
     }
     shell_var_add_ptr(ctx, handle);
 }
@@ -1839,14 +1855,14 @@ cmd_load_cursor_from_mem(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: load_cursor_from_mem <file>\n"
         "  file             file in .cur format in host fs\n";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int show_pointers = 0;
     const char *fname = argv[1];
     void *fdata = host_load_file(fname);
     if (!fdata) {
-        printf("[umka] Can't load file: %s\n", fname);
+        fprintf(ctx->fout, "[umka] Can't load file: %s\n", fname);
         return;
     }
     COVERAGE_ON();
@@ -1854,9 +1870,9 @@ cmd_load_cursor_from_mem(struct shell_ctx *ctx, int argc, char **argv) {
     COVERAGE_OFF();
     free(fdata);
     if (show_pointers) {
-        printf("handle = %p\n", handle);
+        fprintf(ctx->fout, "handle = %p\n", handle);
     } else {
-        printf("handle = %s\n", handle ? "non-zero" : "0");
+        fprintf(ctx->fout, "handle = %s\n", handle ? "non-zero" : "0");
     }
     shell_var_add_ptr(ctx, handle);
 }
@@ -1867,7 +1883,7 @@ cmd_set_cursor(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: set_cursor <handle>\n"
         "  handle           as returned by load_cursor* functions";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int show_pointers = 0;
@@ -1877,9 +1893,9 @@ cmd_set_cursor(struct shell_ctx *ctx, int argc, char **argv) {
     handle = umka_sys_set_cursor(handle);
     COVERAGE_OFF();
     if (show_pointers) {
-        printf("prev handle = %p\n", handle);
+        fprintf(ctx->fout, "prev handle = %p\n", handle);
     } else {
-        printf("prev handle = %s\n", handle ? "non-zero" : "0");
+        fprintf(ctx->fout, "prev handle = %s\n", handle ? "non-zero" : "0");
     }
     shell_var_add_ptr(ctx, handle);
 }
@@ -1895,7 +1911,7 @@ cmd_put_image(struct shell_ctx *ctx, int argc, char **argv) {
         "  x                x coord\n"
         "  y                y coord";
     if (argc != 6) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     FILE *f = fopen(argv[1], "rb");
@@ -1929,7 +1945,7 @@ cmd_put_image_palette(struct shell_ctx *ctx, int argc, char **argv) {
         "  bpp              bits per pixel\n"
         "  row_offset       in bytes";
     if (argc != 8) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     FILE *f = fopen(argv[1], "rb");
@@ -1965,7 +1981,7 @@ cmd_draw_rect(struct shell_ctx *ctx, int argc, char **argv) {
         "  color            in hex\n"
         "  -g               0/1 - gradient";
     if (argc < 6) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x     = strtoul(argv[1], NULL, 0);
@@ -1986,14 +2002,14 @@ cmd_get_screen_size(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_screen_size";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t xsize, ysize;
     COVERAGE_ON();
     umka_sys_get_screen_size(&xsize, &ysize);
     COVERAGE_OFF();
-    printf("%" PRIu32 "x%" PRIu32 "\n", xsize, ysize);
+    fprintf(ctx->fout, "%" PRIu32 "x%" PRIu32 "\n", xsize, ysize);
 }
 
 static void
@@ -2008,7 +2024,7 @@ cmd_draw_line(struct shell_ctx *ctx, int argc, char **argv) {
         "  color            hex\n"
         "  -i               inverted color";
     if (argc < 6) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x    = strtoul(argv[1], NULL, 0);
@@ -2030,7 +2046,7 @@ cmd_set_window_caption(struct shell_ctx *ctx, int argc, char **argv) {
         "  caption          asciiz string\n"
         "  encoding         1 = cp866, 2 = UTF-16LE, 3 = UTF-8";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *caption = argv[1];
@@ -2060,7 +2076,7 @@ cmd_draw_window(struct shell_ctx *ctx, int argc, char **argv) {
         "  style            1 - draw nothing, 3 - skinned, 4 - skinned fixed\n"
         "  caption          asciiz";
     if (argc != 13) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x     = strtoul(argv[1], NULL, 0);
@@ -2090,7 +2106,7 @@ cmd_window_redraw(struct shell_ctx *ctx, int argc, char **argv) {
         "  1                begin\n"
         "  2                end";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int begin_end = strtoul(argv[1], NULL, 0);
@@ -2109,7 +2125,7 @@ cmd_move_window(struct shell_ctx *ctx, int argc, char **argv) {
         "  xsize            x size -1\n"
         "  ysize            y size -1";
     if (argc != 5) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t x      = strtoul(argv[1], NULL, 0);
@@ -2142,13 +2158,13 @@ cmd_blit_bitmap(struct shell_ctx *ctx, int argc, char **argv) {
         "  client_relative  0/1\n"
         "  row_length       in bytes";
     if (argc != 15) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *fname = argv[1];
     FILE *f = fopen(fname, "rb");
     if (!f) {
-        printf("[!] can't open file '%s': %s\n", fname, strerror(errno));
+        fprintf(ctx->fout, "[!] can't open file '%s': %s\n", fname, strerror(errno));
         return;
     }
     fseek(f, 0, SEEK_END);
@@ -2186,7 +2202,7 @@ cmd_write_devices_dat(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: write_devices_dat <file>\n"
         "  file             path/to/devices.dat";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
@@ -2201,23 +2217,29 @@ cmd_scrot(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: scrot <file>\n"
         "  file             path/to/file in png format";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
-    uint32_t xsize, ysize;
-    COVERAGE_ON();
-    umka_sys_get_screen_size(&xsize, &ysize);
-    COVERAGE_OFF();
 
-    uint32_t *lfb = (uint32_t*)kos_lfb_base;    // assume 32bpp
-    for (size_t y = 0; y < ysize; y++) {
-        for (size_t x = 0; x < xsize; x++) {
-            *lfb++ |= 0xff000000;
+    uint32_t *lfb32 = (uint32_t*)kos_lfb_base;
+
+    lfb32 = malloc(4*kos_display.width*kos_display.height);
+    copy_display_to_rgb888(lfb32);
+
+    uint32_t *p = lfb32;
+    for (size_t y = 0; y < kos_display.height; y++) {
+        for (size_t x = 0; x < kos_display.width; x++) {
+            *p++ |= 0xff000000;
         }
     }
 
-    unsigned error = lodepng_encode32_file(argv[1], kos_lfb_base, xsize, ysize);
-    if (error) printf("error %u: %s\n", error, lodepng_error_text(error));
+    unsigned error = lodepng_encode32_file(argv[1], (void*)lfb32,
+                                           kos_display.width,
+                                           kos_display.height);
+    if (error) {
+        fprintf(ctx->fout, "error %u: %s\n", error, lodepng_error_text(error));
+    }
+    free(lfb32);
 }
 
 static void
@@ -2227,7 +2249,7 @@ cmd_cd(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: cd <path>\n"
         "  path             path/to/dir";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
@@ -2237,7 +2259,7 @@ cmd_cd(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
-ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
+ls_range(struct shell_ctx *ctx, f7080s1arg_t *fX0, f70or80_t f70or80) {
     f7080ret_t r;
     size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 :
                                                  BDFE_LEN_UNICODE;
@@ -2253,7 +2275,7 @@ ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
         umka_sys_lfn(fX0, &r, f70or80);
         COVERAGE_OFF();
         fX0->offset += fX0->size;
-        print_f70_status(&r, 1);
+        print_f70_status(ctx, &r, 1);
         f7080s1info_t *dir = fX0->buf;
         int ok = (r.count <= fX0->size);
         ok &= (dir->cnt == r.count);
@@ -2266,7 +2288,7 @@ ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
         for (size_t i = 0; i < dir->cnt; i++) {
             char fattr[KF_ATTR_CNT+1];
             convert_f70_file_attr(bdfe->attr, fattr);
-            printf("%s %s\n", fattr, bdfe->name);
+            fprintf(ctx->fout, "%s %s\n", fattr, bdfe->name);
             bdfe = (bdfe_t*)((uintptr_t)bdfe + bdfe_len);
         }
         if (r.status == ERROR_END_OF_FILE) {
@@ -2276,7 +2298,7 @@ ls_range(f7080s1arg_t *fX0, f70or80_t f70or80) {
 }
 
 static void
-ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
+ls_all(struct shell_ctx *ctx, f7080s1arg_t *fX0, f70or80_t f70or80) {
     f7080ret_t r;
     size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 :
                                                  BDFE_LEN_UNICODE;
@@ -2284,7 +2306,7 @@ ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
         COVERAGE_ON();
         umka_sys_lfn(fX0, &r, f70or80);
         COVERAGE_OFF();
-        print_f70_status(&r, 1);
+        print_f70_status(ctx, &r, 1);
         assert((r.status == ERROR_SUCCESS && r.count == fX0->size)
               || (r.status == ERROR_END_OF_FILE && r.count < fX0->size));
         f7080s1info_t *dir = fX0->buf;
@@ -2296,12 +2318,12 @@ ls_all(f7080s1arg_t *fX0, f70or80_t f70or80) {
         assert(ok);
         if (!ok)
             break;
-        printf("total = %"PRIi32"\n", dir->total_cnt);
+        fprintf(ctx->fout, "total = %"PRIi32"\n", dir->total_cnt);
         bdfe_t *bdfe = dir->bdfes;
         for (size_t i = 0; i < dir->cnt; i++) {
             char fattr[KF_ATTR_CNT+1];
             convert_f70_file_attr(bdfe->attr, fattr);
-            printf("%s %s\n", fattr, bdfe->name);
+            fprintf(ctx->fout, "%s %s\n", fattr, bdfe->name);
             bdfe = (bdfe_t*)((uintptr_t)bdfe + bdfe_len);
         }
         if (r.status == ERROR_END_OF_FILE) {
@@ -2334,7 +2356,7 @@ cmd_exec(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: exec <file>\n"
         "  file           executable to run";
     if (!argc) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     f7080s7arg_t fX0 = {.sf = 7};
@@ -2351,10 +2373,10 @@ cmd_exec(struct shell_ctx *ctx, int argc, char **argv) {
     if (r.status < 0) {
         r.status = -r.status;
     } else {
-        printf("pid: %" PRIu32 "\n", r.status);
+        fprintf(ctx->fout, "pid: %" PRIu32 "\n", r.status);
         r.status = 0;
     }
-    print_f70_status(&r, 1);
+    print_f70_status(ctx, &r, 1);
 }
 
 static void
@@ -2362,7 +2384,7 @@ cmd_ls(struct shell_ctx *ctx, int argc, char **argv, const char *usage,
        f70or80_t f70or80) {
     (void)ctx;
     if (!argc) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     int opt;
@@ -2390,7 +2412,7 @@ cmd_ls(struct shell_ctx *ctx, int argc, char **argv, const char *usage,
             path_enc = parse_encoding(optarg);
             break;
         default:
-            puts(usage);
+            fputs(usage, ctx->fout);
             return;
         }
     }
@@ -2409,9 +2431,9 @@ cmd_ls(struct shell_ctx *ctx, int argc, char **argv, const char *usage,
         fX0.u.f80.path = path;
     }
     if (count != MAX_DIRENTS_TO_READ) {
-        ls_range(&fX0, f70or80);
+        ls_range(ctx, &fX0, f70or80);
     } else {
-        ls_all(&fX0, f70or80);
+        ls_all(ctx, &fX0, f70or80);
     }
     free(dir);
     return;
@@ -2450,7 +2472,7 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
         "  [-m]             force show modification time\n"
         "  [-a]             force show access time";
     if (argc < 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     bool force_ctime = false, force_mtime = false, force_atime = false;
@@ -2468,14 +2490,14 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
     COVERAGE_ON();
     umka_sys_lfn(&fX0, &r, f70or80);
     COVERAGE_OFF();
-    print_f70_status(&r, 0);
+    print_f70_status(ctx, &r, 0);
     if (r.status != ERROR_SUCCESS)
         return;
     char fattr[KF_ATTR_CNT+1];
     convert_f70_file_attr(file.attr, fattr);
-    printf("attr: %s\n", fattr);
+    fprintf(ctx->fout, "attr: %s\n", fattr);
     if ((file.attr & KF_FOLDER) == 0) {   // don't show size for dirs
-        printf("size: %llu\n", file.size);
+        fprintf(ctx->fout, "size: %llu\n", file.size);
     }
 
     int opt;
@@ -2492,7 +2514,7 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
             force_atime = true;
             break;
         default:
-            puts(usage);
+            fputs(usage, ctx->fout);
             return;
         }
     }
@@ -2502,21 +2524,21 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
     if (!ctx->reproducible || force_atime) {
         time = kos_time_to_epoch(&file.atime);
         t = localtime(&time);
-        printf("atime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
+        fprintf(ctx->fout, "atime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
                t->tm_hour, t->tm_min, t->tm_sec);
     }
     if (!ctx->reproducible || force_mtime) {
         time = kos_time_to_epoch(&file.mtime);
         t = localtime(&time);
-        printf("mtime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
+        fprintf(ctx->fout, "mtime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
                t->tm_hour, t->tm_min, t->tm_sec);
     }
     if (!ctx->reproducible || force_ctime) {
         time = kos_time_to_epoch(&file.ctime);
         t = localtime(&time);
-        printf("ctime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
+        fprintf(ctx->fout, "ctime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
                t->tm_hour, t->tm_min, t->tm_sec);
     }
@@ -2538,7 +2560,7 @@ cmd_read(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80,
          const char *usage) {
     (void)ctx;
     if (argc < 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     f7080s0arg_t fX0 = {.sf = 0};
@@ -2552,9 +2574,9 @@ cmd_read(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80,
         fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
         fX0.u.f80.path = argv[opt++];
     }
-    if ((opt >= argc) || !parse_uint64(argv[opt++], &fX0.offset))
+    if ((opt >= argc) || !parse_uint64(ctx, argv[opt++], &fX0.offset))
         return;
-    if ((opt >= argc) || !parse_uint32(argv[opt++], &fX0.count))
+    if ((opt >= argc) || !parse_uint32(ctx, argv[opt++], &fX0.count))
         return;
     for (; opt < argc; opt++) {
         if (!strcmp(argv[opt], "-b")) {
@@ -2563,12 +2585,12 @@ cmd_read(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80,
             dump_hash = true;
         } else if (!strcmp(argv[opt], "-e")) {
             if (f70or80 == F70) {
-                printf("f70 doesn't accept encoding parameter,"
+                fprintf(ctx->fout, "f70 doesn't accept encoding parameter,"
                         " use f80\n");
                 return;
             }
         } else {
-            printf("invalid option: '%s'\n", argv[opt]);
+            fprintf(ctx->fout, "invalid option: '%s'\n", argv[opt]);
             return;
         }
     }
@@ -2578,12 +2600,12 @@ cmd_read(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80,
     umka_sys_lfn(&fX0, &r, f70or80);
     COVERAGE_OFF();
 
-    print_f70_status(&r, 1);
+    print_f70_status(ctx, &r, 1);
     if (r.status == ERROR_SUCCESS || r.status == ERROR_END_OF_FILE) {
         if (dump_bytes)
-            print_bytes(fX0.buf, r.count);
+            print_bytes(ctx, fX0.buf, r.count);
         if (dump_hash)
-            print_hash(fX0.buf, r.count);
+            print_hash(ctx, fX0.buf, r.count);
     }
 
     free(fX0.buf);
@@ -2624,12 +2646,12 @@ cmd_acpi_preload_table(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: acpi_preload_table <file>\n"
         "  file             path/to/local/file.aml";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     FILE *f = fopen(argv[1], "rb");
     if (!f) {
-        printf("[umka] can't open file: %s\n", argv[1]);
+        fprintf(ctx->fout, "[umka] can't open file: %s\n", argv[1]);
         return;
     }
     fseek(f, 0, SEEK_END);
@@ -2638,7 +2660,7 @@ cmd_acpi_preload_table(struct shell_ctx *ctx, int argc, char **argv) {
     uint8_t *table = (uint8_t*)malloc(fsize);
     fread(table, fsize, 1, f);
     fclose(f);
-    printf("table #%zu\n", kos_acpi_ssdt_cnt);
+    fprintf(ctx->fout, "table #%zu\n", kos_acpi_ssdt_cnt);
     kos_acpi_ssdt_base[kos_acpi_ssdt_cnt] = table;
     kos_acpi_ssdt_size[kos_acpi_ssdt_cnt] = fsize;
     kos_acpi_ssdt_cnt++;
@@ -2650,7 +2672,7 @@ cmd_acpi_enable(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_enable";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
@@ -2666,11 +2688,11 @@ cmd_acpi_get_node_cnt(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_get_node_cnt";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t cnt = kos_acpi_count_nodes(acpi_ctx);
-    printf("nodes in namespace: %" PRIu32 "\n", cnt);
+    fprintf(ctx->fout, "nodes in namespace: %" PRIu32 "\n", cnt);
 }
 
 static void
@@ -2680,10 +2702,10 @@ cmd_acpi_get_node_alloc_cnt(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_get_node_alloc_cnt";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
-    printf("nodes allocated: %" PRIu32 "\n", kos_acpi_node_alloc_cnt);
+    fprintf(ctx->fout, "nodes allocated: %" PRIu32 "\n", kos_acpi_node_alloc_cnt);
 }
 
 static void
@@ -2693,10 +2715,10 @@ cmd_acpi_get_node_free_cnt(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_get_node_free_cnt";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
-    printf("nodes freed: %" PRIu32 "\n", kos_acpi_node_free_cnt);
+    fprintf(ctx->fout, "nodes freed: %" PRIu32 "\n", kos_acpi_node_free_cnt);
 }
 
 static void
@@ -2706,7 +2728,7 @@ cmd_acpi_set_usage(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: acpi_set_usage <num>\n"
         "  num            one of ACPI_USAGE_* constants";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t acpi_usage = strtoul(argv[1], NULL, 0);
@@ -2720,10 +2742,10 @@ cmd_acpi_get_usage(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: acpi_get_usage";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
-    printf("ACPI usage: %" PRIu32 "\n", kos_acpi_usage);
+    fprintf(ctx->fout, "ACPI usage: %" PRIu32 "\n", kos_acpi_usage);
 }
 
 static void
@@ -2734,19 +2756,19 @@ cmd_acpi_call(struct shell_ctx *ctx, int argc, char **argv) {
         "  method         name of acpi method to call, e.g. \\_SB_PCI0_PRT";
     if (argc > 2) {
         puts("arguments are not supported / not implemented!");
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     if (argc < 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     const char *method = argv[1];
-    printf("calling acpi method: '%s'\n", method);
+    fprintf(ctx->fout, "calling acpi method: '%s'\n", method);
     COVERAGE_ON();
     kos_acpi_call_name(acpi_ctx, method);
     COVERAGE_OFF();
-    printf("acpi method returned\n");
+    fprintf(ctx->fout, "acpi method returned\n");
 }
 
 static void
@@ -2756,7 +2778,7 @@ cmd_pci_set_path(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: pci_set_path <path>\n"
         "  path           where aaaa:bb:cc.d dirs are";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     strcpy(pci_path, argv[1]);
@@ -2769,10 +2791,10 @@ cmd_pci_get_path(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: pci_get_path";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
-    printf("pci path: %s\n", pci_path);
+    fprintf(ctx->fout, "pci path: %s\n", pci_path);
 }
 
 static void
@@ -2782,14 +2804,14 @@ cmd_load_dll(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: load_dll <path>\n"
         "  path           /path/to/library.obj in KolibriOS fs";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     void *export = umka_sys_load_dll(argv[1]);
     COVERAGE_OFF();
 //    if (ctx->reproducible)
-    printf("### export: %p\n", export);
+    fprintf(ctx->fout, "### export: %p\n", export);
 }
 
 
@@ -2802,7 +2824,7 @@ cmd_stack_init(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: stack_init";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
@@ -2817,14 +2839,14 @@ cmd_net_add_device(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_add_device";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     net_device_t *vnet = vnet_init();   // FIXME: list like block devices
     COVERAGE_ON();
     int32_t dev_num = kos_net_add_device(vnet);
     COVERAGE_OFF();
-    printf("device number: %" PRIi32 "\n", dev_num);
+    fprintf(ctx->fout, "device number: %" PRIi32 "\n", dev_num);
 }
 
 static void
@@ -2833,14 +2855,14 @@ cmd_net_get_dev_count(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_get_dev_count";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     (void)argv;
     COVERAGE_ON();
     uint32_t count = umka_sys_net_get_dev_count();
     COVERAGE_OFF();
-    printf("active network devices: %u\n", count);
+    fprintf(ctx->fout, "active network devices: %u\n", count);
 }
 
 static void
@@ -2850,16 +2872,16 @@ cmd_net_get_dev_type(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_get_dev_type <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     int32_t dev_type = umka_sys_net_get_dev_type(dev_num);
     COVERAGE_OFF();
-    printf("status: %s\n", dev_type == -1 ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", dev_type == -1 ? "fail" : "ok");
     if (dev_type != -1) {
-        printf("type of network device #%" PRIu8 ": %i\n",
+        fprintf(ctx->fout, "type of network device #%" PRIu8 ": %i\n",
                dev_num, dev_type);
     }
 }
@@ -2871,7 +2893,7 @@ cmd_net_get_dev_name(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_get_dev_name <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     char dev_name[64];
@@ -2879,9 +2901,9 @@ cmd_net_get_dev_name(struct shell_ctx *ctx, int argc, char **argv) {
     COVERAGE_ON();
     int32_t status = umka_sys_net_get_dev_name(dev_num, dev_name);
     COVERAGE_OFF();
-    printf("status: %s\n", status == -1 ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", status == -1 ? "fail" : "ok");
     if (status != -1) {
-        printf("name of network device #%" PRIu8 ": %s\n",
+        fprintf(ctx->fout, "name of network device #%" PRIu8 ": %s\n",
                dev_num, dev_name);
     }
 }
@@ -2893,14 +2915,14 @@ cmd_net_dev_reset(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_dev_reset <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     int32_t status = umka_sys_net_dev_reset(dev_num);
     COVERAGE_OFF();
-    printf("status: %s\n", status == -1 ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", status == -1 ? "fail" : "ok");
 }
 
 static void
@@ -2910,14 +2932,14 @@ cmd_net_dev_stop(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_dev_stop <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     int32_t status = umka_sys_net_dev_stop(dev_num);
     COVERAGE_OFF();
-    printf("status: %s\n", status == -1 ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", status == -1 ? "fail" : "ok");
 }
 
 static void
@@ -2927,16 +2949,16 @@ cmd_net_get_dev(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_get_dev <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     intptr_t dev = umka_sys_net_get_dev(dev_num);
     COVERAGE_OFF();
-    printf("status: %s\n", dev == -1 ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", dev == -1 ? "fail" : "ok");
     if (dev != -1) {
-        printf("address of net dev #%" PRIu8 ": 0x%x\n", dev_num, dev);
+        fprintf(ctx->fout, "address of net dev #%" PRIu8 ": 0x%x\n", dev_num, dev);
     }
 }
 
@@ -2947,16 +2969,16 @@ cmd_net_get_packet_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_get_packet_tx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     uint32_t count = umka_sys_net_get_packet_tx_count(dev_num);
     COVERAGE_OFF();
-    printf("status: %s\n", count == UINT32_MAX ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
     if (count != UINT32_MAX) {
-        printf("packet tx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
+        fprintf(ctx->fout, "packet tx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
                dev_num, count);
     }
 }
@@ -2968,16 +2990,16 @@ cmd_net_get_packet_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_get_packet_rx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     uint32_t count = umka_sys_net_get_packet_rx_count(dev_num);
     COVERAGE_OFF();
-    printf("status: %s\n", count == UINT32_MAX ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
     if (count != UINT32_MAX) {
-        printf("packet rx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
+        fprintf(ctx->fout, "packet rx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
                dev_num, count);
     }
 }
@@ -2989,16 +3011,16 @@ cmd_net_get_byte_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_get_byte_tx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     uint32_t count = umka_sys_net_get_byte_tx_count(dev_num);
     COVERAGE_OFF();
-    printf("status: %s\n", count == UINT32_MAX ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
     if (count != UINT32_MAX) {
-        printf("byte tx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
+        fprintf(ctx->fout, "byte tx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
                dev_num, count);
     }
 }
@@ -3010,49 +3032,49 @@ cmd_net_get_byte_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_get_byte_rx_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     uint32_t count = umka_sys_net_get_byte_rx_count(dev_num);
     COVERAGE_OFF();
-    printf("status: %s\n", count == UINT32_MAX ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", count == UINT32_MAX ? "fail" : "ok");
     if (count != UINT32_MAX) {
-        printf("byte rx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
+        fprintf(ctx->fout, "byte rx count of net dev #%" PRIu8 ": %" PRIu32 "\n",
                dev_num, count);
     }
 }
 
 static void
-print_link_status_names(uint32_t status) {
+print_link_status_names(struct shell_ctx *ctx, uint32_t status) {
     switch (status & 0x3) {
     case ETH_LINK_DOWN:
-        printf("ETH_LINK_DOWN");
+        fprintf(ctx->fout, "ETH_LINK_DOWN");
         break;
     case ETH_LINK_UNKNOWN:
-        printf("ETH_LINK_UNKNOWN");
+        fprintf(ctx->fout, "ETH_LINK_UNKNOWN");
         break;
     case ETH_LINK_FD:
-        printf("ETH_LINK_FD");
+        fprintf(ctx->fout, "ETH_LINK_FD");
         break;
     default:
-        printf("ERROR");
+        fprintf(ctx->fout, "ERROR");
         break;
     }
 
     switch(status & ~3u) {
     case ETH_LINK_1G:
-        printf(" + ETH_LINK_1G");
+        fprintf(ctx->fout, " + ETH_LINK_1G");
         break;
     case ETH_LINK_100M:
-        printf(" + ETH_LINK_100M");
+        fprintf(ctx->fout, " + ETH_LINK_100M");
         break;
     case ETH_LINK_10M:
-        printf(" + ETH_LINK_10M");
+        fprintf(ctx->fout, " + ETH_LINK_10M");
         break;
     default:
-        printf(" + UNKNOWN");
+        fprintf(ctx->fout, " + UNKNOWN");
         break;
     }
 }
@@ -3064,19 +3086,19 @@ cmd_net_get_link_status(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_get_link_status <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint8_t dev_num = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     uint32_t status = umka_sys_net_get_link_status(dev_num);
     COVERAGE_OFF();
-    printf("status: %s\n", status == UINT32_MAX ? "fail" : "ok");
+    fprintf(ctx->fout, "status: %s\n", status == UINT32_MAX ? "fail" : "ok");
     if (status != UINT32_MAX) {
-        printf("link status of net dev #%" PRIu8 ": %" PRIu32 " ",
-               dev_num, status);
-        print_link_status_names(status);
-        putchar('\n');
+        fprintf(ctx->fout, "link status of net dev #%" PRIu8 ": %" PRIu32 " ",
+                dev_num, status);
+        print_link_status_names(ctx, status);
+        fprintf(ctx->fout, "\n");
     }
 }
 
@@ -3089,7 +3111,7 @@ cmd_net_open_socket(struct shell_ctx *ctx, int argc, char **argv) {
         "  type           type\n"
         "  protocol       protocol";
     if (argc != 4) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t domain   = strtoul(argv[1], NULL, 0);
@@ -3098,8 +3120,8 @@ cmd_net_open_socket(struct shell_ctx *ctx, int argc, char **argv) {
     COVERAGE_ON();
     f75ret_t r = umka_sys_net_open_socket(domain, type, protocol);
     COVERAGE_OFF();
-    printf("value: 0x%" PRIx32 "\n", r.value);
-    printf("errorcode: 0x%" PRIx32 "\n", r.errorcode);
+    fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
+    fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 // UINT32_MAX
 }
 
@@ -3110,15 +3132,15 @@ cmd_net_close_socket(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_close_socket <socket number>\n"
         "  socket number  socket number\n";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     f75ret_t r = umka_sys_net_close_socket(fd);
     COVERAGE_OFF();
-    printf("value: 0x%" PRIx32 "\n", r.value);
-    printf("errorcode: 0x%" PRIx32 "\n", r.errorcode);
+    fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
+    fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
 static void
@@ -3130,7 +3152,7 @@ cmd_net_bind(struct shell_ctx *ctx, int argc, char **argv) {
         "  port           port\n"
         "  addr           addr";
     if (argc != 4) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
@@ -3142,12 +3164,12 @@ cmd_net_bind(struct shell_ctx *ctx, int argc, char **argv) {
     sa.sin_family = AF_INET4;
     sa.sin_port = htons(port);
     sa.sin_addr.s_addr = addr;
-    printf("sockaddr at %p\n", (void*)&sa);
+    fprintf(ctx->fout, "sockaddr at %p\n", (void*)&sa);
     COVERAGE_ON();
     f75ret_t r = umka_sys_net_bind(fd, &sa, sizeof(struct sockaddr_in));
     COVERAGE_OFF();
-    printf("value: 0x%" PRIx32 "\n", r.value);
-    printf("errorcode: 0x%" PRIx32 "\n", r.errorcode);
+    fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
+    fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
 static void
@@ -3158,7 +3180,7 @@ cmd_net_listen(struct shell_ctx *ctx, int argc, char **argv) {
         "  fd             socket number\n"
         "  backlog        max queue length";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
@@ -3166,8 +3188,8 @@ cmd_net_listen(struct shell_ctx *ctx, int argc, char **argv) {
     COVERAGE_ON();
     f75ret_t r = umka_sys_net_listen(fd, backlog);
     COVERAGE_OFF();
-    printf("value: 0x%" PRIx32 "\n", r.value);
-    printf("errorcode: 0x%" PRIx32 "\n", r.errorcode);
+    fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
+    fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
 static void
@@ -3179,7 +3201,7 @@ cmd_net_connect(struct shell_ctx *ctx, int argc, char **argv) {
         "  port           port\n"
         "  addr           addr";
     if (argc != 4) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
@@ -3191,12 +3213,12 @@ cmd_net_connect(struct shell_ctx *ctx, int argc, char **argv) {
     sa.sin_family = AF_INET4;
     sa.sin_port = htons(port);
     sa.sin_addr.s_addr = addr;
-    printf("sockaddr at %p\n", (void*)&sa);
+    fprintf(ctx->fout, "sockaddr at %p\n", (void*)&sa);
     COVERAGE_ON();
     f75ret_t r = umka_sys_net_connect(fd, &sa, sizeof(struct sockaddr_in));
     COVERAGE_OFF();
-    printf("value: 0x%" PRIx32 "\n", r.value);
-    printf("errorcode: 0x%" PRIx32 "\n", r.errorcode);
+    fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
+    fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
 static void
@@ -3208,7 +3230,7 @@ cmd_net_accept(struct shell_ctx *ctx, int argc, char **argv) {
         "  port           port\n"
         "  addr           addr";
     if (argc != 4) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t fd = strtoul(argv[1], NULL, 0);
@@ -3220,12 +3242,12 @@ cmd_net_accept(struct shell_ctx *ctx, int argc, char **argv) {
     sa.sin_family = AF_INET4;
     sa.sin_port = htons(port);
     sa.sin_addr.s_addr = addr;
-    printf("sockaddr at %p\n", (void*)&sa);
+    fprintf(ctx->fout, "sockaddr at %p\n", (void*)&sa);
     COVERAGE_ON();
     f75ret_t r = umka_sys_net_accept(fd, &sa, sizeof(struct sockaddr_in));
     COVERAGE_OFF();
-    printf("value: 0x%" PRIx32 "\n", r.value);
-    printf("errorcode: 0x%" PRIx32 "\n", r.errorcode);
+    fprintf(ctx->fout, "value: 0x%" PRIx32 "\n", r.value);
+    fprintf(ctx->fout, "errorcode: 0x%" PRIx32 "\n", r.errorcode);
 }
 
 static void
@@ -3235,7 +3257,7 @@ cmd_net_eth_read_mac(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_eth_read_mac <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3243,9 +3265,9 @@ cmd_net_eth_read_mac(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_eth_read_mac(dev_num);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        printf("%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n",
+        fprintf(ctx->fout, "%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n",
                (uint8_t)(r.ebx >>  0), (uint8_t)(r.ebx >>  8),
                (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
                (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
@@ -3259,7 +3281,7 @@ cmd_net_ipv4_get_addr(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_ipv4_get_addr <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3267,9 +3289,9 @@ cmd_net_ipv4_get_addr(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_ipv4_get_addr(dev_num);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        printf("%d.%d.%d.%d\n",
+        fprintf(ctx->fout, "%d.%d.%d.%d\n",
                (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
                (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
     }
@@ -3283,7 +3305,7 @@ cmd_net_ipv4_set_addr(struct shell_ctx *ctx, int argc, char **argv) {
         "  dev_num        device number as returned by net_add_device\n"
         "  addr           a.b.c.d";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3293,9 +3315,9 @@ cmd_net_ipv4_set_addr(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_ipv4_set_addr(dev_num, addr);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        printf("status: ok\n");
+        fprintf(ctx->fout, "status: ok\n");
     }
 }
 
@@ -3306,7 +3328,7 @@ cmd_net_ipv4_get_dns(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_ipv4_get_dns <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3314,9 +3336,9 @@ cmd_net_ipv4_get_dns(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_ipv4_get_dns(dev_num);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        printf("%d.%d.%d.%d\n",
+        fprintf(ctx->fout, "%d.%d.%d.%d\n",
                (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
                (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
     }
@@ -3330,7 +3352,7 @@ cmd_net_ipv4_set_dns(struct shell_ctx *ctx, int argc, char **argv) {
         "  dev_num        device number as returned by net_add_device\n"
         "  dns            a.b.c.d";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3339,9 +3361,9 @@ cmd_net_ipv4_set_dns(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_ipv4_set_dns(dev_num, dns);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        printf("status: ok\n");
+        fprintf(ctx->fout, "status: ok\n");
     }
 }
 
@@ -3352,7 +3374,7 @@ cmd_net_ipv4_get_subnet(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_ipv4_get_subnet <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3360,9 +3382,9 @@ cmd_net_ipv4_get_subnet(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_ipv4_get_subnet(dev_num);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        printf("%d.%d.%d.%d\n",
+        fprintf(ctx->fout, "%d.%d.%d.%d\n",
                (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
                (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
     }
@@ -3376,7 +3398,7 @@ cmd_net_ipv4_set_subnet(struct shell_ctx *ctx, int argc, char **argv) {
         "  dev_num        device number as returned by net_add_device\n"
         "  subnet         a.b.c.d";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3386,9 +3408,9 @@ cmd_net_ipv4_set_subnet(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_ipv4_set_subnet(dev_num, subnet);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        printf("status: ok\n");
+        fprintf(ctx->fout, "status: ok\n");
     }
 }
 
@@ -3399,7 +3421,7 @@ cmd_net_ipv4_get_gw(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_ipv4_get_gw <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3407,9 +3429,9 @@ cmd_net_ipv4_get_gw(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_ipv4_get_gw(dev_num);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        printf("%d.%d.%d.%d\n",
+        fprintf(ctx->fout, "%d.%d.%d.%d\n",
                (uint8_t)(r.eax >>  0), (uint8_t)(r.eax >>  8),
                (uint8_t)(r.eax >> 16), (uint8_t)(r.eax >> 24));
     }
@@ -3423,7 +3445,7 @@ cmd_net_ipv4_set_gw(struct shell_ctx *ctx, int argc, char **argv) {
         "  dev_num        device number as returned by net_add_device\n"
         "  gw             a.b.c.d";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3433,9 +3455,9 @@ cmd_net_ipv4_set_gw(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_ipv4_set_gw(dev_num, gw);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        printf("status: ok\n");
+        fprintf(ctx->fout, "status: ok\n");
     }
 }
 
@@ -3446,7 +3468,7 @@ cmd_net_arp_get_count(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_arp_get_count <dev_num>\n"
         "  dev_num        device number as returned by net_add_device";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3454,9 +3476,9 @@ cmd_net_arp_get_count(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_arp_get_count(dev_num);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        printf("%" PRIi32 "\n", r.eax);
+        fprintf(ctx->fout, "%" PRIi32 "\n", r.eax);
     }
 }
 
@@ -3468,7 +3490,7 @@ cmd_net_arp_get_entry(struct shell_ctx *ctx, int argc, char **argv) {
         "  dev_num        device number as returned by net_add_device\n"
         "  arp_num        arp number as returned by net_add_device";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3478,9 +3500,9 @@ cmd_net_arp_get_entry(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_arp_get_entry(dev_num, arp_num, &arp);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     } else {
-        printf("arp #%u: IP %d.%d.%d.%d, "
+        fprintf(ctx->fout, "arp #%u: IP %d.%d.%d.%d, "
                "mac %2.2" SCNu8 ":%2.2" SCNu8 ":%2.2" SCNu8
                ":%2.2" SCNu8 ":%2.2" SCNu8 ":%2.2" SCNu8 ", "
                "status %" PRIu16 ", "
@@ -3505,7 +3527,7 @@ cmd_net_arp_add_entry(struct shell_ctx *ctx, int argc, char **argv) {
         "  status         see ARP.inc\n"
         "  ttl            Time to live";
     if (argc != 6) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     arp_entry_t arp;
@@ -3521,7 +3543,7 @@ cmd_net_arp_add_entry(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_arp_add_entry(dev_num, &arp);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     }
 }
 
@@ -3533,7 +3555,7 @@ cmd_net_arp_del_entry(struct shell_ctx *ctx, int argc, char **argv) {
         "  dev_num        device number as returned by net_add_device\n"
         "  arp_num        arp number as returned by net_add_device";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t dev_num = strtoul(argv[1], NULL, 0);
@@ -3542,7 +3564,7 @@ cmd_net_arp_del_entry(struct shell_ctx *ctx, int argc, char **argv) {
     f76ret_t r = umka_sys_net_arp_del_entry(dev_num, arp_num);
     COVERAGE_OFF();
     if (r.eax == UINT32_MAX) {
-        printf("status: fail\n");
+        fprintf(ctx->fout, "status: fail\n");
     }
 }
 
@@ -3555,7 +3577,7 @@ cmd_osloop(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: osloop";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
@@ -3571,7 +3593,7 @@ cmd_bg_set_size(struct shell_ctx *ctx, int argc, char **argv) {
         "  xsize          in pixels\n"
         "  ysize          in pixels";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t xsize = strtoul(argv[1], NULL, 0);
@@ -3589,7 +3611,7 @@ cmd_bg_put_pixel(struct shell_ctx *ctx, int argc, char **argv) {
         "  offset         in bytes, (x+y*xsize)*3\n"
         "  color          in hex";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     size_t offset = strtoul(argv[1], NULL, 0);
@@ -3606,7 +3628,7 @@ cmd_bg_redraw(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_redraw";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
@@ -3621,7 +3643,7 @@ cmd_bg_set_mode(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: bg_set_mode <mode>\n"
         "  mode           1 = tile, 2 = stretch";
     if (argc != 3) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     uint32_t mode = strtoul(argv[1], NULL, 0);
@@ -3638,7 +3660,7 @@ cmd_bg_put_img(struct shell_ctx *ctx, int argc, char **argv) {
         "  image          file\n"
         "  offset         in bytes, (x+y*xsize)*3";
     if (argc != 4) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     FILE *f = fopen(argv[1], "rb");
@@ -3655,19 +3677,84 @@ cmd_bg_put_img(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
+cmd_board_get(struct shell_ctx *ctx, int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: board_get [-l]\n";
+    if (argc > 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    int line = 0;
+    int force_newline = 0;
+    int opt;
+    optind = 1;
+    while ((opt = getopt(argc, argv, "ln")) != -1) {
+        switch (opt) {
+        case 'l':
+            line = 1;
+            break;
+        case 'n':
+            force_newline = 1;
+            break;
+        default:
+            fputs(usage, ctx->fout);
+            return;
+        }
+    }
+    if (!line) {
+        COVERAGE_ON();
+        struct board_get_ret c = umka_sys_board_get();
+        COVERAGE_OFF();
+        if (!c.status) {
+            fprintf(ctx->fout, "(empty)\n");
+        } else {
+            fprintf(ctx->fout, "%c\n", c.value);
+        }
+    } else {
+        struct board_get_ret c;
+        do {
+            COVERAGE_ON();
+            c = umka_sys_board_get();
+            COVERAGE_OFF();
+            if (c.status) {
+                fputc(c.value, ctx->fout);
+            }
+        } while (c.status && (c.value != '\n'));
+        if (force_newline) {
+            fputc('\n', ctx->fout);
+        }
+    }
+}
+
+static void
+cmd_board_put(struct shell_ctx *ctx, int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: board_putchar <char>\n";
+    if (argc != 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    char c = argv[1][0];
+    COVERAGE_ON();
+    umka_sys_board_put(c);
+    COVERAGE_OFF();
+}
+
+static void
 cmd_bg_map(struct shell_ctx *ctx, int argc, char **argv) {
-    (void)ctx;
     (void)argv;
     const char *usage = \
         "usage: bg_map";
     if (argc != 1) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     COVERAGE_ON();
     void *addr = umka_sys_bg_map();
     COVERAGE_OFF();
-    printf("%p\n", addr);
+    fprintf(ctx->fout, "%p\n", addr);
 }
 
 static void
@@ -3677,14 +3764,14 @@ cmd_bg_unmap(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: bg_unmap <addr>\n"
         "  addr           return value of bg_map";
     if (argc != 2) {
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
     void *addr = (void*)strtoul(argv[1], NULL, 0);
     COVERAGE_ON();
     uint32_t status = umka_sys_bg_unmap(addr);
     COVERAGE_OFF();
-    printf("status = %d\n", status);
+    fprintf(ctx->fout, "status = %d\n", status);
 }
 
 static void cmd_help(struct shell_ctx *ctx, int argc, char **argv);
@@ -3701,6 +3788,8 @@ func_table_t cmd_cmds[] = {
     { "acpi_get_node_alloc_cnt",        cmd_acpi_get_node_alloc_cnt },
     { "acpi_get_node_free_cnt",         cmd_acpi_get_node_free_cnt },
     { "acpi_get_node_cnt",              cmd_acpi_get_node_cnt },
+    { "board_get",                      cmd_board_get },
+    { "board_put",                      cmd_board_put },
     { "bg_map",                         cmd_bg_map },
     { "bg_put_img",                     cmd_bg_put_img },
     { "bg_put_pixel",                   cmd_bg_put_pixel },
@@ -3829,10 +3918,10 @@ cmd_help(struct shell_ctx *ctx, int argc, char **argv) {
         "  command        help on this command usage";
     switch (argc) {
     case 1:
-        puts(usage);
+        fputs(usage, ctx->fout);
         puts("\navailable commands:\n");
         for (func_table_t *ft = cmd_cmds; ft->name; ft++) {
-            printf("  %s\n", ft->name);
+            fprintf(ctx->fout, "  %s\n", ft->name);
         }
         break;
     case 2: {
@@ -3843,28 +3932,28 @@ cmd_help(struct shell_ctx *ctx, int argc, char **argv) {
                 return;
             }
         }
-        printf("no such command: %s\n", cmd_name);
+        fprintf(ctx->fout, "no such command: %s\n", cmd_name);
         break;
     }
     default:
-        puts(usage);
+        fputs(usage, ctx->fout);
         return;
     }
 }
 
 void *
 run_test(struct shell_ctx *ctx) {
-    int is_tty = isatty(STDIN_FILENO);
+    int is_tty = isatty(fileno(ctx->fin));
     char **argv = (char**)calloc(sizeof(char*), (MAX_COMMAND_ARGS + 1));
     bestlineSetCompletionCallback(completion);
     bestlineSetHintsCallback(hints);
     bestlineHistoryLoad(ctx->hist_file);
     sprintf(prompt_line, "%s> ", last_dir);
     char *line;
-    while((line = bestline(prompt_line))) {
+    while((line = bestlineFile(prompt_line, ctx->fin, ctx->fout))) {
         if (!is_tty) {
             prompt(ctx);
-            printf("%s\n", line);
+            fprintf(ctx->fout, "%s\n", line);
         }
         if (!strcmp(line, "X") || !strcmp(line, "q")) {
             free(line);
@@ -3885,7 +3974,7 @@ run_test(struct shell_ctx *ctx) {
             if (ft->name) {
                 ft->func(ctx, argc, argv);
             } else {
-                printf("unknown command: %s\n", argv[0]);
+                fprintf(ctx->fout, "unknown command: %s\n", argv[0]);
             }
             free(line);
         }
@@ -3898,13 +3987,15 @@ run_test(struct shell_ctx *ctx) {
 
 struct shell_ctx *
 shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
-           struct umka_io *io) {
+           struct umka_io *io, FILE *fin, FILE *fout) {
     struct shell_ctx *ctx = malloc(sizeof(struct shell_ctx));
     ctx->umka = umka;
     ctx->io = io;
     ctx->reproducible = reproducible;
     ctx->hist_file = hist_file;
     ctx->var = NULL;
+    ctx->fin = fin;
+    ctx->fout = fout;
     return ctx;
 }
 
