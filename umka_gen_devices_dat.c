@@ -17,7 +17,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "umka.h"
-#include "util.h"
+#include "umkart.h"
 #include <pci.h>
 
 #define UMKA_DEFAULT_DISPLAY_WIDTH 400

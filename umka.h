@@ -588,14 +588,6 @@ STDCALL void
 kos_set_mouse_data(uint32_t btn_state, int32_t xmoving, int32_t ymoving,
                    int32_t vscroll, int32_t hscroll);
 
-static inline void
-umka_mouse_move(int lbheld, int mbheld, int rbheld, int xabs, int32_t xmoving,
-                int yabs, int32_t ymoving, int32_t hscroll, int32_t vscroll) {
-    uint32_t btn_state = lbheld + (rbheld << 1) + (mbheld << 2) +
-                         (yabs << 30) + (xabs << 31);
-    kos_set_mouse_data(btn_state, xmoving, ymoving, vscroll, hscroll);
-}
-
 STDCALL net_buff_t *
 kos_net_buff_alloc(size_t size);
 
@@ -2413,5 +2405,48 @@ umka_set_keyboard_data(uint32_t scancode) {
         : "c"(scancode)
         : "eax", "edx", "memory", "cc");
 }
+
+#define CMD_BUF_LEN 0x10
+
+enum {
+    UMKA_CMD_NONE,
+    UMKA_CMD_SET_MOUSE_DATA,
+    UMKA_CMD_SYS_PROCESS_INFO,
+    UMKA_CMD_SYS_GET_MOUSE_POS_SCREEN,
+};
+
+enum {
+    UMKA_CMD_STATUS_EMPTY,
+    UMKA_CMD_STATUS_READY,
+    UMKA_CMD_STATUS_DONE,
+};
+
+struct cmd_set_mouse_data {
+    uint32_t btn_state;
+    int32_t xmoving;
+    int32_t ymoving;
+    int32_t vscroll;
+    int32_t hscroll;
+};
+
+struct cmd_sys_process_info {
+    int32_t pid;
+    void *param;
+};
+
+struct cmd_ret_sys_get_mouse_pos_screen {
+    struct point16s pos;
+};
+
+struct umka_cmd {
+    uint32_t status;
+    uint32_t type;
+    union {
+        struct cmd_set_mouse_data set_mouse_data;
+    } arg;
+    union {
+        struct cmd_ret_sys_get_mouse_pos_screen sys_get_mouse_pos_screen;
+    } ret;
+};
 
 #endif  // UMKA_H_INCLUDED

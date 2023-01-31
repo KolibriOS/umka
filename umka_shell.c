@@ -19,7 +19,6 @@
 #include "optparse.h"
 #include "shell.h"
 #include "io.h"
-#include "umka.h"
 #include "trace.h"
 
 #define HIST_FILE_BASENAME ".umka_shell.history"
@@ -38,7 +37,7 @@ umka_shell_init(int reproducible, FILE *fin, FILE *fout) {
     ctx->umka = umka_init();
     ctx->io = io_init(&ctx->umka->running);
     ctx->shell = shell_init(reproducible, history_filename, ctx->umka, ctx->io,
-                            fin, fout);
+                            fin, fout, &ctx->umka->running);
     return ctx;
 }
 

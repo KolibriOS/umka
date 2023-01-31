@@ -57,7 +57,7 @@ test: umka_shell
 
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
             vdisk/raw.o vdisk/qcow2.o vdisk/miniz/miniz.a vnet.o lodepng.o \
-            $(HOST)/pci.o $(HOST)/thread.o io.o $(HOST)/io_async.o util.o \
+            $(HOST)/pci.o $(HOST)/thread.o io.o $(HOST)/io_async.o umkart.o \
             optparse32.o bestline32.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
@@ -68,11 +68,12 @@ umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vdisk/raw.o vdisk/qcow2.o \
          vdisk/miniz/miniz.a vnet.o trace.o trace_lbr.o $(HOST)/pci.o \
-         $(HOST)/thread.o io.o $(HOST)/io_async.o util.o bestline32.o optparse32.o
+         $(HOST)/thread.o io.o $(HOST)/io_async.o umkart.o bestline32.o \
+         optparse32.o
 	$(CC) $(LDFLAGS_32) `sdl2-config --libs` $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
-                      $(HOST)/thread.o util.o
+                      $(HOST)/thread.o umkart.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka.o umka.fas: umka.asm
@@ -108,7 +109,7 @@ optparse32.o: optparse.c optparse.h
 optparse.o: optparse.c optparse.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-util.o: util.c util.h umka.h
+umkart.o: umkart.c umkart.h umka.h
 	$(CC) $(CFLAGS_32) -c $<
 
 default.skn: $(KOLIBRIOS)/skins/Leency/Shkvorka/default.asm colors.dtp
@@ -168,7 +169,7 @@ umka_shell.o: umka_shell.c umka.h trace.h
 umka_fuse.o: umka_fuse.c umka.h
 	$(CC) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $<
 
-umka_os.o: umka_os.c umka.h umka_os.h
+umka_os.o: umka_os.c umka.h
 	$(CC) $(CFLAGS_32) `sdl2-config --cflags` -c $<
 
 umka_gen_devices_dat.o: umka_gen_devices_dat.c umka.h

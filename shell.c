@@ -8,18 +8,19 @@
     Copyright (C) 2021  Magomed Kostoev <mkostoevr@yandex.ru>
 */
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdint.h>
+#include <assert.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
-#include <stdlib.h>
+#include <stdatomic.h>
+#include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <assert.h>
 #include <time.h>
-#include <errno.h>
+#include <unistd.h>
 
 // TODO: Cleanup
 #ifndef _WIN32
@@ -32,7 +33,7 @@
 #include "umka.h"
 #include "trace.h"
 #include "pci.h"
-#include "util.h"
+#include "umkart.h"
 #include "lodepng.h"
 #include "optparse.h"
 #include "bestline.h"
@@ -56,6 +57,38 @@ typedef struct {
     char *name;
     void (*func) (struct shell_ctx *, int, char **);
 } func_table_t;
+
+void
+umka_run_cmd_sync(struct shell_ctx *ctx) {
+    struct umka_cmd *cmd = umka_cmd_buf;
+    if (atomic_load_explicit(&cmd->status, memory_order_acquire) != UMKA_CMD_STATUS_READY) {
+        fprintf(ctx->fout, "[!] command is not ready: %d: %u\n", cmd - umka_cmd_buf, cmd->type);
+        return;
+    }
+    switch (cmd->type) {
+    case UMKA_CMD_SET_MOUSE_DATA: {
+        struct cmd_set_mouse_data *c = &cmd->arg.set_mouse_data;
+        kos_set_mouse_data(c->btn_state, c->xmoving, c->ymoving, c->vscroll,
+                           c->hscroll);
+        break;
+        }
+    default:
+        fprintf(ctx->fout, "[!] unknown command: %u\n", cmd->type);
+        break;
+    }
+    atomic_store_explicit(&cmd->status, UMKA_CMD_STATUS_DONE,
+                          memory_order_release);
+    cnd_signal(&ctx->cmd_done);
+}
+
+static void
+umka_run_cmd(struct shell_ctx *ctx) {
+    if (atomic_load_explicit(ctx->running, memory_order_acquire)) {
+        cnd_wait(&ctx->cmd_done, &ctx->cmd_mutex);
+    } else {
+        umka_run_cmd_sync(ctx);
+    }
+}
 
 const char *f70_status_name[] = {
                                  "success",
@@ -368,7 +401,7 @@ cmd_var(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: var <$name>\n"
-        "  $name            variable name, must start with $ sign";
+        "  $name            variable name, must start with $ sign\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -384,7 +417,7 @@ cmd_send_scancode(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: send_scancode <code>...\n"
-        "  code             dec or hex number";
+        "  code             dec or hex number\n";
     if (argc < 2) {
         fputs(usage, ctx->fout);
         return;
@@ -470,7 +503,7 @@ cmd_i40(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: i40 <eax> [ebx [ecx [edx [esi [edi [ebp]]]]]]...\n"
-        "  see '/kernel/docs/sysfuncs.txt' for details";
+        "  see '/kernel/docs/sysfuncs.txt' for details\n";
     if (argc < 2 || argc > 8) {
         fputs(usage, ctx->fout);
         return;
@@ -577,7 +610,7 @@ cmd_ramdisk_init(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: ramdisk_init <file>\n"
-        "  <file>           absolute or relative path";
+        "  <file>           absolute or relative path\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -610,7 +643,7 @@ cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: disk_add <file> <name> [option]...\n"
         "  <file>           absolute or relative path\n"
         "  <name>           disk name, e.g. hd0 or rd\n"
-        "  -c cache size    size of disk cache in bytes";
+        "  -c cache size    size of disk cache in bytes\n";
     if (argc < 3) {
         fputs(usage, ctx->fout);
         return;
@@ -669,7 +702,7 @@ cmd_disk_del(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: disk_del <name>\n"
-        "  name             disk name, i.e. rd or hd0";
+        "  name             disk name, i.e. rd or hd0\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -683,7 +716,7 @@ static void
 cmd_pwd(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
-        "usage: pwd";
+        "usage: pwd\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -705,7 +738,7 @@ cmd_set_pixel(struct shell_ctx *ctx, int argc, char **argv) {
         "  x                x window coordinate\n"
         "  y                y window coordinate\n"
         "  color            argb in hex\n"
-        "  -i               inverted color";
+        "  -i               inverted color\n";
     if (argc < 4) {
         fputs(usage, ctx->fout);
         return;
@@ -735,7 +768,7 @@ cmd_write_text(struct shell_ctx *ctx, int argc, char **argv) {
         "  font_and_enc     font size and string encoding\n"
         "  draw_to_buf      draw to the buffer pointed to by the next param\n"
         "  length           length of the string if it is non-asciiz\n"
-        "  bg_color_or_buf  argb or pointer";
+        "  bg_color_or_buf  argb or pointer\n";
     if (argc != 12) {
         fputs(usage, ctx->fout);
         return;
@@ -763,7 +796,7 @@ cmd_get_key(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_key";
+        "usage: get_key\n";
     if (argc > 1) {
         fputs(usage, ctx->fout);
         return;
@@ -776,7 +809,7 @@ cmd_dump_key_buff(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: dump_key_buff [count]\n"
-        "  count            how many items to dump (all by default)";
+        "  count            how many items to dump (all by default)\n";
     if (argc > 2) {
         fputs(usage, ctx->fout);
         return;
@@ -796,7 +829,7 @@ cmd_dump_win_stack(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: dump_win_stack [count]\n"
-        "  count            how many items to dump";
+        "  count            how many items to dump\n";
     if (argc > 2) {
         fputs(usage, ctx->fout);
         return;
@@ -815,7 +848,7 @@ cmd_dump_win_pos(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: dump_win_pos [count]\n"
-        "  count            how many items to dump";
+        "  count            how many items to dump\n";
     if (argc < 1) {
         fputs(usage, ctx->fout);
         return;
@@ -835,7 +868,7 @@ cmd_dump_win_map(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
 // TODO: area
     const char *usage = \
-        "usage: dump_win_map";
+        "usage: dump_win_map\n";
     if (argc < 0) {
         fputs(usage, ctx->fout);
         return;
@@ -855,7 +888,7 @@ cmd_dump_appdata(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: dump_appdata <index> [-p]\n"
         "  index            index into appdata array to dump\n"
-        "  -p               print fields that are pointers";
+        "  -p               print fields that are pointers\n";
     if (argc < 2) {
         fputs(usage, ctx->fout);
         return;
@@ -916,7 +949,7 @@ cmd_switch_to_thread(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: switch_to_thread <tid>\n"
-        "  <tid>          thread id to switch to";
+        "  <tid>          thread id to switch to\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -931,7 +964,7 @@ cmd_get(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: get <var>\n"
-        "  <var>          variable to get";
+        "  <var>          variable to get\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -960,7 +993,7 @@ cmd_set(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set <var> <value>\n"
         "  <var>          variable to set\n"
-        "  <value>        decimal or hex value";
+        "  <value>        decimal or hex value\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -994,7 +1027,7 @@ cmd_new_sys_thread(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
 // FIXME
     const char *usage = \
-        "usage: new_sys_thread";
+        "usage: new_sys_thread\n";
     if (!argc) {
         fputs(usage, ctx->fout);
         return;
@@ -1008,14 +1041,14 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: mouse_move [-l] [-m] [-r] [-x {+|-|=}<value>]"
-            "[-y {+|-|=}<value>] [-h {+|-}<value>] [-v {+|-}<value>]\n"
+            " [-y {+|-|=}<value>] [-h {+|-}<value>] [-v {+|-}<value>]\n"
         "  -l             left button is held\n"
         "  -m             middle button is held\n"
         "  -r             right button is held\n"
         "  -x             increase, decrease or set x coordinate\n"
         "  -y             increase, decrease or set y coordinate\n"
         "  -h             scroll horizontally\n"
-        "  -v             scroll vertically";
+        "  -v             scroll vertically\n";
     if (!argc) {
         fputs(usage, ctx->fout);
         return;
@@ -1086,17 +1119,31 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
             return;
         }
     }
+    uint32_t btn_state = lbheld + (rbheld << 1) + (mbheld << 2) + (yabs << 30)
+                         + (xabs << 31);
+    struct umka_cmd *cmd = umka_cmd_buf;
+    struct cmd_set_mouse_data *c = &cmd->arg.set_mouse_data;
+    cmd->type = UMKA_CMD_SET_MOUSE_DATA;
+    c->btn_state = btn_state;
+    c->xmoving = xmoving;
+    c->ymoving = ymoving;
+    c->vscroll = vscroll;
+    c->hscroll = hscroll;
+    atomic_store_explicit(&cmd->status, UMKA_CMD_STATUS_READY,
+                          memory_order_release);
     COVERAGE_ON();
-    umka_mouse_move(lbheld, mbheld, rbheld, xabs, xmoving, yabs, ymoving,
-                    hscroll, vscroll);
+    umka_run_cmd(ctx);
     COVERAGE_OFF();
+
+    atomic_store_explicit(&cmd->status, UMKA_CMD_STATUS_EMPTY,
+                          memory_order_release);
 }
 
 static void
 cmd_process_info(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: process_info <pid>\n"
-        "  pid              process id to dump, -1 for self";
+        "  pid              process id to dump, -1 for self\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -1128,7 +1175,7 @@ cmd_check_for_event(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: check_for_event";
+        "usage: check_for_event\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1159,7 +1206,7 @@ cmd_display_number(struct shell_ctx *ctx, int argc, char **argv) {
         "  font             0 = 6x9, 1 = 8x16\n"
         "  draw_to_buf      0/1\n"
         "  scale_factor     0 = x1, ..., 7 = x8\n"
-        "  bg_color_or_buf  depending on flags fill_bg and draw_to_buf";
+        "  bg_color_or_buf  depending on flags fill_bg and draw_to_buf\n";
     if (argc != 15) {
         fputs(usage, ctx->fout);
         return;
@@ -1197,7 +1244,7 @@ cmd_set_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: set_window_colors <frame> <grab> <work_3d_dark> <work_3d_light>"
             " <grab_text> <work> <work_button> <work_button_text> <work_text>"
             " <work_graph>\n"
-        "  *                all colors are in hex";
+        "  *                all colors are in hex\n";
     if (argc != (1 + sizeof(system_colors_t)/4)) {
         fputs(usage, ctx->fout);
         return;
@@ -1223,7 +1270,7 @@ cmd_get_window_colors(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_window_colors";
+        "usage: get_window_colors\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1251,7 +1298,7 @@ cmd_get_skin_height(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_skin_height";
+        "usage: get_skin_height\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1267,7 +1314,7 @@ cmd_get_screen_area(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_screen_area";
+        "usage: get_screen_area\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1290,7 +1337,7 @@ cmd_set_screen_area(struct shell_ctx *ctx, int argc, char **argv) {
         "  left             left x coord\n"
         "  top              top y coord\n"
         "  right            right x coord (not length!)\n"
-        "  bottom           bottom y coord";
+        "  bottom           bottom y coord\n";
     if (argc != 5) {
         fputs(usage, ctx->fout);
         return;
@@ -1310,7 +1357,7 @@ cmd_get_skin_margins(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_skin_margins";
+        "usage: get_skin_margins\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1330,7 +1377,7 @@ cmd_set_button_style(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: set_button_style <style>\n"
-        "  style            0 - flat, 1 - 3d";
+        "  style            0 - flat, 1 - 3d\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -1346,7 +1393,7 @@ cmd_set_skin(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: set_skin <path>\n"
-        "  path             i.e. /rd/1/DEFAULT.SKN";
+        "  path             i.e. /rd/1/DEFAULT.SKN\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -1367,7 +1414,7 @@ cmd_get_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: get_keyboard_layout <-t type> [-f file]\n"
         "  -t type          layout type: 1 - normal, 2 - shift, 3 - alt\n"
-        "  -f file          file name to save layout to";
+        "  -f file          file name to save layout to\n";
     if (argc < 3) {
         fputs(usage, ctx->fout);
         return;
@@ -1433,7 +1480,7 @@ cmd_set_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: set_keyboard_layout <-t type> <-f file|code{128}>\n"
         "  -t type          layout type: 1 - normal, 2 - shift, 3 - alt\n"
         "  -f file          file name to read layout from\n"
-        "  code             i-th ASCII code for the scancode i";
+        "  code             i-th ASCII code for the scancode i\n";
     if (argc != 5 && argc != 131) {
         fputs(usage, ctx->fout);
         return;
@@ -1498,7 +1545,7 @@ cmd_get_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_keyboard_lang";
+        "usage: get_keyboard_lang\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1519,7 +1566,7 @@ cmd_get_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_system_lang";
+        "usage: get_system_lang\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1542,7 +1589,7 @@ cmd_set_keyboard_lang(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: set_keyboard_lang <lang_id>\n"
         "  lang_id          number or a two-digit code:\n"
         "                   1 - en, 2 - fi, 3 - ge, 4 - ru, 5 - fr, 6 - et,\n"
-        "                   7 - ua, 8 - it, 9 - be, 10 - sp, 11 - ca";
+        "                   7 - ua, 8 - it, 9 - be, 10 - sp, 11 - ca\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -1575,7 +1622,7 @@ cmd_set_system_lang(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: set_system_lang <lang_id>\n"
         "  lang_id          number or a two-digit code:\n"
         "                   1 - en, 2 - fi, 3 - ge, 4 - ru, 5 - fr, 6 - et,\n"
-        "                   7 - ua, 8 - it, 9 - be, 10 - sp, 11 - ca";
+        "                   7 - ua, 8 - it, 9 - be, 10 - sp, 11 - ca\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -1606,7 +1653,7 @@ cmd_get_keyboard_mode(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_keyboard_mode";
+        "usage: get_keyboard_mode\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1624,7 +1671,7 @@ cmd_set_keyboard_mode(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: set_keyboard_mode <mode>\n"
-        "  mode             0 - ASCII, 1 - scancodes";
+        "  mode             0 - ASCII, 1 - scancodes\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -1640,7 +1687,7 @@ cmd_get_font_smoothing(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_font_smoothing";
+        "usage: get_font_smoothing\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1657,7 +1704,7 @@ cmd_set_font_smoothing(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: set_font_smoothing <mode>\n"
-        "  mode             0 - off, 1 - gray AA, 2 - subpixel AA";
+        "  mode             0 - off, 1 - gray AA, 2 - subpixel AA\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -1672,7 +1719,7 @@ static void
 cmd_get_font_size(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
-        "usage: get_font_size";
+        "usage: get_font_size\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1689,7 +1736,7 @@ cmd_set_font_size(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: set_font_size <size>\n"
-        "  size             in pixels";
+        "  size             in pixels\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -1706,7 +1753,7 @@ cmd_set_mouse_pos_screen(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_mouse_pos_screen <x> <y>\n"
         "  x                in pixels\n"
-        "  y                in pixels";
+        "  y                in pixels\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -1724,7 +1771,7 @@ cmd_get_mouse_pos_screen(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_mouse_pos_screen";
+        "usage: get_mouse_pos_screen\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1740,7 +1787,7 @@ cmd_get_mouse_pos_window(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_mouse_pos_window";
+        "usage: get_mouse_pos_window\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1759,7 +1806,7 @@ cmd_get_mouse_buttons_state(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_mouse_buttons_state";
+        "usage: get_mouse_buttons_state\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1776,7 +1823,7 @@ cmd_get_mouse_buttons_state_events(struct shell_ctx *ctx, int argc, char **argv)
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_mouse_buttons_state_events";
+        "usage: get_mouse_buttons_state_events\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -1808,7 +1855,7 @@ cmd_button(struct shell_ctx *ctx, int argc, char **argv) {
         "  id               24-bit\n"
         "  color            hex\n"
         "  draw_button      0/1\n"
-        "  draw_frame       0/1";
+        "  draw_frame       0/1\n";
     if (argc != 9) {
         fputs(usage, ctx->fout);
         return;
@@ -1881,7 +1928,7 @@ static void
 cmd_set_cursor(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_cursor <handle>\n"
-        "  handle           as returned by load_cursor* functions";
+        "  handle           as returned by load_cursor* functions\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -1909,7 +1956,7 @@ cmd_put_image(struct shell_ctx *ctx, int argc, char **argv) {
         "  xsize            x size\n"
         "  ysize            y size\n"
         "  x                x coord\n"
-        "  y                y coord";
+        "  y                y coord\n";
     if (argc != 6) {
         fputs(usage, ctx->fout);
         return;
@@ -1943,7 +1990,7 @@ cmd_put_image_palette(struct shell_ctx *ctx, int argc, char **argv) {
         "  x                x coord\n"
         "  y                y coord\n"
         "  bpp              bits per pixel\n"
-        "  row_offset       in bytes";
+        "  row_offset       in bytes\n";
     if (argc != 8) {
         fputs(usage, ctx->fout);
         return;
@@ -1979,7 +2026,7 @@ cmd_draw_rect(struct shell_ctx *ctx, int argc, char **argv) {
         "  y                y coord\n"
         "  ysize            y size\n"
         "  color            in hex\n"
-        "  -g               0/1 - gradient";
+        "  -g               0/1 - gradient\n";
     if (argc < 6) {
         fputs(usage, ctx->fout);
         return;
@@ -2000,7 +2047,7 @@ cmd_get_screen_size(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: get_screen_size";
+        "usage: get_screen_size\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -2022,7 +2069,7 @@ cmd_draw_line(struct shell_ctx *ctx, int argc, char **argv) {
         "  ybegin           y top coord\n"
         "  yend             y bottom coord\n"
         "  color            hex\n"
-        "  -i               inverted color";
+        "  -i               inverted color\n";
     if (argc < 6) {
         fputs(usage, ctx->fout);
         return;
@@ -2044,7 +2091,7 @@ cmd_set_window_caption(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: set_window_caption <caption> <encoding>\n"
         "  caption          asciiz string\n"
-        "  encoding         1 = cp866, 2 = UTF-16LE, 3 = UTF-8";
+        "  encoding         1 = cp866, 2 = UTF-16LE, 3 = UTF-8\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -2074,7 +2121,7 @@ cmd_draw_window(struct shell_ctx *ctx, int argc, char **argv) {
         "  gradient_fill    0/1\n"
         "  movable          0/1\n"
         "  style            1 - draw nothing, 3 - skinned, 4 - skinned fixed\n"
-        "  caption          asciiz";
+        "  caption          asciiz\n";
     if (argc != 13) {
         fputs(usage, ctx->fout);
         return;
@@ -2104,7 +2151,7 @@ cmd_window_redraw(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: window_redraw <1|2>\n"
         "  1                begin\n"
-        "  2                end";
+        "  2                end\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2123,7 +2170,7 @@ cmd_move_window(struct shell_ctx *ctx, int argc, char **argv) {
         "  x                new x coord\n"
         "  y                new y coord\n"
         "  xsize            x size -1\n"
-        "  ysize            y size -1";
+        "  ysize            y size -1\n";
     if (argc != 5) {
         fputs(usage, ctx->fout);
         return;
@@ -2156,7 +2203,7 @@ cmd_blit_bitmap(struct shell_ctx *ctx, int argc, char **argv) {
         "  background       0/1 - blit into background surface\n"
         "  transparent      0/1\n"
         "  client_relative  0/1\n"
-        "  row_length       in bytes";
+        "  row_length       in bytes\n";
     if (argc != 15) {
         fputs(usage, ctx->fout);
         return;
@@ -2200,7 +2247,7 @@ cmd_write_devices_dat(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: write_devices_dat <file>\n"
-        "  file             path/to/devices.dat";
+        "  file             path/to/devices.dat\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2215,7 +2262,7 @@ cmd_scrot(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: scrot <file>\n"
-        "  file             path/to/file in png format";
+        "  file             path/to/file in png format\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2247,7 +2294,7 @@ cmd_cd(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: cd <path>\n"
-        "  path             path/to/dir";
+        "  path             path/to/dir\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2354,7 +2401,7 @@ cmd_exec(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: exec <file>\n"
-        "  file           executable to run";
+        "  file           executable to run\n";
     if (!argc) {
         fputs(usage, ctx->fout);
         return;
@@ -2470,7 +2517,7 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
         "  file             path/to/file\n"
         "  [-c]             force show creation time\n"
         "  [-m]             force show modification time\n"
-        "  [-a]             force show access time";
+        "  [-a]             force show access time\n";
     if (argc < 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2644,7 +2691,7 @@ cmd_acpi_preload_table(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: acpi_preload_table <file>\n"
-        "  file             path/to/local/file.aml";
+        "  file             path/to/local/file.aml\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2670,7 +2717,7 @@ static void
 cmd_acpi_enable(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
-        "usage: acpi_enable";
+        "usage: acpi_enable\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -2686,7 +2733,7 @@ cmd_acpi_get_node_cnt(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: acpi_get_node_cnt";
+        "usage: acpi_get_node_cnt\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -2700,7 +2747,7 @@ cmd_acpi_get_node_alloc_cnt(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: acpi_get_node_alloc_cnt";
+        "usage: acpi_get_node_alloc_cnt\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -2713,7 +2760,7 @@ cmd_acpi_get_node_free_cnt(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: acpi_get_node_free_cnt";
+        "usage: acpi_get_node_free_cnt\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -2726,7 +2773,7 @@ cmd_acpi_set_usage(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: acpi_set_usage <num>\n"
-        "  num            one of ACPI_USAGE_* constants";
+        "  num            one of ACPI_USAGE_* constants\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2740,7 +2787,7 @@ cmd_acpi_get_usage(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: acpi_get_usage";
+        "usage: acpi_get_usage\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -2753,7 +2800,7 @@ cmd_acpi_call(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: acpi_call <method> [args...]\n"
-        "  method         name of acpi method to call, e.g. \\_SB_PCI0_PRT";
+        "  method         name of acpi method to call, e.g. \\_SB_PCI0_PRT\n";
     if (argc > 2) {
         puts("arguments are not supported / not implemented!");
         fputs(usage, ctx->fout);
@@ -2776,7 +2823,7 @@ cmd_pci_set_path(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: pci_set_path <path>\n"
-        "  path           where aaaa:bb:cc.d dirs are";
+        "  path           where aaaa:bb:cc.d dirs are\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2789,7 +2836,7 @@ cmd_pci_get_path(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: pci_get_path";
+        "usage: pci_get_path\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -2802,7 +2849,7 @@ cmd_load_dll(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: load_dll <path>\n"
-        "  path           /path/to/library.obj in KolibriOS fs";
+        "  path           /path/to/library.obj in KolibriOS fs\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2822,7 +2869,7 @@ cmd_stack_init(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: stack_init";
+        "usage: stack_init\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -2837,7 +2884,7 @@ cmd_net_add_device(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: net_add_device";
+        "usage: net_add_device\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -2853,7 +2900,7 @@ static void
 cmd_net_get_dev_count(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
-        "usage: net_get_dev_count";
+        "usage: net_get_dev_count\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -2870,7 +2917,7 @@ cmd_net_get_dev_type(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_get_dev_type <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2891,7 +2938,7 @@ cmd_net_get_dev_name(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_get_dev_name <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2913,7 +2960,7 @@ cmd_net_dev_reset(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_dev_reset <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2930,7 +2977,7 @@ cmd_net_dev_stop(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_dev_stop <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2947,7 +2994,7 @@ cmd_net_get_dev(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_get_dev <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2967,7 +3014,7 @@ cmd_net_get_packet_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_get_packet_tx_count <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -2988,7 +3035,7 @@ cmd_net_get_packet_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_get_packet_rx_count <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3009,7 +3056,7 @@ cmd_net_get_byte_tx_count(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_get_byte_tx_count <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3030,7 +3077,7 @@ cmd_net_get_byte_rx_count(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_get_byte_rx_count <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3084,7 +3131,7 @@ cmd_net_get_link_status(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_get_link_status <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3109,7 +3156,7 @@ cmd_net_open_socket(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_open_socket <domain> <type> <protocol>\n"
         "  domain         domain\n"
         "  type           type\n"
-        "  protocol       protocol";
+        "  protocol       protocol\n";
     if (argc != 4) {
         fputs(usage, ctx->fout);
         return;
@@ -3129,8 +3176,8 @@ static void
 cmd_net_close_socket(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
-        "usage: net_close_socket <socket number>\n"
-        "  socket number  socket number\n";
+        "usage: net_close_socket <socknum>\n"
+        "  socknum        socket number\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3150,7 +3197,7 @@ cmd_net_bind(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_bind <fd> <port> <ip>\n"
         "  fd             socket number\n"
         "  port           port\n"
-        "  addr           addr";
+        "  addr           addr\n";
     if (argc != 4) {
         fputs(usage, ctx->fout);
         return;
@@ -3178,7 +3225,7 @@ cmd_net_listen(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_listen <fd> <backlog>\n"
         "  fd             socket number\n"
-        "  backlog        max queue length";
+        "  backlog        max queue length\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -3199,7 +3246,7 @@ cmd_net_connect(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_connect <fd> <port> <ip>\n"
         "  fd             socket number\n"
         "  port           port\n"
-        "  addr           addr";
+        "  addr           addr\n";
     if (argc != 4) {
         fputs(usage, ctx->fout);
         return;
@@ -3228,7 +3275,7 @@ cmd_net_accept(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: net_accept <fd> <port> <ip>\n"
         "  fd             socket number\n"
         "  port           port\n"
-        "  addr           addr";
+        "  addr           addr\n";
     if (argc != 4) {
         fputs(usage, ctx->fout);
         return;
@@ -3255,7 +3302,7 @@ cmd_net_eth_read_mac(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_eth_read_mac <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3279,7 +3326,7 @@ cmd_net_ipv4_get_addr(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_ipv4_get_addr <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3303,7 +3350,7 @@ cmd_net_ipv4_set_addr(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_addr <dev_num> <addr>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  addr           a.b.c.d";
+        "  addr           a.b.c.d\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -3326,7 +3373,7 @@ cmd_net_ipv4_get_dns(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_ipv4_get_dns <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3350,7 +3397,7 @@ cmd_net_ipv4_set_dns(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_dns <dev_num> <dns>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  dns            a.b.c.d";
+        "  dns            a.b.c.d\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -3372,7 +3419,7 @@ cmd_net_ipv4_get_subnet(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_ipv4_get_subnet <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3396,7 +3443,7 @@ cmd_net_ipv4_set_subnet(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_subnet <dev_num> <subnet>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  subnet         a.b.c.d";
+        "  subnet         a.b.c.d\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -3419,7 +3466,7 @@ cmd_net_ipv4_get_gw(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_ipv4_get_gw <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3443,7 +3490,7 @@ cmd_net_ipv4_set_gw(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_ipv4_set_gw <dev_num> <gw>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  gw             a.b.c.d";
+        "  gw             a.b.c.d\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -3466,7 +3513,7 @@ cmd_net_arp_get_count(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: net_arp_get_count <dev_num>\n"
-        "  dev_num        device number as returned by net_add_device";
+        "  dev_num        device number as returned by net_add_device\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3488,7 +3535,7 @@ cmd_net_arp_get_entry(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_get_entry <dev_num> <arp_num>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  arp_num        arp number as returned by net_add_device";
+        "  arp_num        arp number as returned by net_add_device\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -3525,7 +3572,7 @@ cmd_net_arp_add_entry(struct shell_ctx *ctx, int argc, char **argv) {
         "  addr           IP addr\n"
         "  mac            ethernet addr\n"
         "  status         see ARP.inc\n"
-        "  ttl            Time to live";
+        "  ttl            Time to live\n";
     if (argc != 6) {
         fputs(usage, ctx->fout);
         return;
@@ -3553,7 +3600,7 @@ cmd_net_arp_del_entry(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: net_arp_del_entry <dev_num> <arp_num>\n"
         "  dev_num        device number as returned by net_add_device\n"
-        "  arp_num        arp number as returned by net_add_device";
+        "  arp_num        arp number as returned by net_add_device\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -3575,7 +3622,7 @@ cmd_osloop(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: osloop";
+        "usage: osloop\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -3591,7 +3638,7 @@ cmd_bg_set_size(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_set_size <xsize> <ysize>\n"
         "  xsize          in pixels\n"
-        "  ysize          in pixels";
+        "  ysize          in pixels\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -3609,7 +3656,7 @@ cmd_bg_put_pixel(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_put_pixel <offset> <color>\n"
         "  offset         in bytes, (x+y*xsize)*3\n"
-        "  color          in hex";
+        "  color          in hex\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -3626,7 +3673,7 @@ cmd_bg_redraw(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: bg_redraw";
+        "usage: bg_redraw\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -3641,7 +3688,7 @@ cmd_bg_set_mode(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: bg_set_mode <mode>\n"
-        "  mode           1 = tile, 2 = stretch";
+        "  mode           1 = tile, 2 = stretch\n";
     if (argc != 3) {
         fputs(usage, ctx->fout);
         return;
@@ -3658,7 +3705,7 @@ cmd_bg_put_img(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: bg_put_img <image> <offset>\n"
         "  image          file\n"
-        "  offset         in bytes, (x+y*xsize)*3";
+        "  offset         in bytes, (x+y*xsize)*3\n";
     if (argc != 4) {
         fputs(usage, ctx->fout);
         return;
@@ -3680,7 +3727,7 @@ static void
 cmd_board_get(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
-        "usage: board_get [-l]\n";
+        "usage: board_get [-l] [-n]\n";
     if (argc > 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3731,7 +3778,7 @@ static void
 cmd_board_put(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
-        "usage: board_putchar <char>\n";
+        "usage: board_put <char>\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3746,7 +3793,7 @@ static void
 cmd_bg_map(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
-        "usage: bg_map";
+        "usage: bg_map\n";
     if (argc != 1) {
         fputs(usage, ctx->fout);
         return;
@@ -3762,7 +3809,7 @@ cmd_bg_unmap(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: bg_unmap <addr>\n"
-        "  addr           return value of bg_map";
+        "  addr           return value of bg_map\n";
     if (argc != 2) {
         fputs(usage, ctx->fout);
         return;
@@ -3915,7 +3962,7 @@ static void
 cmd_help(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: help [command]\n"
-        "  command        help on this command usage";
+        "  command        help on this command usage\n";
     switch (argc) {
     case 1:
         fputs(usage, ctx->fout);
@@ -3943,6 +3990,7 @@ cmd_help(struct shell_ctx *ctx, int argc, char **argv) {
 
 void *
 run_test(struct shell_ctx *ctx) {
+    mtx_lock(&ctx->cmd_mutex);
     int is_tty = isatty(fileno(ctx->fin));
     char **argv = (char**)calloc(sizeof(char*), (MAX_COMMAND_ARGS + 1));
     bestlineSetCompletionCallback(completion);
@@ -3982,12 +4030,13 @@ run_test(struct shell_ctx *ctx) {
     free(argv);
     bestlineHistorySave(ctx->hist_file);
 
+    mtx_unlock(&ctx->cmd_mutex);
     return NULL;
 }
 
 struct shell_ctx *
 shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
-           struct umka_io *io, FILE *fin, FILE *fout) {
+           struct umka_io *io, FILE *fin, FILE *fout, const int *running) {
     struct shell_ctx *ctx = malloc(sizeof(struct shell_ctx));
     ctx->umka = umka;
     ctx->io = io;
@@ -3996,6 +4045,9 @@ shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
     ctx->var = NULL;
     ctx->fin = fin;
     ctx->fout = fout;
+    ctx->running = running;
+    cnd_init(&ctx->cmd_done);
+    mtx_init(&ctx->cmd_mutex, mtx_plain);
     return ctx;
 }
 

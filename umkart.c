@@ -6,8 +6,11 @@
     Copyright (C) 2021, 2023  Ivan Baravy <dunkaist@gmail.com>
 */
 
+#include <stdatomic.h>
 #include <stdio.h>
+#include <threads.h>
 #include "umka.h"
+#include "shell.h"
 
 struct devices_dat_entry {
     uint8_t fun:3;
@@ -20,7 +23,9 @@ struct devices_dat_entry {
     uint32_t pad2;
 };
 
-STDCALL void*
+struct umka_cmd umka_cmd_buf[CMD_BUF_LEN];
+
+static STDCALL void*
 dump_devices_dat_iter(struct pci_dev *node, void *arg) {
     FILE *f = arg;
     if (node->gsi) {
@@ -73,7 +78,7 @@ copy_display_bpp24_to_rgb888(void *to) {
     }
 }
 
-void
+static void
 copy_display_bpp32_to_rgb888(void *to) {
     memcpy(to, kos_lfb_base, kos_display.width*kos_display.height*4);
 }

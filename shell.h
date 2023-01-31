@@ -11,6 +11,7 @@
 #define SHELL_H_INCLUDED
 
 #include <stdio.h>
+#include <threads.h>
 #include "umka.h"
 #include "io.h"
 
@@ -40,16 +41,23 @@ struct shell_ctx {
     struct shell_var *var;
     FILE *fin;
     FILE *fout;
+    const int *running;
+    cnd_t cmd_done;
+    mtx_t cmd_mutex;
+
 };
 
 struct shell_ctx *
 shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
-           struct umka_io *io, FILE *fin, FILE *fout);
+           struct umka_io *io, FILE *fin, FILE *fout, const int *running);
 
 void
 shell_close(struct shell_ctx *shell);
 
 void *
 run_test(struct shell_ctx *ctx);
+
+void
+umka_run_cmd_sync(struct shell_ctx *ctx);
 
 #endif  // SHELL_H_INCLUDED

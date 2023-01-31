@@ -8,13 +8,13 @@
 */
 
 #include <arpa/inet.h>
-#include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <netinet/in.h>
 #define __USE_GNU
 #include <signal.h>
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -30,8 +30,7 @@
 #include <threads.h>
 #include <SDL2/SDL.h>
 #include "umka.h"
-#include "util.h"
-#include "umka_os.h"
+#include "umkart.h"
 #include "bestline.h"
 #include "optparse.h"
 #include "shell.h"
@@ -42,8 +41,6 @@
 
 #define THREAD_STACK_SIZE 0x100000
 
-#define CMD_BUF_LEN 0x10000
-
 struct umka_os_ctx {
     struct umka_ctx *umka;
     struct umka_io *io;
@@ -52,8 +49,6 @@ struct umka_os_ctx {
 };
 
 struct umka_os_ctx *os;
-
-uint8_t cmd_buf[CMD_BUF_LEN];
 
 char history_filename[PATH_MAX];
 
@@ -89,7 +84,7 @@ umka_os_init(FILE *fin, FILE *fout, FILE *fboardlog) {
     ctx->umka = umka_init();
     ctx->io = io_init(&ctx->umka->running);
     ctx->shell = shell_init(SHELL_LOG_NONREPRODUCIBLE, history_filename,
-                            ctx->umka, ctx->io, fin, fout);
+                            ctx->umka, ctx->io, fin, fout, &ctx->umka->running);
     return ctx;
 }
 
@@ -100,15 +95,6 @@ void build_history_filename() {
     }
     sprintf(history_filename, "%s/%s", dir_name, HIST_FILE_BASENAME);
 }
-
-/*
-static void
-monitor(void) {
-    umka_sti();
-    fprintf(stderr, "Start monitor thread\n");
-    __asm__ __inline__ __volatile__ ("jmp $");
-}
-*/
 
 void umka_thread_net_drv(void);
 
@@ -251,16 +237,29 @@ sdlthr(void *arg) {
     return 0;
 }
 
-int
+uint32_t
+umka_run_cmd_wait_test(/* void *wait_param in ebx */) {
+    appdata_t *app;
+    __asm__ __volatile__ __inline__ ("":"=b"(app)::);
+    struct umka_cmd *cmd = (struct umka_cmd*)app->wait_param;
+    return (uint32_t)(atomic_load_explicit(&cmd->status, memory_order_acquire) == UMKA_CMD_STATUS_READY);
+}
+
+static void
+umka_thread_cmd_runner() {
+    umka_sti();
+    while (1) {
+        kos_wait_events(umka_run_cmd_wait_test, umka_cmd_buf);
+        umka_run_cmd_sync(os->shell);
+    }
+}
+
+static int
 umka_monitor(void *arg) {
     (void)arg;
-    union sigval sval = (union sigval){.sival_int = 14};
-
-    pid_t mypid = getpid();
-    char *line;
-    while((line = bestline(">"))) {
-        sigqueue(mypid, SIGUSR2, sval);
-    }
+    os->shell->fin = stdin;
+    os->shell->fout = stdout;
+    run_test(os->shell);
     return 0;
 }
 
@@ -445,16 +444,13 @@ main(int argc, char *argv[]) {
 
     kos_attach_int_handler(14, hw_int_mouse, NULL);
 
-//    thread_start(0, monitor, THREAD_STACK_SIZE);
     thread_start(1, umka_thread_board, THREAD_STACK_SIZE);
+    thread_start(1, umka_thread_cmd_runner, THREAD_STACK_SIZE);
     kos_thread_t start = (kos_thread_t)(KOS_APP_BASE + app->menuet.start);
     thread_start(0, start, THREAD_STACK_SIZE);
 
     dump_procs();
 
-    fflush(stdin);
-    fflush(stdout);
-    fflush(stderr);
     thrd_t thrd_monitor;
     thrd_create(&thrd_monitor, umka_monitor, NULL);
 
@@ -463,7 +459,7 @@ main(int argc, char *argv[]) {
 
     setitimer(ITIMER_REAL, &timeout, NULL);
 
-    os->umka->running = 1;
+    atomic_store_explicit(&os->umka->running, 1, memory_order_release);
     umka_osloop();   // doesn't return
 
     if (coverage)

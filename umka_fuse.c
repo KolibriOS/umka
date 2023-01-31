@@ -24,7 +24,6 @@
 #include <fcntl.h>
 #include "io.h"
 #include "vdisk.h"
-#include "umka.h"
 
 #define DIRENTS_TO_READ 100
 

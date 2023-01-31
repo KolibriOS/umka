@@ -9,6 +9,11 @@
 #ifndef UTIL_H_INCLUDED
 #define UTIL_H_INCLUDED
 
+#include "umka.h"
+#include "shell.h"
+
+extern struct umka_cmd umka_cmd_buf[CMD_BUF_LEN];
+
 void
 dump_devices_dat(const char *filename);
 
