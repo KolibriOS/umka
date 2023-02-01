@@ -4,7 +4,7 @@
     UMKa - User-Mode KolibriOS developer tools
     vnet - virtual network card
 
-    Copyright (C) 2020-2022  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2020-2023  Ivan Baravy <dunkaist@gmail.com>
 */
 
 #ifndef VNET_H_INCLUDED
@@ -12,7 +12,23 @@
 
 #include "umka.h"
 
-net_device_t*
-vnet_init(void);
+#define UMKA_VNET_NAME "umka%d"
+
+extern uint32_t umka_irq_number;
+
+enum vnet_type {
+    VNET_FILE,
+    VNET_TAP,
+};
+
+struct vnet {
+    net_device_t netdev;
+    int fdin;
+    int fdout;
+    int input_processed;
+};
+
+struct vnet *
+vnet_init(enum vnet_type type);
 
 #endif  // VNET_H_INCLUDED

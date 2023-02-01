@@ -12,7 +12,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <inttypes.h>
-#include "io.h"
+#include "umkaio.h"
 #include "io_async.h"
 
 struct umka_io *

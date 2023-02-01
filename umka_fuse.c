@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "io.h"
+#include "umkaio.h"
 #include "vdisk.h"
 
 #define DIRENTS_TO_READ 100

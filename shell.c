@@ -25,6 +25,9 @@
 // TODO: Cleanup
 #ifndef _WIN32
 #include <arpa/inet.h>
+#else
+#include <winsock2.h>
+#include <io.h>
 #endif
 
 #include "shell.h"
@@ -78,13 +81,13 @@ umka_run_cmd_sync(struct shell_ctx *ctx) {
     }
     atomic_store_explicit(&cmd->status, UMKA_CMD_STATUS_DONE,
                           memory_order_release);
-    cnd_signal(&ctx->cmd_done);
+    pthread_cond_signal(&ctx->cmd_done);
 }
 
 static void
 umka_run_cmd(struct shell_ctx *ctx) {
     if (atomic_load_explicit(ctx->running, memory_order_acquire)) {
-        cnd_wait(&ctx->cmd_done, &ctx->cmd_mutex);
+        pthread_cond_wait(&ctx->cmd_done, &ctx->cmd_mutex);
     } else {
         umka_run_cmd_sync(ctx);
     }
@@ -109,20 +112,20 @@ const char *f70_status_name[] = {
 static const char *
 get_f70_status_name(int s) {
     switch (s) {
-    case ERROR_SUCCESS:
+    case KOS_ERROR_SUCCESS:
 //        return "";
-    case ERROR_DISK_BASE:
-    case ERROR_UNSUPPORTED_FS:
-    case ERROR_UNKNOWN_FS:
-    case ERROR_PARTITION:
-    case ERROR_FILE_NOT_FOUND:
-    case ERROR_END_OF_FILE:
-    case ERROR_MEMORY_POINTER:
-    case ERROR_DISK_FULL:
-    case ERROR_FS_FAIL:
-    case ERROR_ACCESS_DENIED:
-    case ERROR_DEVICE:
-    case ERROR_OUT_OF_MEMORY:
+    case KOS_ERROR_DISK_BASE:
+    case KOS_ERROR_UNSUPPORTED_FS:
+    case KOS_ERROR_UNKNOWN_FS:
+    case KOS_ERROR_PARTITION:
+    case KOS_ERROR_FILE_NOT_FOUND:
+    case KOS_ERROR_END_OF_FILE:
+    case KOS_ERROR_MEMORY_POINTER:
+    case KOS_ERROR_DISK_FULL:
+    case KOS_ERROR_FS_FAIL:
+    case KOS_ERROR_ACCESS_DENIED:
+    case KOS_ERROR_DEVICE:
+    case KOS_ERROR_OUT_OF_MEMORY:
         return f70_status_name[s];
     default:
         return "unknown";
@@ -144,7 +147,7 @@ print_f70_status(struct shell_ctx *ctx, f7080ret_t *r, int use_ebx) {
     fprintf(ctx->fout, "status = %d %s", r->status,
             get_f70_status_name(r->status));
     if (use_ebx
-        && (r->status == ERROR_SUCCESS || r->status == ERROR_END_OF_FILE)) {
+        && (r->status == KOS_ERROR_SUCCESS || r->status == KOS_ERROR_END_OF_FILE)) {
         fprintf(ctx->fout, ", count = %d", r->count);
     }
     fprintf(ctx->fout, "\n");
@@ -2326,8 +2329,8 @@ ls_range(struct shell_ctx *ctx, f7080s1arg_t *fX0, f70or80_t f70or80) {
         f7080s1info_t *dir = fX0->buf;
         int ok = (r.count <= fX0->size);
         ok &= (dir->cnt == r.count);
-        ok &= (r.status == ERROR_SUCCESS && r.count == fX0->size)
-              || (r.status == ERROR_END_OF_FILE && r.count < fX0->size);
+        ok &= (r.status == KOS_ERROR_SUCCESS && r.count == fX0->size)
+              || (r.status == KOS_ERROR_END_OF_FILE && r.count < fX0->size);
         assert(ok);
         if (!ok)
             break;
@@ -2338,7 +2341,7 @@ ls_range(struct shell_ctx *ctx, f7080s1arg_t *fX0, f70or80_t f70or80) {
             fprintf(ctx->fout, "%s %s\n", fattr, bdfe->name);
             bdfe = (bdfe_t*)((uintptr_t)bdfe + bdfe_len);
         }
-        if (r.status == ERROR_END_OF_FILE) {
+        if (r.status == KOS_ERROR_END_OF_FILE) {
             break;
         }
     }
@@ -2360,8 +2363,8 @@ ls_all(struct shell_ctx *ctx, f7080s1arg_t *fX0, f70or80_t f70or80) {
         fX0->offset += dir->cnt;
         int ok = (r.count <= fX0->size);
         ok &= (dir->cnt == r.count);
-        ok &= (r.status == ERROR_SUCCESS && r.count == fX0->size)
-              || (r.status == ERROR_END_OF_FILE && r.count < fX0->size);
+        ok &= (r.status == KOS_ERROR_SUCCESS && r.count == fX0->size)
+              || (r.status == KOS_ERROR_END_OF_FILE && r.count < fX0->size);
         assert(ok);
         if (!ok)
             break;
@@ -2373,7 +2376,7 @@ ls_all(struct shell_ctx *ctx, f7080s1arg_t *fX0, f70or80_t f70or80) {
             fprintf(ctx->fout, "%s %s\n", fattr, bdfe->name);
             bdfe = (bdfe_t*)((uintptr_t)bdfe + bdfe_len);
         }
-        if (r.status == ERROR_END_OF_FILE) {
+        if (r.status == KOS_ERROR_END_OF_FILE) {
             break;
         }
     }
@@ -2538,7 +2541,7 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
     umka_sys_lfn(&fX0, &r, f70or80);
     COVERAGE_OFF();
     print_f70_status(ctx, &r, 0);
-    if (r.status != ERROR_SUCCESS)
+    if (r.status != KOS_ERROR_SUCCESS)
         return;
     char fattr[KF_ATTR_CNT+1];
     convert_f70_file_attr(file.attr, fattr);
@@ -2648,7 +2651,7 @@ cmd_read(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80,
     COVERAGE_OFF();
 
     print_f70_status(ctx, &r, 1);
-    if (r.status == ERROR_SUCCESS || r.status == ERROR_END_OF_FILE) {
+    if (r.status == KOS_ERROR_SUCCESS || r.status == KOS_ERROR_END_OF_FILE) {
         if (dump_bytes)
             print_bytes(ctx, fX0.buf, r.count);
         if (dump_hash)
@@ -2889,9 +2892,9 @@ cmd_net_add_device(struct shell_ctx *ctx, int argc, char **argv) {
         fputs(usage, ctx->fout);
         return;
     }
-    net_device_t *vnet = vnet_init();   // FIXME: list like block devices
+    struct vnet *net = vnet_init(VNET_TAP); // TODO: list like block devices
     COVERAGE_ON();
-    int32_t dev_num = kos_net_add_device(vnet);
+    int32_t dev_num = kos_net_add_device(&net->netdev);
     COVERAGE_OFF();
     fprintf(ctx->fout, "device number: %" PRIi32 "\n", dev_num);
 }
@@ -3990,7 +3993,7 @@ cmd_help(struct shell_ctx *ctx, int argc, char **argv) {
 
 void *
 run_test(struct shell_ctx *ctx) {
-    mtx_lock(&ctx->cmd_mutex);
+    pthread_mutex_lock(&ctx->cmd_mutex);
     int is_tty = isatty(fileno(ctx->fin));
     char **argv = (char**)calloc(sizeof(char*), (MAX_COMMAND_ARGS + 1));
     bestlineSetCompletionCallback(completion);
@@ -4030,7 +4033,8 @@ run_test(struct shell_ctx *ctx) {
     free(argv);
     bestlineHistorySave(ctx->hist_file);
 
-    mtx_unlock(&ctx->cmd_mutex);
+    fclose(ctx->fin);
+    pthread_mutex_unlock(&ctx->cmd_mutex);
     return NULL;
 }
 
@@ -4046,8 +4050,8 @@ shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
     ctx->fin = fin;
     ctx->fout = fout;
     ctx->running = running;
-    cnd_init(&ctx->cmd_done);
-    mtx_init(&ctx->cmd_mutex, mtx_plain);
+    pthread_cond_init(&ctx->cmd_done, NULL);
+    pthread_mutex_init(&ctx->cmd_mutex, NULL);
     return ctx;
 }
 

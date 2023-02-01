@@ -19,7 +19,7 @@ SECTIONS
 {
   .data.boot BLOCK(0x1000) :
   {
-    *(.data.boot)
+    *(.data.bt)
   }
 
 }

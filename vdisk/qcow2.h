@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 #include "vdisk.h"
-#include "io.h"
+#include "umkaio.h"
 
 #define QCOW2_SUFFIX ".qcow2"
 

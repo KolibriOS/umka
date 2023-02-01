@@ -1023,7 +1023,6 @@ acpi_root dd ?
 acpi_dev_next dd ?
 endg
 
-;sys_msg_board equ __pex0
 delay_ms equ __pex1
 
 include fix pew
@@ -1047,14 +1046,13 @@ include 'kernel.asm'
 purge jmp
 restore bios32_entry, tmp_page_tabs
 purge org,delay_ms
-;purge sys_msg_board
 restore org,delay_ms
-;restore sys_msg_board
 
 coverage_end:
 
 
-section '.bss.coverage' executable writable align 64
+; cov for coverage; otherwide fasm complains with 'name too long' for MS COFF
+section '.bss.cov' executable writable align 64
 struct coverage_branch
     to_cnt DQ ?
     from_cnt DQ ?
@@ -1066,7 +1064,8 @@ coverage_table rb COVERAGE_TABLE_SIZE * sizeof.coverage_branch
 pubsym coverage_table
 
 
-section '.data.boot' writeable align 0x1000
+; bt for boot; otherwide fasm complains with 'name too long' for MS COFF
+section '.data.bt' writeable align 0x1000
 BOOT boot_data
 virtual at BOOT
 BOOT_LO boot_data

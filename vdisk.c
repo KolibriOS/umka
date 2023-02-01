@@ -27,7 +27,7 @@ vdisk_querymedia(void *userdata, diskmediainfo_t *minfo) {
     minfo->sector_size = disk->sect_size;
     minfo->capacity = disk->sect_cnt;
     COVERAGE_ON();
-    return ERROR_SUCCESS;
+    return KOS_ERROR_SUCCESS;
 }
 
 STDCALL size_t

@@ -112,7 +112,7 @@ thread_start(int is_kernel, void (*entry)(void), size_t stack_size) {
 
 static void
 dump_procs() {
-    for (int i = 0; i < NR_SCHED_QUEUES; i++) {
+    for (int i = 0; i < KOS_NR_SCHED_QUEUES; i++) {
         fprintf(stderr, "sched queue #%i:", i);
         appdata_t *p_begin = kos_scheduler_current[i];
         appdata_t *p = p_begin;
@@ -186,7 +186,7 @@ hw_int(int signo, siginfo_t *info, void *context) {
 }
 
 int
-sdlthr(void *arg) {
+umka_display(void *arg) {
     (void)arg;
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -194,7 +194,10 @@ sdlthr(void *arg) {
         return -1;
     }
 
-    SDL_Window *window = SDL_CreateWindow("LFB Viewer SDL2",
+    char title[64];
+    sprintf(title, "umka0 %ux%u %ubpp", kos_display.width, kos_display.height,
+            kos_display.bits_per_pixel);
+    SDL_Window *window = SDL_CreateWindow(title,
                                           SDL_WINDOWPOS_UNDEFINED,
                                           SDL_WINDOWPOS_UNDEFINED,
                                           kos_display.width,
@@ -257,10 +260,8 @@ umka_thread_cmd_runner() {
 static int
 umka_monitor(void *arg) {
     (void)arg;
-    os->shell->fin = stdin;
-    os->shell->fout = stdout;
     run_test(os->shell);
-    return 0;
+    exit(0);
 }
 
 static void
@@ -280,10 +281,12 @@ int
 main(int argc, char *argv[]) {
     (void)argc;
     const char *usage = "umka_os [-i <infile>] [-o <outfile>]"
-                        " [-b <boardlog>]\n";
+                        " [-b <boardlog>] [\n";
     if (coverage) {
         trace_begin();
     }
+
+    int show_display = 0;
 
     umka_sti();
 
@@ -292,9 +295,11 @@ main(int argc, char *argv[]) {
     bestlineSetHintsCallback(hints);
     bestlineHistoryLoad(history_filename);
 
+    const char *startupfile = NULL;
     const char *infile = NULL;
     const char *outfile = NULL;
     const char *boardlogfile = NULL;
+    FILE *fstartup = NULL;
     FILE *fin = stdin;
     FILE *fout = stdout;
     FILE *fboardlog;
@@ -303,16 +308,22 @@ main(int argc, char *argv[]) {
     int opt;
     optparse_init(&options, argv);
 
-    while ((opt = optparse(&options, "b:i:o:s:")) != -1) {
+    while ((opt = optparse(&options, "b:di:o:s:")) != -1) {
         switch (opt) {
         case 'b':
             boardlogfile = options.optarg;
+            break;
+        case 'd':
+            show_display = 1;
             break;
         case 'i':
             infile = options.optarg;
             break;
         case 'o':
             outfile = options.optarg;
+            break;
+        case 's':
+            startupfile = options.optarg;
             break;
         default:
             fprintf(stderr, "bad option: %c\n", opt);
@@ -379,8 +390,8 @@ main(int argc, char *argv[]) {
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_SIGINFO;
 
-    if (sigaction(SIGUSR2, &sa, NULL) == -1) {
-        fprintf(stderr, "Can't install SIGUSR2 handler!\n");
+    if (sigaction(SIGSYS, &sa, NULL) == -1) {
+        fprintf(stderr, "Can't install SIGSYS handler!\n");
         return 1;
     }
 
@@ -397,14 +408,19 @@ main(int argc, char *argv[]) {
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH * UMKA_DEFAULT_DISPLAY_BPP / 8;
 
     run_test(os->shell);
-//    umka_stack_init();
+    os->shell->fin = stdin;
+    umka_stack_init();
 
 //    load_app_host("../apps/board_cycle", app);
     load_app_host("../apps/readdir", app);
 //    load_app("/rd/1/loader");
 
-//    net_device_t *vnet = vnet_init();
-//    kos_net_add_device(vnet);
+    struct vnet *net = vnet_init(VNET_TAP);
+    if (net) {
+        kos_net_add_device(&net->netdev);
+    } else {
+        fprintf(stderr, "[!] can't initialize vnet device\n");
+    }
 
     char devname[64];
     for (size_t i = 0; i < umka_sys_net_get_dev_count(); i++) {
@@ -442,7 +458,7 @@ main(int argc, char *argv[]) {
     }
 */
 
-    kos_attach_int_handler(14, hw_int_mouse, NULL);
+    kos_attach_int_handler(UMKA_IRQ_MOUSE, hw_int_mouse, NULL);
 
     thread_start(1, umka_thread_board, THREAD_STACK_SIZE);
     thread_start(1, umka_thread_cmd_runner, THREAD_STACK_SIZE);
@@ -454,8 +470,10 @@ main(int argc, char *argv[]) {
     thrd_t thrd_monitor;
     thrd_create(&thrd_monitor, umka_monitor, NULL);
 
-    thrd_t thrd_screen;
-    thrd_create(&thrd_screen, sdlthr, NULL);
+    if (show_display) {
+        thrd_t thrd_display;
+        thrd_create(&thrd_display, umka_display, NULL);
+    }
 
     setitimer(ITIMER_REAL, &timeout, NULL);
 

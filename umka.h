@@ -41,6 +41,9 @@ struct umka_ctx {
 #define KEYBOARD_MODE_ASCII     0
 #define KEYBOARD_MODE_SCANCODES 1
 
+#define UMKA_IRQ_MOUSE 14
+#define UMKA_IRQ_NETWORK 15
+
 enum kos_lang {
     KOS_LANG_EN = 1,
     KOS_LANG_FIRST = KOS_LANG_EN,
@@ -195,19 +198,19 @@ typedef enum {
 } f70or80_t;
 
 enum {
-    ERROR_SUCCESS,
-    ERROR_DISK_BASE,
-    ERROR_UNSUPPORTED_FS,
-    ERROR_UNKNOWN_FS,
-    ERROR_PARTITION,
-    ERROR_FILE_NOT_FOUND,
-    ERROR_END_OF_FILE,
-    ERROR_MEMORY_POINTER,
-    ERROR_DISK_FULL,
-    ERROR_FS_FAIL,
-    ERROR_ACCESS_DENIED,
-    ERROR_DEVICE,
-    ERROR_OUT_OF_MEMORY,
+    KOS_ERROR_SUCCESS,
+    KOS_ERROR_DISK_BASE,
+    KOS_ERROR_UNSUPPORTED_FS,
+    KOS_ERROR_UNKNOWN_FS,
+    KOS_ERROR_PARTITION,
+    KOS_ERROR_FILE_NOT_FOUND,
+    KOS_ERROR_END_OF_FILE,
+    KOS_ERROR_MEMORY_POINTER,
+    KOS_ERROR_DISK_FULL,
+    KOS_ERROR_FS_FAIL,
+    KOS_ERROR_ACCESS_DENIED,
+    KOS_ERROR_DEVICE,
+    KOS_ERROR_OUT_OF_MEMORY,
 };
 
 typedef struct lhead lhead_t;
@@ -501,7 +504,6 @@ struct net_device_t {
     uint32_t hwacc;         // bitmask stating enabled HW accelerations (offload
                             // engines)
     uint8_t mac[6];
-    void *userdata;         // not in kolibri, umka-specific
 }; // NET_DEVICE
 
 typedef struct {
@@ -1085,13 +1087,6 @@ static_assert(sizeof(appdata_t) == 256, "must be 0x100 bytes long");
 #define UMKA_OS              3
 #define UMKA_GEN_DEVICES_DAT 4
 
-#define MAX_PRIORITY    0 // highest, used for kernel tasks
-#define USER_PRIORITY   1 // default
-#define IDLE_PRIORITY   2 // lowest, only IDLE thread goes here
-#define NR_SCHED_QUEUES 3 // MUST equal IDLE_PRIORYTY + 1
-
-extern appdata_t *kos_scheduler_current[NR_SCHED_QUEUES];
-
 extern uint8_t kos_redraw_background;
 extern size_t kos_task_count;
 extern wdata_t kos_window_data[];
@@ -1130,13 +1125,15 @@ umka_scheduler_add_thread(appdata_t *thread, int32_t priority) {
         : "memory", "cc");
 }
 
-#define MAX_PRIORITY    0
-#define USER_PRIORITY   1
-#define IDLE_PRIORITY   2
-#define NR_SCHED_QUEUES 3
+#define KOS_MAX_PRIORITY    0 // highest, used for kernel tasks
+#define KOS_USER_PRIORITY   1 // default
+#define KOS_IDLE_PRIORITY   2 // lowest, only IDLE thread goes here
+#define KOS_NR_SCHED_QUEUES 3 // MUST equal IDLE_PRIORYTY + 1
 
 #define SCHEDULE_ANY_PRIORITY 0
 #define SCHEDULE_HIGHER_PRIORITY 1
+
+extern appdata_t *kos_scheduler_current[KOS_NR_SCHED_QUEUES];
 
 typedef struct {
     appdata_t *appdata;

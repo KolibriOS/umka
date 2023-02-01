@@ -6,8 +6,8 @@
     Copyright (C) 2021, 2023  Ivan Baravy <dunkaist@gmail.com>
 */
 
-#ifndef UTIL_H_INCLUDED
-#define UTIL_H_INCLUDED
+#ifndef UMKART_H_INCLUDED
+#define UMKART_H_INCLUDED
 
 #include "umka.h"
 #include "shell.h"
@@ -20,4 +20,4 @@ dump_devices_dat(const char *filename);
 void
 copy_display_to_rgb888(void *to);
 
-#endif  // UTIL_H_INCLUDED
+#endif  // UMKART_H_INCLUDED

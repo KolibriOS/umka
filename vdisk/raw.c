@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "../trace.h"
-#include "io.h"
+#include "umkaio.h"
 #include "raw.h"
 
 struct vdisk_raw {
@@ -38,7 +38,7 @@ vdisk_raw_read(void *userdata, void *buffer, off_t startsector,
     io_read(disk->fd, buffer, *numsectors * disk->vdisk.sect_size,
             disk->vdisk.io);
     COVERAGE_ON();
-    return ERROR_SUCCESS;
+    return KOS_ERROR_SUCCESS;
 }
 
 STDCALL int
@@ -50,7 +50,7 @@ vdisk_raw_write(void *userdata, void *buffer, off_t startsector,
     io_write(disk->fd, buffer, *numsectors * disk->vdisk.sect_size,
              disk->vdisk.io);
     COVERAGE_ON();
-    return ERROR_SUCCESS;
+    return KOS_ERROR_SUCCESS;
 }
 
 struct vdisk*

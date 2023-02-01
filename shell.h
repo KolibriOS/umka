@@ -11,9 +11,9 @@
 #define SHELL_H_INCLUDED
 
 #include <stdio.h>
-#include <threads.h>
+#include <pthread.h>
 #include "umka.h"
-#include "io.h"
+#include "umkaio.h"
 
 enum shell_var_type {
     SHELL_VAR_SINT,
@@ -42,8 +42,8 @@ struct shell_ctx {
     FILE *fin;
     FILE *fout;
     const int *running;
-    cnd_t cmd_done;
-    mtx_t cmd_mutex;
+    pthread_cond_t cmd_done;
+    pthread_mutex_t cmd_mutex;
 
 };
 

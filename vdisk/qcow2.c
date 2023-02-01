@@ -14,7 +14,11 @@
 #include "../trace.h"
 #include "qcow2.h"
 #include "miniz/miniz.h"
-#include "io.h"
+#include "umkaio.h"
+#ifdef _WIN32
+//#include <io.h>
+//#define open _open
+#endif
 
 #define L1_MAX_LEN (32u*1024u*1024u)
 #define L1_MAX_ENTRIES (L1_MAX_LEN / sizeof(uint64_t))
@@ -179,7 +183,7 @@ vdisk_qcow2_read(void *userdata, void *buffer, off_t startsector,
         buffer = (uint8_t*)buffer + d->vdisk.sect_size;
     }
     COVERAGE_ON();
-    return ERROR_SUCCESS;
+    return KOS_ERROR_SUCCESS;
 }
 
 STDCALL int
@@ -193,7 +197,7 @@ vdisk_qcow2_write(void *userdata, void *buffer, off_t startsector,
     (void)numsectors;
     fprintf(stderr, "[vdisk.qcow2] writing is not implemented");
     COVERAGE_ON();
-    return ERROR_UNSUPPORTED_FS;
+    return KOS_ERROR_UNSUPPORTED_FS;
 }
 
 struct vdisk*

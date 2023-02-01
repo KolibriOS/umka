@@ -10,7 +10,7 @@
 #ifndef IO_ASYNC_H_INCLUDED
 #define IO_ASYNC_H_INCLUDED
 
-#include <unistd.h>
+#include <stddef.h>
 
 void *
 io_async_init();

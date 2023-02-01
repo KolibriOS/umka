@@ -18,7 +18,7 @@
 #include <unistd.h>
 #include "optparse.h"
 #include "shell.h"
-#include "io.h"
+#include "umkaio.h"
 #include "trace.h"
 
 #define HIST_FILE_BASENAME ".umka_shell.history"

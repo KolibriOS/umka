@@ -30,15 +30,15 @@ CFLAGS_32=$(CFLAGS) -m32 -D_FILE_OFFSET_BITS=64 -D__USE_TIME_BITS64
 LDFLAGS=-no-pie
 LDFLAGS_32=$(LDFLAGS) -m32
 
-ifeq ($(HOST),linux)
+#ifeq ($(HOST),linux)
         FASM_INCLUDE=$(KOLIBRIOS)/kernel/trunk;$(KOLIBRIOS)/programs/develop/libraries/libcrash/hash
         FASM=INCLUDE="$(FASM_INCLUDE)" $(FASM_EXE) $(FASM_FLAGS)
-else ifeq ($(HOST),windows)
-        FASM_INCLUDE=$(KOLIBRIOS)\kernel\trunk;$(KOLIBRIOS)\programs\develop\libraries\libcrash\hash
-        FASM=set "INCLUDE=$(FASM_INCLUDE)" && $(FASM_EXE) $(FASM_FLAGS)
-else
-        $(error your OS is not supported)
-endif
+#else ifeq ($(HOST),windows)
+#        FASM_INCLUDE=$(KOLIBRIOS)\kernel\trunk;$(KOLIBRIOS)\programs\develop\libraries\libcrash\hash
+#        FASM=set "INCLUDE=$(FASM_INCLUDE)" && $(FASM_EXE) $(FASM_FLAGS)
+#else
+#        $(error your OS is not supported)
+#endif
 
 ifeq ($(HOST),linux)
 all: umka_shell umka_fuse umka_os umka_gen_devices_dat umka.sym umka.prp \
@@ -56,20 +56,21 @@ test: umka_shell
 	@cd test && make clean all && cd ../
 
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
-            vdisk/raw.o vdisk/qcow2.o vdisk/miniz/miniz.a vnet.o lodepng.o \
-            $(HOST)/pci.o $(HOST)/thread.o io.o $(HOST)/io_async.o umkart.o \
-            optparse32.o bestline32.o
+            vdisk/raw.o vdisk/qcow2.o vdisk/miniz/miniz.a vnet.o \
+            $(HOST)/vnet/tap.o vnet/file.o lodepng.o $(HOST)/pci.o \
+            $(HOST)/thread.o umkaio.o $(HOST)/io_async.o umkart.o optparse32.o \
+            bestline32.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
            vdisk/qcow2.o vdisk/miniz/miniz.a $(HOST)/pci.o $(HOST)/thread.o \
-           io.o $(HOST)/io_async.o
+           umkaio.o $(HOST)/io_async.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs` -T umka.ld
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vdisk/raw.o vdisk/qcow2.o \
-         vdisk/miniz/miniz.a vnet.o trace.o trace_lbr.o $(HOST)/pci.o \
-         $(HOST)/thread.o io.o $(HOST)/io_async.o umkart.o bestline32.o \
-         optparse32.o
+         vdisk/miniz/miniz.a vnet.o $(HOST)/vnet/tap.o vnet/file.o trace.o \
+         trace_lbr.o $(HOST)/pci.o $(HOST)/thread.o umkaio.o \
+         $(HOST)/io_async.o umkart.o bestline32.o optparse32.o
 	$(CC) $(LDFLAGS_32) `sdl2-config --libs` $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
@@ -82,10 +83,10 @@ umka.o umka.fas: umka.asm
 shell.o: shell.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
 
-io.o: io.c io.h
+umkaio.o: umkaio.c umkaio.h
 	$(CC) $(CFLAGS_32) -D_DEFAULT_SOURCE -c $< -o $@
 
-$(HOST)/io_async.o: $(HOST)/io_async.c $(HOST)/io_async.h
+$(HOST)/io_async.o: $(HOST)/io_async.c io_async.h
 	$(CC) $(CFLAGS_32) -D_DEFAULT_SOURCE -c $< -o $@
 
 $(HOST)/thread.o: $(HOST)/thread.c
@@ -160,8 +161,14 @@ vdisk/miniz/miniz.o: vdisk/miniz/miniz.c vdisk/miniz/miniz.h
 vdisk/miniz/miniz.a: vdisk/miniz/miniz.o vdisk/miniz/miniz_tinfl.o vdisk/miniz/miniz_tdef.o
 	$(AR) --target=elf32-i386 r $@ $^
 
-vnet.o: vnet.c
+vnet.o: vnet.c vnet.h
 	$(CC) $(CFLAGS_32) -c $<
+
+$(HOST)/vnet/tap.o: $(HOST)/vnet/tap.c vnet/tap.h
+	$(CC) $(CFLAGS_32) -c $< -o $@
+
+vnet/file.o: vnet/file.c vnet/file.h
+	$(CC) $(CFLAGS_32) -c $< -o $@
 
 umka_shell.o: umka_shell.c umka.h trace.h
 	$(CC) $(CFLAGS_32) -c $<

@@ -6,11 +6,12 @@
     Copyright (C) 2021, 2023  Ivan Baravy <dunkaist@gmail.com>
 */
 
-#include <stdatomic.h>
 #include <stdio.h>
-#include <threads.h>
+#include <stdlib.h>
 #include "umka.h"
 #include "shell.h"
+
+uint32_t umka_irq_number;
 
 struct devices_dat_entry {
     uint8_t fun:3;

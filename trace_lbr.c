@@ -3,7 +3,7 @@
 
     UMKa - User-Mode KolibriOS developer tools
 
-    Copyright (C) 2019-2020,2022  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2019-2020,2022-2023  Ivan Baravy <dunkaist@gmail.com>
     Copyright (C) 2021  Magomed Kostoev <mkostoevr@yandex.ru>
 */
 
@@ -36,6 +36,7 @@ uint64_t rdmsr(uint32_t reg)
         exit(1);
     }
 #else
+    (void)reg;
     printf("STUB: %s:%d", __FILE__, __LINE__);
 #endif
 
@@ -59,6 +60,8 @@ void wrmsr(uint32_t reg, uint64_t data)
 
     close(fd);
 #else
+    (void)reg;
+    (void)data;
     printf("STUB: %s:%d", __FILE__, __LINE__);
 #endif
 }
