@@ -2401,6 +2401,7 @@ enum {
     UMKA_CMD_SET_MOUSE_DATA,
     UMKA_CMD_SYS_PROCESS_INFO,
     UMKA_CMD_SYS_GET_MOUSE_POS_SCREEN,
+    UMKA_CMD_SYS_LFN,
 };
 
 enum {
@@ -2417,6 +2418,16 @@ struct cmd_set_mouse_data {
     int32_t hscroll;
 };
 
+struct cmd_sys_lfn {
+    f70or80_t f70or80;
+    f7080s1arg_t *bufptr;
+    f7080ret_t *r;
+};
+
+struct cmd_ret_sys_lfn {
+    f7080ret_t status;
+};
+
 struct cmd_sys_process_info {
     int32_t pid;
     void *param;
@@ -2431,9 +2442,11 @@ struct umka_cmd {
     uint32_t type;
     union {
         struct cmd_set_mouse_data set_mouse_data;
+        struct cmd_sys_lfn sys_lfn;
     } arg;
     union {
         struct cmd_ret_sys_get_mouse_pos_screen sys_get_mouse_pos_screen;
+        struct cmd_ret_sys_lfn sys_lfn;
     } ret;
 };
 

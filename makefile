@@ -58,19 +58,18 @@ test: umka_shell
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
             vdisk/raw.o vdisk/qcow2.o vdisk/miniz/miniz.a vnet.o \
             $(HOST)/vnet/tap.o vnet/file.o lodepng.o $(HOST)/pci.o \
-            $(HOST)/thread.o umkaio.o $(HOST)/io_async.o umkart.o optparse32.o \
-            bestline32.o
+            $(HOST)/thread.o umkaio.o umkart.o optparse32.o bestline32.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
            vdisk/qcow2.o vdisk/miniz/miniz.a $(HOST)/pci.o $(HOST)/thread.o \
-           umkaio.o $(HOST)/io_async.o
+           umkaio.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs` -T umka.ld
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vdisk/raw.o vdisk/qcow2.o \
          vdisk/miniz/miniz.a vnet.o $(HOST)/vnet/tap.o vnet/file.o trace.o \
-         trace_lbr.o $(HOST)/pci.o $(HOST)/thread.o umkaio.o \
-         $(HOST)/io_async.o umkart.o bestline32.o optparse32.o
+         trace_lbr.o $(HOST)/pci.o $(HOST)/thread.o umkaio.o umkart.o \
+         bestline32.o optparse32.o
 	$(CC) $(LDFLAGS_32) `sdl2-config --libs` $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
@@ -84,9 +83,6 @@ shell.o: shell.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
 
 umkaio.o: umkaio.c umkaio.h
-	$(CC) $(CFLAGS_32) -D_DEFAULT_SOURCE -c $< -o $@
-
-$(HOST)/io_async.o: $(HOST)/io_async.c io_async.h
 	$(CC) $(CFLAGS_32) -D_DEFAULT_SOURCE -c $< -o $@
 
 $(HOST)/thread.o: $(HOST)/thread.c

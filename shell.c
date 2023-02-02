@@ -75,6 +75,11 @@ umka_run_cmd_sync(struct shell_ctx *ctx) {
                            c->hscroll);
         break;
         }
+    case UMKA_CMD_SYS_LFN: {
+        struct cmd_sys_lfn *c = &cmd->arg.sys_lfn;
+        umka_sys_lfn(c->bufptr, c->r, c->f70or80);
+        break;
+        }
     default:
         fprintf(ctx->fout, "[!] unknown command: %u\n", cmd->type);
         break;
@@ -2353,9 +2358,21 @@ ls_all(struct shell_ctx *ctx, f7080s1arg_t *fX0, f70or80_t f70or80) {
     size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 :
                                                  BDFE_LEN_UNICODE;
     while (true) {
+        struct umka_cmd *cmd = umka_cmd_buf;
+        struct cmd_sys_lfn *c = &cmd->arg.sys_lfn;
+        cmd->type = UMKA_CMD_SYS_LFN;
+        c->f70or80 = f70or80;
+        c->bufptr = fX0;
+        c->r = &r;
+
+        atomic_store_explicit(&cmd->status, UMKA_CMD_STATUS_READY,
+                              memory_order_release);
         COVERAGE_ON();
-        umka_sys_lfn(fX0, &r, f70or80);
+//        umka_sys_lfn(fX0, &r, f70or80);
+        umka_run_cmd(ctx);
         COVERAGE_OFF();
+        atomic_store_explicit(&cmd->status, UMKA_CMD_STATUS_EMPTY,
+                              memory_order_release);
         print_f70_status(ctx, &r, 1);
         assert((r.status == ERROR_SUCCESS && r.count == fX0->size)
               || (r.status == ERROR_END_OF_FILE && r.count < fX0->size));
