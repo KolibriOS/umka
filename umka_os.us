@@ -1,4 +1,4 @@
-umka_set_boot_params --bpp 32
+umka_set_boot_params --bpp 32 --x_res 800 --y_res 600
 umka_boot
 ramdisk_init ../img/kolibri.raw
 set_skin /sys/DEFAULT.SKN

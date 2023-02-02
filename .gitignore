@@ -46,3 +46,6 @@ colors.dtp
 apps/board_hello
 apps/board_cycle
 apps/readdir
+apps/loader
+apps/asciivju
+apps/justawindow

@@ -83,8 +83,8 @@ main(int argc, char **argv) {
     int reproducible = 0;
 
     struct optparse options;
-    int opt;
     optparse_init(&options, argv);
+    int opt;
 
     while ((opt = optparse(&options, "i:o:rc")) != -1) {
         switch (opt) {

@@ -641,7 +641,6 @@ cmd_ramdisk_init(struct shell_ctx *ctx, int argc, char **argv) {
 
 static void
 cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
-    (void)ctx;
     const char *usage = \
         "usage: disk_add <file> <name> [option]...\n"
         "  <file>           absolute or relative path\n"
@@ -654,13 +653,13 @@ cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
     size_t cache_size = 0;
     int adjust_cache_size = 0;
     int opt;
-    optind = 1;
-    const char *file_name = argv[optind++];
-    const char *disk_name = argv[optind++];
-    while ((opt = getopt(argc, argv, "c:")) != -1) {
+    optparse_init(&ctx->opts, argv);
+    const char *file_name = optparse_arg(&ctx->opts);
+    const char *disk_name = optparse_arg(&ctx->opts);
+    while ((opt = optparse(&ctx->opts, "c:")) != -1) {
         switch (opt) {
         case 'c':
-            cache_size = strtoul(optarg, NULL, 0);
+            cache_size = strtoul(ctx->opts.optarg, NULL, 0);
             adjust_cache_size = 1;
             break;
         default:
@@ -1056,11 +1055,12 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
         fputs(usage, ctx->fout);
         return;
     }
+
     int lbheld = 0, mbheld = 0, rbheld = 0, xabs = 0, yabs = 0;
     int32_t xmoving = 0, ymoving = 0, hscroll = 0, vscroll = 0;
     int opt;
-    optind = 1;
-    while ((opt = getopt(argc, argv, "lmrx:y:h:v:")) != -1) {
+    optparse_init(&ctx->opts, argv);
+    while ((opt = optparse(&ctx->opts, "lmrx:y:h:v:")) != -1) {
         switch (opt) {
         case 'l':
             lbheld = 1;
@@ -1072,15 +1072,15 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
             rbheld = 1;
             break;
         case 'x':
-            switch (*optarg++) {
+            switch (*ctx->opts.optarg++) {
             case '=':
                 xabs = 1;
                 __attribute__ ((fallthrough));
             case '+':
-                xmoving = strtol(optarg, NULL, 0);
+                xmoving = strtol(ctx->opts.optarg, NULL, 0);
                 break;
             case '-':
-                xmoving = -strtol(optarg, NULL, 0);
+                xmoving = -strtol(ctx->opts.optarg, NULL, 0);
                 break;
             default:
                 fputs(usage, ctx->fout);
@@ -1088,15 +1088,15 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
             }
             break;
         case 'y':
-            switch (*optarg++) {
+            switch (*ctx->opts.optarg++) {
             case '=':
                 yabs = 1;
                 __attribute__ ((fallthrough));
             case '+':
-                ymoving = strtol(optarg, NULL, 0);
+                ymoving = strtol(ctx->opts.optarg, NULL, 0);
                 break;
             case '-':
-                ymoving = -strtol(optarg, NULL, 0);
+                ymoving = -strtol(ctx->opts.optarg, NULL, 0);
                 break;
             default:
                 fputs(usage, ctx->fout);
@@ -1104,18 +1104,18 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
             }
             break;
         case 'h':
-            if ((optarg[0] != '+') && (optarg[0] != '-')) {
+            if ((ctx->opts.optarg[0] != '+') && (ctx->opts.optarg[0] != '-')) {
                 fputs(usage, ctx->fout);
                 return;
             }
-            hscroll = strtol(optarg, NULL, 0);
+            hscroll = strtol(ctx->opts.optarg, NULL, 0);
             break;
         case 'v':
-            if ((optarg[0] != '+') && (optarg[0] != '-')) {
+            if ((ctx->opts.optarg[0] != '+') && (ctx->opts.optarg[0] != '-')) {
                 fputs(usage, ctx->fout);
                 return;
             }
-            vscroll = strtol(optarg, NULL, 0);
+            vscroll = strtol(ctx->opts.optarg, NULL, 0);
             break;
         default:
             fputs(usage, ctx->fout);
@@ -2438,28 +2438,28 @@ cmd_ls(struct shell_ctx *ctx, int argc, char **argv, const char *usage,
         return;
     }
     int opt;
-    optind = 1;
     const char *optstring = (f70or80 == F70) ? "f:c:e:" : "f:c:e:p:";
     const char *path = ".";
     uint32_t readdir_enc = DEFAULT_READDIR_ENCODING;
     uint32_t path_enc = DEFAULT_PATH_ENCODING;
     uint32_t from_idx = 0, count = MAX_DIRENTS_TO_READ;
-    if (argc > 1 && *argv[optind] != '-') {
-        path = argv[optind++];
+    optparse_init(&ctx->opts, argv);
+    if (argc > 1 && argv[1][0] != '-') {
+        path = optparse_arg(&ctx->opts);
     }
-    while ((opt = getopt(argc, argv, optstring)) != -1) {
+    while ((opt = optparse(&ctx->opts, optstring)) != -1) {
         switch (opt) {
         case 'f':
-            from_idx = strtoul(optarg, NULL, 0);
+            from_idx = strtoul(ctx->opts.optarg, NULL, 0);
             break;
         case 'c':
-            count = strtoul(optarg, NULL, 0);
+            count = strtoul(ctx->opts.optarg, NULL, 0);
             break;
         case 'e':
-            readdir_enc = parse_encoding(optarg);
+            readdir_enc = parse_encoding(ctx->opts.optarg);
             break;
         case 'p':
-            path_enc = parse_encoding(optarg);
+            path_enc = parse_encoding(ctx->opts.optarg);
             break;
         default:
             fputs(usage, ctx->fout);
@@ -2525,6 +2525,7 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
         fputs(usage, ctx->fout);
         return;
     }
+    optparse_init(&ctx->opts, argv);
     bool force_ctime = false, force_mtime = false, force_atime = false;
     f7080s5arg_t fX0 = {.sf = 5, .flags = 0};
     f7080ret_t r;
@@ -2532,10 +2533,10 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
     fX0.buf = &file;
     if (f70or80 == F70) {
         fX0.u.f70.zero = 0;
-        fX0.u.f70.path = argv[1];
+        fX0.u.f70.path = optparse_arg(&ctx->opts);
     } else {
         fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
-        fX0.u.f80.path = argv[1];
+        fX0.u.f80.path = optparse_arg(&ctx->opts);
     }
     COVERAGE_ON();
     umka_sys_lfn(&fX0, &r, f70or80);
@@ -2551,8 +2552,7 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, f70or80_t f70or80) {
     }
 
     int opt;
-    optind = 2; // skip command and file
-    while ((opt = getopt(argc, argv, "cma")) != -1) {
+    while ((opt = optparse(&ctx->opts, "cma")) != -1) {
         switch (opt) {
         case 'c':
             force_ctime = true;
@@ -3735,11 +3735,11 @@ cmd_board_get(struct shell_ctx *ctx, int argc, char **argv) {
         fputs(usage, ctx->fout);
         return;
     }
+    optparse_init(&ctx->opts, argv);
     int line = 0;
     int force_newline = 0;
     int opt;
-    optind = 1;
-    while ((opt = getopt(argc, argv, "ln")) != -1) {
+    while ((opt = optparse(&ctx->opts, "ln")) != -1) {
         switch (opt) {
         case 'l':
             line = 1;

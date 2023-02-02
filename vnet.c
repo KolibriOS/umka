@@ -53,7 +53,7 @@ vnet_input(void *udata) {
     if (plen == -1) {
         plen = 0;   // we have just allocated a buffer, so we have to submit it
     }
-//if (plen != 0)
+
     fprintf(stderr, "[vnet] read %i bytes\n", plen);
     for (int i = 0; i < plen; i++) {
         fprintf(stderr, " %2.2x", buf->data[i]);
@@ -85,7 +85,6 @@ vnet_input_monitor(struct vnet *net) {
 
 struct vnet *
 vnet_init(enum vnet_type type) {
-//    printf("vnet_init\n");
     struct vnet *vnet;
     switch (type) {
     case VNET_FILE:

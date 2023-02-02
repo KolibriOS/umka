@@ -14,6 +14,7 @@
 #include <pthread.h>
 #include "umka.h"
 #include "umkaio.h"
+#include "optparse.h"
 
 enum shell_var_type {
     SHELL_VAR_SINT,
@@ -44,7 +45,7 @@ struct shell_ctx {
     const int *running;
     pthread_cond_t cmd_done;
     pthread_mutex_t cmd_mutex;
-
+    struct optparse opts;
 };
 
 struct shell_ctx *

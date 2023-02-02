@@ -11,7 +11,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <netinet/in.h>
 #define __USE_GNU
 #include <signal.h>
 #include <stdatomic.h>
@@ -20,14 +19,9 @@
 #include <unistd.h>
 #define __USE_MISC
 #include <sys/mman.h>
-#include <sys/select.h>
-#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#define __USE_GNU
-#include <sys/uio.h>
-#include <threads.h>
 #include <SDL2/SDL.h>
 #include "umka.h"
 #include "umkart.h"
@@ -40,6 +34,8 @@
 #define HIST_FILE_BASENAME ".umka_os.history"
 
 #define THREAD_STACK_SIZE 0x100000
+#define APP_MAX_MEM_SIZE 0x1000000
+#define UMKA_LDR_BASE ((void*)0x1000000)
 
 struct umka_os_ctx {
     struct umka_ctx *umka;
@@ -117,7 +113,7 @@ dump_procs() {
         appdata_t *p_begin = kos_scheduler_current[i];
         appdata_t *p = p_begin;
         do {
-            printf(" %p", (void*)p);
+            fprintf(stderr, " %p", (void*)p);
             p = p->in_schedule.next;
         } while (p != p_begin);
         putchar('\n');
@@ -125,20 +121,17 @@ dump_procs() {
 }
 
 int
-load_app_host(const char *fname, void *base) {
+load_app_host(const char *fname, struct app_hdr *app) {
     FILE *f = fopen(fname, "r");
     if (!f) {
-        perror("Can't open app file");
+        fprintf(stderr, "[!] can't open app file: %s", fname);
         exit(1);
     }
-    fread(base, 1, 0x100000, f);
+    fread(app, 1, APP_MAX_MEM_SIZE, f);
     fclose(f);
 
-    for (size_t i = 0; i < 0x64; i++) {
-        fprintf(stderr, "%2.2hx ", ((uint8_t*)base)[i]);
-    }
-    fprintf(stderr, "\n");
-
+    kos_thread_t start = (kos_thread_t)(app->menuet.start);
+    thread_start(0, start, THREAD_STACK_SIZE);
     return 0;
 }
 
@@ -177,13 +170,13 @@ hw_int(int signo) {
     umka_sti();
 }
 
-int
+static void *
 umka_display(void *arg) {
     (void)arg;
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         fprintf(stderr, "Failed to initialize the SDL2 library\n");
-        return -1;
+        return NULL;
     }
 
     char title[64];
@@ -199,7 +192,7 @@ umka_display(void *arg) {
     if(!window)
     {
         fprintf(stderr, "Failed to create window\n");
-        return -1;
+        return NULL;
     }
 
     SDL_Surface *window_surface = SDL_GetWindowSurface(window);
@@ -207,7 +200,7 @@ umka_display(void *arg) {
     if(!window_surface)
     {
         fprintf(stderr, "Failed to get the surface from the window\n");
-        return -1;
+        return NULL;
     }
 
     void (*copy_display)(void *);
@@ -229,7 +222,7 @@ umka_display(void *arg) {
         SDL_UpdateWindowSurface(window);
         sleep(1);
     }
-    return 0;
+    return NULL;
 }
 
 uint32_t
@@ -249,7 +242,7 @@ umka_thread_cmd_runner() {
     }
 }
 
-static int
+static void *
 umka_monitor(void *arg) {
     (void)arg;
     run_test(os->shell);
@@ -371,7 +364,7 @@ main(int argc, char *argv[]) {
 
     sa.sa_sigaction = handle_i40;
     sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_SIGINFO | SA_RESTART;
+    sa.sa_flags = SA_SIGINFO | SA_NODEFER | SA_RESTART;
 
     if (sigaction(SIGSEGV, &sa, NULL) == -1) {
         fprintf(stderr, "Can't install 0x40 interrupt handler!\n");
@@ -387,12 +380,20 @@ main(int argc, char *argv[]) {
         return 1;
     }
 
-    struct app_hdr *app = mmap(KOS_APP_BASE, 16*0x100000, PROT_READ | PROT_WRITE
-        | PROT_EXEC, MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (app == MAP_FAILED) {
-        perror("mmap failed");
+    struct app_hdr *app_std = mmap(KOS_APP_BASE, APP_MAX_MEM_SIZE, PROT_READ
+        | PROT_WRITE | PROT_EXEC, MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (app_std == MAP_FAILED) {
+        perror("mmap app_std failed");
         exit(1);
     }
+    memset((void*)app_std, 0, APP_MAX_MEM_SIZE);
+    struct app_hdr *app_ldr = mmap(UMKA_LDR_BASE, APP_MAX_MEM_SIZE, PROT_READ
+        | PROT_WRITE | PROT_EXEC, MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (app_ldr == MAP_FAILED) {
+        perror("mmap app_ldr failed");
+        exit(1);
+    }
+    memset((void*)app_ldr, 0, APP_MAX_MEM_SIZE);
 
     kos_boot.bpp = UMKA_DEFAULT_DISPLAY_BPP;
     kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
@@ -403,8 +404,6 @@ main(int argc, char *argv[]) {
     os->shell->fin = fin;
     umka_stack_init();
 
-//    load_app_host("../apps/board_cycle", app);
-    load_app_host("../apps/readdir", app);
 //    load_app("/rd/1/loader");
 
     struct vnet *vnet = vnet_init(VNET_TAP);
@@ -452,17 +451,18 @@ main(int argc, char *argv[]) {
 
     thread_start(1, umka_thread_board, THREAD_STACK_SIZE);
     thread_start(1, umka_thread_cmd_runner, THREAD_STACK_SIZE);
-    kos_thread_t start = (kos_thread_t)(KOS_APP_BASE + app->menuet.start);
-    thread_start(0, start, THREAD_STACK_SIZE);
+    load_app_host("../apps/loader", UMKA_LDR_BASE);
+//    load_app_host("../apps/justawindow", KOS_APP_BASE);
+    load_app_host("../apps/asciivju", KOS_APP_BASE);
 
     dump_procs();
 
-    thrd_t thrd_monitor;
-    thrd_create(&thrd_monitor, umka_monitor, NULL);
+    pthread_t thread_monitor;
+    pthread_create(&thread_monitor, NULL, umka_monitor, NULL);
 
     if (show_display) {
-        thrd_t thrd_display;
-        thrd_create(&thrd_display, umka_display, NULL);
+        pthread_t thread_display;
+        pthread_create(&thread_display, NULL, umka_display, NULL);
     }
 
     setitimer(ITIMER_REAL, &timeout, NULL);
