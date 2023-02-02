@@ -2892,9 +2892,9 @@ cmd_net_add_device(struct shell_ctx *ctx, int argc, char **argv) {
         fputs(usage, ctx->fout);
         return;
     }
-    struct vnet *net = vnet_init(VNET_TAP); // TODO: list like block devices
+    struct vnet *vnet = vnet_init(VNET_TAP); // TODO: list like block devices
     COVERAGE_ON();
-    int32_t dev_num = kos_net_add_device(&net->netdev);
+    int32_t dev_num = kos_net_add_device(&vnet->eth.net);
     COVERAGE_OFF();
     fprintf(ctx->fout, "device number: %" PRIi32 "\n", dev_num);
 }

@@ -22,7 +22,7 @@ enum vnet_type {
 };
 
 struct vnet {
-    net_device_t netdev;
+    struct eth_device eth;
     int fdin;
     int fdout;
     int input_processed;

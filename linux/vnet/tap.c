@@ -25,14 +25,14 @@
 
 static STDCALL void
 vnet_unload_tap() {
-    printf("vnet_unload\n");
+    printf("vnet_unload_tap\n");
     COVERAGE_ON();
     COVERAGE_OFF();
 }
 
 static STDCALL void
 vnet_reset_tap() {
-    printf("vnet_reset\n");
+    printf("vnet_reset_tap\n");
     COVERAGE_ON();
     COVERAGE_OFF();
 }
@@ -49,18 +49,18 @@ static STDCALL int
 vnet_transmit_tap(net_buff_t *buf) {
     struct vnet *net;
     __asm__ __inline__ __volatile__ (
-        "nop"
+        ""
         : "=b"(net)
         :
         : "memory");
 
     printf("vnet_transmit: %d bytes\n", buf->length);
     dump_net_buff(buf);
-    write(net->fdout, buf->data, buf->length);
+    ssize_t written = write(net->fdout, buf->data, buf->length);
     buf->length = 0;
     COVERAGE_OFF();
     COVERAGE_ON();
-    printf("vnet_transmit: done\n");
+    printf("vnet_transmit: %d bytes written\n", written);
     return 0;
 }
 
@@ -71,7 +71,7 @@ vnet_init_tap() {
     int fd, err;
 
     if( (fd = open(TAP_DEV, O_RDWR | O_NONBLOCK)) < 0 ) {
-        perror("Opening /dev/net/tun");
+        perror("Opening " TAP_DEV );
         return NULL;
     }
 
@@ -125,18 +125,23 @@ vnet_init_tap() {
         return NULL;
     }
 
-    struct vnet *net = malloc(sizeof(struct vnet));
-    net->netdev.device_type = NET_TYPE_ETH;
-    net->netdev.mtu = 1514;
-    net->netdev.name = "UMK0770";
+    struct vnet *vnet = malloc(sizeof(struct vnet));
+    vnet->eth.net.device_type = NET_TYPE_ETH;
+    vnet->eth.net.mtu = 1514;
+    char *devname = malloc(8);
+    sprintf(devname, "UMKTAP%d", 0);   // FIXME: support more devices
+    vnet->eth.net.name = devname;
 
-    net->netdev.unload = vnet_unload_tap;
-    net->netdev.reset = vnet_reset_tap;
-    net->netdev.transmit = vnet_transmit_tap;
+    vnet->eth.net.unload = vnet_unload_tap;
+    vnet->eth.net.reset = vnet_reset_tap;
+    vnet->eth.net.transmit = vnet_transmit_tap;
 
-    net->fdin = fd;
-    net->fdout = fd;
-    net->input_processed = 1;
+    vnet->fdin = fd;
+    vnet->fdout = fd;
+    vnet->input_processed = 1;
 
-    return net;
+    memcpy(vnet->eth.mac, (uint8_t[]){0x80, 0x2b, 0xf9, 0x3b, 0x6c, 0xca},
+           sizeof(vnet->eth.mac));
+
+    return vnet;
 }

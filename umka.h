@@ -22,8 +22,6 @@
 #ifndef _WIN32
 #include <signal.h> // for irq0: siginfo_t
 #else
-//typedef int32_t ssize_t;
-//typedef int64_t off_t;
 typedef void siginfo_t;
 #endif
 
@@ -41,6 +39,8 @@ struct umka_ctx {
 #define KEYBOARD_MODE_ASCII     0
 #define KEYBOARD_MODE_SCANCODES 1
 
+#define UMKA_IRQ_BASE 0x20  // skip CPU exceptions
+#define UMKA_SIGNAL_IRQ SIGSYS
 #define UMKA_IRQ_MOUSE 14
 #define UMKA_IRQ_NETWORK 15
 
@@ -451,41 +451,21 @@ typedef struct {
 // Protocol family
 #define AF_INET4  AF_INET
 
-/*
-struct sockaddr_in {
-    uint16_t sin_family;    // sa_family_t
-    uint16_t sin_port;      // in_port_t
-    uint32_t sin_addr;      // struct in_addr
-    uint8_t sin_zero[8];    // zero
-};
-
-struct addrinfo {
-    uint32_t ai_flags;      // bitmask of AI_*
-    uint32_t ai_family;     // PF_*
-    uint32_t ai_socktype;   // SOCK_*
-    uint32_t ai_protocol;   // 0 or IPPROTO_*
-    uint32_t ai_addrlen;    // length of ai_addr
-    uint32_t ai_canonname;  // char*
-    uint32_t ai_addr;       // struct sockaddr*
-    uint32_t ai_next;       // struct addrinfo*
-};
-*/
-
-typedef struct net_device_t net_device_t;
+struct net_device;
 
 #define NET_BUFFER_SIZE 0x800
 
 typedef struct {
         void *next;     // pointer to next frame in list
         void *prev;     // pointer to previous frame in list
-        net_device_t *device;   // ptr to NET_DEVICE structure
+        struct net_device *device;  // ptr to NET_DEVICE structure
         uint32_t type;  // encapsulation type: e.g. Ethernet
         size_t length;  // size of encapsulated data
         size_t offset;  // offset to actual data (24 bytes for default frame)
         uint8_t data[];
 } net_buff_t;
 
-struct net_device_t {
+struct net_device {
     uint32_t device_type;   // type field
     uint32_t mtu;           // Maximal Transmission Unit
     char *name;             // ptr to 0 terminated string
@@ -495,16 +475,27 @@ struct net_device_t {
     STDCALL void (*reset) (void);
     STDCALL int (*transmit) (net_buff_t *);
 
-    uint64_t bytes_tx;      // statistics, updated by the driver
-    uint64_t bytes_rx;
-    uint32_t packets_tx;
-    uint32_t packets_rx;
-
     uint32_t link_state;    // link state (0 = no link)
     uint32_t hwacc;         // bitmask stating enabled HW accelerations (offload
                             // engines)
-    uint8_t mac[6];
+    uint64_t bytes_tx;      // statistics, updated by the driver
+    uint64_t bytes_rx;
+
+    uint32_t packets_tx;
+    uint32_t packets_tx_err;
+    uint32_t packets_tx_drop;
+    uint32_t packets_tx_ovr;
+
+    uint32_t packets_rx;
+    uint32_t packets_rx_err;
+    uint32_t packets_rx_drop;
+    uint32_t packets_rx_ovr;
 }; // NET_DEVICE
+
+struct eth_device {
+    struct net_device net;
+    uint8_t mac[6];
+};
 
 typedef struct {
     uint32_t ip;
@@ -853,7 +844,7 @@ umka_stack_init() {
 }
 
 static inline int32_t
-kos_net_add_device(net_device_t *dev) {
+kos_net_add_device(struct net_device *dev) {
     int32_t dev_num;
     __asm__ __inline__ __volatile__ (
         "call   net_add_device"

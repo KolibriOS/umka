@@ -167,21 +167,13 @@ handle_i40(int signo, siginfo_t *info, void *context) {
 }
 
 static void
-handle_irq_net(int signo, siginfo_t *info, void *context) {
+hw_int(int signo) {
     (void)signo;
-    (void)info;
-    (void)context;
-    kos_irq_serv_irq10();
-}
-
-static void
-hw_int(int signo, siginfo_t *info, void *context) {
-    (void)signo;
-    (void)context;
-    struct idt_entry *e = kos_idts + info->si_value.sival_int + 0x20;
-    void (*handler)(void) = (void(*)(void)) (((uintptr_t)e->addr_hi << 16)
-                                             + e->addr_lo);
-    handler();
+    size_t irq = atomic_load_explicit(&umka_irq_number, memory_order_acquire);
+    struct idt_entry *e = kos_idts + UMKA_IRQ_BASE + irq;
+    uintptr_t handler_addr = ((uintptr_t)e->addr_hi << 16) + e->addr_lo;
+    void (*irq_handler)(void) = (void(*)(void)) handler_addr;
+    irq_handler();
     umka_sti();
 }
 
@@ -332,6 +324,14 @@ main(int argc, char *argv[]) {
         }
     }
 
+    if (startupfile) {
+        fstartup = fopen(startupfile, "r");
+        if (!fstartup) {
+            fprintf(stderr, "[!] can't open file for reading: %s\n",
+                    startupfile);
+            exit(1);
+        }
+    }
     if (infile) {
         fin = fopen(infile, "r");
         if (!fin) {
@@ -349,49 +349,41 @@ main(int argc, char *argv[]) {
     if (boardlogfile) {
         fboardlog = fopen(boardlogfile, "w");
         if (!fboardlog) {
-            fprintf(stderr, "[!] can't open file for writing: %s\n", outfile);
+            fprintf(stderr, "[!] can't open file for writing: %s\n",
+                    boardlogfile);
             exit(1);
         }
     } else {
         fboardlog = fout;
     }
 
-    os = umka_os_init(fin, fout, fboardlog);
+    os = umka_os_init(fstartup, fout, fboardlog);
 
     struct sigaction sa;
     sa.sa_sigaction = irq0;
     sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_SIGINFO;
+    sa.sa_flags = SA_SIGINFO | SA_RESTART;
 
     if (sigaction(SIGALRM, &sa, NULL) == -1) {
-        fprintf(stderr, "Can't install SIGALRM handler!\n");
+        fprintf(stderr, "Can't install timer interrupt handler!\n");
         return 1;
     }
 
     sa.sa_sigaction = handle_i40;
     sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_SIGINFO;
+    sa.sa_flags = SA_SIGINFO | SA_RESTART;
 
     if (sigaction(SIGSEGV, &sa, NULL) == -1) {
-        fprintf(stderr, "Can't install SIGSEGV handler!\n");
+        fprintf(stderr, "Can't install 0x40 interrupt handler!\n");
         return 1;
     }
 
-    sa.sa_sigaction = handle_irq_net;
+    sa.sa_handler = hw_int;
     sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_SIGINFO;
+    sa.sa_flags = SA_RESTART;
 
-    if (sigaction(SIGUSR1, &sa, NULL) == -1) {
-        fprintf(stderr, "Can't install SIGUSR1 handler!\n");
-        return 1;
-    }
-
-    sa.sa_sigaction = hw_int;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_SIGINFO;
-
-    if (sigaction(SIGSYS, &sa, NULL) == -1) {
-        fprintf(stderr, "Can't install SIGSYS handler!\n");
+    if (sigaction(UMKA_SIGNAL_IRQ, &sa, NULL) == -1) {
+        fprintf(stderr, "Can't install hardware interrupt handler!\n");
         return 1;
     }
 
@@ -408,16 +400,16 @@ main(int argc, char *argv[]) {
     kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH * UMKA_DEFAULT_DISPLAY_BPP / 8;
 
     run_test(os->shell);
-    os->shell->fin = stdin;
+    os->shell->fin = fin;
     umka_stack_init();
 
 //    load_app_host("../apps/board_cycle", app);
     load_app_host("../apps/readdir", app);
 //    load_app("/rd/1/loader");
 
-    struct vnet *net = vnet_init(VNET_TAP);
-    if (net) {
-        kos_net_add_device(&net->netdev);
+    struct vnet *vnet = vnet_init(VNET_TAP);
+    if (vnet) {
+        kos_net_add_device(&vnet->eth.net);
     } else {
         fprintf(stderr, "[!] can't initialize vnet device\n");
     }
@@ -427,36 +419,34 @@ main(int argc, char *argv[]) {
         umka_sys_net_dev_reset(i);
         umka_sys_net_get_dev_name(i, devname);
         uint32_t devtype = umka_sys_net_get_dev_type(i);
-        fprintf(stderr, "[net_drv] device %i: %s %u\n", i, devname, devtype);
+        fprintf(stderr, "[!] device %i: %s %u\n", i, devname, devtype);
     }
 
-/*
     // network setup should be done from the userspace app, e.g. via zeroconf
     f76ret_t r76;
     r76 = umka_sys_net_ipv4_set_subnet(1, inet_addr("255.255.255.0"));
     if (r76.eax == (uint32_t)-1) {
-        fprintf(stderr, "[net_drv] set subnet error\n");
-        return -1;
+        fprintf(stderr, "[!] set subnet error\n");
+//        return -1;
     }
 
     r76 = umka_sys_net_ipv4_set_gw(1, inet_addr("10.50.0.1"));
     if (r76.eax == (uint32_t)-1) {
-        fprintf(stderr, "set gw error\n");
-        return -1;
+        fprintf(stderr, "[!] set gw error\n");
+//        return -1;
     }
 
-    r76 = umka_sys_net_ipv4_set_dns(1, inet_addr("217.10.36.5"));
+    r76 = umka_sys_net_ipv4_set_dns(1, inet_addr("192.168.1.1"));
     if (r76.eax == (uint32_t)-1) {
-        fprintf(stderr, "[net_drv] set dns error\n");
-        return -1;
+        fprintf(stderr, "[!] set dns error\n");
+//        return -1;
     }
 
     r76 = umka_sys_net_ipv4_set_addr(1, inet_addr("10.50.0.2"));
     if (r76.eax == (uint32_t)-1) {
-        fprintf(stderr, "[net_drv] set ip addr error\n");
-        return -1;
+        fprintf(stderr, "[!] set ip addr error\n");
+//        return -1;
     }
-*/
 
     kos_attach_int_handler(UMKA_IRQ_MOUSE, hw_int_mouse, NULL);
 
