@@ -10,16 +10,18 @@ AR ?= ar
 CC ?= gcc
 WARNINGS_COMMON=-Wall -Wextra \
          -Wnull-dereference -Wshadow -Wformat=2 -Wswitch -Wswitch-enum \
-         -Wpedantic \
+         -Wpedantic -Wstrict-prototypes \
          #-Wconversion -Wsign-conversion
 NOWARNINGS_COMMON=-Wno-address-of-packed-member
 
 ifneq (,$(findstring gcc,$(CC)))
         WARNINGS=$(WARNINGS_COMMON) -Wduplicated-cond -Wduplicated-branches -Wrestrict -Wlogical-op -Wjump-misses-init
         NOWARNINGS=$(NOWARNINGS_COMMON)
+        CFLAGS_BESTLINE=-Wno-logical-op
 else ifneq (,$(findstring clang,$(CC)))
         WARNINGS=$(WARNINGS_COMMON)
         NOWARNINGS=$(NOWARNINGS_COMMON) -Wno-missing-prototype-for-cc
+        CFLAGS_BESTLINE=
 else
         $(error your compiler is not supported)
 endif
@@ -95,10 +97,10 @@ lodepng.o: lodepng.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
 
 bestline32.o: bestline.c bestline.h
-	$(CC) $(CFLAGS_32) -Wno-logical-op -Wno-switch-enum -c $< -o $@
+	$(CC) $(CFLAGS_32) $(CFLAGS_BESTLINE) -Wno-switch-enum -c $< -o $@
 
 bestline.o: bestline.c bestline.h
-	$(CC) $(CFLAGS) -Wno-logical-op -Wno-switch-enum -c $< -o $@
+	$(CC) $(CFLAGS) -Wno-switch-enum -c $< -o $@
 
 optparse32.o: optparse.c optparse.h
 	$(CC) $(CFLAGS_32) -c $< -o $@

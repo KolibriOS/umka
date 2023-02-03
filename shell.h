@@ -10,6 +10,7 @@
 #ifndef SHELL_H_INCLUDED
 #define SHELL_H_INCLUDED
 
+#include <stdatomic.h>
 #include <stdio.h>
 #include <pthread.h>
 #include "umka.h"
@@ -42,7 +43,7 @@ struct shell_ctx {
     struct shell_var *var;
     FILE *fin;
     FILE *fout;
-    const int *running;
+    const atomic_int *running;
     pthread_cond_t cmd_done;
     pthread_mutex_t cmd_mutex;
     struct optparse opts;
@@ -50,7 +51,7 @@ struct shell_ctx {
 
 struct shell_ctx *
 shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
-           struct umka_io *io, FILE *fin, FILE *fout, const int *running);
+           struct umka_io *io, FILE *fin, FILE *fout, const atomic_int *running);
 
 void
 shell_close(struct shell_ctx *shell);

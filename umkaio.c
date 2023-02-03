@@ -40,7 +40,7 @@ thread_io(void *arg) {
         switch (cmd->type) {
         case IOT_CMD_TYPE_READ:
             ret = read(cmd->read.arg.fd, cmd->read.arg.buf, cmd->read.arg.count);
-            atomic_store_explicit(&cmd->read.ret.val, ret, memory_order_release);
+            cmd->read.ret.val = ret;
             break;
         case IOT_CMD_TYPE_WRITE:
             cmd->read.ret.val = write(cmd->read.arg.fd, cmd->read.arg.buf,
@@ -57,7 +57,7 @@ thread_io(void *arg) {
 }
 
 static uint32_t
-io_async_submit_wait_test() {
+io_async_submit_wait_test(void) {
 //    appdata_t *app;
 //    __asm__ __volatile__ ("":"=b"(app)::);
 //    struct io_uring_queue *q = app->wait_param;
@@ -66,7 +66,7 @@ io_async_submit_wait_test() {
 }
 
 static uint32_t
-io_async_complete_wait_test() {
+io_async_complete_wait_test(void) {
 //    appdata_t *app;
 //    __asm__ __volatile__ ("":"=b"(app)::);
 //    struct io_uring_queue *q = app->wait_param;
@@ -89,7 +89,7 @@ io_async_read(int fd, void *buf, size_t count, void *arg) {
     pthread_cond_signal(&cmd->iot_cond);
     kos_wait_events(io_async_complete_wait_test, NULL);
 
-    ssize_t res = atomic_load_explicit(&cmd->read.ret.val, memory_order_acquire);
+    ssize_t res = cmd->read.ret.val;
 
     atomic_store_explicit(&cmd->status, UMKA_CMD_STATUS_EMPTY, memory_order_release);
     pthread_mutex_unlock(&cmd->mutex);
@@ -107,7 +107,7 @@ io_async_write(int fd, const void *buf, size_t count, void *arg) {
 }
 
 struct umka_io *
-io_init(int *running) {
+io_init(atomic_int *running) {
     struct umka_io *io = malloc(sizeof(struct umka_io));
     io->running = running;
     if (running) {

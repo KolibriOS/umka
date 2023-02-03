@@ -24,14 +24,14 @@
 #define TAP_DEV "/dev/net/tun"
 
 static STDCALL void
-vnet_unload_tap() {
+vnet_unload_tap(void) {
     printf("vnet_unload_tap\n");
     COVERAGE_ON();
     COVERAGE_OFF();
 }
 
 static STDCALL void
-vnet_reset_tap() {
+vnet_reset_tap(void) {
     printf("vnet_reset_tap\n");
     COVERAGE_ON();
     COVERAGE_OFF();
@@ -68,7 +68,7 @@ vnet_transmit_tap(net_buff_t *buf) {
 }
 
 struct vnet *
-vnet_init_tap() {
+vnet_init_tap(void) {
     struct ifreq ifr = {.ifr_name = UMKA_VNET_NAME,
                         .ifr_flags = IFF_TAP | IFF_NO_PI};
     int fd, err;

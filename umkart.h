@@ -9,8 +9,11 @@
 #ifndef UMKART_H_INCLUDED
 #define UMKART_H_INCLUDED
 
+#include <stdatomic.h>
 #include "umka.h"
 #include "shell.h"
+
+extern atomic_int umka_irq_number;
 
 extern struct umka_cmd umka_cmd_buf[CMD_BUF_LEN];
 

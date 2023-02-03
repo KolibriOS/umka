@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "umka.h"
+#include "umkart.h"
 #include "trace.h"
 #include "vnet.h"
 #include "vnet/tap.h"

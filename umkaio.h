@@ -10,11 +10,12 @@
 #ifndef UMKAIO_H_INCLUDED
 #define UMKAIO_H_INCLUDED
 
+#include <stdatomic.h>
 #include <stddef.h>
 #include <pthread.h>
 
 struct umka_io {
-    const int *running;
+    const atomic_int *running;
     pthread_t iot;
 };
 
@@ -57,7 +58,7 @@ struct iot_cmd {
     pthread_cond_t iot_cond;
     pthread_mutex_t iot_mutex;
     pthread_mutex_t mutex;
-    int status;
+    atomic_int status;
     int type;
     union {
         union iot_cmd_read read;
@@ -66,7 +67,7 @@ struct iot_cmd {
 };
 
 struct umka_io *
-io_init(int *running);
+io_init(atomic_int *running);
 
 void
 io_close(struct umka_io *io);

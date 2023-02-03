@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <signal.h>
+#include <stdatomic.h>
 #include <stddef.h>
 #include <string.h>
 #include <sys/types.h>
@@ -30,7 +31,7 @@ typedef void siginfo_t;
 
 struct umka_ctx {
     int booted;
-    int running;
+    atomic_int running;
 };
 
 #define UMKA_DEFAULT_DISPLAY_BPP 32
@@ -527,11 +528,11 @@ typedef struct {
 } kos_node_package_t;
 
 static inline void
-umka_osloop() {
+umka_osloop(void) {
     __asm__ __inline__ __volatile__ (
-        "pushad;"
+        "pusha;"
         "call   kos_osloop;"
-        "popad"
+        "popa"
         :
         :
         : "memory", "cc");
@@ -660,21 +661,21 @@ kos_wait_event(void *event, uint32_t uid) {
         : "memory", "cc");
 }
 
-typedef uint32_t (*wait_test_t)(void *);
+typedef uint32_t (*wait_test_t)(void);
 
 static inline void *
 kos_wait_events(wait_test_t wait_test, void *wait_param) {
     void *res;
     __asm__ __inline__ __volatile__ (
-        "push   %%ebx;"
-        "push   %%esi;"
-        "push   %%edi;"
-        "push   %%ebp;"
+        "push   ebx;"
+        "push   esi;"
+        "push   edi;"
+        "push   ebp;"
         "call   _kos_wait_events;"
-        "pop    %%ebp;"
-        "pop    %%edi;"
-        "pop    %%esi;"
-        "pop    %%ebx"
+        "pop    ebp;"
+        "pop    edi;"
+        "pop    esi;"
+        "pop    ebx"
         : "=a"(res)
         : "c"(wait_param),
           "d"(wait_test)
@@ -690,9 +691,9 @@ umka_fs_execute(const char *filename) {
 // eax String length
     int32_t result;
     __asm__ __inline__ __volatile__ (
-        "push   %%ebp;"
+        "push   ebp;"
         "call   kos_fs_execute;"
-        "pop    %%ebp"
+        "pop    ebp"
         : "=a"(result)
         : "a"(strlen(filename)),
           "b"(filename),
@@ -703,16 +704,16 @@ umka_fs_execute(const char *filename) {
 }
 
 static inline size_t
-umka_new_sys_threads(uint32_t flags, void (*entry)(), void *stack) {
+umka_new_sys_threads(uint32_t flags, void (*entry)(void), void *stack) {
     size_t tid;
     __asm__ __inline__ __volatile__ (
-        "push %%ebx;"
-        "push %%esi;"
-        "push %%edi;"
+        "push   ebx;"
+        "push   esi;"
+        "push   edi;"
         "call   kos_new_sys_threads;"
-        "pop %%edi;"
-        "pop %%esi;"
-        "pop %%ebx"
+        "pop    edi;"
+        "pop    esi;"
+        "pop    ebx"
         : "=a"(tid)
         : "b"(flags),
           "c"(entry),
@@ -722,7 +723,7 @@ umka_new_sys_threads(uint32_t flags, void (*entry)(), void *stack) {
 }
 
 static inline void
-kos_enable_acpi() {
+kos_enable_acpi(void) {
     __asm__ __inline__ __volatile__ (
         "pusha;"
         "call   enable_acpi;"
@@ -780,7 +781,7 @@ struct pci_dev {
 extern struct pci_dev *kos_pci_root;
 
 void
-kos_acpi_aml_init();
+kos_acpi_aml_init(void);
 
 STDCALL void
 kos_aml_attach(acpi_node_t *parent, acpi_node_t *node);
@@ -789,7 +790,7 @@ STDCALL void
 kos_acpi_fill_pci_irqs(void *ctx);
 
 STDCALL amlctx_t*
-kos_acpi_aml_new_thread();
+kos_acpi_aml_new_thread(void);
 
 STDCALL acpi_node_t*
 kos_aml_alloc_node(int32_t type);
@@ -834,7 +835,7 @@ typedef struct {
 } f76ret_t;
 
 static inline void
-umka_stack_init() {
+umka_stack_init(void) {
     __asm__ __inline__ __volatile__ (
         "pusha;"
         "call   kos_stack_init;"
@@ -1127,36 +1128,16 @@ umka_scheduler_add_thread(appdata_t *thread, int32_t priority) {
 
 extern appdata_t *kos_scheduler_current[KOS_NR_SCHED_QUEUES];
 
-typedef struct {
-    appdata_t *appdata;
-    void *taskdata;
-    int same;
-} find_next_task_t;
-
-static inline find_next_task_t
-umka_find_next_task(int32_t priority) {
-    find_next_task_t fnt;
-    __asm__ __inline__ __volatile__ (
-        "call   find_next_task;"
-        "setz   %%al;"
-        "movzx  %%eax, %%al"
-        : "=b"(fnt.appdata),
-          "=D"(fnt.taskdata),
-          "=a"(fnt.same)
-        : "b"(priority)
-        : "memory", "cc");
-    return fnt;
-}
-
-void i40_asm(uint32_t eax,
-            uint32_t ebx,
-            uint32_t ecx,
-            uint32_t edx,
-            uint32_t esi,
-            uint32_t edi,
-            uint32_t ebp,
-            uint32_t *eax_out,
-            uint32_t *ebx_out);
+void
+i40_asm(uint32_t eax,
+        uint32_t ebx,
+        uint32_t ecx,
+        uint32_t edx,
+        uint32_t esi,
+        uint32_t edi,
+        uint32_t ebp,
+        uint32_t *eax_out,
+        uint32_t *ebx_out);
 
 static inline void
 umka_i40(pushad_t *regs) {
@@ -1203,7 +1184,7 @@ umka_sys_set_pixel(size_t x, size_t y, uint32_t color, int invert) {
 }
 
 static inline uint32_t
-umka_get_key() {
+umka_get_key(void) {
     uint32_t key;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1282,7 +1263,7 @@ umka_sys_process_info(int32_t pid, void *param) {
 }
 
 static inline uint32_t
-umka_sys_wait_for_event() {
+umka_sys_wait_for_event(void) {
     uint32_t event;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1293,7 +1274,7 @@ umka_sys_wait_for_event() {
 }
 
 static inline uint32_t
-umka_sys_check_for_event() {
+umka_sys_check_for_event(void) {
     uint32_t event;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1363,7 +1344,7 @@ umka_sys_bg_put_pixel(uint32_t offset, uint32_t color) {
 }
 
 static inline void
-umka_sys_bg_redraw() {
+umka_sys_bg_redraw(void) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
@@ -1397,7 +1378,7 @@ umka_sys_bg_put_img(void *image, size_t offset, size_t size) {
 }
 
 static inline void *
-umka_sys_bg_map() {
+umka_sys_bg_map(void) {
     void *addr;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1488,7 +1469,7 @@ umka_sys_get_keyboard_layout(int type, void *layout) {
 }
 
 static inline int
-umka_sys_get_keyboard_lang() {
+umka_sys_get_keyboard_lang(void) {
     int status;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1501,7 +1482,7 @@ umka_sys_get_keyboard_lang() {
 }
 
 static inline int
-umka_sys_get_system_lang() {
+umka_sys_get_system_lang(void) {
     int status;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1536,7 +1517,7 @@ umka_sys_get_cwd(const char *buf, size_t len) {
 }
 
 static inline struct point16s
-umka_sys_get_mouse_pos_screen() {
+umka_sys_get_mouse_pos_screen(void) {
     struct point16s pos;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1548,7 +1529,7 @@ umka_sys_get_mouse_pos_screen() {
 }
 
 static inline struct point16s
-umka_sys_get_mouse_pos_window() {
+umka_sys_get_mouse_pos_window(void) {
     struct point16s pos;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1560,7 +1541,7 @@ umka_sys_get_mouse_pos_window() {
 }
 
 static inline struct mouse_state
-umka_sys_get_mouse_buttons_state() {
+umka_sys_get_mouse_buttons_state(void) {
     struct mouse_state mouse;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1572,7 +1553,7 @@ umka_sys_get_mouse_buttons_state() {
 }
 
 static inline struct mouse_state_events
-umka_sys_get_mouse_buttons_state_events() {
+umka_sys_get_mouse_buttons_state_events(void) {
     union {uint32_t x; struct mouse_state_events m;} u;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1694,7 +1675,7 @@ umka_sys_get_window_colors(void *colors) {
 }
 
 static inline uint32_t
-umka_sys_get_skin_height() {
+umka_sys_get_skin_height(void) {
     uint32_t skin_height;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1766,7 +1747,7 @@ umka_sys_set_skin(const char *path) {
 }
 
 static inline int
-umka_sys_get_font_smoothing() {
+umka_sys_get_font_smoothing(void) {
     int type;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1789,7 +1770,7 @@ umka_sys_set_font_smoothing(int type) {
 }
 
 static inline int
-umka_sys_get_font_size() {
+umka_sys_get_font_size(void) {
     uint32_t size;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1823,7 +1804,7 @@ umka_sys_board_put(char c) {
 }
 
 static inline struct board_get_ret
-umka_sys_board_get() {
+umka_sys_board_get(void) {
     struct board_get_ret ret;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1862,7 +1843,7 @@ umka_sys_set_keyboard_mode(int mode) {
 }
 
 static inline int
-umka_sys_get_keyboard_mode() {
+umka_sys_get_keyboard_mode(void) {
     int mode;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1936,7 +1917,7 @@ umka_sys_blit_bitmap(int operation, int background, int transparent,
 }
 
 static inline uint32_t
-umka_sys_net_get_dev_count() {
+umka_sys_net_get_dev_count(void) {
     uint32_t count;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -2439,7 +2420,7 @@ struct cmd_ret_sys_get_mouse_pos_screen {
 };
 
 struct umka_cmd {
-    uint32_t status;
+    atomic_int status;
     uint32_t type;
     union {
         struct cmd_set_mouse_data set_mouse_data;

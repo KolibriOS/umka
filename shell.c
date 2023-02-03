@@ -259,7 +259,7 @@ shell_var_name(struct shell_ctx *ctx, const char *name) {
 }
 
 struct shell_var *
-shell_var_new() {
+shell_var_new(void) {
     struct shell_var *var = (struct shell_var*)malloc(sizeof(struct shell_var));
     var->next = NULL;
     var->name[0] = '\0';
@@ -1427,7 +1427,7 @@ cmd_get_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
         fputs(usage, ctx->fout);
         return;
     }
-    int type;
+    int type = -1;
     if (!strcmp(argv[1], "-t")) {
         const char *type_str = argv[2];
         char *endptr;
@@ -4057,7 +4057,7 @@ run_test(struct shell_ctx *ctx) {
 
 struct shell_ctx *
 shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
-           struct umka_io *io, FILE *fin, FILE *fout, const int *running) {
+           struct umka_io *io, FILE *fin, FILE *fout, const atomic_int *running) {
     struct shell_ctx *ctx = malloc(sizeof(struct shell_ctx));
     ctx->umka = umka;
     ctx->io = io;

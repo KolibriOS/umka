@@ -66,7 +66,8 @@ void wrmsr(uint32_t reg, uint64_t data)
 #endif
 }
 
-void handle_sigtrap() {
+void handle_sigtrap(int signo) {
+    (void)signo;
 #ifndef _WIN32
     uint64_t from = rdmsr(MSR_IA32_LASTBRANCHFROMIP);
     uint64_t to = rdmsr(MSR_IA32_LASTBRANCHTOIP);
@@ -87,11 +88,11 @@ void handle_sigtrap() {
 
 uint32_t set_eflags_tf(uint32_t tf);
 
-void trace_lbr_begin() {
+void trace_lbr_begin(void) {
 #ifndef _WIN32
     struct sigaction action;
-    action.sa_sigaction = &handle_sigtrap;
-    action.sa_flags = SA_SIGINFO;
+    action.sa_handler = &handle_sigtrap;
+    action.sa_flags = 0;
     sigaction(SIGTRAP, &action, NULL);
 
     wrmsr(MSR_IA32_DEBUGCTL, MSR_IA32_DEBUGCTL_LBR + MSR_IA32_DEBUGCTL_BTF);
@@ -105,7 +106,7 @@ void trace_lbr_begin() {
 #endif
 }
 
-void trace_lbr_end() {
+void trace_lbr_end(void) {
 #ifndef _WIN32
     wrmsr(MSR_IA32_DEBUGCTL, 0);
     close(msrfd);

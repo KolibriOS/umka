@@ -84,7 +84,7 @@ umka_os_init(FILE *fin, FILE *fout, FILE *fboardlog) {
     return ctx;
 }
 
-void build_history_filename() {
+void build_history_filename(void) {
     const char *dir_name;
     if (!(dir_name = getenv("HOME"))) {
         dir_name = ".";
@@ -107,7 +107,7 @@ thread_start(int is_kernel, void (*entry)(void), size_t stack_size) {
 }
 
 static void
-dump_procs() {
+dump_procs(void) {
     for (int i = 0; i < KOS_NR_SCHED_QUEUES; i++) {
         fprintf(stderr, "sched queue #%i:", i);
         appdata_t *p_begin = kos_scheduler_current[i];
@@ -203,7 +203,7 @@ umka_display(void *arg) {
         return NULL;
     }
 
-    void (*copy_display)(void *);
+    void (*copy_display)(void *) = NULL;
 
     switch (window_surface->format->format) {
     case SDL_PIXELFORMAT_RGB888:
@@ -225,8 +225,8 @@ umka_display(void *arg) {
     return NULL;
 }
 
-uint32_t
-umka_run_cmd_wait_test(/* void *wait_param in ebx */) {
+static uint32_t
+umka_run_cmd_wait_test(void /* struct appdata * with wait_param is in ebx */) {
     appdata_t *app;
     __asm__ __volatile__ __inline__ ("":"=b"(app)::);
     struct umka_cmd *cmd = (struct umka_cmd*)app->wait_param;
@@ -234,7 +234,7 @@ umka_run_cmd_wait_test(/* void *wait_param in ebx */) {
 }
 
 static void
-umka_thread_cmd_runner() {
+umka_thread_cmd_runner(void) {
     umka_sti();
     while (1) {
         kos_wait_events(umka_run_cmd_wait_test, umka_cmd_buf);
@@ -250,7 +250,7 @@ umka_monitor(void *arg) {
 }
 
 static void
-umka_thread_board() {
+umka_thread_board(void) {
     struct board_get_ret c;
     while (1) {
         c = umka_sys_board_get();

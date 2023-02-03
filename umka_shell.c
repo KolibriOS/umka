@@ -41,7 +41,7 @@ umka_shell_init(int reproducible, FILE *fin, FILE *fout) {
     return ctx;
 }
 
-void build_history_filename() {
+void build_history_filename(void) {
     const char *dir_name;
     if (!(dir_name = getenv("HOME"))) {
         dir_name = ".";

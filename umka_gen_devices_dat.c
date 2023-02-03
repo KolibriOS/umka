@@ -142,7 +142,9 @@ void acpi_process_dev(char *path) {
 }
 
 int
-main () {
+main (int argc, char *argv[]) {
+    (void)argc;
+    (void)argv;
     kos_boot.bpp = 32;
     kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
     kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;

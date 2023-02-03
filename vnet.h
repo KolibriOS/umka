@@ -14,7 +14,6 @@
 
 #define UMKA_VNET_NAME "umka%d"
 #define VNET_BUFIN_CAP (NET_BUFFER_SIZE - offsetof(net_buff_t, data))
-extern uint32_t umka_irq_number;
 
 enum vnet_type {
     VNET_FILE,

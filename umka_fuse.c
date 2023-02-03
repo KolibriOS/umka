@@ -33,7 +33,7 @@ struct umka_fuse_ctx {
 };
 
 static struct umka_fuse_ctx *
-umka_fuse_init() {
+umka_fuse_init(void) {
     struct umka_fuse_ctx *ctx = malloc(sizeof(struct umka_fuse_ctx));
     ctx->umka = umka_init();
     ctx->io = io_init(&ctx->umka->running);

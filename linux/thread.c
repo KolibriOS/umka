@@ -25,6 +25,6 @@ int get_fake_if(ucontext_t *ctx) {
     return !(ctx->uc_mcontext.__gregs[REG_EFL] & (1 << 21));
 }
 
-void system_shutdown() {
+void system_shutdown(void) {
     exit(0);
 }

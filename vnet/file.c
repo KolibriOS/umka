@@ -17,14 +17,14 @@
 #include "vnet.h"
 
 static STDCALL void
-vnet_unload_file() {
+vnet_unload_file(void) {
     printf("vnet_unload_file\n");
     COVERAGE_ON();
     COVERAGE_OFF();
 }
 
 static STDCALL void
-vnet_reset_file() {
+vnet_reset_file(void) {
     printf("vnet_reset_file\n");
     COVERAGE_ON();
     COVERAGE_OFF();
@@ -58,7 +58,7 @@ vnet_transmit_file(net_buff_t *buf) {
 }
 
 struct vnet *
-vnet_init_file() {
+vnet_init_file(void) {
     int fdin;
     int fdout;
 
