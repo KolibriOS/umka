@@ -13,7 +13,7 @@
 #include "umka.h"
 
 #define UMKA_VNET_NAME "umka%d"
-
+#define VNET_BUFIN_CAP (NET_BUFFER_SIZE - offsetof(net_buff_t, data))
 extern uint32_t umka_irq_number;
 
 enum vnet_type {
@@ -23,6 +23,10 @@ enum vnet_type {
 
 struct vnet {
     struct eth_device eth;
+    uint8_t bufin[VNET_BUFIN_CAP];
+    size_t bufin_len;
+//    pthread_cond_t cond;
+//    pthread_mutex_t mutex;
     int fdin;
     int fdout;
     int input_processed;

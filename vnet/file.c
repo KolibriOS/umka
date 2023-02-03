@@ -62,12 +62,12 @@ vnet_init_file() {
     int fdin;
     int fdout;
 
-    if( (fdin = open("/path/to/fdin", O_RDONLY | O_NONBLOCK)) < 0 ) {
+    if( (fdin = open("/path/to/fdin", O_RDONLY)) < 0 ) {
         perror("[vnet_file] can't open input file");
         return NULL;
     }
 
-    if( (fdout = open("/path/to/fdin", O_WRONLY | O_NONBLOCK)) < 0 ) {
+    if( (fdout = open("/path/to/fdin", O_WRONLY)) < 0 ) {
         perror("[vnet_file] can't open output file");
         return NULL;
     }

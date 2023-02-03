@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <signal.h>
 #include <stddef.h>
 #include <string.h>
 #include <sys/types.h>

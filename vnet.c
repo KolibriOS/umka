@@ -12,7 +12,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
-#define _POSIX  // to have SIGSYS on windows
+#include <pthread.h>
 #include <signal.h>
 #include <stdatomic.h>
 #include <stdio.h>
@@ -24,14 +24,10 @@
 #include "vnet/tap.h"
 #include "vnet/file.h"
 
-// TODO: Cleanup
 #ifndef _WIN32
-#include <arpa/inet.h>
-#include <poll.h>
 #include <unistd.h>
 #else
-#include <winsock2.h>
-#include <pthread.h>
+#include <io.h>
 #endif
 
 #define STACK_SIZE 0x10000
@@ -39,48 +35,56 @@
 static int
 vnet_input(void *udata) {
     umka_sti();
-    struct vnet *vnet = udata;
-    int fd = vnet->fdin;
     int plen = 0;
-    fprintf(stderr, "[vnet] input interrupt\n");
+    struct vnet *vnet = udata;
+//    fprintf(stderr, "[vnet] input interrupt\n");
     net_buff_t *buf = kos_net_buff_alloc(NET_BUFFER_SIZE);
     if (!buf) {
         fprintf(stderr, "[vnet] Can't allocate network buffer!\n");
         return 1;
     }
     buf->device = &vnet->eth.net;
+/*
     plen = read(fd, buf->data, NET_BUFFER_SIZE - offsetof(net_buff_t, data));
     if (plen == -1) {
         plen = 0;   // we have just allocated a buffer, so we have to submit it
     }
-
+*/
+    plen = vnet->bufin_len;
+    memcpy(buf->data, vnet->bufin, vnet->bufin_len);
+/*
     fprintf(stderr, "[vnet] read %i bytes\n", plen);
     for (int i = 0; i < plen; i++) {
         fprintf(stderr, " %2.2x", buf->data[i]);
     }
     fprintf(stderr, "\n");
-
+*/
     buf->length = plen;
     buf->offset = offsetof(net_buff_t, data);
     kos_eth_input(buf);
     vnet->input_processed = 1;
+//fprintf(stderr, "[vnet_input] signal before\n");
+//    pthread_cond_signal(&vnet->cond);
+//fprintf(stderr, "[vnet_input] signal after\n");
 
     return 1;   // acknowledge our interrupt
 }
 
-static void
-vnet_input_monitor(struct vnet *net) {
-    umka_sti();
-    struct pollfd pfd = {net->fdin, POLLIN, 0};
+static void *
+vnet_input_monitor(void *arg) {
+    struct vnet *vnet = arg;
     while (1) {
-        if (net->input_processed && poll(&pfd, 1, 0)) {
-            net->input_processed = 0;
-            atomic_store_explicit(&umka_irq_number, UMKA_IRQ_NETWORK,
-                                  memory_order_release);
-            raise(UMKA_SIGNAL_IRQ);
-            umka_sti();
-        }
+        ssize_t nread = read(vnet->fdin, vnet->bufin, VNET_BUFIN_CAP);
+        vnet->input_processed = 0;
+        vnet->bufin_len = nread;
+        atomic_store_explicit(&umka_irq_number, UMKA_IRQ_NETWORK,
+                              memory_order_release);
+        raise(UMKA_SIGNAL_IRQ); // FIXME: not atomic with the above
+//fprintf(stderr, "[vnet_input_monitor] wait for signal\n");
+//        pthread_cond_wait(&vnet->cond, &vnet->mutex);   // TODO: handle spurious
+//fprintf(stderr, "[vnet_input_monitor] got signal\n");
     }
+    return NULL;
 }
 
 struct vnet *
@@ -118,14 +122,14 @@ vnet_init(enum vnet_type type) {
     vnet->eth.net.packets_rx_drop = 0;
     vnet->eth.net.packets_rx_ovr = 0;
 
+//    pthread_cond_init(&vnet->cond, NULL);
+//    pthread_mutex_init(&vnet->mutex, NULL);
+//    pthread_mutex_lock(&vnet->mutex);
+
     kos_attach_int_handler(UMKA_IRQ_NETWORK, vnet_input, vnet);
     fprintf(stderr, "[vnet] start input_monitor thread\n");
-    uint8_t *stack = malloc(STACK_SIZE);
-    size_t tid = umka_new_sys_threads(0, vnet_input_monitor, stack + STACK_SIZE);
-    appdata_t *t = kos_slot_base + tid;
-    *(void**)((uint8_t*)t->saved_esp0-12) = vnet;    // param for monitor thread
-    // -12 here because in UMKa, unlike real hardware, we don't switch between
-    // kernel and userspace, i.e. stack structure is different
+    pthread_t thread_input_monitor;
+    pthread_create(&thread_input_monitor, NULL, vnet_input_monitor, vnet);
 
     return vnet;
 }

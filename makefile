@@ -25,20 +25,20 @@ else
 endif
 
 CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -g -O0 -DNDEBUG -masm=intel \
-        -D_POSIX_C_SOURCE=200809L -I$(HOST) -I. -fno-pie
+        -D_POSIX_C_SOURCE=200809L -I$(HOST) -I. -fno-pie -D_POSIX
 CFLAGS_32=$(CFLAGS) -m32 -D_FILE_OFFSET_BITS=64 -D__USE_TIME_BITS64
 LDFLAGS=-no-pie
 LDFLAGS_32=$(LDFLAGS) -m32
 
-#ifeq ($(HOST),linux)
+ifeq ($(HOST),linux)
         FASM_INCLUDE=$(KOLIBRIOS)/kernel/trunk;$(KOLIBRIOS)/programs/develop/libraries/libcrash/hash
         FASM=INCLUDE="$(FASM_INCLUDE)" $(FASM_EXE) $(FASM_FLAGS)
-#else ifeq ($(HOST),windows)
-#        FASM_INCLUDE=$(KOLIBRIOS)\kernel\trunk;$(KOLIBRIOS)\programs\develop\libraries\libcrash\hash
-#        FASM=set "INCLUDE=$(FASM_INCLUDE)" && $(FASM_EXE) $(FASM_FLAGS)
-#else
-#        $(error your OS is not supported)
-#endif
+else ifeq ($(HOST),windows)
+        FASM_INCLUDE=$(KOLIBRIOS)\kernel\trunk;$(KOLIBRIOS)\programs\develop\libraries\libcrash\hash
+        FASM=set "INCLUDE=$(FASM_INCLUDE)" && $(FASM_EXE) $(FASM_FLAGS)
+else
+        $(error your OS is not supported)
+endif
 
 ifeq ($(HOST),linux)
 all: umka_shell umka_fuse umka_os umka_gen_devices_dat umka.sym umka.prp \

@@ -37,6 +37,7 @@ vnet_reset_tap() {
     COVERAGE_OFF();
 }
 
+/*
 static void
 dump_net_buff(net_buff_t *buf) {
     for (size_t i = 0; i < buf->length; i++) {
@@ -44,6 +45,7 @@ dump_net_buff(net_buff_t *buf) {
     }
     putchar('\n');
 }
+*/
 
 static STDCALL int
 vnet_transmit_tap(net_buff_t *buf) {
@@ -54,13 +56,14 @@ vnet_transmit_tap(net_buff_t *buf) {
         :
         : "memory");
 
-    printf("vnet_transmit: %d bytes\n", buf->length);
-    dump_net_buff(buf);
+//    printf("vnet_transmit: %d bytes\n", buf->length);
+//    dump_net_buff(buf);
     ssize_t written = write(net->fdout, buf->data, buf->length);
+    (void)written;
     buf->length = 0;
     COVERAGE_OFF();
     COVERAGE_ON();
-    printf("vnet_transmit: %d bytes written\n", written);
+//    printf("vnet_transmit: %d bytes written\n", written);
     return 0;
 }
 
@@ -70,7 +73,7 @@ vnet_init_tap() {
                         .ifr_flags = IFF_TAP | IFF_NO_PI};
     int fd, err;
 
-    if( (fd = open(TAP_DEV, O_RDWR | O_NONBLOCK)) < 0 ) {
+    if( (fd = open(TAP_DEV, O_RDWR)) < 0 ) {
         perror("Opening " TAP_DEV );
         return NULL;
     }
