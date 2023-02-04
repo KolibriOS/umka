@@ -16,10 +16,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "optparse.h"
 #include "shell.h"
 #include "umkaio.h"
 #include "trace.h"
+#include "optparse/optparse.h"
 
 #define HIST_FILE_BASENAME ".umka_shell.history"
 

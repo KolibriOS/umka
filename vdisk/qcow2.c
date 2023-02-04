@@ -13,12 +13,8 @@
 #include <unistd.h>
 #include "../trace.h"
 #include "qcow2.h"
-#include "miniz/miniz.h"
 #include "umkaio.h"
-#ifdef _WIN32
-//#include <io.h>
-//#define open _open
-#endif
+#include "em_inflate/em_inflate.h"
 
 #define L1_MAX_LEN (32u*1024u*1024u)
 #define L1_MAX_ENTRIES (L1_MAX_LEN / sizeof(uint64_t))
@@ -152,7 +148,7 @@ qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
             return;
         }
         unsigned long dest_size = d->cluster_size;
-        uncompress(d->cluster, &dest_size, d->cmp_cluster, cmp_size);
+        em_inflate(d->cluster, dest_size, d->cmp_cluster, cmp_size);
     }
     memcpy(buf,
            d->cluster + (sector & d->sector_idx_mask) * d->vdisk.sect_size,

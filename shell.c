@@ -38,8 +38,8 @@
 #include "pci.h"
 #include "umkart.h"
 #include "lodepng.h"
-#include "optparse.h"
-#include "bestline.h"
+#include "optparse/optparse.h"
+#include "bestline/bestline.h"
 
 char *bestlineFile(const char *prompt, FILE *fin, FILE *fout);
 

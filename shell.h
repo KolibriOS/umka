@@ -15,7 +15,7 @@
 #include <pthread.h>
 #include "umka.h"
 #include "umkaio.h"
-#include "optparse.h"
+#include "optparse/optparse.h"
 
 enum shell_var_type {
     SHELL_VAR_SINT,

@@ -6,11 +6,10 @@ FASM_EXE ?= fasm
 FASM_FLAGS=-dUEFI=1 -dextended_primary_loader=1 -dUMKA=1 -dHOST=$(HOST) -m 2000000
 
 HOST ?= linux
-AR ?= ar
 CC ?= gcc
 WARNINGS_COMMON=-Wall -Wextra \
          -Wnull-dereference -Wshadow -Wformat=2 -Wswitch -Wswitch-enum \
-         -Wpedantic -Wstrict-prototypes \
+         -Wpedantic -Wstrict-prototypes -Wunused \
          #-Wconversion -Wsign-conversion
 NOWARNINGS_COMMON=-Wno-address-of-packed-member
 
@@ -27,7 +26,7 @@ else
 endif
 
 CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -g -O0 -DNDEBUG -masm=intel \
-        -D_POSIX_C_SOURCE=200809L -I$(HOST) -I. -fno-pie -D_POSIX
+        -D_POSIX_C_SOURCE=200809L -I$(HOST) -Ideps -I. -fno-pie -D_POSIX
 CFLAGS_32=$(CFLAGS) -m32 -D_FILE_OFFSET_BITS=64 -D__USE_TIME_BITS64
 LDFLAGS=-no-pie
 LDFLAGS_32=$(LDFLAGS) -m32
@@ -58,20 +57,21 @@ test: umka_shell
 	@cd test && make clean all && cd ../
 
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
-            vdisk/raw.o vdisk/qcow2.o vdisk/miniz/miniz.a vnet.o \
+            vdisk/raw.o vdisk/qcow2.o deps/em_inflate/em_inflate.o vnet.o \
             $(HOST)/vnet/tap.o vnet/file.o lodepng.o $(HOST)/pci.o \
-            $(HOST)/thread.o umkaio.o umkart.o optparse32.o bestline32.o
+            $(HOST)/thread.o umkaio.o umkart.o deps/optparse/optparse32.o \
+            deps/bestline/bestline32.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
-           vdisk/qcow2.o vdisk/miniz/miniz.a $(HOST)/pci.o $(HOST)/thread.o \
-           umkaio.o
+           vdisk/qcow2.o deps/em_inflate/em_inflate.o $(HOST)/pci.o \
+           $(HOST)/thread.o umkaio.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs` -T umka.ld
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vdisk/raw.o vdisk/qcow2.o \
-         vdisk/miniz/miniz.a vnet.o $(HOST)/vnet/tap.o vnet/file.o trace.o \
-         trace_lbr.o $(HOST)/pci.o $(HOST)/thread.o umkaio.o umkart.o \
-         bestline32.o optparse32.o
+         deps/em_inflate/em_inflate.o vnet.o $(HOST)/vnet/tap.o vnet/file.o \
+         trace.o trace_lbr.o $(HOST)/pci.o $(HOST)/thread.o umkaio.o umkart.o \
+         deps/bestline/bestline32.o deps/optparse/optparse32.o
 	$(CC) $(LDFLAGS_32) `sdl2-config --libs` $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
@@ -96,16 +96,16 @@ $(HOST)/pci.o: $(HOST)/pci.c
 lodepng.o: lodepng.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
 
-bestline32.o: bestline.c bestline.h
+deps/bestline/bestline32.o: deps/bestline/bestline.c deps/bestline/bestline.h
 	$(CC) $(CFLAGS_32) $(CFLAGS_BESTLINE) -Wno-switch-enum -c $< -o $@
 
-bestline.o: bestline.c bestline.h
+deps/bestline/bestline.o: deps/bestline/bestline.c deps/bestline/bestline.h
 	$(CC) $(CFLAGS) -Wno-switch-enum -c $< -o $@
 
-optparse32.o: optparse.c optparse.h
+deps/optparse/optparse32.o: deps/optparse/optparse.c deps/optparse/optparse.h
 	$(CC) $(CFLAGS_32) -c $< -o $@
 
-optparse.o: optparse.c optparse.h
+deps/optparse/optparse.o: deps/optparse/optparse.c deps/optparse/optparse.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 umkart.o: umkart.c umkart.h umka.h
@@ -147,17 +147,9 @@ vdisk/raw.o: vdisk/raw.c vdisk/raw.h
 vdisk/qcow2.o: vdisk/qcow2.c vdisk/qcow2.h
 	$(CC) $(CFLAGS_32) -c $< -o $@
 
-vdisk/miniz/miniz_tinfl.o: vdisk/miniz/miniz_tinfl.c vdisk/miniz/miniz_tinfl.h
-	$(CC) $(CFLAGS_32) -c $< -o $@
-
-vdisk/miniz/miniz_tdef.o: vdisk/miniz/miniz_tdef.c vdisk/miniz/miniz_tdef.h
-	$(CC) $(CFLAGS_32) -c $< -o $@
-
-vdisk/miniz/miniz.o: vdisk/miniz/miniz.c vdisk/miniz/miniz.h
-	$(CC) $(CFLAGS_32) -DMINIZ_NO_ARCHIVE_APIS -Wno-type-limits -c $< -o $@
-
-vdisk/miniz/miniz.a: vdisk/miniz/miniz.o vdisk/miniz/miniz_tinfl.o vdisk/miniz/miniz_tdef.o
-	$(AR) --target=elf32-i386 r $@ $^
+deps/em_inflate/em_inflate.o: deps/em_inflate/em_inflate.c deps/em_inflate/em_inflate.h
+	$(CC) $(CFLAGS_32) -c $< -o $@ -Wno-sign-compare -Wno-unused-parameter \
+                -Wno-switch-enum -Wno-unused-function
 
 vnet.o: vnet.c vnet.h
 	$(CC) $(CFLAGS_32) -c $<

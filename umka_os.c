@@ -25,11 +25,11 @@
 #include <SDL2/SDL.h>
 #include "umka.h"
 #include "umkart.h"
-#include "bestline.h"
-#include "optparse.h"
 #include "shell.h"
 #include "trace.h"
 #include "vnet.h"
+#include "bestline/bestline.h"
+#include "optparse/optparse.h"
 
 #define HIST_FILE_BASENAME ".umka_os.history"
 
