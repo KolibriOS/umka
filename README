@@ -136,8 +136,8 @@ Links & Acknowledgements
 [ 5] Universal TUN/TAP device driver by Maxim Krasnyansky and others
      https://www.kernel.org/doc/html/v5.12/networking/tuntap.html
 
-[ 6] Bestline by Justine Tunney
-     https://github.com/jart/bestline
+[ 6] Isocline by Daan Leijen
+     https://github.com/daanx/isocline
 
 [ 7] em_inflate by Emmanuel Marty
      https://github.com/emmanuel-marty/em_inflate

@@ -28,7 +28,7 @@
 #include "shell.h"
 #include "trace.h"
 #include "vnet.h"
-#include "bestline/bestline.h"
+#include "isocline/include/isocline.h"
 #include "optparse/optparse.h"
 
 #define HIST_FILE_BASENAME ".umka_os.history"
@@ -49,21 +49,16 @@ struct umka_os_ctx *os;
 char history_filename[PATH_MAX];
 
 static void
-completion(const char *buf, bestlineCompletions *lc) {
-    if (buf[0] == 'h') {
-        bestlineAddCompletion(lc,"hello");
-        bestlineAddCompletion(lc,"hello there");
-    }
+completer(ic_completion_env_t *cenv, const char *prefix) {
+    (void)cenv;
+    (void)prefix;
 }
 
-static char *
-hints(const char *buf, const char **ansi1, const char **ansi2) {
-    if (!strcmp(buf,"hello")) {
-        *ansi1 = "\033[35m";    /* magenta foreground */
-        *ansi2 = "\033[39m";    /* reset foreground */
-        return " World";
-    }
-    return NULL;
+static void
+highlighter(ic_highlight_env_t *henv, const char *input, void *arg) {
+    (void)henv;
+    (void)input;
+    (void)arg;
 }
 
 static int
@@ -74,13 +69,13 @@ hw_int_mouse(void *arg) {
 }
 
 struct umka_os_ctx *
-umka_os_init(FILE *fin, FILE *fout, FILE *fboardlog) {
+umka_os_init(FILE *fstartup, FILE *fboardlog) {
     struct umka_os_ctx *ctx = malloc(sizeof(struct umka_os_ctx));
     ctx->fboardlog = fboardlog;
     ctx->umka = umka_init();
     ctx->io = io_init(&ctx->umka->running);
     ctx->shell = shell_init(SHELL_LOG_NONREPRODUCIBLE, history_filename,
-                            ctx->umka, ctx->io, fin, fout, &ctx->umka->running);
+                            ctx->umka, ctx->io, fstartup, &ctx->umka->running);
     return ctx;
 }
 
@@ -276,9 +271,9 @@ main(int argc, char *argv[]) {
     umka_sti();
 
     build_history_filename();
-    bestlineSetCompletionCallback(completion);
-    bestlineSetHintsCallback(hints);
-    bestlineHistoryLoad(history_filename);
+    ic_set_default_completer(&completer, NULL);
+    ic_set_default_highlighter(highlighter, NULL);
+    ic_enable_auto_tab(1);
 
     const char *startupfile = NULL;
     const char *infile = NULL;
@@ -350,7 +345,7 @@ main(int argc, char *argv[]) {
         fboardlog = fout;
     }
 
-    os = umka_os_init(fstartup, fout, fboardlog);
+    os = umka_os_init(fstartup, fboardlog);
 
     struct sigaction sa;
     sa.sa_sigaction = irq0;

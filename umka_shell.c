@@ -32,12 +32,12 @@ struct umka_shell_ctx {
 char history_filename[PATH_MAX];
 
 struct umka_shell_ctx *
-umka_shell_init(int reproducible, FILE *fin, FILE *fout) {
+umka_shell_init(int reproducible, FILE *fin) {
     struct umka_shell_ctx *ctx = malloc(sizeof(struct umka_shell_ctx));
     ctx->umka = umka_init();
     ctx->io = io_init(NULL);
     ctx->shell = shell_init(reproducible, history_filename, ctx->umka, ctx->io,
-                            fin, fout, &ctx->umka->running);
+                            fin, &ctx->umka->running);
     return ctx;
 }
 
@@ -118,14 +118,14 @@ main(int argc, char **argv) {
         }
     }
     if (outfile) {
-        fout = fopen(outfile, "w");
+        fout = freopen(outfile, "w", stdout);
         if (!fout) {
             fprintf(stderr, "[!] can't open file for writing: %s\n", outfile);
             exit(1);
         }
     }
 
-    struct umka_shell_ctx *ctx = umka_shell_init(reproducible, fin, fout);
+    struct umka_shell_ctx *ctx = umka_shell_init(reproducible, fin);
 
     if (coverage)
         trace_begin();

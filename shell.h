@@ -51,7 +51,7 @@ struct shell_ctx {
 
 struct shell_ctx *
 shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
-           struct umka_io *io, FILE *fin, FILE *fout, const atomic_int *running);
+           struct umka_io *io, FILE *fin, const atomic_int *running);
 
 void
 shell_close(struct shell_ctx *shell);

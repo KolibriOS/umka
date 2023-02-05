@@ -66,7 +66,7 @@ terminate_protection: 1
 keyboard_mode: 0
 captionEncoding: 0
 exec_params: (null)
-wnd_caption: 
+wnd_caption: hi_there
 wnd_clientbox (ltwh): 5 24 291 172
 priority: 0
 in_schedule: prev (2), next (2)

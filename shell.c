@@ -39,7 +39,7 @@
 #include "umkart.h"
 #include "lodepng.h"
 #include "optparse/optparse.h"
-#include "bestline/bestline.h"
+#include "isocline/include/isocline.h"
 
 char *bestlineFile(const char *prompt, FILE *fin, FILE *fout);
 
@@ -380,21 +380,16 @@ prompt(struct shell_ctx *ctx) {
 }
 
 static void
-completion(const char *buf, bestlineCompletions *lc) {
-    if (buf[0] == 'h') {
-        bestlineAddCompletion(lc,"hello");
-        bestlineAddCompletion(lc,"hello there");
-    }
+completer(ic_completion_env_t *cenv, const char *prefix) {
+    (void)cenv;
+    (void)prefix;
 }
 
-static char *
-hints(const char *buf, const char **ansi1, const char **ansi2) {
-    if (!strcmp(buf,"hello")) {
-        *ansi1 = "\033[35m";    /* magenta foreground */
-        *ansi2 = "\033[39m";    /* reset foreground */
-        return " World";
-    }
-    return NULL;
+static void
+highlighter(ic_highlight_env_t *henv, const char *input, void *arg) {
+    (void)henv;
+    (void)input;
+    (void)arg;
 }
 
 static int
@@ -4010,18 +4005,37 @@ cmd_help(struct shell_ctx *ctx, int argc, char **argv) {
 
 void *
 run_test(struct shell_ctx *ctx) {
+    int fdstdin = -1;
+    if (ctx->fin != stdin) {
+        fdstdin = dup(STDIN_FILENO);
+        close(STDIN_FILENO);
+        dup2(fileno(ctx->fin), STDIN_FILENO);
+        fclose(ctx->fin);
+    }
+//    ic_style_def("ic-prompt","ansi-default");
+    ic_enable_color(0);
+    ic_set_prompt_marker(NULL, NULL);
+    ic_enable_multiline(0);
+    ic_enable_beep(0);
+
     pthread_mutex_lock(&ctx->cmd_mutex);
     int is_tty = isatty(fileno(ctx->fin));
     char **argv = (char**)calloc(sizeof(char*), (MAX_COMMAND_ARGS + 1));
-    bestlineSetCompletionCallback(completion);
-    bestlineSetHintsCallback(hints);
-    bestlineHistoryLoad(ctx->hist_file);
-    sprintf(prompt_line, "%s> ", last_dir);
+    ic_set_default_completer(&completer, NULL);
+    ic_set_default_highlighter(highlighter, NULL);
+    ic_enable_auto_tab(1);
+    sprintf(prompt_line, "%s", last_dir);
     char *line;
-    while((line = bestlineFile(prompt_line, ctx->fin, ctx->fout))) {
+    while((line = ic_readline(prompt_line)) || !feof(stdin)) {
         if (!is_tty) {
             prompt(ctx);
-            fprintf(ctx->fout, "%s\n", line);
+            fprintf(ctx->fout, "%s\n", line ? line : "");
+        }
+        if (!line) {
+            continue;
+        }
+        if (line[0] == '\0') {
+            break;
         }
         if (!strcmp(line, "X") || !strcmp(line, "q")) {
             free(line);
@@ -4031,7 +4045,6 @@ run_test(struct shell_ctx *ctx) {
             free(line);
             continue;
         } else {
-            bestlineHistoryAdd(line);
             int argc = split_args(line, argv);
             func_table_t *ft;
             for (ft = cmd_cmds; ft->name; ft++) {
@@ -4048,16 +4061,20 @@ run_test(struct shell_ctx *ctx) {
         }
     }
     free(argv);
-    bestlineHistorySave(ctx->hist_file);
 
-    fclose(ctx->fin);
     pthread_mutex_unlock(&ctx->cmd_mutex);
+
+    if (fdstdin != -1) {
+        close(STDIN_FILENO);
+        dup2(fdstdin, STDIN_FILENO);
+        close(fdstdin);
+    }
     return NULL;
 }
 
 struct shell_ctx *
 shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
-           struct umka_io *io, FILE *fin, FILE *fout, const atomic_int *running) {
+           struct umka_io *io, FILE *fin, const atomic_int *running) {
     struct shell_ctx *ctx = malloc(sizeof(struct shell_ctx));
     ctx->umka = umka;
     ctx->io = io;
@@ -4065,7 +4082,7 @@ shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
     ctx->hist_file = hist_file;
     ctx->var = NULL;
     ctx->fin = fin;
-    ctx->fout = fout;
+    ctx->fout = stdout;
     ctx->running = running;
     pthread_cond_init(&ctx->cmd_done, NULL);
     pthread_mutex_init(&ctx->cmd_mutex, NULL);

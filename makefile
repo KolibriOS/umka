@@ -9,18 +9,18 @@ HOST ?= linux
 CC ?= gcc
 WARNINGS_COMMON=-Wall -Wextra \
          -Wnull-dereference -Wshadow -Wformat=2 -Wswitch -Wswitch-enum \
-         -Wpedantic -Wstrict-prototypes -Wunused \
+         -Wpedantic -Wstrict-prototypes -Wunused -Wformat-nonliteral \
          #-Wconversion -Wsign-conversion
 NOWARNINGS_COMMON=-Wno-address-of-packed-member
 
 ifneq (,$(findstring gcc,$(CC)))
         WARNINGS=$(WARNINGS_COMMON) -Wduplicated-cond -Wduplicated-branches -Wrestrict -Wlogical-op -Wjump-misses-init
         NOWARNINGS=$(NOWARNINGS_COMMON)
-        CFLAGS_BESTLINE=-Wno-logical-op
+        CFLAGS_ISOCLINE=-Wno-duplicated-branches
 else ifneq (,$(findstring clang,$(CC)))
         WARNINGS=$(WARNINGS_COMMON)
         NOWARNINGS=$(NOWARNINGS_COMMON) -Wno-missing-prototype-for-cc
-        CFLAGS_BESTLINE=
+        CFLAGS_ISOCLINE=-Wno-format-nonliteral
 else
         $(error your compiler is not supported)
 endif
@@ -59,8 +59,8 @@ test: umka_shell
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
             vdisk/raw.o vdisk/qcow2.o deps/em_inflate/em_inflate.o vnet.o \
             $(HOST)/vnet/tap.o vnet/file.o lodepng.o $(HOST)/pci.o \
-            $(HOST)/thread.o umkaio.o umkart.o deps/optparse/optparse32.o \
-            deps/bestline/bestline32.o
+            $(HOST)/thread.o umkaio.o umkart.o deps/optparse/optparse.o \
+            deps/isocline/src/isocline.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
@@ -71,7 +71,7 @@ umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vdisk/raw.o vdisk/qcow2.o \
          deps/em_inflate/em_inflate.o vnet.o $(HOST)/vnet/tap.o vnet/file.o \
          trace.o trace_lbr.o $(HOST)/pci.o $(HOST)/thread.o umkaio.o umkart.o \
-         deps/bestline/bestline32.o deps/optparse/optparse32.o
+         deps/isocline/src/isocline.o deps/optparse/optparse.o
 	$(CC) $(LDFLAGS_32) `sdl2-config --libs` $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
@@ -96,17 +96,13 @@ $(HOST)/pci.o: $(HOST)/pci.c
 lodepng.o: lodepng.c lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
 
-deps/bestline/bestline32.o: deps/bestline/bestline.c deps/bestline/bestline.h
-	$(CC) $(CFLAGS_32) $(CFLAGS_BESTLINE) -Wno-switch-enum -c $< -o $@
-
-deps/bestline/bestline.o: deps/bestline/bestline.c deps/bestline/bestline.h
-	$(CC) $(CFLAGS) -Wno-switch-enum -c $< -o $@
-
-deps/optparse/optparse32.o: deps/optparse/optparse.c deps/optparse/optparse.h
-	$(CC) $(CFLAGS_32) -c $< -o $@
+deps/isocline/src/isocline.o: deps/isocline/src/isocline.c \
+        deps/isocline/include/isocline.h
+	$(CC) $(CFLAGS_32) $(CFLAGS_ISOCLINE) -c $< -o $@ -Wno-shadow \
+                -Wno-unused-function
 
 deps/optparse/optparse.o: deps/optparse/optparse.c deps/optparse/optparse.h
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS_32) -c $< -o $@
 
 umkart.o: umkart.c umkart.h umka.h
 	$(CC) $(CFLAGS_32) -c $<

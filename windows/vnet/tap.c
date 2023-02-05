@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 struct vnet *
-vnet_init_tap() {
+vnet_init_tap(void) {
     fprintf(stderr, "[vnet] tap interface isn't implemented for windows\n");
     return NULL;
 }
