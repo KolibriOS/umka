@@ -14,17 +14,20 @@
 
 sigset_t mask;
 
-void reset_procmask(void) {
+void
+reset_procmask(void) {
     sigemptyset (&mask);
 	sigaddset (&mask, SIGALRM);
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
 }
 
-int get_fake_if(ucontext_t *ctx) {
+int
+get_fake_if(ucontext_t *ctx) {
     // we fake IF with ID flag
     return !(ctx->uc_mcontext.__gregs[REG_EFL] & (1 << 21));
 }
 
-void system_shutdown(void) {
+void
+system_shutdown(void) {
     exit(0);
 }

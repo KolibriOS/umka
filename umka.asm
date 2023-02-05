@@ -88,7 +88,7 @@ pubsym irq_serv.irq_10, 'kos_irq_serv_irq10'
 pubsym idts, 'kos_idts'
 pubsym attach_int_handler, 'kos_attach_int_handler', 12
 pubsym fs_execute, 'kos_fs_execute', 4
-pubsym set_keyboard_data, 'kos_set_keyboard_data'
+pubsym set_keyboard_data, 'kos_set_keyboard_data', no_mangle
 pubsym KEY_COUNT, 'kos_key_count'
 pubsym KEY_BUFF, 'kos_key_buff'
 pubsym keyboard_mode, 'kos_keyboard_mode'
@@ -153,7 +153,7 @@ pubsym mem_BACKGROUND
 pubsym sys_background
 pubsym REDRAW_BACKGROUND, 'kos_redraw_background'
 pubsym new_sys_threads, 'kos_new_sys_threads', no_mangle
-pubsym osloop, 'kos_osloop'
+pubsym osloop, 'kos_osloop', no_mangle
 pubsym set_mouse_data, 'kos_set_mouse_data', 20
 pubsym scheduler_current, 'kos_scheduler_current'
 pubsym kos_eth_input
