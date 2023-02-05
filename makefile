@@ -30,6 +30,7 @@ CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -g -O0 -DNDEBUG -masm=intel \
 CFLAGS_32=$(CFLAGS) -m32 -D_FILE_OFFSET_BITS=64 -D__USE_TIME_BITS64
 LDFLAGS=-no-pie
 LDFLAGS_32=$(LDFLAGS) -m32
+LIBS=-lpthread
 
 ifeq ($(HOST),linux)
         FASM_INCLUDE=$(KOLIBRIOS)/kernel/trunk;$(KOLIBRIOS)/programs/develop/libraries/libcrash/hash
@@ -61,7 +62,7 @@ umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
             $(HOST)/vnet/tap.o vnet/file.o lodepng.o $(HOST)/pci.o \
             $(HOST)/thread.o umkaio.o umkart.o deps/optparse/optparse.o \
             deps/isocline/src/isocline.o
-	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld
+	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld $(LIBS)
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
            vdisk/qcow2.o deps/em_inflate/em_inflate.o $(HOST)/pci.o \
@@ -98,7 +99,7 @@ lodepng.o: lodepng.c lodepng.h
 
 deps/isocline/src/isocline.o: deps/isocline/src/isocline.c \
         deps/isocline/include/isocline.h
-	$(CC) $(CFLAGS_32) $(CFLAGS_ISOCLINE) -c $< -o $@ -Wno-shadow \
+	$(CC) $(CFLAGS_32) -D__MINGW_USE_VC2005_COMPAT $(CFLAGS_ISOCLINE) -c $< -o $@ -Wno-shadow \
                 -Wno-unused-function
 
 deps/optparse/optparse.o: deps/optparse/optparse.c deps/optparse/optparse.h

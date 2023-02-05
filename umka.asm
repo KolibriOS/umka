@@ -114,7 +114,7 @@ pubsym coverage_end
 
 pubsym sha3_256_oneshot, 'hash_oneshot'
 pubsym kos_time_to_epoch
-pubsym umka_init, 4
+pubsym umka_init
 pubsym umka_close, 4
 pubsym umka_boot
 
