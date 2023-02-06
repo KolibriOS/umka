@@ -17,6 +17,6 @@
 #define RAW_SUFFIX ".raw"
 
 struct vdisk*
-vdisk_init_raw(const char *fname, struct umka_io *io);
+vdisk_init_raw(const char *fname, const struct umka_io *io);
 
 #endif  // VDISK_RAW_H_INCLUDED

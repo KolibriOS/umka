@@ -22,8 +22,9 @@
 #include "umkart.h"
 #include "trace.h"
 #include "vnet.h"
-#include "vnet/tap.h"
+#include "vnet/null.h"
 #include "vnet/file.h"
+#include "vnet/tap.h"
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -89,13 +90,16 @@ vnet_input_monitor(void *arg) {
 }
 
 struct vnet *
-vnet_init(enum vnet_type type) {
+vnet_init(enum vnet_type type, const atomic_int *running) {
     struct vnet *vnet;
     switch (type) {
-    case VNET_FILE:
+    case VNET_DEVTYPE_NULL:
+        vnet = vnet_init_null();
+        break;
+    case VNET_DEVTYPE_FILE:
         vnet = vnet_init_file();
         break;
-    case VNET_TAP:
+    case VNET_DEVTYPE_TAP:
         vnet = vnet_init_tap();
         break;
     default:
@@ -106,6 +110,8 @@ vnet_init(enum vnet_type type) {
         fprintf(stderr, "[vnet] device initialization failed\n");
         return NULL;
     }
+
+    vnet->running = running;
 
     vnet->eth.net.link_state = ETH_LINK_FD + ETH_LINK_10M;
     vnet->eth.net.hwacc = 0;
@@ -128,9 +134,11 @@ vnet_init(enum vnet_type type) {
 //    pthread_mutex_lock(&vnet->mutex);
 
     kos_attach_int_handler(UMKA_IRQ_NETWORK, vnet_input, vnet);
-    fprintf(stderr, "[vnet] start input_monitor thread\n");
-    pthread_t thread_input_monitor;
-    pthread_create(&thread_input_monitor, NULL, vnet_input_monitor, vnet);
+    if (*running != UMKA_RUNNING_NEVER) {
+        fprintf(stderr, "[vnet] start input_monitor thread\n");
+        pthread_t thread_input_monitor;
+        pthread_create(&thread_input_monitor, NULL, vnet_input_monitor, vnet);
+    }
 
     return vnet;
 }

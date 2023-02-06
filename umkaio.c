@@ -122,7 +122,7 @@ io_close(struct umka_io *io) {
 }
 
 ssize_t
-io_read(int fd, void *buf, size_t count, struct umka_io *io) {
+io_read(int fd, void *buf, size_t count, const struct umka_io *io) {
     ssize_t res;
     if (!io->running || !*io->running) {
         res = read(fd, buf, count);
@@ -133,7 +133,7 @@ io_read(int fd, void *buf, size_t count, struct umka_io *io) {
 }
 
 ssize_t
-io_write(int fd, const void *buf, size_t count, struct umka_io *io) {
+io_write(int fd, const void *buf, size_t count, const struct umka_io *io) {
     ssize_t res;
     if (!io->running || !*io->running) {
         res = write(fd, buf, count);

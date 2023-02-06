@@ -152,7 +152,7 @@ main (int argc, char *argv[]) {
 
     strcpy(pci_path, PCI_BASE_DIR);
 
-    umka_init();
+    umka_init(UMKA_RUNNING_NEVER);
     kos_acpi_aml_init();
     ctx = kos_acpi_aml_new_thread();
     kos_acpi_dev_size = MAX_PCI_DEVICES*16;

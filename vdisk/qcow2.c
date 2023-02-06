@@ -197,7 +197,7 @@ vdisk_qcow2_write(void *userdata, void *buffer, off_t startsector,
 }
 
 struct vdisk*
-vdisk_init_qcow2(const char *fname, struct umka_io *io) {
+vdisk_init_qcow2(const char *fname, const struct umka_io *io) {
     struct vdisk_qcow2 *d =
         (struct vdisk_qcow2*)calloc(1, sizeof(struct vdisk_qcow2));
     if (!d) {

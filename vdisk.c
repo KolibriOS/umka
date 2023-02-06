@@ -41,8 +41,8 @@ vdisk_adjust_cache_size(void *userdata, size_t suggested_size) {
 }
 
 struct vdisk*
-vdisk_init(const char *fname, int adjust_cache_size, size_t cache_size,
-           void *io) {
+vdisk_init(const char *fname, const int adjust_cache_size,
+           const size_t cache_size, const void *io) {
     size_t fname_len = strlen(fname);
     size_t dot_raw_len = strlen(RAW_SUFFIX);
     size_t dot_qcow2_len = strlen(QCOW2_SUFFIX);

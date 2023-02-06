@@ -22,30 +22,19 @@
 #include "vnet.h"
 
 #define TAP_DEV "/dev/net/tun"
+#define UMKA_TAP_NAME "umka%d"
 
 static STDCALL void
 vnet_unload_tap(void) {
-    printf("vnet_unload_tap\n");
     COVERAGE_ON();
     COVERAGE_OFF();
 }
 
 static STDCALL void
 vnet_reset_tap(void) {
-    printf("vnet_reset_tap\n");
     COVERAGE_ON();
     COVERAGE_OFF();
 }
-
-/*
-static void
-dump_net_buff(net_buff_t *buf) {
-    for (size_t i = 0; i < buf->length; i++) {
-        printf("%2.2x ", buf->data[i]);
-    }
-    putchar('\n');
-}
-*/
 
 static STDCALL int
 vnet_transmit_tap(net_buff_t *buf) {
@@ -56,20 +45,17 @@ vnet_transmit_tap(net_buff_t *buf) {
         :
         : "memory");
 
-//    printf("vnet_transmit: %d bytes\n", buf->length);
-//    dump_net_buff(buf);
     ssize_t written = write(net->fdout, buf->data, buf->length);
     (void)written;
     buf->length = 0;
     COVERAGE_OFF();
     COVERAGE_ON();
-//    printf("vnet_transmit: %d bytes written\n", written);
     return 0;
 }
 
 struct vnet *
 vnet_init_tap(void) {
-    struct ifreq ifr = {.ifr_name = UMKA_VNET_NAME,
+    struct ifreq ifr = {.ifr_name = UMKA_TAP_NAME,
                         .ifr_flags = IFF_TAP | IFF_NO_PI};
     int fd, err;
 

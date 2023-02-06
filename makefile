@@ -32,6 +32,10 @@ LDFLAGS=-no-pie
 LDFLAGS_32=$(LDFLAGS) -m32
 LIBS=-lpthread
 
+ifeq ($(HOST),windows)
+        LIBS=$(LIBS) -lws2_32
+endif
+
 ifeq ($(HOST),linux)
         FASM_INCLUDE=$(KOLIBRIOS)/kernel/trunk;$(KOLIBRIOS)/programs/develop/libraries/libcrash/hash
         FASM=INCLUDE="$(FASM_INCLUDE)" $(FASM_EXE) $(FASM_FLAGS)
@@ -59,10 +63,10 @@ test: umka_shell
 
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
             vdisk/raw.o vdisk/qcow2.o deps/em_inflate/em_inflate.o vnet.o \
-            $(HOST)/vnet/tap.o vnet/file.o lodepng.o $(HOST)/pci.o \
+            $(HOST)/vnet/tap.o vnet/file.o vnet/null.o lodepng.o $(HOST)/pci.o \
             $(HOST)/thread.o umkaio.o umkart.o deps/optparse/optparse.o \
             deps/isocline/src/isocline.o
-	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld $(LIBS) -lws2_32
+	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld $(LIBS)
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
            vdisk/qcow2.o deps/em_inflate/em_inflate.o $(HOST)/pci.o \
@@ -71,8 +75,8 @@ umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
 
 umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vdisk/raw.o vdisk/qcow2.o \
          deps/em_inflate/em_inflate.o vnet.o $(HOST)/vnet/tap.o vnet/file.o \
-         trace.o trace_lbr.o $(HOST)/pci.o $(HOST)/thread.o umkaio.o umkart.o \
-         deps/isocline/src/isocline.o deps/optparse/optparse.o
+         vnet/null.o trace.o trace_lbr.o $(HOST)/pci.o $(HOST)/thread.o \
+         umkaio.o umkart.o deps/isocline/src/isocline.o deps/optparse/optparse.o
 	$(CC) $(LDFLAGS_32) `sdl2-config --libs` $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
@@ -155,6 +159,9 @@ $(HOST)/vnet/tap.o: $(HOST)/vnet/tap.c vnet/tap.h
 	$(CC) $(CFLAGS_32) -c $< -o $@
 
 vnet/file.o: vnet/file.c vnet/file.h
+	$(CC) $(CFLAGS_32) -c $< -o $@
+
+vnet/null.o: vnet/null.c vnet/null.h
 	$(CC) $(CFLAGS_32) -c $< -o $@
 
 umka_shell.o: umka_shell.c umka.h trace.h

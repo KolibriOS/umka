@@ -340,7 +340,7 @@ print_hash(struct shell_ctx *ctx, uint8_t *x, size_t len) {
 }
 
 void *host_load_file(const char *fname) {
-    FILE *f = fopen(fname, "r");
+    FILE *f = fopen(fname, "rb");
     if (!f) {
         return NULL;
     }
@@ -1456,7 +1456,7 @@ cmd_get_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
 #undef COLS
     } else if (argc == 5 && !strcmp(argv[3], "-f")) {
         const char *fname = argv[4];
-        FILE *f = fopen(fname, "w");
+        FILE *f = fopen(fname, "wb");
         if (!f) {
             fprintf(ctx->fout, "can't open file for writing: %s\n", fname);
             fputs(usage, ctx->fout);
@@ -2898,12 +2898,27 @@ cmd_net_add_device(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     (void)argv;
     const char *usage = \
-        "usage: net_add_device\n";
-    if (argc != 1) {
+        "usage: net_add_device <devtype>\n"
+        "  devtype          null, file or tap\n";
+    if (argc > 2) {
         fputs(usage, ctx->fout);
         return;
     }
-    struct vnet *vnet = vnet_init(VNET_TAP); // TODO: list like block devices
+    int devtype = VNET_DEVTYPE_NULL;
+    const char *devtypestr = argv[1];
+    if (devtypestr) {
+        if (!strcmp(devtypestr, "null")) {
+            devtype = VNET_DEVTYPE_NULL;
+        } else if (!strcmp(devtypestr, "file")) {
+            devtype = VNET_DEVTYPE_FILE;
+        } else if (!strcmp(devtypestr, "tap")) {
+            devtype = VNET_DEVTYPE_TAP;
+        } else {
+            fprintf(ctx->fout, "bad device type: %s\n", devtypestr);
+            return;
+        }
+    }
+    struct vnet *vnet = vnet_init(devtype, ctx->running); // TODO: list like block devices
     COVERAGE_ON();
     int32_t dev_num = kos_net_add_device(&vnet->eth.net);
     COVERAGE_OFF();
@@ -4069,8 +4084,8 @@ run_test(struct shell_ctx *ctx) {
 }
 
 struct shell_ctx *
-shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
-           struct umka_io *io, FILE *fin, const atomic_int *running) {
+shell_init(const int reproducible, const char *hist_file,
+           const struct umka_ctx *umka, const struct umka_io *io, FILE *fin) {
     struct shell_ctx *ctx = malloc(sizeof(struct shell_ctx));
     ctx->umka = umka;
     ctx->io = io;
@@ -4079,7 +4094,7 @@ shell_init(int reproducible, const char *hist_file, struct umka_ctx *umka,
     ctx->var = NULL;
     ctx->fin = fin;
     ctx->fout = stdout;
-    ctx->running = running;
+    ctx->running = &umka->running;
     pthread_cond_init(&ctx->cmd_done, NULL);
     pthread_mutex_init(&ctx->cmd_mutex, NULL);
     return ctx;

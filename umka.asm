@@ -114,7 +114,7 @@ pubsym coverage_end
 
 pubsym sha3_256_oneshot, 'hash_oneshot'
 pubsym kos_time_to_epoch
-pubsym umka_init
+pubsym umka_init, 4
 pubsym umka_close, 4
 pubsym umka_boot
 
@@ -578,11 +578,12 @@ struct umka_ctx
         running dd ?
 ends
 
-proc umka_init c uses ebx esi edi ebp
+proc umka_init c uses ebx esi edi ebp, _running
         call    umka._.check_alignment
         mov     eax, umka
         mov     [eax+umka_ctx.booted], 0
-        mov     [eax+umka_ctx.running], 0
+        mov     ecx, [_running]
+        mov     [eax+umka_ctx.running], ecx
         ret
 endp
 

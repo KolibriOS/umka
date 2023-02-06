@@ -34,10 +34,10 @@ char history_filename[PATH_MAX];
 struct umka_shell_ctx *
 umka_shell_init(int reproducible, FILE *fin) {
     struct umka_shell_ctx *ctx = malloc(sizeof(struct umka_shell_ctx));
-    ctx->umka = umka_init();
+    ctx->umka = umka_init(UMKA_RUNNING_NEVER);
     ctx->io = io_init(NULL);
     ctx->shell = shell_init(reproducible, history_filename, ctx->umka, ctx->io,
-                            fin, &ctx->umka->running);
+                            fin);
     return ctx;
 }
 

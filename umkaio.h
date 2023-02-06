@@ -14,6 +14,10 @@
 #include <stddef.h>
 #include <pthread.h>
 
+#if !defined (O_BINARY)
+#define O_BINARY 0  // for Windows
+#endif
+
 struct umka_io {
     const atomic_int *running;
     pthread_t iot;
@@ -73,9 +77,9 @@ void
 io_close(struct umka_io *io);
 
 ssize_t
-io_read(int fd, void *buf, size_t count, struct umka_io *io);
+io_read(int fd, void *buf, size_t count, const struct umka_io *io);
 
 ssize_t
-io_write(int fd, const void *buf, size_t count, struct umka_io *io);
+io_write(int fd, const void *buf, size_t count, const struct umka_io *io);
 
 #endif  // UMKAIO_H_INCLUDED

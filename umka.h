@@ -29,6 +29,12 @@ typedef void siginfo_t;
 
 #define STDCALL __attribute__((__stdcall__))
 
+enum {
+    UMKA_RUNNING_NEVER,
+    UMKA_RUNNING_NOT_YET,
+    UMKA_RUNNING_YES,
+};
+
 struct umka_ctx {
     int booted;
     atomic_int running;
@@ -542,7 +548,7 @@ void
 irq0(int signo, siginfo_t *info, void *context);
 
 struct umka_ctx *
-umka_init(void);
+umka_init(int running);
 
 void
 umka_close(struct umka_ctx *ctx);

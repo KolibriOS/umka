@@ -10,28 +10,28 @@
 #ifndef VNET_H_INCLUDED
 #define VNET_H_INCLUDED
 
+#include <stdatomic.h>
 #include "umka.h"
 
-#define UMKA_VNET_NAME "umka%d"
 #define VNET_BUFIN_CAP (NET_BUFFER_SIZE - offsetof(net_buff_t, data))
 
 enum vnet_type {
-    VNET_FILE,
-    VNET_TAP,
+    VNET_DEVTYPE_NULL,
+    VNET_DEVTYPE_FILE,
+    VNET_DEVTYPE_TAP,
 };
 
 struct vnet {
     struct eth_device eth;
     uint8_t bufin[VNET_BUFIN_CAP];
     size_t bufin_len;
-//    pthread_cond_t cond;
-//    pthread_mutex_t mutex;
     int fdin;
     int fdout;
     int input_processed;
+    const atomic_int *running;
 };
 
 struct vnet *
-vnet_init(enum vnet_type type);
+vnet_init(enum vnet_type type, const atomic_int *running);
 
 #endif  // VNET_H_INCLUDED

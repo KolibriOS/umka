@@ -17,6 +17,6 @@
 #define QCOW2_SUFFIX ".qcow2"
 
 struct vdisk*
-vdisk_init_qcow2(const char *fname, struct umka_io *io);
+vdisk_init_qcow2(const char *fname, const struct umka_io *io);
 
 #endif  // VDISK_QCOW2_H_INCLUDED

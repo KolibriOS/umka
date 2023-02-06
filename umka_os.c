@@ -72,14 +72,15 @@ struct umka_os_ctx *
 umka_os_init(FILE *fstartup, FILE *fboardlog) {
     struct umka_os_ctx *ctx = malloc(sizeof(struct umka_os_ctx));
     ctx->fboardlog = fboardlog;
-    ctx->umka = umka_init();
+    ctx->umka = umka_init(UMKA_RUNNING_NOT_YET);
     ctx->io = io_init(&ctx->umka->running);
     ctx->shell = shell_init(SHELL_LOG_NONREPRODUCIBLE, history_filename,
-                            ctx->umka, ctx->io, fstartup, &ctx->umka->running);
+                            ctx->umka, ctx->io, fstartup);
     return ctx;
 }
 
-void build_history_filename(void) {
+static void
+build_history_filename(void) {
     const char *dir_name;
     if (!(dir_name = getenv("HOME"))) {
         dir_name = ".";
@@ -87,7 +88,8 @@ void build_history_filename(void) {
     sprintf(history_filename, "%s/%s", dir_name, HIST_FILE_BASENAME);
 }
 
-void umka_thread_net_drv(void);
+void
+umka_thread_net_drv(void);
 
 struct itimerval timeout = {.it_value = {.tv_sec = 0, .tv_usec = 10000},
                             .it_interval = {.tv_sec = 0, .tv_usec = 10000}};
@@ -401,7 +403,7 @@ main(int argc, char *argv[]) {
 
 //    load_app("/rd/1/loader");
 
-    struct vnet *vnet = vnet_init(VNET_TAP);
+    struct vnet *vnet = vnet_init(VNET_DEVTYPE_TAP, &os->umka->running);
     if (vnet) {
         kos_net_add_device(&vnet->eth.net);
     } else {
@@ -462,7 +464,7 @@ main(int argc, char *argv[]) {
 
     setitimer(ITIMER_REAL, &timeout, NULL);
 
-    atomic_store_explicit(&os->umka->running, 1, memory_order_release);
+    atomic_store_explicit(&os->umka->running, UMKA_RUNNING_YES, memory_order_release);
     umka_osloop();   // doesn't return
 
     if (coverage)
