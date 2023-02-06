@@ -55,7 +55,7 @@ vdisk_raw_write(void *userdata, void *buffer, off_t startsector,
 
 struct vdisk*
 vdisk_init_raw(const char *fname, struct umka_io *io) {
-    int fd = open(fname, O_RDONLY);
+    int fd = open(fname, O_RDONLY | O_BINARY);
     if (!fd) {
         printf("[vdisk.raw]: can't open file '%s': %s\n", fname, strerror(errno));
         return NULL;

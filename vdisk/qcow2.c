@@ -213,7 +213,7 @@ vdisk_init_qcow2(const char *fname, struct umka_io *io) {
                                      };
     d->vdisk.io = io;
     d->prev_cluster_index = ~(uint64_t)0;
-    if (!(d->fd = open(fname, O_RDONLY))) {
+    if (!(d->fd = open(fname, O_RDONLY | O_BINARY))) {
         fprintf(stderr, "[vdisk.qcow2] can't open file '%s': %s\n", fname,
                 strerror(errno));
         vdisk_qcow2_close(d);

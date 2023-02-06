@@ -1510,7 +1510,7 @@ cmd_set_keyboard_layout(struct shell_ctx *ctx, int argc, char **argv) {
     uint8_t layout[KOS_LAYOUT_SIZE];
     if (!strcmp(argv[3], "-f") && argc == 5) {
         const char *fname = argv[4];
-        FILE *f = fopen(fname, "r");
+        FILE *f = fopen(fname, "rb");
         if (!f) {
             fprintf(ctx->fout, "can't open file: %s\n", fname);
             fputs(usage, ctx->fout);
@@ -2877,7 +2877,6 @@ cmd_load_dll(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 
-#ifndef _WIN32
 
 static void
 cmd_stack_init(struct shell_ctx *ctx, int argc, char **argv) {
@@ -3630,7 +3629,6 @@ cmd_net_arp_del_entry(struct shell_ctx *ctx, int argc, char **argv) {
     }
 }
 
-#endif // _WIN32
 
 static void
 cmd_osloop(struct shell_ctx *ctx, int argc, char **argv) {
@@ -3901,7 +3899,6 @@ func_table_t cmd_cmds[] = {
     { "ls80",                           cmd_ls80 },
     { "move_window",                    cmd_move_window },
     { "mouse_move",                     cmd_mouse_move },
-#ifndef _WIN32
     { "stack_init",                     cmd_stack_init },
     { "net_accept",                     cmd_net_accept },
     { "net_add_device",                 cmd_net_add_device },
@@ -3934,7 +3931,6 @@ func_table_t cmd_cmds[] = {
     { "net_ipv4_set_subnet",            cmd_net_ipv4_set_subnet },
     { "net_listen",                     cmd_net_listen },
     { "net_open_socket",                cmd_net_open_socket },
-#endif // _WIN32
     { "osloop",                         cmd_osloop },
     { "pci_get_path",                   cmd_pci_get_path },
     { "pci_set_path",                   cmd_pci_set_path },

@@ -62,7 +62,7 @@ umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
             $(HOST)/vnet/tap.o vnet/file.o lodepng.o $(HOST)/pci.o \
             $(HOST)/thread.o umkaio.o umkart.o deps/optparse/optparse.o \
             deps/isocline/src/isocline.o
-	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld $(LIBS)
+	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld $(LIBS) -lws2_32
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
            vdisk/qcow2.o deps/em_inflate/em_inflate.o $(HOST)/pci.o \

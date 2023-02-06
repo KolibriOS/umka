@@ -144,8 +144,8 @@ pubsym acpi_node_alloc_cnt, 'kos_acpi_node_alloc_cnt'
 pubsym acpi_node_free_cnt, 'kos_acpi_node_free_cnt'
 pubsym acpi.count_nodes, 'kos_acpi_count_nodes', 4
 
-pubsym stack_init, 'kos_stack_init'
-pubsym net_add_device
+pubsym stack_init, 'kos_stack_init', no_mangle
+pubsym net_add_device, no_mangle
 
 pubsym draw_data
 pubsym img_background
