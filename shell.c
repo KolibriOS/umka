@@ -2876,8 +2876,6 @@ cmd_load_dll(struct shell_ctx *ctx, int argc, char **argv) {
     fprintf(ctx->fout, "### export: %p\n", export);
 }
 
-
-
 static void
 cmd_stack_init(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
@@ -3643,7 +3641,6 @@ cmd_net_arp_del_entry(struct shell_ctx *ctx, int argc, char **argv) {
         fprintf(ctx->fout, "status: fail\n");
     }
 }
-
 
 static void
 cmd_osloop(struct shell_ctx *ctx, int argc, char **argv) {

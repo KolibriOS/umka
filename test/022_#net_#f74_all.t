@@ -1,3 +1,4 @@
+umka_boot
 net_get_dev_count
 stack_init
 net_get_dev_count

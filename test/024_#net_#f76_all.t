@@ -1,3 +1,4 @@
+umka_boot
 stack_init
 net_add_device
 net_get_dev_type 1
