@@ -121,35 +121,29 @@ Allow reading process_vm_readv syscall.
 Links & Acknowledgements
 ------------------------
 
-[ 1] Filesystem in Userspace
-     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/fs/fuse
+[1] Filesystem in Userspace
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/fs/fuse
 
-[ 2] Filesystem in Userspace library
-     https://github.com/libfuse/libfuse
+[2] Filesystem in Userspace library
+    https://github.com/libfuse/libfuse
 
-[ 3] LodePNG by Lode Vandevenne
-     https://lodev.org/lodepng/
+[3] LodePNG by Lode Vandevenne
+    https://lodev.org/lodepng/
 
-[ 4] Optparse by Christopher Wellons
-     https://github.com/skeeto/optparse
+[4] Optparse by Christopher Wellons
+    https://github.com/skeeto/optparse
 
-[ 5] Universal TUN/TAP device driver by Maxim Krasnyansky and others
-     https://www.kernel.org/doc/html/v5.12/networking/tuntap.html
+[5] Universal TUN/TAP device driver by Maxim Krasnyansky and others
+    https://www.kernel.org/doc/html/v5.12/networking/tuntap.html
 
-[ 6] Isocline by Daan Leijen
-     https://github.com/daanx/isocline
+[6] Isocline by Daan Leijen
+    https://github.com/daanx/isocline
 
-[ 7] em_inflate by Emmanuel Marty
-     https://github.com/emmanuel-marty/em_inflate
+[7] em_inflate by Emmanuel Marty
+    https://github.com/emmanuel-marty/em_inflate
 
-[ 8] qemu-nbd by Anthony Liguori and others
-     https://www.qemu.org/docs/master/tools/qemu-nbd.html
+[8] qemu-nbd by Anthony Liguori and others
+    https://www.qemu.org/docs/master/tools/qemu-nbd.html
 
-[ 9] io_uring by Jens Axboe and others
-     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/io_uring
-
-[10] io_uring-by-example by Shuveb Hussain
-     https://github.com/shuveb/io_uring-by-example
-
-[11] Simple DirectMedia Layer library aka SDL2
-     https://libsdl.org
+[9] Simple DirectMedia Layer library aka SDL2
+    https://libsdl.org
