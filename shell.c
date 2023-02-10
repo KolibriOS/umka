@@ -41,8 +41,6 @@
 #include "optparse/optparse.h"
 #include "isocline/include/isocline.h"
 
-char *bestlineFile(const char *prompt, FILE *fin, FILE *fout);
-
 #define MAX_COMMAND_ARGS 42
 #define PRINT_BYTES_PER_LINE 32
 #define MAX_DIRENTS_TO_READ 100
@@ -50,6 +48,64 @@ char *bestlineFile(const char *prompt, FILE *fin, FILE *fout);
 
 #define DEFAULT_READDIR_ENCODING UTF8
 #define DEFAULT_PATH_ENCODING UTF8
+
+#define SHELL_CMD_BUF_LEN 0x10
+
+enum {
+    UMKA_CMD_NONE,
+    UMKA_CMD_SET_MOUSE_DATA,
+    UMKA_CMD_SYS_PROCESS_INFO,
+    UMKA_CMD_SYS_GET_MOUSE_POS_SCREEN,
+    UMKA_CMD_SYS_LFN,
+};
+
+enum {
+    SHELL_CMD_STATUS_EMPTY,
+    SHELL_CMD_STATUS_READY,
+    SHELL_CMD_STATUS_DONE,
+};
+
+struct cmd_set_mouse_data {
+    uint32_t btn_state;
+    int32_t xmoving;
+    int32_t ymoving;
+    int32_t vscroll;
+    int32_t hscroll;
+};
+
+struct cmd_sys_lfn {
+    f70or80_t f70or80;
+    f7080s1arg_t *bufptr;
+    f7080ret_t *r;
+};
+
+struct cmd_ret_sys_lfn {
+    f7080ret_t status;
+};
+
+struct cmd_sys_process_info {
+    int32_t pid;
+    void *param;
+};
+
+struct cmd_ret_sys_get_mouse_pos_screen {
+    struct point16s pos;
+};
+
+struct umka_cmd {
+    atomic_int status;
+    uint32_t type;
+    union {
+        struct cmd_set_mouse_data set_mouse_data;
+        struct cmd_sys_lfn sys_lfn;
+    } arg;
+    union {
+        struct cmd_ret_sys_get_mouse_pos_screen sys_get_mouse_pos_screen;
+        struct cmd_ret_sys_lfn sys_lfn;
+    } ret;
+};
+
+struct umka_cmd umka_cmd_buf[SHELL_CMD_BUF_LEN];
 
 char prompt_line[PATH_MAX];
 char cur_dir[PATH_MAX] = "/";
@@ -62,9 +118,9 @@ typedef struct {
 } func_table_t;
 
 void
-umka_run_cmd_sync(struct shell_ctx *ctx) {
+shell_run_cmd_sync(struct shell_ctx *ctx) {
     struct umka_cmd *cmd = umka_cmd_buf;
-    if (atomic_load_explicit(&cmd->status, memory_order_acquire) != UMKA_CMD_STATUS_READY) {
+    if (atomic_load_explicit(&cmd->status, memory_order_acquire) != SHELL_CMD_STATUS_READY) {
         fprintf(ctx->fout, "[!] command is not ready: %d: %u\n", cmd - umka_cmd_buf, cmd->type);
         return;
     }
@@ -84,17 +140,35 @@ umka_run_cmd_sync(struct shell_ctx *ctx) {
         fprintf(ctx->fout, "[!] unknown command: %u\n", cmd->type);
         break;
     }
-    atomic_store_explicit(&cmd->status, UMKA_CMD_STATUS_DONE,
+    atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_DONE,
                           memory_order_release);
     pthread_cond_signal(&ctx->cmd_done);
 }
 
 static void
-umka_run_cmd(struct shell_ctx *ctx) {
+shell_run_cmd(struct shell_ctx *ctx) {
     if (atomic_load_explicit(ctx->running, memory_order_acquire)) {
         pthread_cond_wait(&ctx->cmd_done, &ctx->cmd_mutex);
     } else {
-        umka_run_cmd_sync(ctx);
+        shell_run_cmd_sync(ctx);
+    }
+}
+
+static uint32_t
+shell_run_cmd_wait_test(void /* struct appdata * with wait_param is in ebx */) {
+    appdata_t *app;
+    __asm__ __volatile__ __inline__ ("":"=b"(app)::);
+    struct umka_cmd *cmd = (struct umka_cmd*)app->wait_param;
+    return (uint32_t)(atomic_load_explicit(&cmd->status, memory_order_acquire) == SHELL_CMD_STATUS_READY);
+}
+
+static void
+thread_cmd_runner(void *arg) {
+    umka_sti();
+    struct shell_ctx *ctx = arg;
+    while (1) {
+        kos_wait_events(shell_run_cmd_wait_test, umka_cmd_buf);
+        shell_run_cmd_sync(ctx);
     }
 }
 
@@ -457,6 +531,13 @@ cmd_umka_boot(struct shell_ctx *ctx, int argc, char **argv) {
     COVERAGE_ON();
     umka_boot();
     COVERAGE_OFF();
+
+    if (*ctx->running != UMKA_RUNNING_NEVER) {
+        char *stack = malloc(UMKA_DEFAULT_THREAD_STACK_SIZE);
+        char *stack_top = stack + UMKA_DEFAULT_THREAD_STACK_SIZE;
+        size_t tid = umka_new_sys_threads(1, thread_cmd_runner, stack_top, ctx);
+        (void)tid;
+    }
 }
 
 static void
@@ -1034,7 +1115,7 @@ cmd_new_sys_thread(struct shell_ctx *ctx, int argc, char **argv) {
         fputs(usage, ctx->fout);
         return;
     }
-    size_t tid = umka_new_sys_threads(0, NULL, NULL);
+    size_t tid = kos_new_sys_threads(0, NULL, NULL);
     fprintf(ctx->fout, "tid: %u\n", tid);
 }
 
@@ -1132,13 +1213,13 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
     c->ymoving = ymoving;
     c->vscroll = vscroll;
     c->hscroll = hscroll;
-    atomic_store_explicit(&cmd->status, UMKA_CMD_STATUS_READY,
+    atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_READY,
                           memory_order_release);
     COVERAGE_ON();
-    umka_run_cmd(ctx);
+    shell_run_cmd(ctx);
     COVERAGE_OFF();
 
-    atomic_store_explicit(&cmd->status, UMKA_CMD_STATUS_EMPTY,
+    atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_EMPTY,
                           memory_order_release);
 }
 
@@ -2360,13 +2441,12 @@ ls_all(struct shell_ctx *ctx, f7080s1arg_t *fX0, f70or80_t f70or80) {
         c->bufptr = fX0;
         c->r = &r;
 
-        atomic_store_explicit(&cmd->status, UMKA_CMD_STATUS_READY,
+        atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_READY,
                               memory_order_release);
         COVERAGE_ON();
-//        umka_sys_lfn(fX0, &r, f70or80);
-        umka_run_cmd(ctx);
+        shell_run_cmd(ctx);
         COVERAGE_OFF();
-        atomic_store_explicit(&cmd->status, UMKA_CMD_STATUS_EMPTY,
+        atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_EMPTY,
                               memory_order_release);
         print_f70_status(ctx, &r, 1);
         assert((r.status == ERROR_SUCCESS && r.count == fX0->size)
@@ -3031,7 +3111,7 @@ cmd_net_get_dev(struct shell_ctx *ctx, int argc, char **argv) {
     intptr_t dev = umka_sys_net_get_dev(dev_num);
     COVERAGE_OFF();
     fprintf(ctx->fout, "status: %s\n", dev == -1 ? "fail" : "ok");
-    if (dev != -1) {
+    if (!ctx->reproducible && dev != -1) {
         fprintf(ctx->fout, "address of net dev #%" PRIu8 ": 0x%x\n", dev_num, dev);
     }
 }
@@ -4020,6 +4100,7 @@ run_test(struct shell_ctx *ctx) {
         dup2(fileno(ctx->fin), STDIN_FILENO);
         fclose(ctx->fin);
     }
+    ic_init_custom_malloc(NULL, NULL, NULL);
 //    ic_style_def("ic-prompt","ansi-default");
     ic_enable_color(0);
     ic_set_prompt_marker(NULL, NULL);
@@ -4027,14 +4108,14 @@ run_test(struct shell_ctx *ctx) {
     ic_enable_beep(0);
 
     pthread_mutex_lock(&ctx->cmd_mutex);
-    int is_tty = isatty(fileno(ctx->fin));
+    int is_tty = isatty(fileno(stdin));
     char **argv = (char**)calloc(sizeof(char*), (MAX_COMMAND_ARGS + 1));
-    ic_set_default_completer(&completer, NULL);
+    ic_set_default_completer(completer, NULL);
     ic_set_default_highlighter(highlighter, NULL);
     ic_enable_auto_tab(1);
     sprintf(prompt_line, "%s", last_dir);
     char *line;
-    while((line = ic_readline(prompt_line)) || !feof(stdin)) {
+    while ((line = ic_readline(prompt_line)) || !feof(stdin)) {
         if (!is_tty) {
             prompt(ctx);
             fprintf(ctx->fout, "%s\n", line ? line : "");

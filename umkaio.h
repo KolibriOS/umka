@@ -23,53 +23,6 @@ struct umka_io {
     pthread_t iot;
 };
 
-struct iot_cmd_read_arg {
-    int fd;
-    void *buf;
-    size_t count;
-};
-
-struct iot_cmd_read_ret {
-    ssize_t val;
-};
-
-union iot_cmd_read {
-    struct iot_cmd_read_arg arg;
-    struct iot_cmd_read_ret ret;
-};
-
-struct iot_cmd_write_arg {
-    int fd;
-    void *buf;
-    size_t count;
-};
-
-struct iot_cmd_write_ret {
-    ssize_t val;
-};
-
-union iot_cmd_write {
-    struct iot_cmd_write_arg arg;
-    struct iot_cmd_write_ret ret;
-};
-
-enum {
-    IOT_CMD_TYPE_READ,
-    IOT_CMD_TYPE_WRITE,
-};
-
-struct iot_cmd {
-    pthread_cond_t iot_cond;
-    pthread_mutex_t iot_mutex;
-    pthread_mutex_t mutex;
-    atomic_int status;
-    int type;
-    union {
-        union iot_cmd_read read;
-        union iot_cmd_write write;
-    };
-};
-
 struct umka_io *
 io_init(atomic_int *running);
 

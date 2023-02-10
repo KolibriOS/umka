@@ -565,7 +565,7 @@ static signal_handler_t sighandlers[] = {
   { SIGINT  , {0} }, 
   { SIGQUIT , {0} }, 
   { SIGHUP  , {0} },
-  { SIGSEGV , {0} }, 
+//  { SIGSEGV , {0} },
   { SIGTRAP , {0} }, 
   { SIGBUS  , {0} }, 
   { SIGTSTP , {0} },

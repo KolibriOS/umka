@@ -2,4 +2,5 @@ umka_set_boot_params --bpp 32 --x_res 800 --y_res 600
 umka_boot
 ramdisk_init ../img/kolibri.raw
 set_skin /sys/DEFAULT.SKN
-disk_add ../img/xfs_samehash_s05k.raw  hd0 -c 0
+disk_add ../img/xfs_samehash_s05k.raw hd0 -c 0
+stack_init

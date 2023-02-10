@@ -25,8 +25,6 @@ struct devices_dat_entry {
     uint32_t pad2;
 };
 
-struct umka_cmd umka_cmd_buf[CMD_BUF_LEN];
-
 static STDCALL void*
 dump_devices_dat_iter(struct pci_dev *node, void *arg) {
     FILE *f = arg;

@@ -33,7 +33,6 @@
 
 #define HIST_FILE_BASENAME ".umka_os.history"
 
-#define THREAD_STACK_SIZE 0x100000
 #define APP_MAX_MEM_SIZE 0x1000000
 #define UMKA_LDR_BASE ((void*)0x1000000)
 
@@ -47,19 +46,6 @@ struct umka_os_ctx {
 struct umka_os_ctx *os;
 
 char history_filename[PATH_MAX];
-
-static void
-completer(ic_completion_env_t *cenv, const char *prefix) {
-    (void)cenv;
-    (void)prefix;
-}
-
-static void
-highlighter(ic_highlight_env_t *henv, const char *input, void *arg) {
-    (void)henv;
-    (void)input;
-    (void)arg;
-}
 
 static int
 hw_int_mouse(void *arg) {
@@ -88,25 +74,20 @@ build_history_filename(void) {
     sprintf(history_filename, "%s/%s", dir_name, HIST_FILE_BASENAME);
 }
 
-void
-umka_thread_net_drv(void);
-
 struct itimerval timeout = {.it_value = {.tv_sec = 0, .tv_usec = 10000},
                             .it_interval = {.tv_sec = 0, .tv_usec = 10000}};
 
-typedef void (*kos_thread_t)(void);
-
 static void
-thread_start(int is_kernel, void (*entry)(void), size_t stack_size) {
-    fprintf(stderr, "### thread_start: %p\n", (void*)(uintptr_t)entry);
+thread_start(int is_kernel, kos_thread_t entry, size_t stack_size) {
+    fprintf(stderr, "[os] starting thread: %p\n", (void*)(uintptr_t)entry);
     uint8_t *stack = malloc(stack_size);
-    umka_new_sys_threads(is_kernel, entry, stack + stack_size);
+    kos_new_sys_threads(is_kernel, entry, stack + stack_size);
 }
 
 static void
 dump_procs(void) {
     for (int i = 0; i < KOS_NR_SCHED_QUEUES; i++) {
-        fprintf(stderr, "sched queue #%i:", i);
+        fprintf(stderr, "[os] sched queue #%i:", i);
         appdata_t *p_begin = kos_scheduler_current[i];
         appdata_t *p = p_begin;
         do {
@@ -119,7 +100,7 @@ dump_procs(void) {
 
 int
 load_app_host(const char *fname, struct app_hdr *app) {
-    FILE *f = fopen(fname, "r");
+    FILE *f = fopen(fname, "rb");
     if (!f) {
         fprintf(stderr, "[!] can't open app file: %s", fname);
         exit(1);
@@ -128,7 +109,7 @@ load_app_host(const char *fname, struct app_hdr *app) {
     fclose(f);
 
     kos_thread_t start = (kos_thread_t)(app->menuet.start);
-    thread_start(0, start, THREAD_STACK_SIZE);
+    thread_start(0, start, UMKA_DEFAULT_THREAD_STACK_SIZE);
     return 0;
 }
 
@@ -222,27 +203,10 @@ umka_display(void *arg) {
     return NULL;
 }
 
-static uint32_t
-umka_run_cmd_wait_test(void /* struct appdata * with wait_param is in ebx */) {
-    appdata_t *app;
-    __asm__ __volatile__ __inline__ ("":"=b"(app)::);
-    struct umka_cmd *cmd = (struct umka_cmd*)app->wait_param;
-    return (uint32_t)(atomic_load_explicit(&cmd->status, memory_order_acquire) == UMKA_CMD_STATUS_READY);
-}
-
-static void
-umka_thread_cmd_runner(void) {
-    umka_sti();
-    while (1) {
-        kos_wait_events(umka_run_cmd_wait_test, umka_cmd_buf);
-        umka_run_cmd_sync(os->shell);
-    }
-}
-
 static void *
 umka_monitor(void *arg) {
-    (void)arg;
-    run_test(os->shell);
+    struct shell_ctx *sh = arg;
+    run_test(sh);
     exit(0);
 }
 
@@ -263,7 +227,7 @@ int
 main(int argc, char *argv[]) {
     (void)argc;
     const char *usage = "umka_os [-i <infile>] [-o <outfile>]"
-                        " [-b <boardlog>] [\n";
+                        " [-b <boardlog>] [-s <startupfile>]\n";
     if (coverage) {
         trace_begin();
     }
@@ -273,9 +237,6 @@ main(int argc, char *argv[]) {
     umka_sti();
 
     build_history_filename();
-    ic_set_default_completer(&completer, NULL);
-    ic_set_default_highlighter(highlighter, NULL);
-    ic_enable_auto_tab(1);
 
     const char *startupfile = NULL;
     const char *infile = NULL;
@@ -315,7 +276,7 @@ main(int argc, char *argv[]) {
     }
 
     if (startupfile) {
-        fstartup = fopen(startupfile, "r");
+        fstartup = fopen(startupfile, "rb");
         if (!fstartup) {
             fprintf(stderr, "[!] can't open file for reading: %s\n",
                     startupfile);
@@ -323,21 +284,21 @@ main(int argc, char *argv[]) {
         }
     }
     if (infile) {
-        fin = fopen(infile, "r");
+        fin = fopen(infile, "rb");
         if (!fin) {
             fprintf(stderr, "[!] can't open file for reading: %s\n", infile);
             exit(1);
         }
     }
     if (outfile) {
-        fout = fopen(outfile, "w");
+        fout = fopen(outfile, "wb");
         if (!fout) {
             fprintf(stderr, "[!] can't open file for writing: %s\n", outfile);
             exit(1);
         }
     }
     if (boardlogfile) {
-        fboardlog = fopen(boardlogfile, "w");
+        fboardlog = fopen(boardlogfile, "wb");
         if (!fboardlog) {
             fprintf(stderr, "[!] can't open file for writing: %s\n",
                     boardlogfile);
@@ -399,7 +360,7 @@ main(int argc, char *argv[]) {
 
     run_test(os->shell);
     os->shell->fin = fin;
-    umka_stack_init();
+    clearerr(stdin);    // reset feof
 
 //    load_app("/rd/1/loader");
 
@@ -446,8 +407,7 @@ main(int argc, char *argv[]) {
 
     kos_attach_int_handler(UMKA_IRQ_MOUSE, hw_int_mouse, NULL);
 
-    thread_start(1, umka_thread_board, THREAD_STACK_SIZE);
-    thread_start(1, umka_thread_cmd_runner, THREAD_STACK_SIZE);
+    thread_start(1, umka_thread_board, UMKA_DEFAULT_THREAD_STACK_SIZE);
     load_app_host("../apps/loader", UMKA_LDR_BASE);
 //    load_app_host("../apps/justawindow", KOS_APP_BASE);
     load_app_host("../apps/asciivju", KOS_APP_BASE);
@@ -455,7 +415,7 @@ main(int argc, char *argv[]) {
     dump_procs();
 
     pthread_t thread_monitor;
-    pthread_create(&thread_monitor, NULL, umka_monitor, NULL);
+    pthread_create(&thread_monitor, NULL, umka_monitor, os->shell);
 
     if (show_display) {
         pthread_t thread_display;

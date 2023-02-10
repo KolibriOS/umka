@@ -607,7 +607,7 @@ typedef void  (ic_free_fun_t)( void* p );
 
 /// Initialize with custom allocation functions.
 /// This must be called as the first function in a program!
-void ic_init_custom_alloc( ic_malloc_fun_t* _malloc, ic_realloc_fun_t* _realloc, ic_free_fun_t* _free );
+void ic_init_custom_malloc( ic_malloc_fun_t* _malloc, ic_realloc_fun_t* _realloc, ic_free_fun_t* _free );
 
 /// Free a potentially custom alloc'd pointer (in particular, the result returned from `ic_readline`)
 void ic_free( void* p );

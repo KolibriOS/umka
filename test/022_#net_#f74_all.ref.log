@@ -44,10 +44,8 @@ status: ok
 status: ok
 /> net_get_dev 0
 status: ok
-address of net dev #0: 0x80d12d8
 /> net_get_dev 1
 status: ok
-address of net dev #1: 0x2aa8b100
 /> net_get_packet_tx_count 0
 status: ok
 packet tx count of net dev #0: 0

@@ -13,14 +13,16 @@ WARNINGS_COMMON=-Wall -Wextra \
          #-Wconversion -Wsign-conversion
 NOWARNINGS_COMMON=-Wno-address-of-packed-member
 
-ifneq (,$(findstring gcc,$(CC)))
-        WARNINGS=$(WARNINGS_COMMON) -Wduplicated-cond -Wduplicated-branches -Wrestrict -Wlogical-op -Wjump-misses-init
-        NOWARNINGS=$(NOWARNINGS_COMMON)
-        CFLAGS_ISOCLINE=-Wno-duplicated-branches
-else ifneq (,$(findstring clang,$(CC)))
+CFLAGS_ISOCLINE_COMMON=-D__MINGW_USE_VC2005_COMPAT
+ifeq (,$(findstring gcc,$(CC)))
         WARNINGS=$(WARNINGS_COMMON)
         NOWARNINGS=$(NOWARNINGS_COMMON) -Wno-missing-prototype-for-cc
-        CFLAGS_ISOCLINE=-Wno-format-nonliteral
+        CFLAGS_ISOCLINE=$(CFLAGS_ISOCLINE_COMMON) -Wno-format-nonliteral
+else ifeq (,$(findstring clang,$(CC)))
+        WARNINGS=$(WARNINGS_COMMON) -Wduplicated-cond -Wduplicated-branches \
+                 -Wrestrict -Wlogical-op -Wjump-misses-init
+        NOWARNINGS=$(NOWARNINGS_COMMON)
+        CFLAGS_ISOCLINE=$(CFLAGS_ISOCLINE_COMMON) -Wno-duplicated-branches
 else
         $(error your compiler is not supported)
 endif
@@ -103,7 +105,7 @@ lodepng.o: lodepng.c lodepng.h
 
 deps/isocline/src/isocline.o: deps/isocline/src/isocline.c \
         deps/isocline/include/isocline.h
-	$(CC) $(CFLAGS_32) -D__MINGW_USE_VC2005_COMPAT $(CFLAGS_ISOCLINE) -c $< -o $@ -Wno-shadow \
+	$(CC) $(CFLAGS_32) $(CFLAGS_ISOCLINE) -c $< -o $@ -Wno-shadow \
                 -Wno-unused-function
 
 deps/optparse/optparse.o: deps/optparse/optparse.c deps/optparse/optparse.h

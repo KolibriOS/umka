@@ -20,6 +20,8 @@
 #include <time.h>
 
 #define UMKA_PATH_MAX 4096
+#define UMKA_DEFAULT_THREAD_STACK_SIZE 0x10000
+
 // TODO: Cleanup
 #ifndef _WIN32
 #include <signal.h> // for irq0: siginfo_t
@@ -614,144 +616,6 @@ struct ret_create_event {
     uint32_t uid;
 };
 
-static inline struct ret_create_event
-kos_create_event(void *data, uint32_t flags) {
-    struct ret_create_event ret;
-    __asm__ __inline__ __volatile__ (
-        "push   ebx esi edi ebp;"
-        "call   _kos_create_event;"
-        "pop    ebp edi esi ebx"
-        : "=a"(ret.event),
-          "=d"(ret.uid)
-        : "S"(data),
-          "c"(flags)
-        : "memory", "cc");
-    return ret;
-}
-
-static inline void*
-kos_destroy_event(void *event, uint32_t uid) {
-    void *ret;
-    __asm__ __inline__ __volatile__ (
-        "push   ebx;"
-        "push   esi;"
-        "push   edi;"
-        "push   ebp;"
-        "call   _kos_destroy_event;"
-        "pop    ebp;"
-        "pop    edi;"
-        "pop    esi;"
-        "pop    ebx"
-        : "=a"(ret)
-        : "a"(event),
-          "b"(uid)
-        : "memory", "cc");
-    return ret;
-}
-
-static inline void
-kos_wait_event(void *event, uint32_t uid) {
-    __asm__ __inline__ __volatile__ (
-        "push   ebx;"
-        "push   esi;"
-        "push   edi;"
-        "push   ebp;"
-        "call   _kos_wait_event;"
-        "pop    ebp;"
-        "pop    edi;"
-        "pop    esi;"
-         "pop   ebx"
-        :
-        : "a"(event),
-          "b"(uid)
-        : "memory", "cc");
-}
-
-typedef uint32_t (*wait_test_t)(void);
-
-static inline void *
-kos_wait_events(wait_test_t wait_test, void *wait_param) {
-    void *res;
-    __asm__ __inline__ __volatile__ (
-        "push   ebx;"
-        "push   esi;"
-        "push   edi;"
-        "push   ebp;"
-        "call   _kos_wait_events;"
-        "pop    ebp;"
-        "pop    edi;"
-        "pop    esi;"
-        "pop    ebx"
-        : "=a"(res)
-        : "c"(wait_param),
-          "d"(wait_test)
-        : "memory", "cc");
-    return res;
-}
-
-static inline int32_t
-umka_fs_execute(const char *filename) {
-// edx Flags
-// ecx Commandline
-// ebx Absolute file path
-// eax String length
-    int32_t result;
-    __asm__ __inline__ __volatile__ (
-        "push   ebp;"
-        "call   kos_fs_execute;"
-        "pop    ebp"
-        : "=a"(result)
-        : "a"(strlen(filename)),
-          "b"(filename),
-          "c"(NULL),
-          "d"(0)
-        : "memory");
-    return result;
-}
-
-static inline size_t
-umka_new_sys_threads(uint32_t flags, void (*entry)(void), void *stack) {
-    size_t tid;
-    __asm__ __inline__ __volatile__ (
-        "push   ebx;"
-        "push   esi;"
-        "push   edi;"
-        "call   kos_new_sys_threads;"
-        "pop    edi;"
-        "pop    esi;"
-        "pop    ebx"
-        : "=a"(tid)
-        : "b"(flags),
-          "c"(entry),
-          "d"(stack)
-        : "memory", "cc");
-    return tid;
-}
-
-static inline void
-kos_enable_acpi(void) {
-    __asm__ __inline__ __volatile__ (
-        "pusha;"
-        "call   enable_acpi;"
-        "popa"
-        :
-        :
-        : "memory", "cc");
-}
-
-static inline void
-kos_acpi_call_name(void *ctx, const char *name) {
-    __asm__ __inline__ __volatile__ (
-        "pusha;"
-        "push   %[name];"
-        "push   %[ctx];"
-        "call   acpi.call_name;"
-        "popa"
-        :
-        : [ctx] "r"(ctx), [name] "r"(name)
-        : "memory", "cc");
-}
-
 #define KOS_ACPI_NODE_Uninitialized 1
 #define KOS_ACPI_NODE_Integer       2
 #define KOS_ACPI_NODE_String        3
@@ -1156,6 +1020,160 @@ umka_i40(pushad_t *regs) {
             regs->ebp,
             &regs->eax,
             &regs->ebx);
+}
+
+static inline struct ret_create_event
+kos_create_event(void *data, uint32_t flags) {
+    struct ret_create_event ret;
+    __asm__ __inline__ __volatile__ (
+        "push   ebx esi edi ebp;"
+        "call   _kos_create_event;"
+        "pop    ebp edi esi ebx"
+        : "=a"(ret.event),
+          "=d"(ret.uid)
+        : "S"(data),
+          "c"(flags)
+        : "memory", "cc");
+    return ret;
+}
+
+static inline void*
+kos_destroy_event(void *event, uint32_t uid) {
+    void *ret;
+    __asm__ __inline__ __volatile__ (
+        "push   ebx;"
+        "push   esi;"
+        "push   edi;"
+        "push   ebp;"
+        "call   _kos_destroy_event;"
+        "pop    ebp;"
+        "pop    edi;"
+        "pop    esi;"
+        "pop    ebx"
+        : "=a"(ret)
+        : "a"(event),
+          "b"(uid)
+        : "memory", "cc");
+    return ret;
+}
+
+static inline void
+kos_wait_event(void *event, uint32_t uid) {
+    __asm__ __inline__ __volatile__ (
+        "push   ebx;"
+        "push   esi;"
+        "push   edi;"
+        "push   ebp;"
+        "call   _kos_wait_event;"
+        "pop    ebp;"
+        "pop    edi;"
+        "pop    esi;"
+         "pop   ebx"
+        :
+        : "a"(event),
+          "b"(uid)
+        : "memory", "cc");
+}
+
+typedef uint32_t (*wait_test_t)(void);
+
+static inline void *
+kos_wait_events(wait_test_t wait_test, void *wait_param) {
+    void *res;
+    __asm__ __inline__ __volatile__ (
+        "push   ebx;"
+        "push   esi;"
+        "push   edi;"
+        "push   ebp;"
+        "call   _kos_wait_events;"
+        "pop    ebp;"
+        "pop    edi;"
+        "pop    esi;"
+        "pop    ebx"
+        : "=a"(res)
+        : "c"(wait_param),
+          "d"(wait_test)
+        : "memory", "cc");
+    return res;
+}
+
+static inline int32_t
+umka_fs_execute(const char *filename) {
+// edx Flags
+// ecx Commandline
+// ebx Absolute file path
+// eax String length
+    int32_t result;
+    __asm__ __inline__ __volatile__ (
+        "push   ebp;"
+        "call   kos_fs_execute;"
+        "pop    ebp"
+        : "=a"(result)
+        : "a"(strlen(filename)),
+          "b"(filename),
+          "c"(NULL),
+          "d"(0)
+        : "memory");
+    return result;
+}
+
+typedef void (*kos_thread_t)(void);
+
+static inline size_t
+kos_new_sys_threads(uint32_t flags, kos_thread_t entry, void *stack_top) {
+    size_t tid;
+    __asm__ __inline__ __volatile__ (
+        "push   ebx;"
+        "push   esi;"
+        "push   edi;"
+        "push   ebp;"
+        "call   _kos_new_sys_threads;"
+        "pop    ebp;"
+        "pop    edi;"
+        "pop    esi;"
+        "pop    ebx"
+        : "=a"(tid)
+        : "b"(flags),
+          "c"(entry),
+          "d"(stack_top)
+        : "memory", "cc");
+    return tid;
+}
+
+static inline size_t
+umka_new_sys_threads(uint32_t flags, void (*entry)(void *), void *stack_top,
+                     void *arg) {
+    kos_thread_t entry_noparam = (kos_thread_t)entry;
+    size_t tid = kos_new_sys_threads(flags, entry_noparam, stack_top);
+    appdata_t *t = kos_slot_base + tid;
+    *(void**)((char*)t->saved_esp0-12) = arg;   // param for the thread
+    // -12 here because in UMKa, unlike real hardware, we don't switch between
+    // kernel and userspace, i.e. stack structure is different
+    return tid;
+}
+
+static inline void
+kos_enable_acpi(void) {
+    __asm__ __inline__ __volatile__ (
+        "pusha;"
+        "call   enable_acpi;"
+        "popa"
+        :
+        :
+        : "memory", "cc");
+}
+
+static inline void
+kos_acpi_call_name(void *ctx, const char *name) {
+    __asm__ __inline__ __volatile__ (
+        "pusha;"
+        "push   %[name];"
+        "push   %[ctx];"
+        "call   acpi.call_name;"
+        "popa"
+        :
+        : [ctx] "r"(ctx), [name] "r"(name)
+        : "memory", "cc");
 }
 
 static inline void
@@ -2381,61 +2399,5 @@ umka_set_keyboard_data(uint32_t scancode) {
         : "c"(scancode)
         : "eax", "edx", "memory", "cc");
 }
-
-#define CMD_BUF_LEN 0x10
-
-enum {
-    UMKA_CMD_NONE,
-    UMKA_CMD_SET_MOUSE_DATA,
-    UMKA_CMD_SYS_PROCESS_INFO,
-    UMKA_CMD_SYS_GET_MOUSE_POS_SCREEN,
-    UMKA_CMD_SYS_LFN,
-};
-
-enum {
-    UMKA_CMD_STATUS_EMPTY,
-    UMKA_CMD_STATUS_READY,
-    UMKA_CMD_STATUS_DONE,
-};
-
-struct cmd_set_mouse_data {
-    uint32_t btn_state;
-    int32_t xmoving;
-    int32_t ymoving;
-    int32_t vscroll;
-    int32_t hscroll;
-};
-
-struct cmd_sys_lfn {
-    f70or80_t f70or80;
-    f7080s1arg_t *bufptr;
-    f7080ret_t *r;
-};
-
-struct cmd_ret_sys_lfn {
-    f7080ret_t status;
-};
-
-struct cmd_sys_process_info {
-    int32_t pid;
-    void *param;
-};
-
-struct cmd_ret_sys_get_mouse_pos_screen {
-    struct point16s pos;
-};
-
-struct umka_cmd {
-    atomic_int status;
-    uint32_t type;
-    union {
-        struct cmd_set_mouse_data set_mouse_data;
-        struct cmd_sys_lfn sys_lfn;
-    } arg;
-    union {
-        struct cmd_ret_sys_get_mouse_pos_screen sys_get_mouse_pos_screen;
-        struct cmd_ret_sys_lfn sys_lfn;
-    } ret;
-};
 
 #endif  // UMKA_H_INCLUDED

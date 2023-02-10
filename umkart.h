@@ -15,8 +15,6 @@
 
 extern atomic_int umka_irq_number;
 
-extern struct umka_cmd umka_cmd_buf[CMD_BUF_LEN];
-
 void
 dump_devices_dat(const char *filename);
 

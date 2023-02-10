@@ -152,7 +152,7 @@ pubsym img_background
 pubsym mem_BACKGROUND
 pubsym sys_background
 pubsym REDRAW_BACKGROUND, 'kos_redraw_background'
-pubsym new_sys_threads, 'kos_new_sys_threads', no_mangle
+pubsym new_sys_threads, '_kos_new_sys_threads', no_mangle
 pubsym osloop, 'kos_osloop', no_mangle
 pubsym set_mouse_data, 'kos_set_mouse_data', 20
 pubsym scheduler_current, 'kos_scheduler_current'
@@ -959,14 +959,6 @@ init_sys_v86:
 usb_init:
 fdc_init:
 mtrr_validate:
-; sys32.inc
-;terminate:
-;protect_from_terminate:
-;unprotect_from_terminate:
-;lock_application_table:
-;unlock_application_table:
-;sys_resize_app_memory:
-;request_terminate:
 v86_exc_c:
 except_7:
 ReadCDWRetr:
@@ -1032,11 +1024,15 @@ macro pew x {inclu#de `x}
 macro org x {}
 macro format [x] {}
 
+UMKA_RUNNIGS_NEVER = 0
+UMKA_RUNNIGS_NOT_YET = 1
+UMKA_RUNNIGS_YES = 2
+
 bios32_entry equ bios32_entry_pew
 tmp_page_tabs equ tmp_page_tabs_pew
 macro jmp target {
   if target eq osloop
-        cmp     [umka.running], 1
+        cmp     [umka.running], UMKA_RUNNIGS_YES
         jz      osloop
         ret
   else
