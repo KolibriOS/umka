@@ -167,14 +167,10 @@ main(int argc, char *argv[]) {
         exit(1);
     }
 
-    kos_boot.bpp = UMKA_DEFAULT_DISPLAY_BPP;
-    kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
-    kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
-    kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH * UMKA_DEFAULT_DISPLAY_BPP / 8;
-
     struct umka_fuse_ctx *ctx = umka_fuse_init();
+    umka_boot();
 
-    struct vdisk *umka_disk = vdisk_init(argv[2], 1, 0u, 0);
+    struct vdisk *umka_disk = vdisk_init(argv[2], 1, 0u, ctx->io);
     disk_t *disk = disk_add(&umka_disk->diskfunc, "hd0", umka_disk, 0);
     disk_media_changed(disk, 1);
     return fuse_main(argc-1, argv, &umka_oper, ctx);

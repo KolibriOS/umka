@@ -75,11 +75,6 @@ main(int argc, char **argv) {
     kos_boot.memmap_blocks[1] = (e820entry_t){(uintptr_t)mem1, 128*1024*1024, 1};
     kos_boot.memmap_blocks[2] = (e820entry_t){(uintptr_t)mem2, 256*1024*1024, 1};
 */
-    kos_boot.bpp = UMKA_DEFAULT_DISPLAY_BPP;
-    kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
-    kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
-    kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH * UMKA_DEFAULT_DISPLAY_BPP / 8;
-
     int reproducible = 0;
 
     struct optparse options;

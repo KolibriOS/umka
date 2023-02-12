@@ -89,6 +89,10 @@ UMKA_OS    = 3
 
 UMKA_MEMORY_BYTES = 256 SHL 20
 
+UMKA_BOOT_DEFAULT_DISPLAY_BPP = 32
+UMKA_BOOT_DEFAULT_DISPLAY_WIDTH = 400
+UMKA_BOOT_DEFAULT_DISPLAY_HEIGHT = 300
+
 public idle_reached
 pubsym irq_serv.irq_10, 'kos_irq_serv_irq10'
 pubsym idts, 'kos_idts'
@@ -586,6 +590,14 @@ ends
 
 proc umka_init c uses ebx esi edi ebp, _running
         call    umka._.check_alignment
+        ; init boot vars
+        mov     eax, BOOT
+        mov     [eax + boot_data.x_res], UMKA_BOOT_DEFAULT_DISPLAY_WIDTH
+        mov     [eax + boot_data.y_res], UMKA_BOOT_DEFAULT_DISPLAY_HEIGHT
+        mov     [eax + boot_data.bpp], UMKA_BOOT_DEFAULT_DISPLAY_BPP
+        mov     [eax + boot_data.pitch], UMKA_BOOT_DEFAULT_DISPLAY_BPP * \
+                UMKA_BOOT_DEFAULT_DISPLAY_WIDTH / 8
+        ; init umka context
         mov     eax, umka
         mov     [eax+umka_ctx.booted], 0
         mov     ecx, [_running]

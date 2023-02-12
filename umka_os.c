@@ -353,11 +353,6 @@ main(int argc, char *argv[]) {
     }
     memset((void*)app_ldr, 0, APP_MAX_MEM_SIZE);
 
-    kos_boot.bpp = UMKA_DEFAULT_DISPLAY_BPP;
-    kos_boot.x_res = UMKA_DEFAULT_DISPLAY_WIDTH;
-    kos_boot.y_res = UMKA_DEFAULT_DISPLAY_HEIGHT;
-    kos_boot.pitch = UMKA_DEFAULT_DISPLAY_WIDTH * UMKA_DEFAULT_DISPLAY_BPP / 8;
-
     run_test(os->shell);
     os->shell->fin = fin;
     clearerr(stdin);    // reset feof

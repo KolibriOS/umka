@@ -43,10 +43,6 @@ struct umka_ctx {
     atomic_int running;
 };
 
-#define UMKA_DEFAULT_DISPLAY_BPP 32
-#define UMKA_DEFAULT_DISPLAY_WIDTH 400
-#define UMKA_DEFAULT_DISPLAY_HEIGHT 300
-
 #define KEYBOARD_MODE_ASCII     0
 #define KEYBOARD_MODE_SCANCODES 1
 
