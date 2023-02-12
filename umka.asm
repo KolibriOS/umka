@@ -62,19 +62,26 @@ macro pubsym name, marg1, marg2 {
 ;   extrn name     -> extrn name
 ;   extrn name, 20 -> extrn name
 macro extrn name, argsize, asname {
-    if asname eq
-        __asname equ name
-    else
-        __asname equ asname
-    end if
     if HOST eq windows
-        if argsize > 0
-            extrn '_' # `name # '@' # `argsize as __asname
+        if argsize eqtype 0 & argsize > 0
+            if asname eqtype 'string'
+                extrn '_' # `name # '@' # `argsize as asname
+            else
+                extrn '_' # `name # '@' # `argsize as name
+            end if
         else
-            extrn '_' # `name as name
+            if asname eqtype
+                extrn '_' # `name as name
+            else
+                extrn '_' # `name as asname
+            end if
         end if
     else if HOST eq linux
-        extrn name
+        if asname eqtype
+            extrn name
+        else
+            extrn name as asname
+        end if
     else
         error "Your HOST is not supported"
     end if
@@ -245,14 +252,8 @@ include 'macros.inc'
 
 macro diff16 msg,blah2,blah3 {
   if msg eq "end of .data segment"
-    if HOST eq windows
-      section '.bss.8k' writeable align 8192
-    else if HOST eq linux
-      ; fasm doesn't align on 65536, but ld script does
-      section '.bss.aligned65k' writeable align 65536
-    else
-      error "Your HOST is not supported"
-    end if
+    ; fasm doesn't align on 1MiB, but ld script does
+    section '.bss.1M' writeable align 0x1000
 bss_base:
   end if
 }
@@ -327,8 +328,9 @@ include 'system.inc'
 include 'fdo.inc'
 
 OS_BASE equ 0
+;OS_BASE equ os_base
 macro mov target, source {
-  if source eq (HEAP_BASE - 0 + HEAP_MIN_SIZE)/4096
+  if source eq (HEAP_BASE - OS_BASE + HEAP_MIN_SIZE)/PAGE_SIZE
         push    eax eax
         mov     eax, HEAP_BASE
         add     eax, HEAP_MIN_SIZE
@@ -336,7 +338,7 @@ macro mov target, source {
         mov     [esp+4], eax
         pop     eax
         pop     target
-  else if target eq dword [sys_proc-0+PROC.pdt_0+(page_tabs shr 20)]
+  else if target eq dword [sys_proc-OS_BASE+PROC.pdt_0+(page_tabs shr 20)]
         push    eax ecx
         mov     eax, page_tabs
         shr     eax, 20
@@ -345,12 +347,37 @@ macro mov target, source {
         mov     ecx, sys_proc+PROC.pdt_0+PG_SWR
         mov     [eax], ecx
         pop     ecx eax
+  else if target eq [(pci_code_32 - OS_BASE)]
+  else if target eq [(pci_data_32 - OS_BASE)]
+  else if target eq [(pci_code_32 - OS_BASE)+2]
+  else if target eq [(pci_data_32 - OS_BASE)+2]
+  else if target eq [(pci_code_32 - OS_BASE)+4]
+  else if target eq [(pci_data_32 - OS_BASE)+4]
+  else if target eq [(pci_code_32 - OS_BASE)+6]
+  else if target eq [(pci_data_32 - OS_BASE)+6]
+  else if target eq [(pci_bios_entry - OS_BASE)]
+  else if source eq (OS_BASE/PAGE_SIZE)
+        push    ecx
+        mov     ecx, OS_BASE
+        shr     ecx, 12
+        mov     target, ecx
+        pop     ecx
+  else if target eq dword [sys_proc-OS_BASE+PROC.pdt_0+(page_tabs shr 20)]
+  else if source eq (sys_proc - OS_BASE + PROC.pdt_0) + (OS_BASE shr 20)
+        push    ecx
+        mov     ecx, OS_BASE
+        shr     ecx, 20
+        add     ecx, sys_proc
+        add     ecx, PROC.pdt_0
+        sub     ecx, OS_BASE
+        mov     target, ecx
+        pop     ecx
   else
         mov     target, source
   end if
 }
 macro cmp target, source {
-  if source eq (HEAP_BASE - 0 + HEAP_MIN_SIZE)/4096
+  if source eq (HEAP_BASE - OS_BASE + HEAP_MIN_SIZE)/PAGE_SIZE
         push    eax eax
         mov     eax, HEAP_BASE
         add     eax, HEAP_MIN_SIZE
@@ -359,14 +386,33 @@ macro cmp target, source {
         mov     eax, [esp+4]
         cmp     target, [esp]
         pop     eax eax
+  else if source eq (OS_BASE/PAGE_SIZE)
+        push    ecx
+        mov     ecx, OS_BASE
+        shr     ecx, 12
+        cmp     target, ecx
+        pop     ecx
   else
         cmp     target, source
   end if
 }
+macro lea target, source {
+  if source eq [edi + (OS_BASE shr 20)]
+        push    ecx
+        mov     ecx, OS_BASE
+        shr     ecx, 20
+        add     ecx, edi
+        mov     target, ecx
+        pop     ecx
+  else
+        lea     target, source
+  end if
+}
 
 include 'init.inc'
-purge cmp
 purge mov
+purge cmp
+purge lea
 restore OS_BASE
 include 'core/sync.inc'
 macro call target {
@@ -521,6 +567,12 @@ proc umka._.check_alignment
         sub     ecx, eax
         DEBUGF 4, "HEAP_BASE must be aligned on PAGE_SIZE: 0x%x", HEAP_BASE
         DEBUGF 4, ", add 0x%x or sub 0x%x\n", ecx, eax
+        mov     eax, SLOT_BASE
+        and     eax, 0x10000 - 1
+        jz      @f
+        mov     eax, os_base
+        and     eax, 0x100000 - 1
+        jz      @f
         int3
 @@:
         ret
@@ -597,6 +649,13 @@ proc umka_init c uses ebx esi edi ebp, _running
         mov     [eax + boot_data.bpp], UMKA_BOOT_DEFAULT_DISPLAY_BPP
         mov     [eax + boot_data.pitch], UMKA_BOOT_DEFAULT_DISPLAY_BPP * \
                 UMKA_BOOT_DEFAULT_DISPLAY_WIDTH / 8
+        mov     [eax + boot_data.memmap_block_cnt], 1
+        lea     ecx, [eax + boot_data.memmap_blocks]
+        mov     [ecx + e820entry.addr.lo], mem_block
+        mov     [ecx + e820entry.addr.hi], 0
+        mov     [ecx + e820entry.size.lo], 256*0x10000
+        mov     [ecx + e820entry.size.hi], 0
+        mov     [ecx + e820entry.type], 1
         ; init umka context
         mov     eax, umka
         mov     [eax+umka_ctx.booted], 0
@@ -617,7 +676,7 @@ proc umka_boot uses ebx esi edi ebp
         xor     eax, eax
         rep stosb
 
-;        call    mem_test
+        call    mem_test
 ;        call    init_mem
 ;        call    init_page_map
         mov     [irq_mode], IRQ_APIC
@@ -824,7 +883,7 @@ endp
 
 pubsym skin_udata
 proc idle uses ebx esi edi
-extrn "pause" as libc_pause
+extrn "pause", 0, libc_pause
         sti
 @@:
         mov     [idle_reached], 1
@@ -1052,7 +1111,6 @@ COVERAGE_TABLE_SIZE = 512*1024  ; 512k should be enough for the kernel
 coverage_table rb COVERAGE_TABLE_SIZE * sizeof.coverage_branch
 pubsym coverage_table
 
-
 ; bt for boot; otherwide fasm complains with 'name too long' for MS COFF
 section '.data.bt' writeable align 0x1000
 BOOT boot_data
@@ -1061,21 +1119,21 @@ BOOT_LO boot_data
 end virtual
 
 
-if HOST eq windows
-    section '.data.8k' writeable align 8192
-else if HOST eq linux
-    ; fasm doesn't align on 65536, but ld script does
-    section '.data.aligned65k' writeable align 65536
-else
-    error "Your HOST is not supported"
-end if
+; fasm doesn't align on 65536, but ld script does
+; 64 for align on 64k; otherwide fasm complains with 'name too long' for MS COFF
+section '.data.64' writeable align 0x1000
 
 umka umka_ctx
 fpu_owner dd ?
 idle_reached dd ?
 
+; mem for memory; otherwide fasm complains with 'name too long' for MS COFF
+section '.bss.mem' writeable align 0x1000
+mem_block rb 256*0x10000
+
 uglobal
 align 64
+                rb 0x100000 - (($-bss_base) AND (0x100000-1)) ; align on 1MiB
 os_base:        rb PAGE_SIZE
 window_data:    rb sizeof.WDATA * 256
 CDDataBuf:      rb 0x1000

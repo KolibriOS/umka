@@ -29,7 +29,7 @@ SECTIONS
 {
   .data.aligned BLOCK(0x10000) :
   {
-    *(SORT_BY_NAME(.data.align*))
+    *(.data.64)
   }
 
 }
@@ -37,9 +37,18 @@ INSERT AFTER .data;
 
 SECTIONS
 {
-  .bss.aligned BLOCK(0x10000) :
+  .bss.aligned BLOCK(0x100000) :
   {
-    *(SORT_BY_NAME(.bss.align*))
+    *(.bss.1M)
+  }
+}
+INSERT AFTER .bss;
+
+SECTIONS
+{
+  .bss.memory BLOCK(0x1000) :
+  {
+    *(.bss.mem)
   }
 }
 INSERT AFTER .bss;
