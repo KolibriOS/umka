@@ -54,6 +54,8 @@
 enum {
     UMKA_CMD_NONE,
     UMKA_CMD_SET_MOUSE_DATA,
+    UMKA_CMD_WAIT_FOR_IDLE,
+    UMKA_CMD_SYS_CSLEEP,
     UMKA_CMD_SYS_PROCESS_INFO,
     UMKA_CMD_SYS_GET_MOUSE_POS_SCREEN,
     UMKA_CMD_SYS_LFN,
@@ -65,7 +67,7 @@ enum {
     SHELL_CMD_STATUS_DONE,
 };
 
-struct cmd_set_mouse_data {
+struct cmd_set_mouse_data_arg {
     uint32_t btn_state;
     int32_t xmoving;
     int32_t ymoving;
@@ -73,36 +75,82 @@ struct cmd_set_mouse_data {
     int32_t hscroll;
 };
 
-struct cmd_sys_lfn {
+struct cmd_set_mouse_data_ret {
+    char stub;
+};
+
+struct cmd_set_mouse_data {
+    struct cmd_set_mouse_data_arg arg;
+    struct cmd_set_mouse_data_ret ret;
+};
+
+struct cmd_sys_lfn_arg {
     f70or80_t f70or80;
     f7080s1arg_t *bufptr;
     f7080ret_t *r;
 };
 
-struct cmd_ret_sys_lfn {
+struct cmd_sys_lfn_ret {
     f7080ret_t status;
 };
 
-struct cmd_sys_process_info {
+struct cmd_sys_lfn {
+    struct cmd_sys_lfn_arg arg;
+    struct cmd_sys_lfn_ret ret;
+};
+
+struct cmd_sys_process_info_arg {
     int32_t pid;
     void *param;
 };
 
-struct cmd_ret_sys_get_mouse_pos_screen {
+struct cmd_sys_process_info_ret {
+    char stub;
+};
+
+struct cmd_sys_process_info {
+    struct cmd_sys_process_info_arg arg;
+    struct cmd_sys_process_info_ret ret;
+};
+
+struct cmd_sys_get_mouse_pos_screen_arg {
+    char stub;
+};
+
+struct cmd_sys_get_mouse_pos_screen_ret {
     struct point16s pos;
+};
+
+struct cmd_sys_get_mouse_pos_screen {
+    struct cmd_sys_get_mouse_pos_screen_arg arg;
+    struct cmd_sys_get_mouse_pos_screen_ret ret;
+};
+
+struct cmd_sys_csleep_arg {
+    uint32_t csec;
+};
+
+struct cmd_sys_csleep_ret {
+    char stub;
+};
+
+struct cmd_sys_csleep {
+    struct cmd_sys_csleep_arg arg;
+    struct cmd_sys_csleep_ret ret;
 };
 
 struct umka_cmd {
     atomic_int status;
     uint32_t type;
     union {
+        // internal funcs
         struct cmd_set_mouse_data set_mouse_data;
+        // syscalls
+        struct cmd_sys_csleep sys_csleep;
+        struct cmd_sys_process_info sys_process_info;
         struct cmd_sys_lfn sys_lfn;
-    } arg;
-    union {
-        struct cmd_ret_sys_get_mouse_pos_screen sys_get_mouse_pos_screen;
-        struct cmd_ret_sys_lfn sys_lfn;
-    } ret;
+        struct cmd_sys_get_mouse_pos_screen sys_get_mouse_pos_screen;
+    };
 };
 
 struct umka_cmd umka_cmd_buf[SHELL_CMD_BUF_LEN];
@@ -118,32 +166,7 @@ typedef struct {
 } func_table_t;
 
 void
-shell_run_cmd_sync(struct shell_ctx *ctx) {
-    struct umka_cmd *cmd = umka_cmd_buf;
-    if (atomic_load_explicit(&cmd->status, memory_order_acquire) != SHELL_CMD_STATUS_READY) {
-        fprintf(ctx->fout, "[!] command is not ready: %d: %u\n", cmd - umka_cmd_buf, cmd->type);
-        return;
-    }
-    switch (cmd->type) {
-    case UMKA_CMD_SET_MOUSE_DATA: {
-        struct cmd_set_mouse_data *c = &cmd->arg.set_mouse_data;
-        kos_set_mouse_data(c->btn_state, c->xmoving, c->ymoving, c->vscroll,
-                           c->hscroll);
-        break;
-        }
-    case UMKA_CMD_SYS_LFN: {
-        struct cmd_sys_lfn *c = &cmd->arg.sys_lfn;
-        umka_sys_lfn(c->bufptr, c->r, c->f70or80);
-        break;
-        }
-    default:
-        fprintf(ctx->fout, "[!] unknown command: %u\n", cmd->type);
-        break;
-    }
-    atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_DONE,
-                          memory_order_release);
-    pthread_cond_signal(&ctx->cmd_done);
-}
+shell_run_cmd_sync(struct shell_ctx *ctx);
 
 static void
 shell_run_cmd(struct shell_ctx *ctx) {
@@ -535,7 +558,7 @@ cmd_umka_boot(struct shell_ctx *ctx, int argc, char **argv) {
     if (*ctx->running != UMKA_RUNNING_NEVER) {
         char *stack = malloc(UMKA_DEFAULT_THREAD_STACK_SIZE);
         char *stack_top = stack + UMKA_DEFAULT_THREAD_STACK_SIZE;
-        size_t tid = umka_new_sys_threads(1, thread_cmd_runner, stack_top, ctx);
+        size_t tid = umka_new_sys_threads(0, thread_cmd_runner, stack_top, ctx);
         (void)tid;
     }
 }
@@ -580,6 +603,54 @@ cmd_umka_set_boot_params(struct shell_ctx *ctx, int argc, char **argv) {
             return;
         }
     }
+}
+
+static void
+cmd_csleep(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: csleep\n";
+    if (argc != 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    struct umka_cmd *cmd = umka_cmd_buf;
+    struct cmd_sys_csleep_arg *c = &cmd->sys_csleep.arg;
+    cmd->type = UMKA_CMD_SYS_CSLEEP;
+    c->csec = strtoul(argv[1], NULL, 0);
+    atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_READY,
+                          memory_order_release);
+    shell_run_cmd(ctx);
+    atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_EMPTY,
+                          memory_order_release);
+}
+
+static uint32_t
+umka_wait_for_idle_test(void) {
+    return (uint32_t)(atomic_load_explicit(&idle_reached, memory_order_acquire));
+}
+
+static void
+umka_wait_for_idle(void) {
+    atomic_store_explicit(&idle_reached, 0, memory_order_release);
+    kos_wait_events(umka_wait_for_idle_test, NULL);
+}
+
+static void
+cmd_wait_for_idle(struct shell_ctx *ctx, int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: wait_for_idle\n";
+    if (argc != 1) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    struct umka_cmd *cmd = umka_cmd_buf;
+    cmd->type = UMKA_CMD_WAIT_FOR_IDLE;
+    atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_READY,
+                          memory_order_release);
+    shell_run_cmd(ctx);
+    atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_EMPTY,
+                          memory_order_release);
 }
 
 static void
@@ -707,8 +778,9 @@ cmd_ramdisk_init(struct shell_ctx *ctx, int argc, char **argv) {
     }
     fseek(f, 0, SEEK_END);
     size_t fsize = ftell(f);
-    if (fsize > 2880*512) {
-        fprintf(ctx->fout, "[!] file '%s' is too big, max size is 1474560 bytes\n", fname);
+    if (fsize > RAMDISK_MAX_LEN) {
+        fprintf(ctx->fout, "[!] file '%s' is too big, max size is %d bytes\n",
+                fname, RAMDISK_MAX_LEN);
         return;
     }
     rewind(f);
@@ -1206,7 +1278,7 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
     uint32_t btn_state = lbheld + (rbheld << 1) + (mbheld << 2) + (yabs << 30)
                          + (xabs << 31);
     struct umka_cmd *cmd = umka_cmd_buf;
-    struct cmd_set_mouse_data *c = &cmd->arg.set_mouse_data;
+    struct cmd_set_mouse_data_arg *c = &cmd->set_mouse_data.arg;
     cmd->type = UMKA_CMD_SET_MOUSE_DATA;
     c->btn_state = btn_state;
     c->xmoving = xmoving;
@@ -1215,9 +1287,7 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
     c->hscroll = hscroll;
     atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_READY,
                           memory_order_release);
-    COVERAGE_ON();
     shell_run_cmd(ctx);
-    COVERAGE_OFF();
 
     atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_EMPTY,
                           memory_order_release);
@@ -2357,10 +2427,15 @@ cmd_scrot(struct shell_ctx *ctx, int argc, char **argv) {
     lfb32 = malloc(4*kos_display.width*kos_display.height);
     copy_display_to_rgb888(lfb32);
 
-    uint32_t *p = lfb32;
+    uint8_t *from = (uint8_t*)lfb32;
     for (size_t y = 0; y < kos_display.height; y++) {
         for (size_t x = 0; x < kos_display.width; x++) {
-            *p++ |= 0xff000000;
+            uint32_t p = 0;
+            p += (uint32_t)from[y*kos_display.width*4+x*4 + 0] << 16;
+            p += (uint32_t)from[y*kos_display.width*4+x*4 + 1] << 8;
+            p += (uint32_t)from[y*kos_display.width*4+x*4 + 2] << 0;
+            p += 0xff000000;
+            ((uint32_t*)from)[y*kos_display.width+x] = p;
         }
     }
 
@@ -2435,7 +2510,7 @@ ls_all(struct shell_ctx *ctx, f7080s1arg_t *fX0, f70or80_t f70or80) {
                                                  BDFE_LEN_UNICODE;
     while (true) {
         struct umka_cmd *cmd = umka_cmd_buf;
-        struct cmd_sys_lfn *c = &cmd->arg.sys_lfn;
+        struct cmd_sys_lfn_arg *c = &cmd->sys_lfn.arg;
         cmd->type = UMKA_CMD_SYS_LFN;
         c->f70or80 = f70or80;
         c->bufptr = fX0;
@@ -4050,16 +4125,61 @@ func_table_t cmd_cmds[] = {
     { "set_system_lang",                cmd_set_system_lang },
     { "set_window_caption",             cmd_set_window_caption },
     { "set_window_colors",              cmd_set_window_colors },
+    { "csleep",                         cmd_csleep },
     { "stat70",                         cmd_stat70 },
     { "stat80",                         cmd_stat80 },
     { "var",                            cmd_var },
     { "check_for_event",                cmd_check_for_event },
+    { "wait_for_idle",                  cmd_wait_for_idle },
     { "window_redraw",                  cmd_window_redraw },
     { "write_text",                     cmd_write_text },
     { "switch_to_thread",               cmd_switch_to_thread },
     { "new_sys_thread",                 cmd_new_sys_thread },
     { NULL,                             NULL },
 };
+
+void
+shell_run_cmd_sync(struct shell_ctx *ctx) {
+    struct umka_cmd *cmd = umka_cmd_buf;
+    if (atomic_load_explicit(&cmd->status, memory_order_acquire) != SHELL_CMD_STATUS_READY) {
+        fprintf(ctx->fout, "[!] command is not ready: %d: %u\n", cmd - umka_cmd_buf, cmd->type);
+        return;
+    }
+    switch (cmd->type) {
+    case UMKA_CMD_WAIT_FOR_IDLE: {
+        COVERAGE_ON();
+        umka_wait_for_idle();
+        COVERAGE_OFF();
+        break;
+        }
+    case UMKA_CMD_SYS_CSLEEP: {
+        struct cmd_sys_csleep_arg *c = &cmd->sys_csleep.arg;
+        COVERAGE_ON();
+        umka_sys_csleep(c->csec);
+        COVERAGE_OFF();
+        break;
+        }
+    case UMKA_CMD_SET_MOUSE_DATA: {
+        struct cmd_set_mouse_data_arg *c = &cmd->set_mouse_data.arg;
+        COVERAGE_ON();
+        kos_set_mouse_data(c->btn_state, c->xmoving, c->ymoving, c->vscroll,
+                           c->hscroll);
+        COVERAGE_OFF();
+        break;
+        }
+    case UMKA_CMD_SYS_LFN: {
+        struct cmd_sys_lfn_arg *c = &cmd->sys_lfn.arg;
+        umka_sys_lfn(c->bufptr, c->r, c->f70or80);
+        break;
+        }
+    default:
+        fprintf(ctx->fout, "[!] unknown command: %u\n", cmd->type);
+        break;
+    }
+    atomic_store_explicit(&cmd->status, SHELL_CMD_STATUS_DONE,
+                          memory_order_release);
+    pthread_cond_signal(&ctx->cmd_done);
+}
 
 static void
 cmd_help(struct shell_ctx *ctx, int argc, char **argv) {

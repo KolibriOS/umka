@@ -10,7 +10,7 @@ if HOST eq windows
 else if HOST eq linux
     format ELF
 else
-    error "Your OS is not supported"
+    error "Your HOST is not supported"
 end if
 
 ; win32:
@@ -51,7 +51,7 @@ macro pubsym name, marg1, marg2 {
             public name
         end if
     else
-        error "Your OS is not supported"
+        error "Your HOST is not supported"
     end if
 }
 
@@ -61,17 +61,22 @@ macro pubsym name, marg1, marg2 {
 ; linux:
 ;   extrn name     -> extrn name
 ;   extrn name, 20 -> extrn name
-macro extrn name, [argsize] {
+macro extrn name, argsize, asname {
+    if asname eq
+        __asname equ name
+    else
+        __asname equ asname
+    end if
     if HOST eq windows
-        if argsize eqtype 20
-            extrn '_' # `name # '@' # `argsize as name
+        if argsize > 0
+            extrn '_' # `name # '@' # `argsize as __asname
         else
             extrn '_' # `name as name
         end if
     else if HOST eq linux
         extrn name
     else
-        error "Your OS is not supported"
+        error "Your HOST is not supported"
     end if
 }
 
@@ -84,6 +89,7 @@ UMKA_OS    = 3
 
 UMKA_MEMORY_BYTES = 256 SHL 20
 
+public idle_reached
 pubsym irq_serv.irq_10, 'kos_irq_serv_irq10'
 pubsym idts, 'kos_idts'
 pubsym attach_int_handler, 'kos_attach_int_handler', 12
@@ -241,7 +247,7 @@ macro diff16 msg,blah2,blah3 {
       ; fasm doesn't align on 65536, but ld script does
       section '.bss.aligned65k' writeable align 65536
     else
-      error "Your OS is not supported"
+      error "Your HOST is not supported"
     end if
 bss_base:
   end if
@@ -497,9 +503,9 @@ endp
 proc kos_time_to_epoch c uses ebx esi edi ebp, _time
         mov     esi, [_time]
         call    fsCalculateTime
-	xor	edx, edx
+        xor     edx, edx
         add     eax, UNIXTIME_TO_KOS_OFFSET
-	adc	edx, 0
+        adc     edx, 0
         ret
 endp
 
@@ -806,11 +812,12 @@ endp
 
 pubsym skin_udata
 proc idle uses ebx esi edi
+extrn "pause" as libc_pause
         sti
 @@:
-;        DEBUGF 1, "1 idle\n"
-        movi    eax, SYS_PAUSE
-        int     0x80
+        mov     [idle_reached], 1
+        sfence
+        call    libc_pause
         jmp     @b
 
         ret
@@ -838,33 +845,6 @@ proc _pci_read_reg uses ebx esi edi
 endp
 
 proc _page_fault_handler
-        ret
-endp
-
-proc s2ys_msg_board
-        cmp     cl, 0x0d
-        jz      @f
-if HOST eq windows
-        extrn   putchar
-        pushad
-        push    ecx
-        call    putchar
-        pop     ecx
-        popad
-else if HOST eq linux
-        pushad
-        mov     eax, SYS_WRITE
-        mov     ebx, STDOUT
-        push    ecx
-        mov     ecx, esp
-        mov     edx, 1
-        int     0x80
-        pop     ecx
-        popad
-else
-    error "Your OS is not supported"
-end if
-@@:
         ret
 endp
 
@@ -1075,11 +1055,12 @@ else if HOST eq linux
     ; fasm doesn't align on 65536, but ld script does
     section '.data.aligned65k' writeable align 65536
 else
-    error "Your OS is not supported"
+    error "Your HOST is not supported"
 end if
 
 umka umka_ctx
 fpu_owner dd ?
+idle_reached dd ?
 
 uglobal
 align 64

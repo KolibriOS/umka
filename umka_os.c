@@ -218,7 +218,7 @@ umka_thread_board(void) {
         if (c.status) {
             fprintf(os->fboardlog, "%c", c.value);
         } else {
-            umka_sys_delay(50);
+            umka_sys_csleep(50);
         }
     }
 }

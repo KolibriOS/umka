@@ -21,6 +21,7 @@
 
 #define UMKA_PATH_MAX 4096
 #define UMKA_DEFAULT_THREAD_STACK_SIZE 0x10000
+#define RAMDISK_MAX_LEN (2880*512)
 
 // TODO: Cleanup
 #ifndef _WIN32
@@ -576,13 +577,15 @@ disk_del(disk_t *disk);
 void
 hash_oneshot(void *ctx, void *data, size_t len);
 
+extern atomic_int idle_reached;
+
 extern uint8_t xfs_user_functions[];
 extern uint8_t ext_user_functions[];
 extern uint8_t fat_user_functions[];
 extern uint8_t exfat_user_functions[];
 extern uint8_t ntfs_user_functions[];
 
-extern uint8_t kos_ramdisk[2880*512];
+extern char kos_ramdisk[RAMDISK_MAX_LEN];
 
 disk_t *
 kos_ramdisk_init(void);
@@ -1238,7 +1241,7 @@ umka_sys_write_text(size_t x, size_t y, uint32_t color, int asciiz,
 }
 
 static inline void
-umka_sys_delay(size_t cs) {
+umka_sys_csleep(size_t cs) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         :
