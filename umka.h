@@ -67,6 +67,14 @@ enum kos_lang {
     KOS_LANG_LAST = KOS_LANG_CA
 };
 
+#define KOS_TSTATE_RUNNING        0
+#define KOS_TSTATE_RUN_SUSPENDED  1
+#define KOS_TSTATE_WAIT_SUSPENDED 2
+#define KOS_TSTATE_ZOMBIE         3
+#define KOS_TSTATE_TERMINATING    4
+#define KOS_TSTATE_WAITING        5
+#define KOS_TSTATE_FREE           9
+
 #define KOS_LAYOUT_SIZE 128
 
 #define BDFE_LEN_CP866 304
@@ -573,7 +581,8 @@ disk_del(disk_t *disk);
 void
 hash_oneshot(void *ctx, void *data, size_t len);
 
-extern atomic_int idle_reached;
+extern atomic_int idle_scheduled;
+extern atomic_int os_scheduled;
 
 extern uint8_t xfs_user_functions[];
 extern uint8_t ext_user_functions[];
@@ -944,11 +953,6 @@ typedef struct {
 
 static_assert(sizeof(appdata_t) == 256, "must be 0x100 bytes long");
 
-#define UMKA_SHELL           1
-#define UMKA_FUSE            2
-#define UMKA_OS              3
-#define UMKA_GEN_DEVICES_DAT 4
-
 extern uint8_t kos_redraw_background;
 extern size_t kos_task_count;
 extern wdata_t kos_window_data[];
@@ -1141,10 +1145,11 @@ kos_new_sys_threads(uint32_t flags, kos_thread_t entry, void *stack_top) {
 
 static inline size_t
 umka_new_sys_threads(uint32_t flags, void (*entry)(void *), void *stack_top,
-                     void *arg) {
+                     void *arg, const char *app_name) {
     kos_thread_t entry_noparam = (kos_thread_t)entry;
     size_t tid = kos_new_sys_threads(flags, entry_noparam, stack_top);
     appdata_t *t = kos_slot_base + tid;
+    strncpy(t->app_name, app_name, 11);
     *(void**)((char*)t->saved_esp0-12) = arg;   // param for the thread
     // -12 here because in UMKa, unlike real hardware, we don't switch between
     // kernel and userspace, i.e. stack structure is different
@@ -1434,7 +1439,7 @@ umka_sys_set_mouse_pos_screen(struct point16s new_pos) {
           "b"(19),
           "c"(4),
           "d"(new_pos)
-        :);
+        : "memory");
 }
 
 static inline int

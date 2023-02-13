@@ -8,7 +8,7 @@ else ifeq ($(HOST),windows)
         FASM_INCLUDE=$(KOLIBRIOS)\programs
         FASM=set "INCLUDE=$(FASM_INCLUDE)" && $(FASM_EXE) $(FASM_FLAGS)
 else
-        $(error your OS is not supported)
+        $(error your HOST is not supported)
 endif
 
 all: board_hello board_cycle readdir loader justawindow

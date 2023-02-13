@@ -96,6 +96,12 @@ dump_procs(void) {
         } while (p != p_begin);
         putchar('\n');
     }
+    for (size_t i = 0; i < 256; i++) {
+        appdata_t *app = kos_slot_base + i;
+        if (app->state != KOS_TSTATE_FREE && app->app_name[0]) {
+            printf("slot %2.2d: %s\n", i, app->app_name);
+        }
+    }
 }
 
 int
@@ -417,9 +423,9 @@ main(int argc, char *argv[]) {
         pthread_create(&thread_display, NULL, umka_display, NULL);
     }
 
+    atomic_store_explicit(&os->umka->running, UMKA_RUNNING_YES, memory_order_release);
     setitimer(ITIMER_REAL, &timeout, NULL);
 
-    atomic_store_explicit(&os->umka->running, UMKA_RUNNING_YES, memory_order_release);
     umka_osloop();   // doesn't return
 
     if (coverage)

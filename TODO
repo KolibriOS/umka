@@ -1,4 +1,3 @@
-switch from parted to gdisk
 lsstat to decrease tests size
 separate dirs for each image and test
 library loader

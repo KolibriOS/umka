@@ -100,7 +100,8 @@ UMKA_BOOT_DEFAULT_DISPLAY_BPP = 32
 UMKA_BOOT_DEFAULT_DISPLAY_WIDTH = 400
 UMKA_BOOT_DEFAULT_DISPLAY_HEIGHT = 300
 
-public idle_reached
+public idle_scheduled
+public os_scheduled
 pubsym irq_serv.irq_10, 'kos_irq_serv_irq10'
 pubsym idts, 'kos_idts'
 pubsym attach_int_handler, 'kos_attach_int_handler', 12
@@ -886,7 +887,7 @@ proc idle uses ebx esi edi
 extrn "pause", 0, libc_pause
         sti
 @@:
-        mov     [idle_reached], 1
+        mov     [idle_scheduled], 1
         sfence
         call    libc_pause
         jmp     @b
@@ -1083,6 +1084,7 @@ bios32_entry equ bios32_entry_pew
 tmp_page_tabs equ tmp_page_tabs_pew
 macro jmp target {
   if target eq osloop
+        mov     [os_scheduled], 1
         cmp     [umka.running], UMKA_RUNNIGS_YES
         jz      osloop
         ret
@@ -1125,7 +1127,8 @@ section '.data.64' writeable align 0x1000
 
 umka umka_ctx
 fpu_owner dd ?
-idle_reached dd ?
+idle_scheduled dd ?
+os_scheduled dd ?
 
 ; mem for memory; otherwide fasm complains with 'name too long' for MS COFF
 section '.bss.mem' writeable align 0x1000
