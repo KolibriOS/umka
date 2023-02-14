@@ -65,9 +65,9 @@ test: umka_shell
 
 umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
             vdisk/raw.o vdisk/qcow2.o deps/em_inflate/em_inflate.o vnet.o \
-            $(HOST)/vnet/tap.o vnet/file.o vnet/null.o lodepng.o $(HOST)/pci.o \
-            $(HOST)/thread.o umkaio.o umkart.o deps/optparse/optparse.o \
-            deps/isocline/src/isocline.o
+            $(HOST)/vnet/tap.o vnet/file.o vnet/null.o deps/lodepng/lodepng.o \
+            $(HOST)/pci.o $(HOST)/thread.o umkaio.o umkart.o \
+            deps/optparse/optparse.o deps/isocline/src/isocline.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld $(LIBS)
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
@@ -75,10 +75,11 @@ umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
            $(HOST)/thread.o umkaio.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs` -T umka.ld
 
-umka_os: umka_os.o umka.o shell.o lodepng.o vdisk.o vdisk/raw.o vdisk/qcow2.o \
-         deps/em_inflate/em_inflate.o vnet.o $(HOST)/vnet/tap.o vnet/file.o \
-         vnet/null.o trace.o trace_lbr.o $(HOST)/pci.o $(HOST)/thread.o \
-         umkaio.o umkart.o deps/isocline/src/isocline.o deps/optparse/optparse.o
+umka_os: umka_os.o umka.o shell.o deps/lodepng/lodepng.o vdisk.o vdisk/raw.o \
+         vdisk/qcow2.o deps/em_inflate/em_inflate.o vnet.o $(HOST)/vnet/tap.o \
+         vnet/file.o vnet/null.o trace.o trace_lbr.o $(HOST)/pci.o \
+         $(HOST)/thread.o umkaio.o umkart.o deps/isocline/src/isocline.o \
+         deps/optparse/optparse.o
 	$(CC) $(LDFLAGS_32) `sdl2-config --libs` $^ -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
@@ -88,7 +89,7 @@ umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
 umka.o umka.fas: umka.asm
 	$(FASM) $< umka.o -s umka.fas
 
-shell.o: shell.c lodepng.h
+shell.o: shell.c deps/lodepng/lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
 
 umkaio.o: umkaio.c umkaio.h
@@ -100,8 +101,10 @@ $(HOST)/thread.o: $(HOST)/thread.c
 $(HOST)/pci.o: $(HOST)/pci.c
 	$(CC) $(CFLAGS_32) -std=gnu11 -c $< -o $@
 
-lodepng.o: lodepng.c lodepng.h
-	$(CC) $(CFLAGS_32) -c $<
+deps/lodepng/lodepng.o: deps/lodepng/lodepng.c deps/lodepng/lodepng.h
+	$(CC) $(CFLAGS_32) -c $< -DLODEPNG_NO_COMPILE_ZLIB \
+                -DLODEPNG_NO_COMPILE_DECODER -DLODEPNG_NO_COMPILE_DISK \
+                -DLODEPNG_NO_COMPILE_ANCILLARY_CHUNKS -DLODEPNG_NO_COMPILE_CRC
 
 deps/isocline/src/isocline.o: deps/isocline/src/isocline.c \
         deps/isocline/include/isocline.h

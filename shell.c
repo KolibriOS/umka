@@ -37,7 +37,7 @@
 #include "trace.h"
 #include "pci.h"
 #include "umkart.h"
-#include "lodepng.h"
+#include "lodepng/lodepng.h"
 #include "optparse/optparse.h"
 #include "isocline/include/isocline.h"
 
