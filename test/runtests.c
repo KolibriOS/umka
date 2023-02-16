@@ -34,8 +34,9 @@
 
 thread_local char bufa[CMPFILE_BUF_LEN];
 thread_local char bufb[CMPFILE_BUF_LEN];
-thread_local char outfname[PATH_MAX];
 thread_local char timeoutfname[PATH_MAX];
+thread_local char reffname[PATH_MAX];
+thread_local char outfname[PATH_MAX];
 
 int silent_success = 1;
 
@@ -53,7 +54,8 @@ is_valid_test_name(const char *name) {
 }
 
 static int
-cmpfile(const char *fnamea, const char *fnameb) {
+cmpfiles(const char *fnamea, const char *fnameb) {
+    int result = 0;
     FILE *filea = fopen(fnamea, "rb");
     if (!filea) {
         fprintf(stderr, "Can't open file '%s' for reading: %s\n", fnamea,
@@ -64,25 +66,30 @@ cmpfile(const char *fnamea, const char *fnameb) {
     if (!fileb) {
         fprintf(stderr, "Can't open file '%s' for reading: %s\n", fnameb,
                 strerror(errno));
+        fclose(filea);
         return -1;
     }
     while (1) {
-        size_t reada = fread(bufa, CMPFILE_BUF_LEN, 1, filea);
-        size_t readb = fread(bufa, CMPFILE_BUF_LEN, 1, fileb);
+        size_t reada = fread(bufa, 1, CMPFILE_BUF_LEN, filea);
+        size_t readb = fread(bufb, 1, CMPFILE_BUF_LEN, fileb);
         if (reada != readb || memcmp(bufa, bufb, reada)) {
             fprintf(stderr, "[!] files %s and %s don't match\n", fnamea,
                     fnameb);
-            return -1;
+            result = -1;
+            break;
+        }
+        if (feof(filea) && feof(fileb)) {
+            break;
         }
     }
     fclose(filea);
     fclose(fileb);
-    return 0;
+    return result;
 }
 
 static int
 check_test_artefacts(const char *testname) {
-    DIR *tdir = opendir(".");
+    DIR *tdir = opendir(testname);
     if (!tdir) {
         fprintf(stderr, "Can't open directory '%s': %s\n", testname,
                 strerror(errno));
@@ -91,16 +98,16 @@ check_test_artefacts(const char *testname) {
 
     struct dirent dent;
     struct dirent *result;
-    const char *reffname;
-    while (readdir_r(tdir, &dent, &result)) {
-        reffname = dent.d_name;
-        const char *dotrefdot = strstr(reffname, ".ref.");
-        if (!dotrefdot) {
+    while (!readdir_r(tdir, &dent, &result) && result) {
+        const char *refdot = strstr(dent.d_name, "ref.");
+        if (!refdot) {
             continue;
         }
+        size_t ref_off = refdot - dent.d_name;
+        sprintf(reffname, "%s/%s", testname, dent.d_name);
         strcpy(outfname, reffname);
-        memcpy(outfname + (dotrefdot - reffname), ".out.", 5);
-        if (cmpfile(reffname, outfname)) {
+        memcpy(outfname + strlen(testname) + 1 + ref_off, "out", 3);
+        if (cmpfiles(reffname, outfname)) {
             return -1;
         }
     }

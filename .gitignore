@@ -23,6 +23,7 @@ tools/randdir
 *.img
 *.raw
 *.out.???
+out.???
 *.out.indent
 .gdb_history
 umka.fas
