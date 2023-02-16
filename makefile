@@ -50,10 +50,9 @@ endif
 
 ifeq ($(HOST),linux)
 all: umka_shell umka_fuse umka_os umka_gen_devices_dat umka.sym umka.prp \
-     umka.lst tags default.skn skin.skn
+     umka.lst tags default.skn skin.skn test/runtests
 else ifeq ($(HOST),windows)
-all: umka_shell umka.sym umka.prp \
-     umka.lst default.skn skin.skn
+all: umka_shell umka.sym umka.prp umka.lst default.skn skin.skn test/runtests
 else
         $(error your OS is not supported)
 endif
@@ -102,9 +101,8 @@ $(HOST)/pci.o: $(HOST)/pci.c
 	$(CC) $(CFLAGS_32) -std=gnu11 -c $< -o $@
 
 deps/lodepng/lodepng.o: deps/lodepng/lodepng.c deps/lodepng/lodepng.h
-	$(CC) $(CFLAGS_32) -c $< -DLODEPNG_NO_COMPILE_ZLIB \
-                -DLODEPNG_NO_COMPILE_DECODER -DLODEPNG_NO_COMPILE_DISK \
-                -DLODEPNG_NO_COMPILE_ANCILLARY_CHUNKS -DLODEPNG_NO_COMPILE_CRC
+	$(CC) $(CFLAGS_32) -c $< -o $@ -DLODEPNG_NO_COMPILE_DECODER \
+                -DLODEPNG_NO_COMPILE_ZLIB -DLODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
 
 deps/isocline/src/isocline.o: deps/isocline/src/isocline.c \
         deps/isocline/include/isocline.h
@@ -181,10 +179,18 @@ umka_os.o: umka_os.c umka.h
 umka_gen_devices_dat.o: umka_gen_devices_dat.c umka.h
 	$(CC) $(CFLAGS_32) -c $<
 
+test/runtests: test/runtests.o deps/optparse/optparse.o
+	$(CC) $(LDFLAGS_32) -o $@ $^
+
+test/runtests.o: test/runtests.c
+	$(CC) $(CFLAGS_32) -c $< -o $@ -Wno-deprecated-declarations
+
+
 .PHONY: all clean
 
 clean:
 	rm -f umka_shell umka_fuse umka_os umka_gen_devices_dat umka.fas \
-          umka.sym umka.lst umka.prp umka.cov coverage *.skn colors.dtp
+          umka.sym umka.lst umka.prp umka.cov coverage *.skn colors.dtp \
+          test/runtests
 	find . -name "*.o" -delete
 	find . -name "*.a" -delete
