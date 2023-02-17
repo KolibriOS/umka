@@ -32,9 +32,10 @@ arp_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#arp_*.t)))
 acpi_tests     := $(addsuffix .out.log, $(basename $(wildcard *\#acpi_*.t)))
 input_tests    := $(addsuffix .out.log, $(basename $(wildcard *\#input_*.t)))
 gpt_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#gpt_*.t)))
+uevent_tests   := $(addsuffix .out.log, $(basename $(wildcard *\#uevent_*.t)))
 
 all: xfs xfsv5 exfat fat ext s05k s4k f30 f70 f70s0 f70s1 f70s5 lookup bug \
-     xattr unicode draw coverage i40 net arp acpi input gpt
+     xattr unicode draw coverage i40 net arp acpi input gpt uevent
 	@echo all tests passed
 
 xfs: $(xfs_tests)
@@ -61,6 +62,7 @@ arp: $(arp_tests)
 acpi: $(acpi_tests)
 input: $(input_tests)
 gpt: $(gpt_tests)
+uevent: $(uevent_tests)
 
 %.out.log: %.t
 	$(UMKA_SHELL) -ri $*.t -o $@

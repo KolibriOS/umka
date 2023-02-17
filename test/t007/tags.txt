@@ -1,0 +1,2 @@
+syscall: f70
+fs: xfs lookup

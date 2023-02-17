@@ -1,0 +1,15 @@
+/> umka_boot
+/> board_get
+(empty)
+/> board_put d
+/> board_get
+d
+/> board_get
+(empty)
+/> 
+/> board_put h
+/> board_put i
+/> board_get -ln
+hi
+/> 
+/> board_get -l

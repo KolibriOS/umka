@@ -719,7 +719,7 @@ fat32_test0.raw () {
     sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $p1 $TEMP_DIR
 
     $RANDDIR $TEMP_DIR 1000 8 255 65536
-    $DIRTOTEST $TEMP_DIR $img hd0 > "../test/045_#f70_#fat32_test0.t"
+    $DIRTOTEST $TEMP_DIR $img hd0 > "../test/045/run.us"
 
 #    tree $TEMP_DIR
 #    du -sh $TEMP_DIR

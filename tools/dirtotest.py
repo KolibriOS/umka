@@ -46,7 +46,7 @@ if __name__ == "__main__":
         virtual_disk_name = "hd0"
 
     print("umka_init")
-    print(f"disk_add ../img/{img_name} {virtual_disk_name} -c 0")
+    print(f"disk_add ../../img/{img_name} {virtual_disk_name} -c 0")
     disk = f"/{virtual_disk_name}/1"
     folder = sys.argv[1]
     handle_dir(folder)

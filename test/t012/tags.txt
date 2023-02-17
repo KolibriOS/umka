@@ -1,0 +1,4 @@
+syscall: f70 f70s1
+fs: xfs
+xfs: v5 ftype1
+blkdev: s05k

@@ -1,0 +1,3 @@
+syscall: f70 f70s1
+fs: ext ext4
+blkdev: s05k

@@ -1,0 +1,2 @@
+draw: cursor
+osloop:

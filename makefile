@@ -102,7 +102,7 @@ $(HOST)/pci.o: $(HOST)/pci.c
 
 deps/lodepng/lodepng.o: deps/lodepng/lodepng.c deps/lodepng/lodepng.h
 	$(CC) $(CFLAGS_32) -c $< -o $@ -DLODEPNG_NO_COMPILE_DECODER \
-                -DLODEPNG_NO_COMPILE_ZLIB -DLODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
+                -DLODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
 
 deps/isocline/src/isocline.o: deps/isocline/src/isocline.c \
         deps/isocline/include/isocline.h

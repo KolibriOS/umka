@@ -1,0 +1,3 @@
+syscall: f70 f70s1
+fs: fat fat16
+blkdev: s05k
