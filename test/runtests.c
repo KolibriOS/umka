@@ -14,12 +14,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <threads.h>
 #include <unistd.h>
 
 #include <pthread.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 
 #include "optparse/optparse.h"
 
@@ -32,11 +30,11 @@
 #define TIMEOUT_STR_MAX_LEN 16
 #define ACTION_RUN 0
 
-thread_local char bufa[CMPFILE_BUF_LEN];
-thread_local char bufb[CMPFILE_BUF_LEN];
-thread_local char timeoutfname[PATH_MAX];
-thread_local char reffname[PATH_MAX];
-thread_local char outfname[PATH_MAX];
+_Thread_local char bufa[CMPFILE_BUF_LEN];
+_Thread_local char bufb[CMPFILE_BUF_LEN];
+_Thread_local char timeoutfname[PATH_MAX];
+_Thread_local char reffname[PATH_MAX];
+_Thread_local char outfname[PATH_MAX];
 
 int silent_success = 1;
 
@@ -96,15 +94,14 @@ check_test_artefacts(const char *testname) {
         return -1;
     }
 
-    struct dirent dent;
-    struct dirent *result;
-    while (!readdir_r(tdir, &dent, &result) && result) {
-        const char *refdot = strstr(dent.d_name, "ref.");
+    struct dirent *dent;
+    while ((dent = readdir(tdir))) {
+        const char *refdot = strstr(dent->d_name, "ref.");
         if (!refdot) {
             continue;
         }
-        size_t ref_off = refdot - dent.d_name;
-        sprintf(reffname, "%s/%s", testname, dent.d_name);
+        size_t ref_off = refdot - dent->d_name;
+        sprintf(reffname, "%s/%s", testname, dent->d_name);
         strcpy(outfname, reffname);
         memcpy(outfname + strlen(testname) + 1 + ref_off, "out", 3);
         if (cmpfiles(reffname, outfname)) {
@@ -151,6 +148,9 @@ get_test_timeout(const char *testname) {
 }
 
 #ifndef _WIN32
+
+#include <sys/wait.h>
+
 static void *
 thread_wait(void *arg) {
     struct test_wait_arg *wa = arg;
@@ -195,11 +195,38 @@ run_test(const void *arg) {
     return result;
 }
 #else
-static void *
-run_test(void *arg) {
-    const char *test_name = arg;
 
-    return (void *)-1;
+#include <errhandlingapi.h>
+#include <intsafe.h>
+#include <io.h>
+#include <processthreadsapi.h>
+#include <synchapi.h>
+
+static void *
+run_test(const void *arg) {
+    const char *test_name = arg;
+    void *result = NULL;
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
+    memset(&si, 0, sizeof(si));
+    memset(&pi, 0, sizeof(pi));
+    unsigned tout = get_test_timeout(test_name);
+
+    if(!CreateProcess(NULL, "../../umka_shell -ri run.us -o out.log", NULL,
+                      NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+        fprintf(stderr, "CreateProcess failed: %lu\n", GetLastError());
+        return (void *)-1;
+    }
+
+    DWORD wait_res = WaitForSingleObject(pi.hProcess, tout*1000);
+    if (wait_res == WAIT_TIMEOUT) {
+        TerminateProcess(pi.hProcess, 1);
+        result = (void *)(intptr_t)-1;
+    }
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+
+    return result;
 }
 #endif
 
