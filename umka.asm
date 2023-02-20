@@ -100,8 +100,8 @@ UMKA_BOOT_DEFAULT_DISPLAY_BPP = 32
 UMKA_BOOT_DEFAULT_DISPLAY_WIDTH = 400
 UMKA_BOOT_DEFAULT_DISPLAY_HEIGHT = 300
 
-public idle_scheduled
-public os_scheduled
+pubsym idle_scheduled, 'idle_scheduled'
+pubsym os_scheduled, 'os_scheduled'
 pubsym irq_serv.irq_10, 'kos_irq_serv_irq10'
 pubsym idts, 'kos_idts'
 pubsym attach_int_handler, 'kos_attach_int_handler', 12
@@ -132,8 +132,8 @@ pubsym coverage_end
 
 pubsym sha3_256_oneshot, 'hash_oneshot'
 pubsym kos_time_to_epoch
-pubsym umka_init, 4
-pubsym umka_close, 4
+pubsym umka_init, 'umka_init'
+pubsym umka_close, 'umka_close'
 pubsym umka_boot
 
 pubsym current_process, 'kos_current_process'
@@ -884,12 +884,14 @@ endp
 
 pubsym skin_udata
 proc idle uses ebx esi edi
-extrn "pause", 0, libc_pause
         sti
 @@:
         mov     [idle_scheduled], 1
         sfence
+if ~ HOST eq windows
+extrn "pause", 0, libc_pause
         call    libc_pause
+end if
         jmp     @b
 
         ret

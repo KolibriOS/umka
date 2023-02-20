@@ -212,8 +212,8 @@ run_test(const void *arg) {
     memset(&pi, 0, sizeof(pi));
     unsigned tout = get_test_timeout(test_name);
 
-    if(!CreateProcess(NULL, "../../umka_shell -ri run.us -o out.log", NULL,
-                      NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+    if(!CreateProcessA(NULL, "../umka_shell -ri run.us -o out.log", NULL,
+                      NULL, FALSE, 0, NULL, test_name, &si, &pi)) {
         fprintf(stderr, "CreateProcess failed: %lu\n", GetLastError());
         return (void *)-1;
     }

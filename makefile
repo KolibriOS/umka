@@ -32,10 +32,14 @@ CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -g -O0 -DNDEBUG -masm=intel \
 CFLAGS_32=$(CFLAGS) -m32 -D_FILE_OFFSET_BITS=64 -D__USE_TIME_BITS64
 LDFLAGS=-no-pie
 LDFLAGS_32=$(LDFLAGS) -m32
-LIBS=-lpthread
+LIBS_COMMON=-lpthread
 
-ifeq ($(HOST),windows)
-        LIBS=$(LIBS) -lws2_32
+ifeq ($(HOST),linux)
+        LIBS=$(LIBS_COMMON)
+else ifeq ($(HOST),windows)
+        LIBS=$(LIBS_COMMON) -lws2_32
+else
+        $(error your HOST is not supported)
 endif
 
 ifeq ($(HOST),linux)
@@ -45,7 +49,7 @@ else ifeq ($(HOST),windows)
         FASM_INCLUDE=$(KOLIBRIOS)\kernel\trunk;$(KOLIBRIOS)\programs\develop\libraries\libcrash\hash
         FASM=set "INCLUDE=$(FASM_INCLUDE)" && $(FASM_EXE) $(FASM_FLAGS)
 else
-        $(error your OS is not supported)
+        $(error your HOST is not supported)
 endif
 
 ifeq ($(HOST),linux)
@@ -54,7 +58,7 @@ all: umka_shell umka_fuse umka_os umka_gen_devices_dat umka.sym umka.prp \
 else ifeq ($(HOST),windows)
 all: umka_shell umka.sym umka.prp umka.lst default.skn skin.skn test/runtests
 else
-        $(error your OS is not supported)
+        $(error your HOST is not supported)
 endif
 
 .PHONY: test
@@ -180,7 +184,7 @@ umka_gen_devices_dat.o: umka_gen_devices_dat.c umka.h
 	$(CC) $(CFLAGS_32) -c $<
 
 test/runtests: test/runtests.o deps/optparse/optparse.o
-	$(CC) $(LDFLAGS_32) -o $@ $^
+	$(CC) $(LDFLAGS_32) -o $@ $^ $(LIBS)
 
 test/runtests.o: test/runtests.c
 	$(CC) $(CFLAGS_32) -c $< -o $@ -Wno-deprecated-declarations
