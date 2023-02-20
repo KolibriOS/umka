@@ -1,0 +1,10 @@
+* text=auto
+
+*.us text
+ref.log text
+
+*.cur binary
+*.png binary
+*.rgb binary
+*.rgba binary
+*.layout binary
