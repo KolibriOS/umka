@@ -450,12 +450,12 @@ include 'core/heap.inc'
 ;restore user_alloc_at
 include 'core/malloc.inc'
 macro mov target, source {
-  if target eq [edi - 4096 + (page_tabs shr 20)]
+  if target eq [edi - PAGE_SIZE + (page_tabs shr 20)]
         push    eax ebx
         mov     ebx, eax
         mov     eax, page_tabs
         shr     eax, 20
-        sub     eax, 4096
+        sub     eax, PAGE_SIZE
         add     eax, edi
         mov     [eax], ebx
         pop     ebx eax
