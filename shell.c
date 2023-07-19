@@ -4085,7 +4085,7 @@ cmd_board_get(struct shell_ctx *ctx, int argc, char **argv) {
             COVERAGE_ON();
             c = umka_sys_board_get();
             COVERAGE_OFF();
-            if (c.status) {
+            if (c.status && (c.value != '\r')) {
                 fputc(c.value, ctx->fout);
             }
         } while (c.status && ((c.value != '\n') || flush));
