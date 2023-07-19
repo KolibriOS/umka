@@ -1,4 +1,4 @@
-umka_init
+umka_boot
 pci_set_path machines/000/pci
 acpi_set_usage 2
 

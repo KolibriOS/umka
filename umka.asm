@@ -1063,17 +1063,17 @@ alloc_pages:
 ;map_memEx:
         ret     20
 
-uglobal
-acpi_ctx dd ?
-acpi_usage dd ?
-acpi_node_alloc_cnt dd ?
-acpi_node_free_cnt dd ?
-pci_root dd ?
-acpi_root dd ?
-acpi_dev_next dd ?
-endg
+;uglobal
+;acpi_ctx dd ?
+;acpi_usage dd ?
+;acpi_node_alloc_cnt dd ?
+;acpi_node_free_cnt dd ?
+;pci_root dd ?
+;acpi_root dd ?
+;acpi_dev_next dd ?
+;endg
 
-sys_msg_board equ __pex0
+;sys_msg_board equ __pex0
 delay_ms equ __pex1
 
 include fix pew
