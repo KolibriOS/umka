@@ -1,4 +1,4 @@
-umka_init
+umka_boot
 pci_set_path machines/002/pci
 
 # some _ADR's are methods with memory access
@@ -20,6 +20,7 @@ acpi_preload_table machines/002/acpi/SSDT11
 acpi_preload_table machines/002/acpi/SSDT12
 
 acpi_enable
+board_get -f
 
 acpi_get_node_alloc_cnt
 acpi_get_node_free_cnt

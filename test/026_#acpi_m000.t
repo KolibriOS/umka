@@ -11,6 +11,7 @@ acpi_preload_table machines/000/acpi/SSDT5
 acpi_preload_table machines/000/acpi/SSDT6
 
 acpi_enable
+board_get -f
 
 acpi_get_node_alloc_cnt
 acpi_get_node_free_cnt

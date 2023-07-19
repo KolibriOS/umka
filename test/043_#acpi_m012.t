@@ -1,4 +1,4 @@
-umka_init
+umka_boot
 pci_set_path machines/012/pci
 acpi_set_usage 2
 
@@ -11,6 +11,7 @@ acpi_preload_table machines/012/acpi/ssdt5.dat
 acpi_preload_table machines/012/acpi/ssdt6.dat
 
 acpi_enable
+board_get -f
 
 acpi_get_node_alloc_cnt
 acpi_get_node_free_cnt
