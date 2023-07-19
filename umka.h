@@ -1895,7 +1895,7 @@ umka_sys_move_window(size_t x, size_t y, ssize_t xsize, ssize_t ysize) {
         : "memory");
 }
 
-static inline void*
+static inline void *
 umka_sys_load_dll(const char *fname) {
     void *table;
     __asm__ __inline__ __volatile__ (
@@ -1906,6 +1906,41 @@ umka_sys_load_dll(const char *fname) {
           "c"(fname)
         : "memory");
     return table;
+}
+
+struct sys_load_file_ret {
+    void *fdata;
+    size_t fsize;
+};
+
+static inline size_t
+kos_sys_misc_init_heap(void) {
+    size_t heap_size;
+
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(heap_size)
+        : "a"(68),
+          "b"(11)
+        : "memory");
+
+    return heap_size;
+}
+
+static inline struct sys_load_file_ret
+kos_sys_misc_load_file(const char *fname) {
+    struct sys_load_file_ret ret;
+
+    __asm__ __inline__ __volatile__ (
+        "call   i40"
+        : "=a"(ret.fdata),
+          "=d"(ret.fsize)
+        : "a"(68),
+          "b"(27),
+          "c"(fname)
+        : "memory");
+
+    return ret;
 }
 
 static inline void

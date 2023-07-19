@@ -2110,6 +2110,67 @@ cmd_button(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
+cmd_kos_sys_misc_init_heap(struct shell_ctx *ctx, int argc, char **argv) {
+    (void)argv;
+    const char *usage = \
+        "usage: kos_sys_misc_init_heap\n";
+    if (argc != 1) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+
+    COVERAGE_ON();
+    size_t heap_size = kos_sys_misc_init_heap();
+    COVERAGE_OFF();
+    fprintf(ctx->fout, "heap size = %u\n", heap_size);
+}
+
+static void
+cmd_kos_sys_misc_load_file(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: kos_sys_misc_load_file <filename> [-h] [-p]\n"
+        "  file             file in kolibri fs, e.g. /sys/pew/blah\n"
+        "  -h               dump bytes in hex\n"
+        "  -p               print pointers\n";
+    if (argc < 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    const char *fname = argv[1];
+    int show_hash = 0;
+    int show_pointers = 0;
+    optparse_init(&ctx->opts, argv+1);
+    int opt;
+    while ((opt = optparse(&ctx->opts, "hp")) != -1) {
+        switch (opt) {
+        case 'h':
+            show_hash = 1;
+            break;
+        case 'p':
+            show_pointers = 1;
+            break;
+        default:
+            fputs(usage, ctx->fout);
+            return;
+        }
+    }
+
+    COVERAGE_ON();
+    struct sys_load_file_ret ret = kos_sys_misc_load_file(fname);
+    COVERAGE_OFF();
+    if (show_pointers) {
+        fprintf(ctx->fout, "file data = %p\n", ret.fdata);
+    } else {
+        fprintf(ctx->fout, "file data = %s\n", ret.fdata ? "non-zero" : "0");
+    }
+    if (show_hash) {
+        print_hash(ctx, ret.fdata, ret.fsize);
+    }
+    fprintf(ctx->fout, "file size = %u\n", ret.fsize);
+    shell_var_add_ptr(ctx, ret.fdata);
+}
+
+static void
 cmd_load_cursor_from_file(struct shell_ctx *ctx, int argc, char **argv) {
     const char *usage = \
         "usage: load_cursor_from_file <file>\n"
@@ -4077,7 +4138,8 @@ cmd_bg_unmap(struct shell_ctx *ctx, int argc, char **argv) {
     fprintf(ctx->fout, "status = %d\n", status);
 }
 
-static void cmd_help(struct shell_ctx *ctx, int argc, char **argv);
+static void
+cmd_help(struct shell_ctx *ctx, int argc, char **argv);
 
 func_table_t cmd_cmds[] = {
     { "send_scancode",                  cmd_send_scancode },
@@ -4135,6 +4197,9 @@ func_table_t cmd_cmds[] = {
     { "get_window_colors",              cmd_get_window_colors },
     { "help",                           cmd_help },
     { "i40",                            cmd_i40 },
+    // f68
+    { "kos_sys_misc_init_heap",         cmd_kos_sys_misc_init_heap },   // 11
+    { "kos_sys_misc_load_file",         cmd_kos_sys_misc_load_file },   // 27
     { "load_cursor_from_file",          cmd_load_cursor_from_file },
     { "load_cursor_from_mem",           cmd_load_cursor_from_mem },
     { "load_dll",                       cmd_load_dll },

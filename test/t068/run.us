@@ -1,0 +1,13 @@
+umka_boot
+ramdisk_init ../img/kolibri.raw
+
+kos_sys_misc_init_heap
+kos_sys_misc_load_file /sys/fill.cur
+#kos_sys_misc_load_file /sys/fill.cur -h
+#kos_sys_misc_load_file /sys/fill.cur -h
+
+#kos_sys_misc_load_file /sys/spray.cur
+#kos_sys_misc_load_file /sys/spray.cur -h
+#kos_sys_misc_load_file /sys/spray.cur -h
+
+disk_del rd
