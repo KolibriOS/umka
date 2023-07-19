@@ -4044,17 +4044,21 @@ static void
 cmd_board_get(struct shell_ctx *ctx, int argc, char **argv) {
     (void)argv;
     const char *usage = \
-        "usage: board_get [-l] [-n]\n";
+        "usage: board_get [<-l|-a>] [-n]\n";
     if (argc > 2) {
         fputs(usage, ctx->fout);
         return;
     }
     optparse_init(&ctx->opts, argv);
+    int flush = 0;
     int line = 0;
     int force_newline = 0;
     int opt;
-    while ((opt = optparse(&ctx->opts, "ln")) != -1) {
+    while ((opt = optparse(&ctx->opts, "fln")) != -1) {
         switch (opt) {
+        case 'f':
+            flush = 1;
+            __attribute__((fallthrough));   // TODO: use [[fallthrough]]; (C23)
         case 'l':
             line = 1;
             break;
@@ -4084,7 +4088,7 @@ cmd_board_get(struct shell_ctx *ctx, int argc, char **argv) {
             if (c.status) {
                 fputc(c.value, ctx->fout);
             }
-        } while (c.status && (c.value != '\n'));
+        } while (c.status && ((c.value != '\n') || flush));
         if (force_newline) {
             fputc('\n', ctx->fout);
         }
@@ -4101,6 +4105,23 @@ cmd_board_put(struct shell_ctx *ctx, int argc, char **argv) {
         return;
     }
     char c = argv[1][0];
+    if (c == '\\') {
+        switch ((c = argv[1][1])) {
+        case 'n':
+            c = '\n';
+            break;
+        case 'r':
+            c = '\r';
+            break;
+        case 't':
+            c = '\t';
+            break;
+        default:
+            fprintf(ctx->fout, "unknown escape symbol: '%c'\n", c);
+            c = '?';
+            break;
+        }
+    }
     COVERAGE_ON();
     umka_sys_board_put(c);
     COVERAGE_OFF();
