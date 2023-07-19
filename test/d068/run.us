@@ -1,5 +1,5 @@
 umka_boot
-ramdisk_init ../img/kolibri.raw
+ramdisk_init ../../img/kolibri.raw
 
 kos_sys_misc_init_heap
 kos_sys_misc_load_file /sys/fill.cur

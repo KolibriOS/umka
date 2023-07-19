@@ -182,9 +182,15 @@ typedef struct {
     uint8_t fl_wstate;
     uint8_t fl_wdrawn;
     uint8_t fl_redraw;
+    box_t clientbox;
+    uint8_t *shape;
+    uint32_t shape_scale;
+    char *caption;
+    uint8_t caption_encoding;
+    uint8_t pad[3];
 } __attribute__((packed)) wdata_t;
 
-static_assert(sizeof(wdata_t) == 0x20, "must be 0x20 bytes long");
+static_assert(sizeof(wdata_t) == 0x40, "must be 0x40 bytes long");
 
 typedef struct {
     uint32_t frame;
@@ -926,8 +932,8 @@ typedef struct {
     uint8_t state;                 // +124
     uint8_t wnd_number;            // +125
     uint8_t pad2[2];               // +126
-    uint8_t *wnd_shape;            // +128
-    uint32_t wnd_shape_scale;      // +132
+    uint32_t pad3;                 // +128
+    uint32_t pad4;                 // +132
     uint32_t mem_start;            // +136
     uint32_t counter_sum;          // +140
     box_t saved_box;               // +144
@@ -937,18 +943,17 @@ typedef struct {
     uint32_t debugger_slot;        // +172
     uint32_t terminate_protection; // +176
     uint8_t keyboard_mode;         // +180
-    uint8_t captionEncoding;       // +181
-    uint8_t pad3[2];               // +182
+    uint8_t pad5[3];               // +181
     char *exec_params;             // +184
     void *dbg_event_mem;           // +188
     dbg_regs_t dbg_regs;           // +192
-    char *wnd_caption;             // +212
-    box_t wnd_clientbox;           // +216
+    uint32_t pad6;                 // +212
+    uint32_t pad7[4];              // +216
     uint32_t priority;             // +232
     lhead_t in_schedule;           // +236
     uint32_t counter_add;          // +244
     uint32_t cpu_usage;            // +248
-    uint32_t pad4;                 // +252
+    uint32_t pad8;                 // +252
 } appdata_t;
 
 static_assert(sizeof(appdata_t) == 256, "must be 0x100 bytes long");

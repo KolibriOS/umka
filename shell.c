@@ -701,12 +701,14 @@ cmd_wait_for_os_idle(struct shell_ctx *ctx, int argc, char **argv) {
 static uint32_t
 umka_wait_for_window_test(void) {
     appdata_t *app;
+    wdata_t *wdata;
     __asm__ __volatile__ __inline__ ("":"=b"(app)::);
     const char *wnd_title = (const char *)app->wait_param;
     for (size_t i = 0; i < 256; i++) {
         app = kos_slot_base + i;
-        if (app->state != KOS_TSTATE_FREE && app->wnd_caption
-            && !strcmp(app->wnd_caption, wnd_title)) {
+        wdata = kos_window_data + i;
+        if (app->state != KOS_TSTATE_FREE && wdata->caption
+            && !strcmp(wdata->caption, wnd_title)) {
             return 1;
         }
     }
@@ -1121,6 +1123,25 @@ cmd_dump_win_map(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
+cmd_dump_wdata(struct shell_ctx *ctx, int argc, char **argv) {
+    (void)ctx;
+    const char *usage = \
+        "usage: dump_wdata <index>\n"
+        "  index            index into wdata array to dump\n";
+    if (argc < 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    int idx = strtol(argv[1], NULL, 0);
+    wdata_t *w = kos_window_data + idx;
+
+    fprintf(ctx->fout, "captionEncoding: %u\n", w->caption_encoding);
+    fprintf(ctx->fout, "caption: %s\n", w->caption);
+    fprintf(ctx->fout, "clientbox (ltwh): %u %u %u %u\n", w->clientbox.left,
+           w->clientbox.top, w->clientbox.width, w->clientbox.height);
+}
+
+static void
 cmd_dump_appdata(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
@@ -1163,12 +1184,7 @@ cmd_dump_appdata(struct shell_ctx *ctx, int argc, char **argv) {
     fprintf(ctx->fout, "wnd_number: %" PRIu8 "\n", a->wnd_number);
     fprintf(ctx->fout, "terminate_protection: %u\n", a->terminate_protection);
     fprintf(ctx->fout, "keyboard_mode: %u\n", a->keyboard_mode);
-    fprintf(ctx->fout, "captionEncoding: %u\n", a->captionEncoding);
     fprintf(ctx->fout, "exec_params: %s\n", a->exec_params);
-    fprintf(ctx->fout, "wnd_caption: %s\n", a->wnd_caption);
-    fprintf(ctx->fout, "wnd_clientbox (ltwh): %u %u %u %u\n", a->wnd_clientbox.left,
-           a->wnd_clientbox.top, a->wnd_clientbox.width,
-           a->wnd_clientbox.height);
     fprintf(ctx->fout, "priority: %u\n", a->priority);
 
     fprintf(ctx->fout, "in_schedule: prev");
@@ -4197,6 +4213,7 @@ func_table_t cmd_cmds[] = {
     { "draw_window",                    cmd_draw_window },
     { "dump_appdata",                   cmd_dump_appdata },
     { "dump_key_buff",                  cmd_dump_key_buff },
+    { "dump_wdata",                     cmd_dump_wdata },
     { "dump_win_pos",                   cmd_dump_win_pos },
     { "dump_win_stack",                 cmd_dump_win_stack },
     { "dump_win_map",                   cmd_dump_win_map },

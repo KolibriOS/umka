@@ -64,12 +64,13 @@ state: 0x0
 wnd_number: 2
 terminate_protection: 1
 keyboard_mode: 0
-captionEncoding: 0
 exec_params: (null)
-wnd_caption: 
-wnd_clientbox (ltwh): 5 24 291 172
 priority: 0
 in_schedule: prev (2), next (2)
+/> dump_wdata 2
+captionEncoding: 0
+caption: 
+clientbox (ltwh): 5 24 291 172
 /> 
 /> process_info -1
 cpu_usage: 0
