@@ -1,0 +1,3 @@
+umka_init
+ramdisk_init ../img/kolibri.img
+load_dll /sys/lib/network.obj
