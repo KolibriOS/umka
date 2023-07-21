@@ -39,7 +39,8 @@ _Thread_local char outfname[PATH_MAX];
 int silent_success = 1;
 
 static int
-is_valid_test_name(const char *name) {
+is_valid_test(const char *name) {
+    // Check that name starts with t\d\d\d
     if (name[0] != 't') {
         return 0;
     }
@@ -48,7 +49,13 @@ is_valid_test_name(const char *name) {
             return 0;
         }
     }
-    return 1;
+    // Check that run.us file exists
+    sprintf(reffname, "%s/%s", name, "run.us");
+    FILE *f = fopen(reffname, "rb");
+    if (f) {
+        fclose(f);
+    }
+    return f != NULL;
 }
 
 static int
@@ -244,7 +251,7 @@ thread_run_test(void *arg) {
             break;
         }
         const char *testname = dent->d_name;
-        if (!is_valid_test_name(testname)) {
+        if (!is_valid_test(testname)) {
             continue;
         }
         fprintf(stderr, "running test %s\n", testname);
