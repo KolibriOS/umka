@@ -1,0 +1,453 @@
+/> umka_boot
+/> acpi_set_usage 1
+/> 
+/> acpi_preload_table ../machines/unit/acpi/debug_object.aml
+table #0
+/> 
+/> acpi_enable
+/> board_get -f
+acpi.aml.process_table begin
+table length 0x00000084
+Table signature: 'DSDT'
+Table length (with header): 0x00000084
+Revision: 0x01
+OEM ID: 'UMKA '
+OEM Table ID: 'UMKADSDT'
+OEM Table Revision: 0x00000001
+
+table/position: [0x00000024]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.name begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000025
+aml._.name_path begin
+aml._.name_path end
+name_string: BUFF
+aml._.name_string end
+aml._.get_node_by_name begin
+name: ''
+aml._.get_node_by_name end
+aml._.data_ref_object begin
+aml._.data_object begin
+aml._.computational_data begin
+aml._.buffer begin
+pkg_length: 0x00000007
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.byte_const begin
+aml._.byte_const end
+aml._.data_object end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+aml._.buffer end
+aml._.data_object end
+aml._.data_ref_object end
+aml._.name end
+aml._.namespace_modifier_obj end
+aml._.object end
+aml._.term_obj end
+table/position: [0x00000031]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.method begin
+pkg_length: 0x00000052
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000034
+aml._.name_path begin
+aml._.name_path end
+name_string: MAIN
+aml._.name_string end
+aml._.attach_node begin
+aml._.get_node_by_name begin
+name: ''
+aml._.get_node_by_name end
+aml._.attach_node end
+aml._.method end
+aml._.named_obj end
+aml._.object end
+aml._.term_obj end
+==========ACPI_TREE==========
+\MAIN Method         length:0x0000004B Args:0 serialize:0 sync_level:0
+\BUFF Buffer         Len:0x00000004
+\_TZ_ Scope         
+\_SI_ Scope         
+\_SB_ Scope         
+\_PR_ Scope         
+\_GPE Scope         
+-----------------------------
+acpi.aml.process_table end
+==========ACPI_TREE==========
+\MAIN Method         length:0x0000004B Args:0 serialize:0 sync_level:0
+\BUFF Buffer         Len:0x00000004
+\_TZ_ Scope         
+\_SI_ Scope         
+\_SB_ Scope         
+\_PR_ Scope         
+\_GPE Scope         
+-----------------------------
+/> 
+/> acpi_get_node_alloc_cnt
+nodes allocated: 11
+/> acpi_get_node_free_cnt
+nodes freed: 0
+/> acpi_get_node_cnt
+nodes in namespace: 10
+/> 
+/> acpi_call \MAIN
+calling acpi method: '\MAIN'
+acpi method returned
+/> board_get -f
+acpi.call_name begin
+aml._.get_node_by_name begin
+name: '\MAIN'
+aml._.get_node_by_name end
+acpi.call_node begin
+# func name MAIN
+# bytes 0x65680D70
+# bytes 0x006F6C6C
+# bytes 0x0A70315B
+table/position: [0x00000039]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.statement_opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.string begin
+aml._.string end
+aml._.data_object end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.debug_obj begin
+aml._.debug_obj end
+aml._.super_name end
+aml._.store_table begin
+types 3 to 19
+aml._.store_table.string_to_debug_object begin
+AML_DBG: hello
+aml._.store_table.string_to_debug_object end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+table/position: [0x00000043]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.statement_opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.byte_const begin
+aml._.byte_const end
+aml._.data_object end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.debug_obj begin
+aml._.debug_obj end
+aml._.super_name end
+aml._.store_table begin
+types 2 to 19
+aml._.store_table.integer_to_debug_object begin
+AML_DBG: 0x0000000000000042
+aml._.store_table.integer_to_debug_object end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+table/position: [0x00000048]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.statement_opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.string begin
+aml._.string end
+aml._.data_object end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.debug_obj begin
+aml._.debug_obj end
+aml._.super_name end
+aml._.store_table begin
+types 3 to 19
+aml._.store_table.string_to_debug_object begin
+AML_DBG: hello
+aml._.store_table.string_to_debug_object end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+table/position: [0x00000052]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.statement_opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.concat begin
+aml._.term_arg begin
+aml._.concat begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.string begin
+aml._.string end
+aml._.data_object end
+aml._.term_arg end
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.byte_const begin
+aml._.byte_const end
+aml._.data_object end
+aml._.term_arg end
+concat 00000003 and 00000002
+aml._.convert begin
+types 2 to 3
+aml._.convert.integer_to_string begin
+aml._.convert.integer_to_string end
+aml._.convert end
+aml._.target begin
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.name_string begin
+aml._.name_string end
+aml._.super_name end
+aml._.null_name begin
+aml._.null_name end
+aml._.target end
+aml._.concat end
+aml._.term_arg end
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.string begin
+aml._.string end
+aml._.data_object end
+aml._.term_arg end
+concat 00000003 and 00000003
+aml._.convert begin
+types 3 to 3
+aml._.convert.string_to_string begin
+aml._.convert.string_to_string end
+aml._.convert end
+aml._.target begin
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.name_string begin
+aml._.name_string end
+aml._.super_name end
+aml._.null_name begin
+aml._.null_name end
+aml._.target end
+aml._.concat end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.debug_obj begin
+aml._.debug_obj end
+aml._.super_name end
+aml._.store_table begin
+types 3 to 19
+aml._.store_table.string_to_debug_object begin
+AML_DBG: hi 0x0000000000000042 there
+aml._.store_table.string_to_debug_object end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+table/position: [0x00000068]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.statement_opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.concat begin
+aml._.term_arg begin
+aml._.concat begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.string begin
+aml._.string end
+aml._.data_object end
+aml._.term_arg end
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000073
+aml._.name_path begin
+aml._.name_path end
+name_string: BUFF
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'BUFF'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000073
+aml._.name_path begin
+aml._.name_path end
+name_string: BUFF
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'BUFF'
+aml._.get_node_by_name end
+aml._.term_arg end
+concat 00000003 and 00000004
+aml._.convert begin
+types 4 to 3
+aml._.convert.buffer_to_string begin
+### buf len: 4
+aml._.convert.buffer_to_string end
+aml._.convert end
+aml._.target begin
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.name_string begin
+aml._.name_string end
+aml._.super_name end
+aml._.null_name begin
+aml._.null_name end
+aml._.target end
+aml._.concat end
+aml._.term_arg end
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.string begin
+aml._.string end
+aml._.data_object end
+aml._.term_arg end
+concat 00000003 and 00000003
+aml._.convert begin
+types 3 to 3
+aml._.convert.string_to_string begin
+aml._.convert.string_to_string end
+aml._.convert end
+aml._.target begin
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.name_string begin
+aml._.name_string end
+aml._.super_name end
+aml._.null_name begin
+aml._.null_name end
+aml._.target end
+aml._.concat end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string end
+aml._.simple_name end
+aml._.debug_obj begin
+aml._.debug_obj end
+aml._.super_name end
+aml._.store_table begin
+types 3 to 19
+aml._.store_table.string_to_debug_object begin
+AML_DBG: hello 66 72 6F 6D buffer
+aml._.store_table.string_to_debug_object end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+acpi.call_node end
+acpi.call_name end
+/> 
+/> acpi_get_node_alloc_cnt
+nodes allocated: 29
+/> acpi_get_node_free_cnt
+nodes freed: 0
+/> acpi_get_node_cnt
+nodes in namespace: 10

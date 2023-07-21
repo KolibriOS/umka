@@ -1,0 +1,654 @@
+/> umka_boot
+/> pci_set_path ../machines/014/pci
+/> acpi_set_usage 1
+/> 
+/> acpi_preload_table ../machines/014/acpi/dsdt.dat
+table #0
+/> acpi_preload_table ../machines/014/acpi/ssdt.dat
+table #1
+/> acpi_preload_table ../machines/014/acpi/ssdt1.dat
+table #2
+/> acpi_preload_table ../machines/014/acpi/ssdt2.dat
+table #3
+/> acpi_preload_table ../machines/014/acpi/ssdt3.dat
+table #4
+/> acpi_preload_table ../machines/014/acpi/ssdt4.dat
+table #5
+/> acpi_preload_table ../machines/014/acpi/ssdt5.dat
+table #6
+/> acpi_preload_table ../machines/014/acpi/ssdt6.dat
+table #7
+/> acpi_preload_table ../machines/014/acpi/ssdt7.dat
+table #8
+/> acpi_preload_table ../machines/014/acpi/ssdt8.dat
+table #9
+/> 
+/> acpi_enable
+/> board_get -f
+INIT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000055B Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\MODE RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000558 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\TCOT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000550 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\THRT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000548 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\OSST RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000540 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\OSTT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000538 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\S5RS RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000535 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\S5EN RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000534 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\S4RS RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000533 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\S4EN RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000532 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\S3RS RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000531 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\S3EN RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000530 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ACOF RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000052F Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\AIRP RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000052E Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\LEAK RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000052D Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BOVP RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000052C Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ACMD RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000052B Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\LERN RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000052A Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ADPP RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000529 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\CHCR RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000528 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\TPWK RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000527 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\KEYW RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000526 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\USBW RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000525 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\WLAW RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000524 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\RTCW RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000523 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\LANW RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000522 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\MODW RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000521 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\PMEW RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000520 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ADPT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000051F Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ADPI RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000051C Len:00000002 Acc:1
+\_SB_\PCI0\LPCB\EC0_\OSTY RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000518 Len:00000003 Acc:1
+\_SB_\PCI0\LPCB\EC0_\HKDB RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000050B Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\TPAD RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000050A Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\VOUT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000509 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\IWAK RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000506 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ISC2 RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000505 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ISUP RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000504 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\IRTC RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000503 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ISS0 RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000502 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\IBCL RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000501 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\IBTL RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000500 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BDN0 RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:000004C0 Len:00000040 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BMN0 RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000478 Len:00000048 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BKLT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000461 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\QCHO RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000460 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\TPDV RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000458 Len:00000003 Acc:1
+\_SB_\PCI0\LPCB\EC0_\UCER RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000457 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\UCHR RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000456 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\KLOR RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000455 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\KLFS RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000454 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\KLCH RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000452 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\UCHE RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000451 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\KBLO RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000450 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\FBFG RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000445 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\SAD1 RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000438 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\SAD0 RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000430 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\SMAA RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000428 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BCNT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000420 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\SMDA RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000320 Len:00000100 Acc:1
+\_SB_\PCI0\LPCB\EC0_\SMCM RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000318 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\SMAD RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000310 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\SMST RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000308 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\HMPR RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000300 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\EXND RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:000002F8 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\EXSB RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:000002F0 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\EXSI RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:000002E8 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\CHIS RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000270 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BFUD RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000260 Len:00000010 Acc:1
+\_SB_\PCI0\LPCB\EC0_\EMOD RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000258 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ESMC RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000250 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ECTP RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000218 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\GDST RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:000001C0 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\GUST RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:000001B8 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\DGPU RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:000001B0 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\IRTI RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:000001A0 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\KIRT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000198 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\PIRT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000190 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\GIRT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000188 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\LSKV RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:000000F8 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\QHMO RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:000000E8 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\FWBT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:000000A0 Len:00000040 Acc:1
+\_SB_\PCI0\LPCB\EC0_\FUSH RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000098 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\FUSL RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000090 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\VTYP RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000008A Len:00000002 Acc:1
+\_SB_\PCI0\LPCB\EC0_\RSBT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000089 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\RMBT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000088 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\LS35 RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000086 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\QUIT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000085 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\GTMP RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000084 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\SUPR RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000083 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\PINF RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000080 Len:00000003 Acc:1
+\_SB_\PCI0\LPCB\EC0_\AFCC RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000078 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\VTMP RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000070 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\RTMP RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000068 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\EODS RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000067 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ODFB RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000066 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\SODD RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000065 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\CMON RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000064 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\CMEX RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000063 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ODPK RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000062 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\EODD RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000061 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ODPO RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000060 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\SGCN RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000005F Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\COLR RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000005E Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\DCRF RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000005D Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\EVNT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000005C Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\SWST RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000005B Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\HYBD RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000005A Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\HDMI RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000059 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\SGST RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000058 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\CSBM RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000057 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\LBTM RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000056 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BTCM RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000055 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BTSM RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000054 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\CCSB RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000053 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\CDMB RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000052 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ALSC RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000051 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\EDCC RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000050 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\DBTL RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000048 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ABTL RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000040 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\FCHG RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000003F Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\AUTO RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000003E Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BBAD RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000003D Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BTST RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000003C Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BNSM RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000003B Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BATF RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:0000003A Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BLEG RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000039 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\BUSG RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000038 Len:00000001 Acc:1
+\_SB_\PCI0\LPCB\EC0_\FANS RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000030 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\VSTA RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000010 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\VDAT RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAX] Off:00000008 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ERAX OpRegion       [SystemMemory] Len:000000FF
+\_SB_\PCI0\LPCB\EC0_\SMPR RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAM] Off:00000300 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\VCMD RegionField    Rgn [\_SB_\PCI0\LPCB\EC0_\ERAM] Off:00000000 Len:00000008 Acc:1
+\_SB_\PCI0\LPCB\EC0_\ERAM OpRegion       [EmbeddedControl] Len:000000FF
+\_SB_\PCI0\LPCB\EC0_\_STA Method         length:0x0000000D Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\LPCB\EC0_\_CRS Method         length:0x00000020 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\LPCB\EC0_\_GPE Method         length:0x00000006 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\LPCB\EC0_\LFCM Mutex          sync_level:0
+\_SB_\PCI0\LPCB\EC0_\ECAV Integer        = 0x0000000000000000
+\_SB_\PCI0\LPCB\EC0_\_UID Integer        = 0x0000000000000001
+\_SB_\PCI0\LPCB\EC0_\_HID Integer        = 0x00000000090CD041
+\_SB_\PCI0\LPCB\C1EN RegionField    Rgn [\_SB_\PCI0\LPCB\LPC0] Off:00000200 Len:00000001 Acc:0
+\_SB_\PCI0\LPCB\LPC0 OpRegion       [PCIConfig] Len:000000C0
+\_SB_\PCI0\LPCB\GR19 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC_] Off:000005E2 Len:00000002 Acc:0
+\_SB_\PCI0\LPCB\GR0B RegionField    Rgn [\_SB_\PCI0\LPCB\LPC_] Off:000005D6 Len:00000002 Acc:0
+\_SB_\PCI0\LPCB\XUSB RegionField    Rgn [\_SB_\PCI0\LPCB\LPC_] Off:00000570 Len:00000001 Acc:0
+\_SB_\PCI0\LPCB\PRBL RegionField    Rgn [\_SB_\PCI0\LPCB\LPC_] Off:00000509 Len:00000001 Acc:0
+\_SB_\PCI0\LPCB\IOD1 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC_] Off:00000408 Len:00000008 Acc:0
+\_SB_\PCI0\LPCB\IOD0 RegionField    Rgn [\_SB_\PCI0\LPCB\LPC_] Off:00000400 Len:00000008 Acc:0
+\_SB_\PCI0\LPCB\SIRQ RegionField    Rgn [\_SB_\PCI0\LPCB\LPC_] Off:00000320 Len:00000008 Acc:0
+\_SB_\PCI0\LPCB\CRID RegionField    Rgn [\_SB_\PCI0\LPCB\LPC_] Off:00000040 Len:00000008 Acc:0
+\_SB_\PCI0\LPCB\CDID RegionField    Rgn [\_SB_\PCI0\LPCB\LPC_] Off:00000010 Len:00000010 Acc:0
+\_SB_\PCI0\LPCB\LPC_ OpRegion       [PCIConfig] Len:00000100
+\_SB_\PCI0\LPCB\_ADR Integer        = 0x00000000001F0000
+\_SB_\PCI0\LNSL Integer        = 0x0000000000000000
+\_SB_\PCI0\LMSL Integer        = 0x0000000000000000
+\_SB_\PCI0\OBFN Integer        = 0x0000000000000000
+\_SB_\PCI0\LTRN Integer        = 0x0000000000000000
+\_SB_\PCI0\_OSC Method         length:0x000000AB Args:4 serialize:1 sync_level:0
+\_SB_\PCI0\CTRL Integer        = 0x0000000000000000
+\_SB_\PCI0\SUPP Integer        = 0x0000000000000000
+\_SB_\PCI0\GUID Buffer         Len:0x00000010
+\_SB_\PCI0\RES0 Buffer         Len:0x000001D8
+\_SB_\PCI0\_CRS Method         length:0x0000005E Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\VLVC Device        
+\_SB_\PCI0\VLVC\TOLD RegionField    Rgn [\_SB_\PCI0\VLVC\HBUS] Off:000005E0 Len:00000020 Acc:3
+\_SB_\PCI0\VLVC\BDSM RegionField    Rgn [\_SB_\PCI0\VLVC\HBUS] Off:00000580 Len:00000020 Acc:3
+\_SB_\PCI0\VLVC\MHBR RegionField    Rgn [\_SB_\PCI0\VLVC\HBUS] Off:0000024F Len:00000018 Acc:3
+\_SB_\PCI0\VLVC\MHEN RegionField    Rgn [\_SB_\PCI0\VLVC\HBUS] Off:00000240 Len:00000001 Acc:3
+\_SB_\PCI0\VLVC\HBUS OpRegion       [PCIConfig] Len:000000FF
+\_SB_\PCI0\VLVC\_ADR Integer        = 0x0000000000000000
+\_SB_\PCI0\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\_UID Integer        = 0x0000000000000000
+\_SB_\PCI0\_BBN Method         length:0x00000005 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\_ADR Integer        = 0x0000000000000000
+\_SB_\PCI0\_CID Integer        = 0x00000000030AD041
+\_SB_\PCI0\_HID Integer        = 0x00000000080AD041
+\_SB_\PRSH Alias          Source: \_SB_\PRSA
+\_SB_\PRSG Alias          Source: \_SB_\PRSA
+\_SB_\PRSF Alias          Source: \_SB_\PRSA
+\_SB_\PRSE Alias          Source: \_SB_\PRSA
+\_SB_\PRSD Alias          Source: \_SB_\PRSA
+\_SB_\PRSC Alias          Source: \_SB_\PRSA
+\_SB_\PRSB Alias          Source: \_SB_\PRSA
+\_SB_\PRSA Buffer         Len:0x00000006
+\_SB_\AR07 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000014
+\_SB_\PR07 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKF
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKE
+         Integer        = 0x0000000000000000
+\_SB_\AR06 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000014
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+\_SB_\PR06 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKE
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKF
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+\_SB_\AR05 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000014
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+\_SB_\PR05 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKE
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKF
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+\_SB_\AR04 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000014
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+\_SB_\PR04 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKE
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKF
+         Integer        = 0x0000000000000000
+\_SB_\AR00 Package        elements:36
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000018
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x00000000000CFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000002C
+     Package        elements:4
+         Integer        = 0x00000000000EFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000019
+     Package        elements:4
+         Integer        = 0x00000000000FFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000014
+     Package        elements:4
+         Integer        = 0x000000000011FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000001A
+     Package        elements:4
+         Integer        = 0x000000000012FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000013FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x000000000013FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x000000000013FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x000000000013FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x000000000014FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+     Package        elements:4
+         Integer        = 0x000000000014FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+     Package        elements:4
+         Integer        = 0x000000000015FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000015FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000000D
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000001B
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000001C
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000001D
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000001E
+     Package        elements:4
+         Integer        = 0x000000000017FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000001F
+     Package        elements:4
+         Integer        = 0x000000000017FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000020
+     Package        elements:4
+         Integer        = 0x000000000017FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000021
+     Package        elements:4
+         Integer        = 0x000000000017FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000022
+     Package        elements:4
+         Integer        = 0x000000000018FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000004
+     Package        elements:4
+         Integer        = 0x000000000018FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000005
+     Package        elements:4
+         Integer        = 0x000000000018FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000006
+     Package        elements:4
+         Integer        = 0x000000000018FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000007
+     Package        elements:4
+         Integer        = 0x000000000019FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000023
+     Package        elements:4
+         Integer        = 0x000000000019FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000024
+     Package        elements:4
+         Integer        = 0x000000000019FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000025
+     Package        elements:4
+         Integer        = 0x00000000001BFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000003
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000027
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000002A
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000014
+\_SB_\PR00 Package        elements:15
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000000EFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000000FFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKE
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000012FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000013FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000013FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000013FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKE
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000013FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKF
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000014FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000014FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000015FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000015FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKE
+         Integer        = 0x0000000000000000
+\_PR_ Scope         
+\_GPE Scope         
+\_GPE\_L09 Method         length:0x000000E1 Args:0 serialize:0 sync_level:0
+\_GPE\_L08 Method         length:0x00000033 Args:0 serialize:0 sync_level:0
+\_GPE\_L0F Method         length:0x00000000 Args:0 serialize:0 sync_level:0
+\_GPE\_L0E Method         length:0x00000012 Args:0 serialize:0 sync_level:0
+\_GPE\_L0D Method         length:0x00000012 Args:0 serialize:0 sync_level:0
+\_GPE\_L02 Method         length:0x00000028 Args:0 serialize:0 sync_level:0
+-----------------------------
+/> 
+/> acpi_get_node_alloc_cnt
+nodes allocated: 5142
+/> acpi_get_node_free_cnt
+nodes freed: 259
+/> acpi_get_node_cnt
+nodes in namespace: 2427

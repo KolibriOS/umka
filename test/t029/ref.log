@@ -1,0 +1,690 @@
+/> umka_boot
+/> pci_set_path ../machines/003/pci
+/> acpi_set_usage 2
+/> 
+/> acpi_preload_table ../machines/003/acpi/DSDT
+table #0
+/> 
+/> acpi_enable
+/> board_get -f
+       Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKE
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKF
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+\_SB_\PCI0\ISA_ Device        
+\_SB_\PCI0\ISA_\COM2 Device        
+\_SB_\PCI0\ISA_\COM2\_CRS Buffer         Len:0x0000000D
+\_SB_\PCI0\ISA_\COM2\_STA Method         length:0x00000012 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\ISA_\COM2\_UID Integer        = 0x0000000000000002
+\_SB_\PCI0\ISA_\COM2\_HID Integer        = 0x000000000105D041
+\_SB_\PCI0\ISA_\COM1 Device        
+\_SB_\PCI0\ISA_\COM1\_CRS Buffer         Len:0x0000000D
+\_SB_\PCI0\ISA_\COM1\_STA Method         length:0x00000012 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\ISA_\COM1\_UID Integer        = 0x0000000000000001
+\_SB_\PCI0\ISA_\COM1\_HID Integer        = 0x000000000105D041
+\_SB_\PCI0\ISA_\LPT_ Device        
+\_SB_\PCI0\ISA_\LPT_\_CRS Buffer         Len:0x0000000D
+\_SB_\PCI0\ISA_\LPT_\_STA Method         length:0x00000012 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\ISA_\LPT_\_HID Integer        = 0x000000000004D041
+\_SB_\PCI0\ISA_\MOU_ Device        
+\_SB_\PCI0\ISA_\MOU_\_CRS Buffer         Len:0x00000005
+\_SB_\PCI0\ISA_\MOU_\_STA Method         length:0x00000003 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\ISA_\MOU_\_HID Integer        = 0x00000000130FD041
+\_SB_\PCI0\ISA_\KBD_ Device        
+\_SB_\PCI0\ISA_\KBD_\_CRS Buffer         Len:0x00000015
+\_SB_\PCI0\ISA_\KBD_\_STA Method         length:0x00000003 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\ISA_\KBD_\_HID Integer        = 0x000000000303D041
+\_SB_\PCI0\ISA_\RTC_ Device        
+\_SB_\PCI0\ISA_\RTC_\_CRS Buffer         Len:0x00000015
+\_SB_\PCI0\ISA_\RTC_\_HID Integer        = 0x00000000000BD041
+\_SB_\PCI0\ISA_\LPEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000002 Len:00000001 Acc:0
+\_SB_\PCI0\ISA_\CBEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000001 Len:00000001 Acc:0
+\_SB_\PCI0\ISA_\CAEN RegionField    Rgn [\_SB_\PCI0\ISA_\LPCE] Off:00000000 Len:00000001 Acc:0
+\_SB_\PCI0\ISA_\LPCE OpRegion       [PCIConfig] Len:00000002
+\_SB_\PCI0\ISA_\LPTD RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000008 Len:00000002 Acc:0
+\_SB_\PCI0\ISA_\COMB RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000004 Len:00000003 Acc:0
+\_SB_\PCI0\ISA_\COMA RegionField    Rgn [\_SB_\PCI0\ISA_\LPCD] Off:00000000 Len:00000003 Acc:0
+\_SB_\PCI0\ISA_\LPCD OpRegion       [PCIConfig] Len:00000002
+\_SB_\PCI0\ISA_\PIRQ OpRegion       [PCIConfig] Len:0000000C
+\_SB_\PCI0\ISA_\_ADR Integer        = 0x00000000001F0000
+\_SB_\PCI0\_OSC Method         length:0x00000075 Args:4 serialize:0 sync_level:0
+\_SB_\PCI0\_UID Integer        = 0x0000000000000001
+\_SB_\PCI0\_ADR Integer        = 0x0000000000000000
+\_SB_\PCI0\_CID Integer        = 0x00000000030AD041
+\_SB_\PCI0\_HID Integer        = 0x00000000080AD041
+\_PR_ Scope         
+\_GPE Scope         
+\_GPE\_HID String         Len:0x00000008 value:ACPI0006
+\_GPE\_E02 Method         length:0x0000000F Args:0 serialize:0 sync_level:0
+-----------------------------
+acpi.call_name begin
+aml._.get_node_by_name begin
+name: '\_PIC'
+aml._.get_node_by_name end
+acpi.call_node begin
+# func name _PIC
+# bytes 0x49506870
+# bytes 0x8E104643
+# bytes 0x535F0159
+table/position: [0x00000397]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.statement_opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.arg_obj begin
+aml._.arg_obj end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000399
+aml._.name_path begin
+aml._.name_path end
+name_string: PICF
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICF'
+aml._.get_node_by_name end
+aml._.simple_name end
+aml._.super_name end
+aml._.store_table begin
+types 2 to 2
+aml._.store_table.integer_to_integer begin
+aml._.store_table.integer_to_integer end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+acpi.call_node end
+acpi.call_name end
+aml._.get_node_by_name begin
+name: '\_SB_PCI0'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_PRT'
+aml._.get_node_by_name end
+acpi.call_node begin
+# func name _PRT
+# bytes 0x50930CA0
+# bytes 0x00464349
+# bytes 0x545250A4
+table/position: [0x00001235]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.if begin
+pkg_length: 0x0000000C
+aml._.term_arg begin
+aml._.l_equal begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00001238
+aml._.name_path begin
+aml._.name_path end
+name_string: PICF
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICF'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00001238
+aml._.name_path begin
+aml._.name_path end
+name_string: PICF
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICF'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.const_obj begin
+aml._.const_obj end
+aml._.computational_data end
+aml._.data_object end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+ eax == ecx: 0x00000000 == 0x00000001
+aml._.l_equal end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+aml._.if end
+aml._.statement_opcode end
+aml._.term_obj end
+table/position: [0x00001242]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.else begin
+pkg_length: 0x00000006
+else branch taken
+table/position: [0x00001244]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.return begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00001245
+aml._.name_path begin
+aml._.name_path end
+name_string: PRTA
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PRTA'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00001245
+aml._.name_path begin
+aml._.name_path end
+name_string: PRTA
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PRTA'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.return end
+acpi.call_node end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_PRT'
+aml._.get_node_by_name end
+acpi.call_node begin
+# func name _PRT
+# bytes 0x50930CA0
+# bytes 0x00464349
+# bytes 0x545250A4
+table/position: [0x00001235]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.if begin
+pkg_length: 0x0000000C
+aml._.term_arg begin
+aml._.l_equal begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00001238
+aml._.name_path begin
+aml._.name_path end
+name_string: PICF
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICF'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00001238
+aml._.name_path begin
+aml._.name_path end
+name_string: PICF
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICF'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.const_obj begin
+aml._.const_obj end
+aml._.computational_data end
+aml._.data_object end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+ eax == ecx: 0x00000000 == 0x00000001
+aml._.l_equal end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+aml._.if end
+aml._.statement_opcode end
+aml._.term_obj end
+table/position: [0x00001242]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.else begin
+pkg_length: 0x00000006
+else branch taken
+table/position: [0x00001244]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.return begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00001245
+aml._.name_path begin
+aml._.name_path end
+name_string: PRTA
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PRTA'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00001245
+aml._.name_path begin
+aml._.name_path end
+name_string: PRTA
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PRTA'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.return end
+acpi.call_node end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_PRT'
+aml._.get_node_by_name end
+acpi.call_node begin
+# func name _PRT
+# bytes 0x50930CA0
+# bytes 0x00464349
+# bytes 0x545250A4
+table/position: [0x00001235]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.if begin
+pkg_length: 0x0000000C
+aml._.term_arg begin
+aml._.l_equal begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00001238
+aml._.name_path begin
+aml._.name_path end
+name_string: PICF
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICF'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00001238
+aml._.name_path begin
+aml._.name_path end
+name_string: PICF
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICF'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.const_obj begin
+aml._.const_obj end
+aml._.computational_data end
+aml._.data_object end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+ eax == ecx: 0x00000000 == 0x00000001
+aml._.l_equal end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+aml._.if end
+aml._.statement_opcode end
+aml._.term_obj end
+table/position: [0x00001242]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.else begin
+pkg_length: 0x00000006
+else branch taken
+table/position: [0x00001244]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.return begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00001245
+aml._.name_path begin
+aml._.name_path end
+name_string: PRTA
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PRTA'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00001245
+aml._.name_path begin
+aml._.name_path end
+name_string: PRTA
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PRTA'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.return end
+acpi.call_node end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_CRS'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_CRS'
+aml._.get_node_by_name end
+00:00.0  0000:0000  00  1  \_SB_\PCI0
+  00:1F.0  0000:0000  00  1  \_SB_\PCI0\ISA_
+  00:1F.3  8086:2930  10  0  \_SB_\PCI0\SMB0
+  00:00.0  0000:0000  00  1  \_SB_\PCI0\S00_
+  00:01.0  1234:1111  00  0  \_SB_\PCI0\S08_
+  00:02.0  8086:10D3  16  0  \_SB_\PCI0\S10_
+/> 
+/> acpi_get_node_alloc_cnt
+nodes allocated: 1917
+/> acpi_get_node_free_cnt
+nodes freed: 6
+/> acpi_get_node_cnt
+nodes in namespace: 249

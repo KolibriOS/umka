@@ -1,0 +1,1327 @@
+/> umka_boot
+/> acpi_set_usage 1
+/> 
+/> acpi_preload_table ../machines/004/acpi/DSDT
+table #0
+/> acpi_preload_table ../machines/004/acpi/SSDT1
+table #1
+/> acpi_preload_table ../machines/004/acpi/SSDT2
+table #2
+/> acpi_preload_table ../machines/004/acpi/SSDT3
+table #3
+/> 
+/> acpi_enable
+/> board_get -f
+Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+\_SB_\AR0C Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+\_SB_\PR0C Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+\_SB_\AR0B Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+\_SB_\PR0B Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+\_SB_\AR0A Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+\_SB_\PR0A Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+\_SB_\AR02 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+\_SB_\PR02 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+\_SB_\AR01 Package        elements:16
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000014
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000014
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000003FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000003FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000003FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x000000000003FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+\_SB_\PR01 Package        elements:16
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKF
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKE
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKF
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKE
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000003FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000003FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000003FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKF
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000003FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+\_SB_\AR0F Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+\_SB_\PR0F Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+\_SB_\AR0E Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+\_SB_\PR0E Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+\_SB_\AR09 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+\_SB_\PR09 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+\_SB_\AR08 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+\_SB_\PR08 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+\_SB_\AR07 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+\_SB_\PR07 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+\_SB_\AR06 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+\_SB_\PR06 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+\_SB_\AR05 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+\_SB_\PR05 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+\_SB_\AR04 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+\_SB_\PR04 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+\_SB_\AR00 Package        elements:30
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000014FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+     Package        elements:4
+         Integer        = 0x00000000001BFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+     Package        elements:4
+         Integer        = 0x000000000019FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000014
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000006FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000006FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000006FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000006FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000004FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000004FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000004FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000004FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x00000000001AFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+\_SB_\PR00 Package        elements:30
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKF
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000014FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001BFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000019FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKE
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000001FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000006FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000006FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000006FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000006FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000004FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000004FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000004FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000004FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001AFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKF
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+\_PR_ Scope         
+\_PR_\PPC2 RegionField    Rgn [\_PR_\PPMT] Off:00000140 Len:00000008 Acc:0
+\_PR_\TAR2 RegionField    Rgn [\_PR_\PPMT] Off:00000138 Len:00000008 Acc:0
+\_PR_\CTC2 RegionField    Rgn [\_PR_\PPMT] Off:00000130 Len:00000008 Acc:0
+\_PR_\PLW2 RegionField    Rgn [\_PR_\PPMT] Off:00000128 Len:00000008 Acc:0
+\_PR_\PL22 RegionField    Rgn [\_PR_\PPMT] Off:00000118 Len:00000010 Acc:0
+\_PR_\PL12 RegionField    Rgn [\_PR_\PPMT] Off:00000108 Len:00000010 Acc:0
+\_PR_\PPC1 RegionField    Rgn [\_PR_\PPMT] Off:00000100 Len:00000008 Acc:0
+\_PR_\TAR1 RegionField    Rgn [\_PR_\PPMT] Off:000000F8 Len:00000008 Acc:0
+\_PR_\CTC1 RegionField    Rgn [\_PR_\PPMT] Off:000000F0 Len:00000008 Acc:0
+\_PR_\PLW1 RegionField    Rgn [\_PR_\PPMT] Off:000000E8 Len:00000008 Acc:0
+\_PR_\PL21 RegionField    Rgn [\_PR_\PPMT] Off:000000D8 Len:00000010 Acc:0
+\_PR_\PL11 RegionField    Rgn [\_PR_\PPMT] Off:000000C8 Len:00000010 Acc:0
+\_PR_\PPC0 RegionField    Rgn [\_PR_\PPMT] Off:000000C0 Len:00000008 Acc:0
+\_PR_\TAR0 RegionField    Rgn [\_PR_\PPMT] Off:000000B8 Len:00000008 Acc:0
+\_PR_\CTC0 RegionField    Rgn [\_PR_\PPMT] Off:000000B0 Len:00000008 Acc:0
+\_PR_\PLW0 RegionField    Rgn [\_PR_\PPMT] Off:000000A8 Len:00000008 Acc:0
+\_PR_\PL20 RegionField    Rgn [\_PR_\PPMT] Off:00000098 Len:00000010 Acc:0
+\_PR_\PL10 RegionField    Rgn [\_PR_\PPMT] Off:00000088 Len:00000010 Acc:0
+\_PR_\CBMI RegionField    Rgn [\_PR_\PPMT] Off:00000080 Len:00000008 Acc:0
+\_PR_\CLVL RegionField    Rgn [\_PR_\PPMT] Off:00000078 Len:00000008 Acc:0
+\_PR_\CCTP RegionField    Rgn [\_PR_\PPMT] Off:00000070 Len:00000008 Acc:0
+\_PR_\CPPC RegionField    Rgn [\_PR_\PPMT] Off:00000068 Len:00000008 Acc:0
+\_PR_\CPID RegionField    Rgn [\_PR_\PPMT] Off:00000048 Len:00000020 Acc:0
+\_PR_\AAC0 RegionField    Rgn [\_PR_\PPMT] Off:00000040 Len:00000008 Acc:0
+\_PR_\APSV RegionField    Rgn [\_PR_\PPMT] Off:00000038 Len:00000008 Acc:0
+\_PR_\ACRT RegionField    Rgn [\_PR_\PPMT] Off:00000030 Len:00000008 Acc:0
+\_PR_\PGRV RegionField    Rgn [\_PR_\PPMT] Off:00000000 Len:00000008 Acc:0
+\_PR_\PPMT OpRegion       [SystemMemory] Len:00000029
+\_PR_\CPU7 Processor      ID:0x08 Addr:0x00000410 Len:0x00000006
+\_PR_\CPU7\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
+\_PR_\CPU7\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
+\_PR_\CPU7\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_PR_\CPU6 Processor      ID:0x07 Addr:0x00000410 Len:0x00000006
+\_PR_\CPU6\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
+\_PR_\CPU6\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
+\_PR_\CPU6\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_PR_\CPU5 Processor      ID:0x06 Addr:0x00000410 Len:0x00000006
+\_PR_\CPU5\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
+\_PR_\CPU5\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
+\_PR_\CPU5\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_PR_\CPU4 Processor      ID:0x05 Addr:0x00000410 Len:0x00000006
+\_PR_\CPU4\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
+\_PR_\CPU4\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
+\_PR_\CPU4\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_PR_\CPU3 Processor      ID:0x04 Addr:0x00000410 Len:0x00000006
+\_PR_\CPU3\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
+\_PR_\CPU3\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
+\_PR_\CPU3\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_PR_\CPU2 Processor      ID:0x03 Addr:0x00000410 Len:0x00000006
+\_PR_\CPU2\GCAP Method         length:0x0000008D Args:1 serialize:0 sync_level:0
+\_PR_\CPU2\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
+\_PR_\CPU2\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_PR_\CPU1 Processor      ID:0x02 Addr:0x00000410 Len:0x00000006
+\_PR_\CPU1\APPT Method         length:0x00000042 Args:0 serialize:0 sync_level:0
+\_PR_\CPU1\APCT Method         length:0x00000043 Args:0 serialize:0 sync_level:0
+\_PR_\CPU1\GCAP Method         length:0x00000077 Args:1 serialize:0 sync_level:0
+\_PR_\CPU1\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
+\_PR_\CPU1\_PDC Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_PR_\CPU1\HC1_ Integer        = 0x0000000000000000
+\_PR_\CPU1\HI1_ Integer        = 0x0000000000000000
+\_PR_\CPU0 Processor      ID:0x01 Addr:0x00000410 Len:0x00000006
+\_PR_\CPU0\GCAP Method         length:0x000000A7 Args:1 serialize:0 sync_level:0
+\_PR_\CPU0\COSC Method         length:0x000000B6 Args:4 serialize:0 sync_level:0
+\_PR_\CPU0\CPDC Method         length:0x00000061 Args:1 serialize:0 sync_level:0
+\_PR_\CPU0\_OSC Method         length:0x00000011 Args:4 serialize:0 sync_level:0
+\_PR_\CPU0\_PDC Method         length:0x00000022 Args:1 serialize:0 sync_level:0
+\_PR_\CPU0\HC0_ Integer        = 0x0000000000000000
+\_PR_\CPU0\HI0_ Integer        = 0x0000000000000000
+\_PR_\CPU0\SPSD Package        elements:1
+     Package        elements:5
+         Integer        = 0x0000000000000005
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x00000000000000FC
+         Integer        = 0x0000000000000080
+\_PR_\CPU0\HPSD Package        elements:1
+     Package        elements:5
+         Integer        = 0x0000000000000005
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x00000000000000FE
+         Integer        = 0x0000000000000080
+\_PR_\CPU0\_PSD Method         length:0x00000044 Args:0 serialize:0 sync_level:0
+\_PR_\CPU0\PSDF Integer        = 0x0000000000000000
+\_PR_\CPU0\_PSS Package        elements:16
+     Package        elements:6
+         Integer        = 0x0000000000000D49
+         Integer        = 0x0000000000012CC8
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000FF00
+         Integer        = 0x000000000000FF00
+     Package        elements:6
+         Integer        = 0x0000000000000D48
+         Integer        = 0x0000000000012CC8
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000002200
+         Integer        = 0x0000000000002200
+     Package        elements:6
+         Integer        = 0x0000000000000CE4
+         Integer        = 0x0000000000012070
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000002100
+         Integer        = 0x0000000000002100
+     Package        elements:6
+         Integer        = 0x0000000000000C1C
+         Integer        = 0x000000000001086E
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001F00
+         Integer        = 0x0000000000001F00
+     Package        elements:6
+         Integer        = 0x0000000000000BB8
+         Integer        = 0x000000000000FCC1
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001E00
+         Integer        = 0x0000000000001E00
+     Package        elements:6
+         Integer        = 0x0000000000000B54
+         Integer        = 0x000000000000F14C
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001D00
+         Integer        = 0x0000000000001D00
+     Package        elements:6
+         Integer        = 0x0000000000000AF0
+         Integer        = 0x000000000000E61B
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001C00
+         Integer        = 0x0000000000001C00
+     Package        elements:6
+         Integer        = 0x0000000000000A28
+         Integer        = 0x000000000000D043
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001A00
+         Integer        = 0x0000000000001A00
+     Package        elements:6
+         Integer        = 0x00000000000009C4
+         Integer        = 0x000000000000C5A9
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001900
+         Integer        = 0x0000000000001900
+     Package        elements:6
+         Integer        = 0x0000000000000960
+         Integer        = 0x000000000000BB44
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001800
+         Integer        = 0x0000000000001800
+     Package        elements:6
+         Integer        = 0x0000000000000898
+         Integer        = 0x000000000000A723
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001600
+         Integer        = 0x0000000000001600
+     Package        elements:6
+         Integer        = 0x0000000000000834
+         Integer        = 0x0000000000009D5C
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001500
+         Integer        = 0x0000000000001500
+     Package        elements:6
+         Integer        = 0x00000000000007D0
+         Integer        = 0x00000000000093C9
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001400
+         Integer        = 0x0000000000001400
+     Package        elements:6
+         Integer        = 0x000000000000076C
+         Integer        = 0x0000000000008A69
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001300
+         Integer        = 0x0000000000001300
+     Package        elements:6
+         Integer        = 0x00000000000006A4
+         Integer        = 0x0000000000007ABD
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001100
+         Integer        = 0x0000000000001100
+     Package        elements:6
+         Integer        = 0x0000000000000640
+         Integer        = 0x00000000000071EC
+         Integer        = 0x000000000000000A
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000001000
+         Integer        = 0x0000000000001000
+\_PR_\CPU0\SPSS Package        elements:16
+     Package        elements:6
+         Integer        = 0x0000000000000D49
+         Integer        = 0x0000000000012CC8
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000083
+         Integer        = 0x0000000000000000
+     Package        elements:6
+         Integer        = 0x0000000000000D48
+         Integer        = 0x0000000000012CC8
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000183
+         Integer        = 0x0000000000000001
+     Package        elements:6
+         Integer        = 0x0000000000000CE4
+         Integer        = 0x0000000000012070
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000283
+         Integer        = 0x0000000000000002
+     Package        elements:6
+         Integer        = 0x0000000000000C1C
+         Integer        = 0x000000000001086E
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000383
+         Integer        = 0x0000000000000003
+     Package        elements:6
+         Integer        = 0x0000000000000BB8
+         Integer        = 0x000000000000FCC1
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000483
+         Integer        = 0x0000000000000004
+     Package        elements:6
+         Integer        = 0x0000000000000B54
+         Integer        = 0x000000000000F14C
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000583
+         Integer        = 0x0000000000000005
+     Package        elements:6
+         Integer        = 0x0000000000000AF0
+         Integer        = 0x000000000000E61B
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000683
+         Integer        = 0x0000000000000006
+     Package        elements:6
+         Integer        = 0x0000000000000A28
+         Integer        = 0x000000000000D043
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000783
+         Integer        = 0x0000000000000007
+     Package        elements:6
+         Integer        = 0x00000000000009C4
+         Integer        = 0x000000000000C5A9
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000883
+         Integer        = 0x0000000000000008
+     Package        elements:6
+         Integer        = 0x0000000000000960
+         Integer        = 0x000000000000BB44
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000983
+         Integer        = 0x0000000000000009
+     Package        elements:6
+         Integer        = 0x0000000000000898
+         Integer        = 0x000000000000A723
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000A83
+         Integer        = 0x000000000000000A
+     Package        elements:6
+         Integer        = 0x0000000000000834
+         Integer        = 0x0000000000009D5C
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000B83
+         Integer        = 0x000000000000000B
+     Package        elements:6
+         Integer        = 0x00000000000007D0
+         Integer        = 0x00000000000093C9
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000C83
+         Integer        = 0x000000000000000C
+     Package        elements:6
+         Integer        = 0x000000000000076C
+         Integer        = 0x0000000000008A69
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000D83
+         Integer        = 0x000000000000000D
+     Package        elements:6
+         Integer        = 0x00000000000006A4
+         Integer        = 0x0000000000007ABD
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000E83
+         Integer        = 0x000000000000000E
+     Package        elements:6
+         Integer        = 0x0000000000000640
+         Integer        = 0x00000000000071EC
+         Integer        = 0x000000000000006E
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000F83
+         Integer        = 0x000000000000000F
+\_PR_\CPU0\XPSS Method         length:0x00000013 Args:0 serialize:0 sync_level:0
+\_PR_\CPU0\_PCT Method         length:0x00000087 Args:0 serialize:0 sync_level:0
+\_PR_\CPU0\_PPC Integer        = 0x0000000000000000
+\_GPE Scope         
+\_GPE\_L07 Method         length:0x00000016 Args:0 serialize:0 sync_level:0
+\_GPE\_L06 Method         length:0x0000002E Args:0 serialize:0 sync_level:0
+\_GPE\_L02 Method         length:0x00000058 Args:0 serialize:0 sync_level:0
+\_GPE\_L01 Method         length:0x00000626 Args:0 serialize:0 sync_level:0
+\_GPE\_L0D Method         length:0x00000098 Args:0 serialize:0 sync_level:0
+\_GPE\_L09 Method         length:0x000001C6 Args:0 serialize:0 sync_level:0
+\_GPE\_L0B Method         length:0x00000035 Args:0 serialize:0 sync_level:0
+\_GPE\_L08 Method         length:0x00000020 Args:0 serialize:0 sync_level:0
+\_GPE\_L1D Method         length:0x00000020 Args:0 serialize:0 sync_level:0
+\_GPE\_L1F Method         length:0x00000020 Args:0 serialize:0 sync_level:0
+-----------------------------
+/> 
+/> acpi_get_node_alloc_cnt
+nodes allocated: 4097
+/> acpi_get_node_free_cnt
+nodes freed: 311
+/> acpi_get_node_cnt
+nodes in namespace: 1728

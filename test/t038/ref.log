@@ -1,0 +1,458 @@
+/> umka_boot
+/> acpi_set_usage 1
+/> 
+/> acpi_preload_table ../machines/008/acpi/dsdt.dat
+table #0
+/> acpi_preload_table ../machines/008/acpi/ssdt1.dat
+table #1
+/> acpi_preload_table ../machines/008/acpi/ssdt2.dat
+table #2
+/> acpi_preload_table ../machines/008/acpi/ssdt3.dat
+table #3
+/> acpi_preload_table ../machines/008/acpi/ssdt4.dat
+table #4
+/> acpi_preload_table ../machines/008/acpi/ssdt5.dat
+table #5
+/> acpi_preload_table ../machines/008/acpi/ssdt6.dat
+table #6
+/> acpi_preload_table ../machines/008/acpi/ssdt7.dat
+table #7
+/> acpi_preload_table ../machines/008/acpi/ssdt8.dat
+table #8
+/> 
+/> acpi_enable
+/> board_get -f
+egionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000283 Len:00000005 Acc:0
+\_SB_\PCI0\GFX0\GIVD RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000281 Len:00000001 Acc:0
+\_SB_\PCI0\GFX0\MADR RegionField    Rgn [\_SB_\PCI0\GFX0\IGDP] Off:00000080 Len:00000020 Acc:0
+\_SB_\PCI0\GFX0\IGDP OpRegion       [PCIConfig] Len:00000100
+\_SB_\PCI0\GFX0\NDDS Method         length:0x00000061 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\CDDS Method         length:0x0000006B Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\SDDL Method         length:0x00000067 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD1F Device        
+\_SB_\PCI0\GFX0\DD1F\_BQC Method         length:0x00000005 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD1F\_BCM Method         length:0x00000018 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD1F\_BCL Method         length:0x000000B5 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD1F\_DSS Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD1F\_DGS Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD1F\_DCS Method         length:0x00000015 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD1F\_ADR Method         length:0x00000017 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\DD08 Device        
+\_SB_\PCI0\GFX0\DD08\_DSS Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD08\_DGS Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD08\_DCS Method         length:0x00000016 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD08\_ADR Method         length:0x00000039 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\DD07 Device        
+\_SB_\PCI0\GFX0\DD07\_DSS Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD07\_DGS Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD07\_DCS Method         length:0x00000016 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD07\_ADR Method         length:0x00000039 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\DD06 Device        
+\_SB_\PCI0\GFX0\DD06\_DSS Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD06\_DGS Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD06\_DCS Method         length:0x00000016 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD06\_ADR Method         length:0x00000039 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\DD05 Device        
+\_SB_\PCI0\GFX0\DD05\_DSS Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD05\_DGS Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD05\_DCS Method         length:0x00000016 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD05\_ADR Method         length:0x00000039 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\DD04 Device        
+\_SB_\PCI0\GFX0\DD04\_DSS Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD04\_DGS Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD04\_DCS Method         length:0x00000016 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD04\_ADR Method         length:0x00000039 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\DD03 Device        
+\_SB_\PCI0\GFX0\DD03\_DSS Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD03\_DGS Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD03\_DCS Method         length:0x00000016 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD03\_ADR Method         length:0x00000039 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\DD02 Device        
+\_SB_\PCI0\GFX0\DD02\_DSS Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD02\_DGS Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD02\_DCS Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD02\_ADR Method         length:0x00000039 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\DD01 Device        
+\_SB_\PCI0\GFX0\DD01\_DSS Method         length:0x00000019 Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD01\_DGS Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD01\_DCS Method         length:0x00000009 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\DD01\_ADR Method         length:0x00000036 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\GFX0\_DOD Method         length:0x00000351 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\_DOS Method         length:0x0000000A Args:1 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\_S0W Integer        = 0x0000000000000003
+\_SB_\PCI0\GFX0\_CRS Method         length:0x0000002C Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\GFX0\_DEP Package        elements:5
+     Reference      Target: \_SB_\PEPD
+     Reference      Target: \_SB_\GPO0
+     Reference      Target: \_SB_\I2C4
+     Reference      Target: \_SB_\I2C5
+     Reference      Target: \_SB_\I2C5\PMI1
+\_SB_\PCI0\GFX0\_ADR Integer        = 0x0000000000020000
+\_SB_\PCI0\_OSC Method         length:0x000000AC Args:4 serialize:1 sync_level:0
+\_SB_\PCI0\CTRL Integer        = 0x0000000000000000
+\_SB_\PCI0\SUPP Integer        = 0x0000000000000000
+\_SB_\PCI0\GUID Buffer         Len:0x00000010
+\_SB_\PCI0\RES0 Buffer         Len:0x00000108
+\_SB_\PCI0\_CRS Method         length:0x00000126 Args:0 serialize:1 sync_level:0
+\_SB_\PCI0\VLVC Device        
+\_SB_\PCI0\VLVC\WMBR Method         length:0x0000001D Args:3 serialize:1 sync_level:0
+\_SB_\PCI0\VLVC\RMBR Method         length:0x0000001C Args:2 serialize:1 sync_level:0
+\_SB_\PCI0\VLVC\MCRX RegionField    Rgn [\_SB_\PCI0\VLVC\HBUS] Off:000006C0 Len:00000020 Acc:3
+\_SB_\PCI0\VLVC\SMDR RegionField    Rgn [\_SB_\PCI0\VLVC\HBUS] Off:000006A0 Len:00000020 Acc:3
+\_SB_\PCI0\VLVC\SMCR RegionField    Rgn [\_SB_\PCI0\VLVC\HBUS] Off:00000680 Len:00000020 Acc:3
+\_SB_\PCI0\VLVC\HBUS OpRegion       [PCIConfig] Len:000000FF
+\_SB_\PCI0\VLVC\_ADR Integer        = 0x0000000000000000
+\_SB_\PCI0\_DEP Package        elements:1
+     Reference      Target: \_SB_\PEPD
+\_SB_\PCI0\_PRT Method         length:0x00000010 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\_UID Integer        = 0x0000000000000000
+\_SB_\PCI0\_BBN Method         length:0x00000005 Args:0 serialize:0 sync_level:0
+\_SB_\PCI0\_ADR Integer        = 0x0000000000000000
+\_SB_\PCI0\_CID Integer        = 0x00000000030AD041
+\_SB_\PCI0\_HID Integer        = 0x00000000080AD041
+\_SB_\AR00 Package        elements:17
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000010FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000011FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000012FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000014FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000014
+     Package        elements:4
+         Integer        = 0x000000000015FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000015
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+     Package        elements:4
+         Integer        = 0x000000000017FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+     Package        elements:4
+         Integer        = 0x000000000018FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x000000000018FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000018FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000018FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+\_SB_\PR00 Package        elements:17
+     Package        elements:4
+         Integer        = 0x000000000002FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000010FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000011FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000012FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000014FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKE
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000015FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKF
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000016FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000017FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000018FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000018FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000018FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000018FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001EFFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+\_SB_\PRSH Alias          Source: \_SB_\PRSA
+\_SB_\PRSG Alias          Source: \_SB_\PRSA
+\_SB_\PRSF Alias          Source: \_SB_\PRSA
+\_SB_\PRSE Alias          Source: \_SB_\PRSA
+\_SB_\PRSD Alias          Source: \_SB_\PRSA
+\_SB_\PRSC Alias          Source: \_SB_\PRSA
+\_SB_\PRSB Alias          Source: \_SB_\PRSA
+\_SB_\PRSA Buffer         Len:0x00000006
+\_SB_\HPET Device        
+\_SB_\HPET\_CRS Method         length:0x00000025 Args:0 serialize:1 sync_level:0
+\_SB_\HPET\_STA Method         length:0x00000003 Args:0 serialize:0 sync_level:0
+\_SB_\HPET\_UID Integer        = 0x0000000000000000
+\_SB_\HPET\_HID Integer        = 0x000000000301D041
+\_SB_\RTC0 Device        
+\_SB_\RTC0\_CRS Buffer         Len:0x0000000A
+\_SB_\RTC0\_HID Integer        = 0x00000000000BD041
+\_PR_ Scope         
+\_PR_\CPU3 Processor      ID:0x04 Addr:0x00000000 Len:0x00000000
+\_PR_\CPU3\_TSD Method         length:0x0000002A Args:0 serialize:0 sync_level:0
+\_PR_\CPU3\_TSS Method         length:0x00000010 Args:0 serialize:0 sync_level:0
+\_PR_\CPU3\_PTC Method         length:0x00000010 Args:0 serialize:0 sync_level:0
+\_PR_\CPU3\_TPC Integer        = 0x0000000000000000
+\_PR_\CPU3\APPT Method         length:0x00000042 Args:0 serialize:0 sync_level:0
+\_PR_\CPU3\APCT Method         length:0x00000043 Args:0 serialize:0 sync_level:0
+\_PR_\CPU3\GCAP Method         length:0x0000006E Args:1 serialize:0 sync_level:0
+\_PR_\CPU3\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
+\_PR_\CPU3\_PDC Method         length:0x00000017 Args:1 serialize:0 sync_level:0
+\_PR_\CPU3\HC1_ Integer        = 0x0000000000000000
+\_PR_\CPU3\HI1_ Integer        = 0x0000000000000000
+\_PR_\CPU2 Processor      ID:0x03 Addr:0x00000000 Len:0x00000000
+\_PR_\CPU2\_TSD Method         length:0x0000002A Args:0 serialize:0 sync_level:0
+\_PR_\CPU2\_TSS Method         length:0x00000010 Args:0 serialize:0 sync_level:0
+\_PR_\CPU2\_PTC Method         length:0x00000010 Args:0 serialize:0 sync_level:0
+\_PR_\CPU2\_TPC Integer        = 0x0000000000000000
+\_PR_\CPU2\APPT Method         length:0x00000042 Args:0 serialize:0 sync_level:0
+\_PR_\CPU2\APCT Method         length:0x00000043 Args:0 serialize:0 sync_level:0
+\_PR_\CPU2\GCAP Method         length:0x0000006E Args:1 serialize:0 sync_level:0
+\_PR_\CPU2\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
+\_PR_\CPU2\_PDC Method         length:0x00000017 Args:1 serialize:0 sync_level:0
+\_PR_\CPU2\HC1_ Integer        = 0x0000000000000000
+\_PR_\CPU2\HI1_ Integer        = 0x0000000000000000
+\_PR_\CPU1 Processor      ID:0x02 Addr:0x00000000 Len:0x00000000
+\_PR_\CPU1\_TSD Method         length:0x0000002A Args:0 serialize:0 sync_level:0
+\_PR_\CPU1\_TSS Method         length:0x00000010 Args:0 serialize:0 sync_level:0
+\_PR_\CPU1\_PTC Method         length:0x00000010 Args:0 serialize:0 sync_level:0
+\_PR_\CPU1\_TPC Integer        = 0x0000000000000000
+\_PR_\CPU1\APPT Method         length:0x00000042 Args:0 serialize:0 sync_level:0
+\_PR_\CPU1\APCT Method         length:0x00000043 Args:0 serialize:0 sync_level:0
+\_PR_\CPU1\GCAP Method         length:0x0000006E Args:1 serialize:0 sync_level:0
+\_PR_\CPU1\_OSC Method         length:0x0000001C Args:4 serialize:0 sync_level:0
+\_PR_\CPU1\_PDC Method         length:0x00000017 Args:1 serialize:0 sync_level:0
+\_PR_\CPU1\HC1_ Integer        = 0x0000000000000000
+\_PR_\CPU1\HI1_ Integer        = 0x0000000000000000
+\_PR_\CPU0 Processor      ID:0x01 Addr:0x00000000 Len:0x00000000
+\_PR_\CPU0\_TSD Method         length:0x0000005A Args:0 serialize:0 sync_level:0
+\_PR_\CPU0\_TDL Method         length:0x00000030 Args:0 serialize:0 sync_level:0
+\_PR_\CPU0\_TSS Method         length:0x00000078 Args:0 serialize:0 sync_level:0
+\_PR_\CPU0\TSSF Integer        = 0x0000000000000000
+\_PR_\CPU0\TSSM Package        elements:8
+     Package        elements:5
+         Integer        = 0x0000000000000064
+         Integer        = 0x00000000000003E8
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x0000000000000058
+         Integer        = 0x000000000000036B
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000001E
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x000000000000004B
+         Integer        = 0x00000000000002EE
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000001C
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x000000000000003F
+         Integer        = 0x0000000000000271
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000001A
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x0000000000000032
+         Integer        = 0x00000000000001F4
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000018
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x0000000000000026
+         Integer        = 0x0000000000000177
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x0000000000000019
+         Integer        = 0x00000000000000FA
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000014
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x000000000000000D
+         Integer        = 0x000000000000007D
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+         Integer        = 0x0000000000000000
+\_PR_\CPU0\TSSI Package        elements:8
+     Package        elements:5
+         Integer        = 0x0000000000000064
+         Integer        = 0x00000000000003E8
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x0000000000000058
+         Integer        = 0x000000000000036B
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000000F
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x000000000000004B
+         Integer        = 0x00000000000002EE
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000000E
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x000000000000003F
+         Integer        = 0x0000000000000271
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000000D
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x0000000000000032
+         Integer        = 0x00000000000001F4
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000000C
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x0000000000000026
+         Integer        = 0x0000000000000177
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000000B
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x0000000000000019
+         Integer        = 0x00000000000000FA
+         Integer        = 0x0000000000000000
+         Integer        = 0x000000000000000A
+         Integer        = 0x0000000000000000
+     Package        elements:5
+         Integer        = 0x000000000000000D
+         Integer        = 0x000000000000007D
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000009
+         Integer        = 0x0000000000000000
+\_PR_\CPU0\_PTC Method         length:0x00000066 Args:0 serialize:0 sync_level:0
+\_PR_\CPU0\_TPC Integer        = 0x0000000000000000
+\_PR_\CPU0\GCAP Method         length:0x00000102 Args:1 serialize:0 sync_level:0
+\_PR_\CPU0\COSC Method         length:0x000000B6 Args:4 serialize:0 sync_level:0
+\_PR_\CPU0\CPDC Method         length:0x00000061 Args:1 serialize:0 sync_level:0
+\_PR_\CPU0\_OSC Method         length:0x00000011 Args:4 serialize:0 sync_level:0
+\_PR_\CPU0\_PDC Method         length:0x0000000C Args:1 serialize:0 sync_level:0
+\_PR_\CPU0\HC0_ Integer        = 0x0000000000000000
+\_PR_\CPU0\HI0_ Integer        = 0x0000000000000000
+\_GPE Scope         
+-----------------------------
+/> 
+/> acpi_get_node_alloc_cnt
+nodes allocated: 6311
+/> acpi_get_node_free_cnt
+nodes freed: 174
+/> acpi_get_node_cnt
+nodes in namespace: 2928

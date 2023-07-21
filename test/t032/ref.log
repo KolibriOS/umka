@@ -1,0 +1,1728 @@
+/> umka_boot
+/> pci_set_path ../machines/005/pci
+/> acpi_set_usage 2
+/> 
+/> acpi_preload_table ../machines/005/acpi/DSDT
+table #0
+/> 
+/> acpi_enable
+/> board_get -f
+\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+\_SB_\AR02 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000010
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+\_SB_\PR02 Package        elements:4
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKA
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x000000000000FFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+\_SB_\AR00 Package        elements:8
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000011
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000012
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000003
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000017
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000001
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000002
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000016
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000000
+         Integer        = 0x0000000000000013
+\_SB_\PR00 Package        elements:8
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKB
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKC
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001CFFFF
+         Integer        = 0x0000000000000003
+         Reference      Target: \_SB_\LNKP
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKH
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000001
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001DFFFF
+         Integer        = 0x0000000000000002
+         Reference      Target: \_SB_\LNKG
+         Integer        = 0x0000000000000000
+     Package        elements:4
+         Integer        = 0x00000000001FFFFF
+         Integer        = 0x0000000000000000
+         Reference      Target: \_SB_\LNKD
+         Integer        = 0x0000000000000000
+\_PR_ Scope         
+\_PR_\CPU2 Processor      ID:0x02 Addr:0x00000000 Len:0x00000000
+\_PR_\CPU2\APPC Method         length:0x00000003 Args:0 serialize:0 sync_level:0
+\_PR_\CPU2\APSS Package        elements:10
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+\_PR_\CPU2\APCT Package        elements:2
+     Buffer         Len:0x00000011
+     Buffer         Len:0x00000011
+\_PR_\CPU1 Processor      ID:0x01 Addr:0x00005010 Len:0x00000006
+\_PR_\CPU1\APPC Method         length:0x00000003 Args:0 serialize:0 sync_level:0
+\_PR_\CPU1\APSS Package        elements:10
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+     Package        elements:6
+         Integer        = 0x0000000009999999
+         Integer        = 0x0000000000099999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000000999999
+         Integer        = 0x0000000099999999
+         Integer        = 0x0000000099999999
+\_PR_\CPU1\APCT Package        elements:2
+     Buffer         Len:0x00000011
+     Buffer         Len:0x00000011
+\_GPE Scope         
+\_GPE\_L0E Method         length:0x00000043 Args:0 serialize:0 sync_level:0
+\_GPE\_L0D Method         length:0x00000013 Args:0 serialize:0 sync_level:0
+\_GPE\_L02 Method         length:0x00000013 Args:0 serialize:0 sync_level:0
+\_GPE\_L10 Method         length:0x0000001F Args:0 serialize:0 sync_level:0
+\_GPE\_L0C Method         length:0x000000C1 Args:0 serialize:0 sync_level:0
+-----------------------------
+acpi.call_name begin
+aml._.get_node_by_name begin
+name: '\_PIC'
+aml._.get_node_by_name end
+acpi.call_node begin
+# func name _PIC
+# bytes 0x680642A0
+# bytes 0x44AA0A70
+# bytes 0x70384742
+table/position: [0x0000018F]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.if begin
+pkg_length: 0x00000062
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.arg_obj begin
+aml._.arg_obj end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+if branch taken
+table/position: [0x00000193]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.statement_opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.byte_const begin
+aml._.byte_const end
+aml._.data_object end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000196
+aml._.name_path begin
+aml._.name_path end
+name_string: DBG8
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'DBG8'
+aml._.get_node_by_name end
+aml._.simple_name end
+aml._.super_name end
+aml._.store_table begin
+types 2 to 6
+aml._.store_table.integer_to_op_region_field begin
+aml._.store_table.integer_to_op_region_field end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+table/position: [0x0000019A]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.statement_opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.byte_const begin
+aml._.byte_const end
+aml._.data_object end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000019D
+aml._.name_path begin
+aml._.name_path end
+name_string: \_SB_PCI0PMU_BK7C
+aml._.name_string end
+aml._.get_node_by_name begin
+name: '\_SB_PCI0PMU_BK7C'
+aml._.get_node_by_name end
+aml._.simple_name end
+aml._.super_name end
+aml._.store_table begin
+types 2 to 6
+aml._.store_table.integer_to_op_region_field begin
+aml._.store_table.integer_to_op_region_field end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+table/position: [0x000001B0]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.statement_opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.byte_const begin
+aml._.byte_const end
+aml._.data_object end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000001B3
+aml._.name_path begin
+aml._.name_path end
+name_string: \_SB_PCI0PMU_BK7D
+aml._.name_string end
+aml._.get_node_by_name begin
+name: '\_SB_PCI0PMU_BK7D'
+aml._.get_node_by_name end
+aml._.simple_name end
+aml._.super_name end
+aml._.store_table begin
+types 2 to 6
+aml._.store_table.integer_to_op_region_field begin
+aml._.store_table.integer_to_op_region_field end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+table/position: [0x000001C6]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.statement_opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.byte_const begin
+aml._.byte_const end
+aml._.data_object end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000001C9
+aml._.name_path begin
+aml._.name_path end
+name_string: \_SB_PCI0PMU_BK7E
+aml._.name_string end
+aml._.get_node_by_name begin
+name: '\_SB_PCI0PMU_BK7E'
+aml._.get_node_by_name end
+aml._.simple_name end
+aml._.super_name end
+aml._.store_table begin
+types 2 to 6
+aml._.store_table.integer_to_op_region_field begin
+aml._.store_table.integer_to_op_region_field end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+table/position: [0x000001DC]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.statement_opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.byte_const begin
+aml._.byte_const end
+aml._.data_object end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000001DF
+aml._.name_path begin
+aml._.name_path end
+name_string: \_SB_PCI0PMU_BK7F
+aml._.name_string end
+aml._.get_node_by_name begin
+name: '\_SB_PCI0PMU_BK7F'
+aml._.get_node_by_name end
+aml._.simple_name end
+aml._.super_name end
+aml._.store_table begin
+types 2 to 6
+aml._.store_table.integer_to_op_region_field begin
+aml._.store_table.integer_to_op_region_field end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+aml._.if end
+aml._.statement_opcode end
+aml._.term_obj end
+table/position: [0x000001F2]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.else begin
+pkg_length: 0x00000061
+aml._.else end
+aml._.statement_opcode end
+aml._.term_obj end
+table/position: [0x00000254]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.statement_opcode end
+aml._.store begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.arg_obj begin
+aml._.arg_obj end
+aml._.term_arg end
+aml._.super_name begin
+aml._.simple_name begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000256
+aml._.name_path begin
+aml._.name_path end
+name_string: PICM
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICM'
+aml._.get_node_by_name end
+aml._.simple_name end
+aml._.super_name end
+aml._.store_table begin
+types 2 to 2
+aml._.store_table.integer_to_integer begin
+aml._.store_table.integer_to_integer end
+aml._.store_table end
+aml._.store end
+aml._.term_obj end
+acpi.call_node end
+acpi.call_name end
+aml._.get_node_by_name begin
+name: '\_SB_PCI0'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_PRT'
+aml._.get_node_by_name end
+acpi.call_node begin
+# func name _PRT
+# bytes 0x49500AA0
+# bytes 0x41A44D43
+# bytes 0xA4303052
+table/position: [0x00000963]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.if begin
+pkg_length: 0x0000000A
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000965
+aml._.name_path begin
+aml._.name_path end
+name_string: PICM
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICM'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000965
+aml._.name_path begin
+aml._.name_path end
+name_string: PICM
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICM'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+if branch taken
+table/position: [0x00000969]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.return begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000096A
+aml._.name_path begin
+aml._.name_path end
+name_string: AR00
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'AR00'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000096A
+aml._.name_path begin
+aml._.name_path end
+name_string: AR00
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'AR00'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.return end
+acpi.call_node end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_PRT'
+aml._.get_node_by_name end
+acpi.call_node begin
+# func name _PRT
+# bytes 0x49500AA0
+# bytes 0x41A44D43
+# bytes 0xA4303052
+table/position: [0x00000963]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.if begin
+pkg_length: 0x0000000A
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000965
+aml._.name_path begin
+aml._.name_path end
+name_string: PICM
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICM'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000965
+aml._.name_path begin
+aml._.name_path end
+name_string: PICM
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICM'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+if branch taken
+table/position: [0x00000969]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.return begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000096A
+aml._.name_path begin
+aml._.name_path end
+name_string: AR00
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'AR00'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000096A
+aml._.name_path begin
+aml._.name_path end
+name_string: AR00
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'AR00'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.return end
+acpi.call_node end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_PRT'
+aml._.get_node_by_name end
+acpi.call_node begin
+# func name _PRT
+# bytes 0x49500AA0
+# bytes 0x41A44D43
+# bytes 0xA4303052
+table/position: [0x00000963]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.if begin
+pkg_length: 0x0000000A
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000965
+aml._.name_path begin
+aml._.name_path end
+name_string: PICM
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICM'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000965
+aml._.name_path begin
+aml._.name_path end
+name_string: PICM
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICM'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+if branch taken
+table/position: [0x00000969]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.return begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000096A
+aml._.name_path begin
+aml._.name_path end
+name_string: AR00
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'AR00'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x0000096A
+aml._.name_path begin
+aml._.name_path end
+name_string: AR00
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'AR00'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.return end
+acpi.call_node end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_PRT'
+aml._.get_node_by_name end
+acpi.call_node begin
+# func name _PRT
+# bytes 0x49500AA0
+# bytes 0x41A44D43
+# bytes 0xA4303152
+table/position: [0x00000ACE]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.if begin
+pkg_length: 0x0000000A
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000AD0
+aml._.name_path begin
+aml._.name_path end
+name_string: PICM
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICM'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000AD0
+aml._.name_path begin
+aml._.name_path end
+name_string: PICM
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICM'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+if branch taken
+table/position: [0x00000AD4]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.return begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000AD5
+aml._.name_path begin
+aml._.name_path end
+name_string: AR10
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'AR10'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x00000AD5
+aml._.name_path begin
+aml._.name_path end
+name_string: AR10
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'AR10'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.return end
+acpi.call_node end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_PRT'
+aml._.get_node_by_name end
+acpi.call_node begin
+# func name _PRT
+# bytes 0x49500AA0
+# bytes 0x41A44D43
+# bytes 0xA4323052
+table/position: [0x000009AC]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.if begin
+pkg_length: 0x0000000A
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000009AE
+aml._.name_path begin
+aml._.name_path end
+name_string: PICM
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICM'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000009AE
+aml._.name_path begin
+aml._.name_path end
+name_string: PICM
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'PICM'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.convert begin
+types 2 to 2
+aml._.convert.integer_to_integer begin
+aml._.convert.integer_to_integer end
+aml._.convert end
+if branch taken
+table/position: [0x000009B2]
+aml._.term_obj begin
+aml._.object begin
+aml._.namespace_modifier_obj begin
+aml._.namespace_modifier_obj end
+aml._.named_obj begin
+aml._.named_obj end
+aml._.object end
+aml._.statement_opcode begin
+aml._.return begin
+aml._.term_arg begin
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000009B3
+aml._.name_path begin
+aml._.name_path end
+name_string: AR02
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'AR02'
+aml._.get_node_by_name end
+aml._.data_object begin
+aml._.computational_data begin
+aml._.computational_data end
+aml._.data_object end
+aml._.name_string begin
+aml._.name_string begin again
+offset: 0x000009B3
+aml._.name_path begin
+aml._.name_path end
+name_string: AR02
+aml._.name_string end
+aml._.get_node_by_name begin
+name: 'AR02'
+aml._.get_node_by_name end
+aml._.term_arg end
+aml._.return end
+acpi.call_node end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+aml._.get_node_by_name begin
+name: '_ADR'
+aml._.get_node_by_name end
+00:18.0  0000:0000  00  1  \_SB_\PCI0
+  00:01.0  FFFF:FFFF  00  0  \_SB_\PCI0\P0P1
+  00:02.0  0000:0000  00  1  \_SB_\PCI0\P0P2
+  00:03.0  FFFF:FFFF  00  0  \_SB_\PCI0\P0P3
+  00:04.0  FFFF:FFFF  00  0  \_SB_\PCI0\P0P4
+  00:05.0  FFFF:FFFF  00  0  \_SB_\PCI0\P0P5
+  00:06.0  FFFF:FFFF  00  0  \_SB_\PCI0\P0P6
+  00:07.0  FFFF:FFFF  00  0  \_SB_\PCI0\P0P7
+  00:1A.0  0000:0000  00  1  \_SB_\PCI0\PE2P
+  00:1E.0  0000:0000  00  1  \_SB_\PCI0\SBRG
+  00:1E.1  0000:0000  00  1  \_SB_\PCI0\PMU_
+  00:1C.0  10B9:5237  11  0  \_SB_\PCI0\USB0
+  00:1C.1  10B9:5237  12  0  \_SB_\PCI0\USB1
+  00:1C.2  10B9:5237  13  0  \_SB_\PCI0\USB2
+  00:1C.3  10B9:5239  17  0  \_SB_\PCI0\UB20
+  00:1D.0  10B9:5461  16  0  \_SB_\PCI0\AC97
+  00:1D.1  FFFF:FFFF  00  0  \_SB_\PCI0\MC97
+  00:1D.2  FFFF:FFFF  00  0  \_SB_\PCI0\AZAL
+  00:1F.0  10B9:5229  13  0  \_SB_\PCI0\IDEC
+  00:1F.1  10B9:5288  13  0  \_SB_\PCI0\SATA
+/> 
+/> acpi_get_node_alloc_cnt
+nodes allocated: 1844
+/> acpi_get_node_free_cnt
+nodes freed: 46
+/> acpi_get_node_cnt
+nodes in namespace: 778

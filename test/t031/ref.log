@@ -1,0 +1,49 @@
+/> umka_boot
+/> acpi_set_usage 1
+/> 
+/> acpi_preload_table ../machines/unit/acpi/scope_empty.aml
+table #0
+/> acpi_preload_table ../machines/unit/acpi/scope_spec1.aml
+table #1
+/> acpi_preload_table ../machines/unit/acpi/scope.aml
+table #2
+/> 
+/> acpi_enable
+/> board_get -f
+    = 0x0000000000000000
+\PCI0\DV00\DV0A Device        
+\PCI0\DV00\DV0A\_ADR Integer        = 0x0000000000000000
+\PCI0\DV00\AL17 Alias          Source: \PCI0\DV00\DV00
+\PCI0\DV00\AL16 Alias          Source: \PCI0\DV00
+\PCI0\DV00\AL15 Alias          Source: \PCI0
+\PCI0\DV00\AL14 Alias          Source: \PCI0\DV00\DV00
+\PCI0\DV00\AL13 Alias          Source: \PCI0\DV00
+\PCI0\DV00\AL12 Alias          Source: \PCI0\DV00\DV00
+\PCI0\DV00\AL11 Alias          Source: \PCI0\DV00
+\PCI0\DV00\AL10 Alias          Source: \PCI0
+\PCI0\DV00\AL09 Alias          Source: \PCI0\DV00\DV00
+\PCI0\DV00\AL08 Alias          Source: \PCI0\DV00\DV00
+\PCI0\DV00\AL07 Alias          Source: \PCI0\DV00
+\PCI0\DV00\AL06 Alias          Source: \PCI0
+\PCI0\DV00\AL05 Alias          Source: \PCI0\DV00\DV00
+\PCI0\DV00\AL04 Alias          Source: \PCI0\DV00
+\PCI0\DV00\AL03 Alias          Source: \PCI0\DV00\DV00
+\PCI0\DV00\AL02 Alias          Source: \PCI0\DV00
+\PCI0\DV00\AL01 Alias          Source: \PCI0
+\PCI0\DV00\AL00 Alias          Source: \PCI0\DV00\DV00
+\PCI0\DV00\DV00 Integer        = 0x0000000000000000
+\PCI0\DV00\_ADR Integer        = 0x0000000000000001
+\PCI0\_ADR Integer        = 0x0000000000000000
+\_TZ_ Scope         
+\_SI_ Scope         
+\_SB_ Scope         
+\_PR_ Scope         
+\_GPE Scope         
+-----------------------------
+/> 
+/> acpi_get_node_alloc_cnt
+nodes allocated: 197
+/> acpi_get_node_free_cnt
+nodes freed: 0
+/> acpi_get_node_cnt
+nodes in namespace: 110
