@@ -26,8 +26,26 @@ QCOW2_OPTS="compat=v3,compression_type=zlib,encryption=off,extended_l2=off,preal
 NBD_DEV=/dev/nbd0   # FIXME
 SGDISK="sgdisk --align-end --disk-guid=abcdefff-0123-4554-3210-ffeeddccbbaa"
 
+check_command () {
+    if [ "$#" -ne 2 ]; then
+        echo "Usage: $FUNCNAME <command> <for_what>"
+    fi
+    if ! command -v "$1" &> /dev/null
+    then
+        echo "*** WARNING: Skipping $2 (command $1 not found)"
+        return 1
+    fi
+    return 0
+}
+
 gpt_large.qcow2 () {
     local img=$FUNCNAME
+
+    if [ ! -f $NBD_DEV ]; then
+        echo "*** WARNING: Skipping $FUNCNAME (network block device $NBD_DEV not found)"
+        return
+    fi
+
     qemu-img create -f qcow2 -o $QCOW2_OPTS,cluster_size=2097152 $img 2E > /dev/null
     sudo qemu-nbd -c $NBD_DEV $img
 
@@ -78,6 +96,10 @@ gpt_partitions_s4k.qcow2 () {
 
 kolibri.raw () {
     local img=$FUNCNAME
+
+    if ! check_command mkfs.fat $FUNCNAME; then return; fi
+    if ! check_command mcopy $FUNCNAME; then return; fi
+
     touch $img
     fallocate -z -o 0 -l 1440KiB $img
     mkfs.fat -n KOLIBRIOS -F 12 $img > /dev/null
@@ -92,6 +114,8 @@ kolibri.raw () {
 jfs.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
+    if ! check_command mkfs.jfs $FUNCNAME; then return; fi
 
     fallocate -l 16MiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
@@ -109,6 +133,8 @@ jfs.qcow2 () {
 xfs_lookup_v4.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
 
     fallocate -l 3GiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
@@ -151,6 +177,8 @@ xfs_lookup_v5.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
+
     fallocate -l 5GiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
@@ -192,6 +220,8 @@ xfs_nrext64.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
+
     fallocate -l 3GiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
@@ -229,6 +259,8 @@ xfs_nrext64.qcow2 () {
 xfs_bigtime.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
 
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
@@ -269,6 +301,8 @@ xfs_borg_bit.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
+
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
@@ -286,9 +320,17 @@ xfs_short_dir_i8.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
+
 #    echo -en "\x00" > $img_raw
     fallocate -l 1MiB $img_raw
-    fallocate -i -o 0 -l 42TiB $img_raw
+
+    if ! fallocate -i -o 0 -l 42TiB $img_raw; then
+        rm $img_raw
+        echo "*** WARNING: Skipping $FUNCNAME (no disk space)"
+        return
+    fi
+
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
     local p1="$LOOP_DEV"p1
@@ -314,6 +356,8 @@ xfs_short_dir_i8.qcow2 () {
 xfs_v4_ftype0_s05k_b2k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
 
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
@@ -356,6 +400,8 @@ xfs_v4_ftype1_s05k_b2k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
+
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
@@ -397,6 +443,8 @@ xfs_v4_xattr.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
+
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
@@ -430,6 +478,8 @@ xfs_v4_btrees_l2.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
+
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
@@ -460,6 +510,8 @@ xfs_v4_btrees_l2.qcow2 () {
 xfs_v4_files_s05k_b4k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
 
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
@@ -506,6 +558,8 @@ xfs_v4_ftype0_s4k_b4k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
+
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     sudo losetup -b 4096 $LOOP_DEV $img_raw
     $SGDISK --clear --new=0:0:0 $LOOP_DEV > /dev/null
@@ -548,6 +602,8 @@ xfs_v4_ftype0_s4k_b4k_n8k.qcow2 () {
 xfs_v4_ftype0_s05k_b2k_n8k_xattr.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
 
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
@@ -597,6 +653,8 @@ xfs_v4_unicode.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
+
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
@@ -630,6 +688,8 @@ xfs_v4_unicode.qcow2 () {
 xfs_v5_ftype1_s05k_b2k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
 
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
@@ -672,6 +732,8 @@ xfs_v5_files_s05k_b4k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
+
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
@@ -710,6 +772,8 @@ xfs_v5_files_s05k_b4k_n8k.qcow2 () {
 fat32_test0.raw () {
     local img=$FUNCNAME
 
+    if ! check_command mkfs.fat $FUNCNAME; then return; fi
+
     fallocate -l 64MiB $img
     $SGDISK --clear --new=0:0:0 $img > /dev/null
     sudo losetup -P $LOOP_DEV $img
@@ -719,7 +783,7 @@ fat32_test0.raw () {
     sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $p1 $TEMP_DIR
 
     $RANDDIR $TEMP_DIR 1000 8 255 65536
-    $DIRTOTEST $TEMP_DIR $img hd0 > "../test/045/run.us"
+    $DIRTOTEST $TEMP_DIR $img hd0 > "../test/t045/run.us"
 
 #    tree $TEMP_DIR
 #    du -sh $TEMP_DIR
@@ -731,6 +795,8 @@ fat32_test0.raw () {
 exfat_s05k_c16k_b16k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
+    if ! check_command mkfs.exfat $FUNCNAME; then return; fi
 
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
@@ -760,6 +826,8 @@ exfat_s05k_c16k_b16k.qcow2 () {
 exfat_s05k_c8k_b8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
+    if ! check_command mkfs.exfat $FUNCNAME; then return; fi
 
     fallocate -l $XFS_MIN_DISK_SIZE $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
@@ -845,6 +913,13 @@ xfs_samehash_s05k.raw () {
 #    local img_raw=$(basename $img .qcow2).raw
     local img_raw=$img
 
+    if ! check_command mkfs.xfs $FUNCNAME; then return; fi
+
+    if [ ! -f $NBD_DEV ]; then
+        echo "*** WARNING: Skipping $FUNCNAME (FIXME: it takes too long)"
+        return
+    fi
+
     fallocate -l 1GiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
@@ -881,6 +956,8 @@ xfs_samehash_s05k.raw () {
 ext2_s05k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
+    if ! check_command mkfs.ext2 $FUNCNAME; then return; fi
 
     fallocate -l 5GiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
@@ -920,6 +997,10 @@ ext2_s05k.qcow2 () {
 ext4_s05k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
+    if ! check_command mkfs.ext4 $FUNCNAME; then return; fi
+
+    echo "This one is VERY long, it's OK."
 
     fallocate -l 5GiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
@@ -963,6 +1044,8 @@ fat12_s05k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
+    if ! check_command mkfs.fat $FUNCNAME; then return; fi
+
     fallocate -l 256MiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
@@ -996,6 +1079,10 @@ fat12_s05k.qcow2 () {
 fat16_s05k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
+
+    if ! check_command mkfs.fat $FUNCNAME; then return; fi
+
+    echo "This one is long too."
 
     fallocate -l 4GiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
@@ -1048,7 +1135,6 @@ LOOP_DEV=$(losetup --find)
 
 for image in ${images[*]}; do
     if [ -f "$image" ]; then
-        echo "skipping $image"
         continue
     else
         echo "generate $image"
