@@ -50,4 +50,4 @@ apps/readdir
 apps/loader
 apps/asciivju
 apps/justawindow
-test/runtests
+runtests

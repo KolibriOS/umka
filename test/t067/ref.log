@@ -7,6 +7,11 @@
 /rd/1: fs=fat, start=0 (0 B), length=2880 (1440 kiB)
 /> set_skin /sys/DEFAULT.SKN
 status: 0
+/> 
+/> new_sys_thread
+tid: 3
+/> switch_to_thread 3
+/> 
 /> window_redraw 1
 /> draw_window 10 300 5 200 0x000088 1 1 1 0 1 4 hello
 /> set_pixel 0 0 0x0000ff
@@ -57,8 +62,6 @@ app_name: OS
 except_mask: 0
 dbg_state: 0
 cur_dir: 
-draw_bgr_x: 0
-draw_bgr_y: 0
 event_mask: 0
 tid: 2
 state: 0x0
@@ -68,23 +71,26 @@ keyboard_mode: 0
 exec_params: (null)
 priority: 0
 in_schedule: prev (2), next (2)
-/> dump_wdata 2
+/> dump_wdata 3
 captionEncoding: 0
-caption: 
+caption: hi_there
 clientbox (ltwh): 5 24 291 172
+draw_bgr_x: 0
+draw_bgr_y: 0
+thread: 3
 /> 
 /> process_info -1
 cpu_usage: 0
-window_stack_position: 2
-window_stack_value: 2
+window_stack_position: 3
+window_stack_value: 3
 process_name: OS
 memory_start: 0x00000000
 used_memory: 4294967295 (0xffffffff)
-pid: 2
+pid: 3
 box: 10 5 300 200
 slot_state: 0
 client_box: 5 24 291 172
-wnd_state: 0x00
+wnd_state: 0x80
 /> get_skin_height
 24
 /> get_screen_area

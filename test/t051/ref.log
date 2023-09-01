@@ -6,6 +6,10 @@
 /> set_skin /sys/DEFAULT.SKN
 status: 0
 /> 
+/> new_sys_thread
+tid: 3
+/> switch_to_thread 3
+/> 
 /> load_cursor_from_file /sys/fill.cur
 handle = non-zero
 /> var $cur_fill

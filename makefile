@@ -54,9 +54,9 @@ endif
 
 ifeq ($(HOST),linux)
 all: umka_shell umka_fuse umka_os umka_gen_devices_dat umka.sym umka.prp \
-     umka.lst tags default.skn skin.skn test/runtests
+     umka.lst tags default.skn skin.skn runtests
 else ifeq ($(HOST),windows)
-all: umka_shell umka.sym umka.prp umka.lst default.skn skin.skn test/runtests
+all: umka_shell umka.sym umka.prp umka.lst default.skn skin.skn runtests
 else
         $(error your HOST is not supported)
 endif
@@ -183,10 +183,10 @@ umka_os.o: umka_os.c umka.h
 umka_gen_devices_dat.o: umka_gen_devices_dat.c umka.h
 	$(CC) $(CFLAGS_32) -c $<
 
-test/runtests: test/runtests.o deps/optparse/optparse.o
+runtests: runtests.o deps/optparse/optparse.o
 	$(CC) $(LDFLAGS_32) -o $@ $^ $(LIBS)
 
-test/runtests.o: test/runtests.c
+runtests.o: runtests.c
 	$(CC) $(CFLAGS_32) -c $< -o $@ -Wno-deprecated-declarations
 
 
@@ -195,6 +195,6 @@ test/runtests.o: test/runtests.c
 clean:
 	rm -f umka_shell umka_fuse umka_os umka_gen_devices_dat umka.fas \
           umka.sym umka.lst umka.prp umka.cov coverage *.skn colors.dtp \
-          test/runtests
+          runtests
 	find . -name "*.o" -delete
 	find . -name "*.a" -delete

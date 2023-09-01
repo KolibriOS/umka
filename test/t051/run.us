@@ -3,6 +3,9 @@ umka_boot
 ramdisk_init ../../img/kolibri.raw
 set_skin /sys/DEFAULT.SKN
 
+new_sys_thread
+switch_to_thread 3
+
 load_cursor_from_file /sys/fill.cur
 var $cur_fill
 load_cursor_from_mem ./spray.cur

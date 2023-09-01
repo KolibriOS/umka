@@ -6,6 +6,10 @@
 /> set_skin /sys/DEFAULT.SKN
 status: 0
 /> 
+/> new_sys_thread
+tid: 3
+/> switch_to_thread 3
+/> 
 /> window_redraw 1
 /> draw_window 10 300 5 200 0x000088 1 1 1 0 1 3 hello
 /> window_redraw 2

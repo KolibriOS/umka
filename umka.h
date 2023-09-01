@@ -173,7 +173,7 @@ typedef struct {
 static_assert(sizeof(process_information_t) == 0x400,
               "must be 0x400 bytes long");
 
-typedef struct {
+typedef struct wdata {
     box_t box;
     uint32_t cl_workarea;
     uint32_t cl_titlebar;
@@ -187,10 +187,18 @@ typedef struct {
     uint32_t shape_scale;
     char *caption;
     uint8_t caption_encoding;
-    uint8_t pad[3];
+    uint8_t pad0[3];
+    box_t saved_box;
+    void *cursor;
+    void *temp_cursor;
+    uint32_t draw_bgr_x;
+    uint32_t draw_bgr_y;
+    rect_t draw_data;
+    struct appdata *thread;
+    uint8_t pad1[12];
 } __attribute__((packed)) wdata_t;
 
-static_assert(sizeof(wdata_t) == 0x40, "must be 0x40 bytes long");
+static_assert(sizeof(struct wdata) == 0x80, "must be 0x80 bytes long");
 
 typedef struct {
     uint32_t frame;
@@ -900,7 +908,7 @@ typedef struct {
 
 static_assert(sizeof(proc_t) == 0x1400, "must be 0x1400 bytes long");
 
-typedef struct {
+typedef struct appdata {
     char app_name[11];
     uint8_t pad1[5];
 
@@ -910,7 +918,7 @@ typedef struct {
     void *exc_handler;             // +32
     uint32_t except_mask;          // +36
     void *pl0_stack;               // +40
-    void *cursor;                  // +44
+    uint32_t pad2;                 // +44
     event_t *fd_ev;                // +48
     event_t *bk_ev;                // +52
     appobj_t *fd_obj;              // +56
@@ -927,36 +935,36 @@ typedef struct {
     void *tls_base;                // +104
     uint32_t event_mask;           // +108
     uint32_t tid;                  // +112
-    uint32_t draw_bgr_x;           // +116
-    uint32_t draw_bgr_y;           // +120
+    uint32_t pad3;                 // +116
+    uint32_t pad4;                 // +120
     uint8_t state;                 // +124
     uint8_t wnd_number;            // +125
-    uint8_t pad2[2];               // +126
-    uint32_t pad3;                 // +128
-    uint32_t pad4;                 // +132
-    uint32_t mem_start;            // +136
+    uint16_t pad5;                 // +126
+    struct wdata *window;          // +128
+    uint32_t pad6;                 // +132
+    uint32_t pad7;                 // +136
     uint32_t counter_sum;          // +140
-    box_t saved_box;               // +144
+    uint32_t pad8[4];              // +144
     uint32_t *ipc_start;           // +160
     size_t ipc_size;               // +164
     uint32_t occurred_events;      // +168
     uint32_t debugger_slot;        // +172
     uint32_t terminate_protection; // +176
     uint8_t keyboard_mode;         // +180
-    uint8_t pad5[3];               // +181
+    uint8_t pad9[3];               // +181
     char *exec_params;             // +184
     void *dbg_event_mem;           // +188
     dbg_regs_t dbg_regs;           // +192
-    uint32_t pad6;                 // +212
-    uint32_t pad7[4];              // +216
+    uint32_t pad10;                // +212
+    uint32_t pad11[4];             // +216
     uint32_t priority;             // +232
     lhead_t in_schedule;           // +236
     uint32_t counter_add;          // +244
     uint32_t cpu_usage;            // +248
-    uint32_t pad8;                 // +252
+    uint32_t pad12;                // +252
 } appdata_t;
 
-static_assert(sizeof(appdata_t) == 256, "must be 0x100 bytes long");
+static_assert(sizeof(struct appdata) == 256, "must be 0x100 bytes long");
 
 extern uint8_t kos_redraw_background;
 extern size_t kos_task_count;

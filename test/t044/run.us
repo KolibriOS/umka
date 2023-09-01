@@ -3,6 +3,9 @@ umka_boot
 ramdisk_init ../../img/kolibri.raw
 set_skin /sys/DEFAULT.SKN
 
+new_sys_thread
+switch_to_thread 3
+
 window_redraw 1
 draw_window 2 10 4 10 0x000088 1 1 1 0 1 4 hello
 window_redraw 2
@@ -10,7 +13,7 @@ window_redraw 2
 set_window_caption hi_there 0
 
 new_sys_thread
-switch_to_thread 3
+switch_to_thread 4
 
 window_redraw 1
 draw_window 4 5 8 5 0x000088 1 1 1 0 1 4 hello

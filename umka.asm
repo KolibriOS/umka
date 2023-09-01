@@ -165,7 +165,6 @@ pubsym acpi.count_nodes, 'kos_acpi_count_nodes', 4
 pubsym stack_init, 'kos_stack_init', no_mangle
 pubsym net_add_device, no_mangle
 
-pubsym draw_data
 pubsym img_background
 pubsym mem_BACKGROUND
 pubsym sys_background
@@ -262,8 +261,8 @@ include 'proc32.inc'
 include 'struct.inc'
 macro BOOT_LO a {}
 macro BOOT a {}
-window_data equ __pew01
-CDDataBuf equ __pew06
+window_data equ __pew_window_data
+background_window equ __pew_background_window
 idts equ __pew07
 WIN_STACK equ __pew08
 WIN_POS equ __pew09
@@ -297,7 +296,8 @@ macro tss pew {}
 include 'const.inc'
 purge tss
 restore window_data
-restore CDDataBuf,idts,WIN_STACK,WIN_POS
+restore background_window
+restore idts,WIN_STACK,WIN_POS
 restore FDD_BUFF,WIN_TEMP_XY,KEY_COUNT,KEY_BUFF,BTN_COUNT,BTN_BUFF,BTN_ADDR
 restore MEM_AMOUNT,SYS_SHUTDOWN,SLOT_BASE,sys_proc,VGABasePtr
 restore HEAP_BASE
@@ -855,8 +855,8 @@ proc umka_boot uses ebx esi edi ebp
         call    calculatebackground
         call    init_display
         mov     eax, [def_cursor]
-        mov     [SLOT_BASE+APPDATA.cursor+sizeof.APPDATA], eax
-        mov     [SLOT_BASE+APPDATA.cursor+sizeof.APPDATA*2], eax
+        mov     [window_data + sizeof.WDATA + WDATA.cursor], eax
+        mov     [window_data + sizeof.WDATA*2 + WDATA.cursor], eax
 
         ; from set_variables
         mov     ax, [BOOT.y_res]
@@ -1141,7 +1141,7 @@ align 64
                 rb 0x100000 - (($-bss_base) AND (0x100000-1)) ; align on 1MiB
 os_base:        rb PAGE_SIZE
 window_data:    rb sizeof.WDATA * 256
-CDDataBuf:      rb 0x1000
+background_window = window_data + sizeof.WDATA
 idts            rb (NUM_EXCEPTIONS + IRQ_RESERVED) * sizeof.idt_entry
 WIN_STACK       rw 0x200        ; why not 0x100?
 WIN_POS         rw 0x200

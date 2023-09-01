@@ -36,6 +36,7 @@ _Thread_local char timeoutfname[PATH_MAX];
 _Thread_local char reffname[PATH_MAX];
 _Thread_local char outfname[PATH_MAX];
 
+int coverage = 0;
 int silent_success = 1;
 
 static int

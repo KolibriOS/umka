@@ -1127,18 +1127,30 @@ cmd_dump_wdata(struct shell_ctx *ctx, int argc, char **argv) {
     (void)ctx;
     const char *usage = \
         "usage: dump_wdata <index>\n"
-        "  index            index into wdata array to dump\n";
+        "  index            index into wdata array to dump\n"
+        "  -p               print fields that are pointers\n";
     if (argc < 2) {
         fputs(usage, ctx->fout);
         return;
     }
+    int show_pointers = 0;
     int idx = strtol(argv[1], NULL, 0);
+    if (argc > 2 && !strcmp(argv[2], "-p")) {
+        show_pointers = 1;
+    }
     wdata_t *w = kos_window_data + idx;
 
     fprintf(ctx->fout, "captionEncoding: %u\n", w->caption_encoding);
     fprintf(ctx->fout, "caption: %s\n", w->caption);
     fprintf(ctx->fout, "clientbox (ltwh): %u %u %u %u\n", w->clientbox.left,
            w->clientbox.top, w->clientbox.width, w->clientbox.height);
+    fprintf(ctx->fout, "draw_bgr_x: %u\n", w->draw_bgr_x);
+    fprintf(ctx->fout, "draw_bgr_y: %u\n", w->draw_bgr_y);
+    fprintf(ctx->fout, "thread: %u\n", (uintptr_t)(w->thread - kos_slot_base));
+    if (show_pointers) {
+        fprintf(ctx->fout, "thread: %p\n", (void*)w->thread);
+        fprintf(ctx->fout, "cursor: %p\n", (void*)w->cursor);
+    }
 }
 
 static void
@@ -1167,7 +1179,6 @@ cmd_dump_appdata(struct shell_ctx *ctx, int argc, char **argv) {
     fprintf(ctx->fout, "except_mask: %" PRIx32 "\n", a->except_mask);
     if (show_pointers) {
         fprintf(ctx->fout, "pl0_stack: %p\n", (void*)a->pl0_stack);
-        fprintf(ctx->fout, "cursor: %p\n", (void*)a->cursor);
         fprintf(ctx->fout, "fd_ev: %p\n", (void*)a->fd_ev);
         fprintf(ctx->fout, "bk_ev: %p\n", (void*)a->bk_ev);
         fprintf(ctx->fout, "fd_obj: %p\n", (void*)a->fd_obj);
@@ -1176,8 +1187,6 @@ cmd_dump_appdata(struct shell_ctx *ctx, int argc, char **argv) {
     }
     fprintf(ctx->fout, "dbg_state: %u\n", a->dbg_state);
     fprintf(ctx->fout, "cur_dir: %s\n", a->cur_dir);
-    fprintf(ctx->fout, "draw_bgr_x: %u\n", a->draw_bgr_x);
-    fprintf(ctx->fout, "draw_bgr_y: %u\n", a->draw_bgr_y);
     fprintf(ctx->fout, "event_mask: %" PRIx32 "\n", a->event_mask);
     fprintf(ctx->fout, "tid: %" PRId32 "\n", a->tid);
     fprintf(ctx->fout, "state: 0x%" PRIx8 "\n", a->state);

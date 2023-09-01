@@ -4,6 +4,10 @@ set_mouse_pos_screen 40 30
 #disk_add ../img/kolibri.raw rd -c 0
 ramdisk_init ../../img/kolibri.raw
 set_skin /sys/DEFAULT.SKN
+
+new_sys_thread
+switch_to_thread 3
+
 window_redraw 1
 draw_window 10 300 5 200 0x000088 1 1 1 0 1 4 hello
 set_pixel 0 0 0x0000ff
@@ -34,7 +38,7 @@ set_window_colors 0 0 0 0 0 0 0 0 0 0
 dump_win_stack 2
 dump_win_pos 2
 dump_appdata 2
-dump_wdata 2
+dump_wdata 3
 
 process_info -1
 get_skin_height

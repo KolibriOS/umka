@@ -8,9 +8,9 @@ else
 UMKA_SHELL ?= sudo taskset 1 ../umka_shell -c
 endif
 
-xfs_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#xfs_*.t)))
-xfsv5_tests    := $(addsuffix .out.log, $(basename $(wildcard *\#xfsv5_*.t)))
-exfat_tests    := $(addsuffix .out.log, $(basename $(wildcard *\#exfat_*.t)))
+test_dirs      := $(wildcard t???*)
+test_logs  := $(addsuffix .out.log, $(basename $(wildcard *\#xfsv5_*.t)))
+test_run_    := $(addsuffix .out.log, $(basename $(wildcard *\#exfat_*.t)))
 fat_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#fat_*.t)))
 ext_tests      := $(addsuffix .out.log, $(basename $(wildcard *\#ext_*.t)))
 s05k_tests     := $(addsuffix .out.log, $(basename $(wildcard *\#s05k_*.t)))
