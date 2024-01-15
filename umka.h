@@ -789,6 +789,15 @@ typedef struct {
     void *check_m_pixel;
 
     size_t bytes_per_pixel;
+
+    void *put_pixel;
+    void *put_rect;
+    void *put_image;
+    void *put_line;
+    void *get_pixel;
+    void *get_rect;
+    void *get_image;
+    void *get_line;
 } __attribute__((packed)) display_t;
 
 extern display_t kos_display;

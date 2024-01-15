@@ -503,7 +503,21 @@ include 'video/vesa20.inc'
 include 'video/blitter.inc'
 include 'video/vga.inc'
 include 'video/cursors.inc'
+
+macro lea target, source {
+  if source eq [eax + PROC.pdt_0 + (LFB_BASE shr 20)]
+        push    ecx
+        mov     ecx, LFB_BASE
+        shr     ecx, 20
+        add     ecx, PROC.pdt_0
+        lea     target, [eax + ecx]
+        pop     ecx
+  else
+        lea     target, source
+  end if
+}
 include 'video/framebuffer.inc'
+purge lea
 
 include 'gui/window.inc'
 include 'gui/event.inc'
@@ -735,6 +749,7 @@ proc umka_boot uses ebx esi edi ebp
         list_init eax
 
         mov     [BOOT.lfb], LFB_BASE
+        mov     [BOOT.vesa_mode], 0x4000
         call    init_video
 
         stdcall alloc_kernel_space, 0x50000         ; FIXME check size
@@ -1013,6 +1028,7 @@ init_sys_v86:
 usb_init:
 fdc_init:
 mtrr_validate:
+init_pat_mtrr:
 v86_exc_c:
 except_7:
 ReadCDWRetr:
@@ -1094,8 +1110,21 @@ macro jmp target {
         jmp     target
   end if
 }
+macro mov target, source {
+  if source eq (HEAP_BASE - OS_BASE - CLEAN_ZONE) / 4
+        push    eax
+        mov     eax, HEAP_BASE
+        sub     eax, OS_BASE
+        sub     eax, CLEAN_ZONE
+        shr     eax, 2
+        mov     target, eax
+        pop     eax
+  else
+        mov     target, source
+  end if
+}
 include 'kernel.asm'
-purge jmp
+purge jmp,mov
 restore bios32_entry, tmp_page_tabs
 purge org,delay_ms
 restore org,delay_ms
@@ -1209,7 +1238,7 @@ BUTTON_INFO     equ
 endg
 
 macro org x {
-  if x eq (OS_BASE+0x0100000)
+  if x eq (OS_BASE + RAMDISK_BASE)
   else
     org x
   end if
