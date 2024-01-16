@@ -155,7 +155,7 @@ acpi.call_node begin
 # bytes 0x49506870
 # bytes 0x68704D43
 # bytes 0x43495047
-table/position: [0xFFFF32C7]
+table/position: [0xFFFF2CB7]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -180,7 +180,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF32C9
+offset: 0xFFFF2CB9
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -197,7 +197,7 @@ aml._.store_table.integer_to_integer end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFF32CD]
+table/position: [0xFFFF2CBD]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -222,7 +222,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF32CF
+offset: 0xFFFF2CBF
 aml._.name_path begin
 aml._.name_path end
 name_string: GPIC
@@ -239,7 +239,7 @@ aml._.store_table.integer_to_integer end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFF32D3]
+table/position: [0xFFFF2CC3]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -253,7 +253,7 @@ pkg_length: 0x0000000F
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF32D5
+offset: 0xFFFF2CC5
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -267,7 +267,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF32D5
+offset: 0xFFFF2CC5
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -282,7 +282,7 @@ aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
 if branch taken
-table/position: [0xFFFF32D9]
+table/position: [0xFFFF2CC9]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -294,7 +294,7 @@ aml._.statement_opcode begin
 aml._.statement_opcode end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF32D9
+offset: 0xFFFF2CC9
 aml._.name_path begin
 aml._.name_path end
 name_string: \_SB_DSPI
@@ -304,7 +304,7 @@ name: '\_SB_DSPI'
 aml._.get_node_by_name end
 aml._.method_invocation begin
 arg_count: 0
-table/position: [0xFFFFB451]
+table/position: [0xFFFFAE41]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -316,7 +316,7 @@ aml._.statement_opcode begin
 aml._.statement_opcode end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB451
+offset: 0xFFFFAE41
 aml._.name_path begin
 aml._.name_path end
 name_string: INTA
@@ -335,7 +335,7 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-table/position: [0xFFFFB492]
+table/position: [0xFFFFAE82]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -360,7 +360,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB494
+offset: 0xFFFFAE84
 aml._.name_path begin
 aml._.name_path end
 name_string: PIRA
@@ -377,7 +377,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB498]
+table/position: [0xFFFFAE88]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -402,7 +402,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB49A
+offset: 0xFFFFAE8A
 aml._.name_path begin
 aml._.name_path end
 name_string: HDAD
@@ -419,7 +419,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB49E]
+table/position: [0xFFFFAE8E]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -444,7 +444,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4A0
+offset: 0xFFFFAE90
 aml._.name_path begin
 aml._.name_path end
 name_string: GEC_
@@ -461,7 +461,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB4A4]
+table/position: [0xFFFFAE94]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -486,7 +486,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4A6
+offset: 0xFFFFAE96
 aml._.name_path begin
 aml._.name_path end
 name_string: GPP0
@@ -503,7 +503,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB4AA]
+table/position: [0xFFFFAE9A]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -528,7 +528,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4AC
+offset: 0xFFFFAE9C
 aml._.name_path begin
 aml._.name_path end
 name_string: GPP0
@@ -547,7 +547,7 @@ aml._.store end
 aml._.term_obj end
 aml._.method_invocation end
 aml._.term_obj end
-table/position: [0xFFFFB457]
+table/position: [0xFFFFAE47]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -559,7 +559,7 @@ aml._.statement_opcode begin
 aml._.statement_opcode end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB457
+offset: 0xFFFFAE47
 aml._.name_path begin
 aml._.name_path end
 name_string: INTB
@@ -578,7 +578,7 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-table/position: [0xFFFFB4B7]
+table/position: [0xFFFFAEA7]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -603,7 +603,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4B9
+offset: 0xFFFFAEA9
 aml._.name_path begin
 aml._.name_path end
 name_string: PIRB
@@ -620,7 +620,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB4BD]
+table/position: [0xFFFFAEAD]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -645,7 +645,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4BF
+offset: 0xFFFFAEAF
 aml._.name_path begin
 aml._.name_path end
 name_string: USB2
@@ -662,7 +662,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB4C3]
+table/position: [0xFFFFAEB3]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -687,7 +687,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4C5
+offset: 0xFFFFAEB5
 aml._.name_path begin
 aml._.name_path end
 name_string: USB4
@@ -704,7 +704,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB4C9]
+table/position: [0xFFFFAEB9]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -729,7 +729,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4CB
+offset: 0xFFFFAEBB
 aml._.name_path begin
 aml._.name_path end
 name_string: USB6
@@ -746,7 +746,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB4CF]
+table/position: [0xFFFFAEBF]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -771,7 +771,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4D1
+offset: 0xFFFFAEC1
 aml._.name_path begin
 aml._.name_path end
 name_string: GPP1
@@ -788,7 +788,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB4D5]
+table/position: [0xFFFFAEC5]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -813,7 +813,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4D7
+offset: 0xFFFFAEC7
 aml._.name_path begin
 aml._.name_path end
 name_string: IDE_
@@ -832,7 +832,7 @@ aml._.store end
 aml._.term_obj end
 aml._.method_invocation end
 aml._.term_obj end
-table/position: [0xFFFFB45D]
+table/position: [0xFFFFAE4D]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -844,7 +844,7 @@ aml._.statement_opcode begin
 aml._.statement_opcode end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB45D
+offset: 0xFFFFAE4D
 aml._.name_path begin
 aml._.name_path end
 name_string: INTC
@@ -863,7 +863,7 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-table/position: [0xFFFFB4E2]
+table/position: [0xFFFFAED2]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -888,7 +888,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4E4
+offset: 0xFFFFAED4
 aml._.name_path begin
 aml._.name_path end
 name_string: PIRC
@@ -905,7 +905,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB4E8]
+table/position: [0xFFFFAED8]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -930,7 +930,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4EA
+offset: 0xFFFFAEDA
 aml._.name_path begin
 aml._.name_path end
 name_string: USB1
@@ -947,7 +947,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB4EE]
+table/position: [0xFFFFAEDE]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -972,7 +972,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4F0
+offset: 0xFFFFAEE0
 aml._.name_path begin
 aml._.name_path end
 name_string: USB3
@@ -989,7 +989,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB4F4]
+table/position: [0xFFFFAEE4]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1014,7 +1014,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4F6
+offset: 0xFFFFAEE6
 aml._.name_path begin
 aml._.name_path end
 name_string: USB5
@@ -1031,7 +1031,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB4FA]
+table/position: [0xFFFFAEEA]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1056,7 +1056,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB4FC
+offset: 0xFFFFAEEC
 aml._.name_path begin
 aml._.name_path end
 name_string: USB7
@@ -1073,7 +1073,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB500]
+table/position: [0xFFFFAEF0]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1098,7 +1098,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB502
+offset: 0xFFFFAEF2
 aml._.name_path begin
 aml._.name_path end
 name_string: GPP2
@@ -1117,7 +1117,7 @@ aml._.store end
 aml._.term_obj end
 aml._.method_invocation end
 aml._.term_obj end
-table/position: [0xFFFFB463]
+table/position: [0xFFFFAE53]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1129,7 +1129,7 @@ aml._.statement_opcode begin
 aml._.statement_opcode end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB463
+offset: 0xFFFFAE53
 aml._.name_path begin
 aml._.name_path end
 name_string: INTD
@@ -1148,7 +1148,7 @@ aml._.byte_const begin
 aml._.byte_const end
 aml._.data_object end
 aml._.term_arg end
-table/position: [0xFFFFB50D]
+table/position: [0xFFFFAEFD]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1173,7 +1173,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB50F
+offset: 0xFFFFAEFF
 aml._.name_path begin
 aml._.name_path end
 name_string: PIRD
@@ -1190,7 +1190,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB513]
+table/position: [0xFFFFAF03]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1215,7 +1215,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB515
+offset: 0xFFFFAF05
 aml._.name_path begin
 aml._.name_path end
 name_string: SATA
@@ -1232,7 +1232,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB519]
+table/position: [0xFFFFAF09]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1257,7 +1257,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB51B
+offset: 0xFFFFAF0B
 aml._.name_path begin
 aml._.name_path end
 name_string: GPP3
@@ -1276,7 +1276,7 @@ aml._.store end
 aml._.term_obj end
 aml._.method_invocation end
 aml._.term_obj end
-table/position: [0xFFFFB469]
+table/position: [0xFFFFAE59]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1290,7 +1290,7 @@ aml._.store begin
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB46A
+offset: 0xFFFFAE5A
 aml._.name_path begin
 aml._.name_path end
 name_string: PD64
@@ -1304,7 +1304,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB46A
+offset: 0xFFFFAE5A
 aml._.name_path begin
 aml._.name_path end
 name_string: PD64
@@ -1325,7 +1325,7 @@ aml._.store_table begin
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB46F]
+table/position: [0xFFFFAE5F]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1349,7 +1349,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB472
+offset: 0xFFFFAE62
 aml._.name_path begin
 aml._.name_path end
 name_string: PIRE
@@ -1366,7 +1366,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB476]
+table/position: [0xFFFFAE66]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1390,7 +1390,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB479
+offset: 0xFFFFAE69
 aml._.name_path begin
 aml._.name_path end
 name_string: PIRF
@@ -1407,7 +1407,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB47D]
+table/position: [0xFFFFAE6D]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1431,7 +1431,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB480
+offset: 0xFFFFAE70
 aml._.name_path begin
 aml._.name_path end
 name_string: PIRG
@@ -1448,7 +1448,7 @@ aml._.store_table.integer_to_index_field end
 aml._.store_table end
 aml._.store end
 aml._.term_obj end
-table/position: [0xFFFFB484]
+table/position: [0xFFFFAE74]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1472,7 +1472,7 @@ aml._.super_name begin
 aml._.simple_name begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFB487
+offset: 0xFFFFAE77
 aml._.name_path begin
 aml._.name_path end
 name_string: PIRH
@@ -1510,7 +1510,7 @@ acpi.call_node begin
 # bytes 0x49500AA0
 # bytes 0x41A44D43
 # bytes 0xA4303052
-table/position: [0xFFFF426E]
+table/position: [0xFFFF3C5E]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1524,7 +1524,7 @@ pkg_length: 0x0000000A
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF4270
+offset: 0xFFFF3C60
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -1538,7 +1538,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF4270
+offset: 0xFFFF3C60
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -1553,7 +1553,7 @@ aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
 if branch taken
-table/position: [0xFFFF4274]
+table/position: [0xFFFF3C64]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1566,7 +1566,7 @@ aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF4275
+offset: 0xFFFF3C65
 aml._.name_path begin
 aml._.name_path end
 name_string: AR00
@@ -1580,7 +1580,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF4275
+offset: 0xFFFF3C65
 aml._.name_path begin
 aml._.name_path end
 name_string: AR00
@@ -1605,7 +1605,7 @@ acpi.call_node begin
 # bytes 0x49500AA0
 # bytes 0x41A44D43
 # bytes 0xA4303052
-table/position: [0xFFFF426E]
+table/position: [0xFFFF3C5E]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1619,7 +1619,7 @@ pkg_length: 0x0000000A
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF4270
+offset: 0xFFFF3C60
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -1633,7 +1633,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF4270
+offset: 0xFFFF3C60
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -1648,7 +1648,7 @@ aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
 if branch taken
-table/position: [0xFFFF4274]
+table/position: [0xFFFF3C64]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1661,7 +1661,7 @@ aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF4275
+offset: 0xFFFF3C65
 aml._.name_path begin
 aml._.name_path end
 name_string: AR00
@@ -1675,7 +1675,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF4275
+offset: 0xFFFF3C65
 aml._.name_path begin
 aml._.name_path end
 name_string: AR00
@@ -1715,7 +1715,7 @@ acpi.call_node begin
 # bytes 0x49500AA0
 # bytes 0x41A44D43
 # bytes 0xA4393052
-table/position: [0xFFFFA147]
+table/position: [0xFFFF9B37]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1729,7 +1729,7 @@ pkg_length: 0x0000000A
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFA149
+offset: 0xFFFF9B39
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -1743,7 +1743,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFA149
+offset: 0xFFFF9B39
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -1758,7 +1758,7 @@ aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
 if branch taken
-table/position: [0xFFFFA14D]
+table/position: [0xFFFF9B3D]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1771,7 +1771,7 @@ aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFA14E
+offset: 0xFFFF9B3E
 aml._.name_path begin
 aml._.name_path end
 name_string: AR09
@@ -1785,7 +1785,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFFA14E
+offset: 0xFFFF9B3E
 aml._.name_path begin
 aml._.name_path end
 name_string: AR09
@@ -1846,7 +1846,7 @@ acpi.call_node begin
 # bytes 0x49500AA0
 # bytes 0x41A44D43
 # bytes 0xA4303052
-table/position: [0xFFFF426E]
+table/position: [0xFFFF3C5E]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1860,7 +1860,7 @@ pkg_length: 0x0000000A
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF4270
+offset: 0xFFFF3C60
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -1874,7 +1874,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF4270
+offset: 0xFFFF3C60
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -1889,7 +1889,7 @@ aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
 if branch taken
-table/position: [0xFFFF4274]
+table/position: [0xFFFF3C64]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -1902,7 +1902,7 @@ aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF4275
+offset: 0xFFFF3C65
 aml._.name_path begin
 aml._.name_path end
 name_string: AR00
@@ -1916,7 +1916,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF4275
+offset: 0xFFFF3C65
 aml._.name_path begin
 aml._.name_path end
 name_string: AR00
@@ -2052,7 +2052,7 @@ acpi.call_node begin
 # bytes 0x49500AA0
 # bytes 0x41A44D43
 # bytes 0xA4423052
-table/position: [0xFFFF85C5]
+table/position: [0xFFFF7FB5]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -2066,7 +2066,7 @@ pkg_length: 0x0000000A
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF85C7
+offset: 0xFFFF7FB7
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -2080,7 +2080,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF85C7
+offset: 0xFFFF7FB7
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -2095,7 +2095,7 @@ aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
 if branch taken
-table/position: [0xFFFF85CB]
+table/position: [0xFFFF7FBB]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -2108,7 +2108,7 @@ aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF85CC
+offset: 0xFFFF7FBC
 aml._.name_path begin
 aml._.name_path end
 name_string: AR0B
@@ -2122,7 +2122,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF85CC
+offset: 0xFFFF7FBC
 aml._.name_path begin
 aml._.name_path end
 name_string: AR0B
@@ -2177,7 +2177,7 @@ acpi.call_node begin
 # bytes 0x49500AA0
 # bytes 0x41A44D43
 # bytes 0xA4413052
-table/position: [0xFFFF84AD]
+table/position: [0xFFFF7E9D]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -2191,7 +2191,7 @@ pkg_length: 0x0000000A
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF84AF
+offset: 0xFFFF7E9F
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -2205,7 +2205,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF84AF
+offset: 0xFFFF7E9F
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -2220,7 +2220,7 @@ aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
 if branch taken
-table/position: [0xFFFF84B3]
+table/position: [0xFFFF7EA3]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -2233,7 +2233,7 @@ aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF84B4
+offset: 0xFFFF7EA4
 aml._.name_path begin
 aml._.name_path end
 name_string: AR0A
@@ -2247,7 +2247,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF84B4
+offset: 0xFFFF7EA4
 aml._.name_path begin
 aml._.name_path end
 name_string: AR0A

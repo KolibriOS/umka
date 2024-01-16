@@ -91,7 +91,7 @@ acpi.call_node begin
 # bytes 0x49500AA0
 # bytes 0x41A44D43
 # bytes 0xA4303052
-table/position: [0xFFFF2F2B]
+table/position: [0xFFFF222B]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -105,7 +105,7 @@ pkg_length: 0x0000000A
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF2F2D
+offset: 0xFFFF222D
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -119,7 +119,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF2F2D
+offset: 0xFFFF222D
 aml._.name_path begin
 aml._.name_path end
 name_string: PICM
@@ -134,7 +134,7 @@ aml._.convert.integer_to_integer begin
 aml._.convert.integer_to_integer end
 aml._.convert end
 if branch taken
-table/position: [0xFFFF2F31]
+table/position: [0xFFFF2231]
 aml._.term_obj begin
 aml._.object begin
 aml._.namespace_modifier_obj begin
@@ -147,7 +147,7 @@ aml._.return begin
 aml._.term_arg begin
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF2F32
+offset: 0xFFFF2232
 aml._.name_path begin
 aml._.name_path end
 name_string: AR00
@@ -161,7 +161,7 @@ aml._.computational_data end
 aml._.data_object end
 aml._.name_string begin
 aml._.name_string begin again
-offset: 0xFFFF2F32
+offset: 0xFFFF2232
 aml._.name_path begin
 aml._.name_path end
 name_string: AR00
