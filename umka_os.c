@@ -233,11 +233,9 @@ int
 main(int argc, char *argv[]) {
     (void)argc;
     const char *usage = "umka_os [-i <infile>] [-o <outfile>]"
-                        " [-b <boardlog>] [-s <startupfile>]\n";
-    if (coverage) {
-        trace_begin();
-    }
+                        " [-b <boardlog>] [-s <startupfile>] [-c covfile]\n";
 
+    int coverage = 0;
     int show_display = 0;
 
     umka_sti();
@@ -248,6 +246,7 @@ main(int argc, char *argv[]) {
     const char *infile = NULL;
     const char *outfile = NULL;
     const char *boardlogfile = NULL;
+    const char *covfile = NULL;
     FILE *fstartup = NULL;
     FILE *fin = stdin;
     FILE *fout = stdout;
@@ -257,10 +256,14 @@ main(int argc, char *argv[]) {
     int opt;
     optparse_init(&options, argv);
 
-    while ((opt = optparse(&options, "b:di:o:s:")) != -1) {
+    while ((opt = optparse(&options, "b:c:di:o:s:")) != -1) {
         switch (opt) {
         case 'b':
             boardlogfile = options.optarg;
+            break;
+        case 'c':
+            coverage = 1;
+            covfile = options.optarg;
             break;
         case 'd':
             show_display = 1;
@@ -279,6 +282,10 @@ main(int argc, char *argv[]) {
             fputs(usage, stderr);
             exit(1);
         }
+    }
+
+    if (coverage) {
+        trace_enable();
     }
 
     if (startupfile) {
@@ -429,7 +436,9 @@ main(int argc, char *argv[]) {
     umka_osloop();   // doesn't return
 
     if (coverage)
-        trace_end();
+        trace_disable();
+
+    (void)covfile;
 
     return 0;
 }

@@ -117,6 +117,10 @@ Allow reading process_vm_readv syscall.
 
     # sysctl -w kernel.yama.ptrace_scope=0
 
+Insert msr linux kernel module to collect coverage.
+
+    # modprobe msr
+
 
 Links & Acknowledgements
 ------------------------

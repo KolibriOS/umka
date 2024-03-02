@@ -37,6 +37,7 @@ _Thread_local char reffname[PATH_MAX];
 _Thread_local char outfname[PATH_MAX];
 
 int coverage = 0;
+int no_timeout = 0;
 int silent_success = 1;
 
 static int
@@ -125,7 +126,7 @@ struct test_wait_arg {
     pthread_cond_t *cond;
 };
 
-static unsigned
+static time_t
 get_test_timeout(const char *testname) {
     sprintf(timeoutfname, "%s/%s", testname, TIMEOUT_FILENAME);
     FILE *f = fopen(timeoutfname, "rb");
@@ -178,21 +179,33 @@ run_test(const void *arg) {
     int child;
     if (!(child = fork())) {
         chdir(test_name);
-        execl("../../umka_shell", "../../umka_shell", "-ri", "run.us", "-o",
-              "out.log", NULL);
+        if (coverage) {
+            char covfile[64];
+            sprintf(covfile, "../cov_%s", test_name);
+            execl("/usr/bin/taskset", "taskset", "1", "sudo",
+                  "../../umka_shell", "-ri", "run.us", "-o", "out.log", "-c",
+                  covfile, NULL);
+        } else {
+            execl("../../umka_shell", "../../umka_shell", "-ri", "run.us", "-o",
+                "out.log", NULL);
+        }
         fprintf(stderr, "Can't run test command: %s\n", strerror(errno));
         return (void *)-1;
     }
     pthread_t t;
     struct test_wait_arg wa = {.pid = child, .cond = &cond};
     pthread_create(&t, NULL, thread_wait, &wa);
-    unsigned tout = get_test_timeout(test_name);
+    time_t tout = get_test_timeout(test_name);
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
-    ts.tv_sec += tout;
+    if (no_timeout) {
+        ts.tv_sec += 60*60*24*7;  // a week
+    } else {
+        ts.tv_sec += tout;
+    }
     int status;
     if ((status = pthread_cond_timedwait(&cond, &mutex, &ts))) {
-        fprintf(stderr, "[!] %s: timeout (%um%us)\n", test_name,
+        fprintf(stderr, "[!] %s: timeout (%llim%llis)\n", test_name,
                 tout/60, tout % 60);
         kill(child, SIGKILL);
         result = (void *)(intptr_t)status;
@@ -270,18 +283,23 @@ main(int argc, char *argv[]) {
     (void)argc;
 //    int action = ACTION_RUN;
     size_t nthreads = 1;
-
     struct optparse opts;
     optparse_init(&opts, argv);
     int opt;
 
-    while ((opt = optparse(&opts, "j:s")) != -1) {
+    while ((opt = optparse(&opts, "cj:st")) != -1) {
         switch (opt) {
+        case 'c':
+            coverage = 1;
+            break;
         case 'j':
             nthreads = strtoul(opts.optarg, NULL, 0);
             break;
         case 's':
             silent_success = 0;
+            break;
+        case 't':
+            no_timeout = 1;
             break;
         default:
             fprintf(stderr, "[!] Unknown option: '%c'\n", opt);

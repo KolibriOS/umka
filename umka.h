@@ -862,6 +862,9 @@ umka_cli(void);
 void
 umka_sti(void);
 
+void
+set_eflags_tf(uint32_t tf);
+
 #define COVERAGE_TABLE_SIZE (512*1024)
 
 struct coverage_branch {

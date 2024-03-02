@@ -4368,7 +4368,9 @@ shell_run_cmd_sync(struct shell_ctx *ctx) {
         }
     case UMKA_CMD_SYS_LFN: {
         struct cmd_sys_lfn_arg *c = &cmd->sys_lfn.arg;
+        COVERAGE_ON();
         umka_sys_lfn(c->bufptr, c->r, c->f70or80);
+        COVERAGE_OFF();
         break;
         }
     default:

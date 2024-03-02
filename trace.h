@@ -9,17 +9,13 @@
 #ifndef TRACE_H_INCLUDED
 #define TRACE_H_INCLUDED
 
-#include <inttypes.h>
+#define COVERAGE_ON() do { trace_on(); } while (0)
 
-extern uint32_t coverage;
+#define COVERAGE_OFF() do { trace_off(); } while (0)
 
-#define COVERAGE_ON() do { trace_resume(coverage); } while (0)
-
-#define COVERAGE_OFF() do { coverage = trace_pause(); } while (0)
-
-void trace_begin(void);
-void trace_end(void);
-uint32_t trace_pause(void);
-void trace_resume(uint32_t value);
+void trace_enable(void);
+void trace_disable(void);
+void trace_on(void);
+void trace_off(void);
 
 #endif

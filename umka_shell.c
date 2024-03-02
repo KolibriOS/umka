@@ -63,7 +63,9 @@ main(int argc, char **argv) {
         "  -i infile        file with commands\n"
         "  -o outfile       file for logs\n"
         "  -r               reproducible logs (without pointers and datetime)\n"
-        "  -c               collect coverage\n";
+        "  -c covfile       collect coverage to the file\n";
+
+    char covfile[64];
 
     const char *infile = NULL, *outfile = NULL;
     FILE *fin = stdin;
@@ -75,13 +77,14 @@ main(int argc, char **argv) {
     kos_boot.memmap_blocks[1] = (e820entry_t){(uintptr_t)mem1, 128*1024*1024, 1};
     kos_boot.memmap_blocks[2] = (e820entry_t){(uintptr_t)mem2, 256*1024*1024, 1};
 */
+    int coverage = 0;
     int reproducible = 0;
 
     struct optparse options;
     optparse_init(&options, argv);
     int opt;
 
-    while ((opt = optparse(&options, "i:o:rc")) != -1) {
+    while ((opt = optparse(&options, "i:o:rc:")) != -1) {
         switch (opt) {
         case 'i':
             infile = options.optarg;
@@ -94,6 +97,7 @@ main(int argc, char **argv) {
             break;
         case 'c':
             coverage = 1;
+            sprintf(covfile, "%s.%i", options.optarg, getpid());
             break;
         case 'h':
             fputs(usage, stderr);
@@ -123,15 +127,13 @@ main(int argc, char **argv) {
     struct umka_shell_ctx *ctx = umka_shell_init(reproducible, fin);
 
     if (coverage)
-        trace_begin();
+        trace_enable();
 
     run_test(ctx->shell);
 
     if (coverage) {
-        trace_end();
-        char coverage_filename[32];
-        sprintf(coverage_filename, "coverage.%i", getpid());
-        FILE *f = fopen(coverage_filename, "w");
+        trace_disable();
+        FILE *f = fopen(covfile, "w");
         fwrite(coverage_table,
                COVERAGE_TABLE_SIZE * sizeof(struct coverage_branch), 1, f);
         fclose(f);

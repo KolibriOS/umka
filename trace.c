@@ -8,24 +8,22 @@
 
 #include "trace_lbr.h"
 
-uint32_t coverage;
-
 void
-trace_begin(void) {
-    trace_lbr_begin();
+trace_enable(void) {
+    trace_lbr_enable();
 }
 
 void
-trace_end(void) {
-    trace_lbr_end();
-}
-
-uint32_t
-trace_pause(void) {
-    return trace_lbr_pause();
+trace_disable(void) {
+    trace_lbr_disable();
 }
 
 void
-trace_resume(uint32_t value) {
-    trace_lbr_resume(value);
+trace_on(void) {
+    trace_lbr_on();
+}
+
+void
+trace_off(void) {
+    trace_lbr_off();
 }

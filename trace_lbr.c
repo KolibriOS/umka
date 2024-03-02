@@ -24,10 +24,11 @@
 #define MSR_IA32_LASTBRANCHFROMIP   0x1db
 #define MSR_IA32_LASTBRANCHTOIP     0x1dc
 
+int coverage = 0;
 int msrfd;
 
-uint64_t rdmsr(uint32_t reg)
-{
+static uint64_t
+rdmsr(uint32_t reg) {
     uint64_t data = 0;
 
 #ifndef _WIN32
@@ -43,8 +44,8 @@ uint64_t rdmsr(uint32_t reg)
     return data;
 }
 
-void wrmsr(uint32_t reg, uint64_t data)
-{
+static void
+wrmsr(uint32_t reg, uint64_t data) {
 #ifndef _WIN32
     int fd;
     fd = open("/dev/cpu/0/msr", O_WRONLY);
@@ -66,7 +67,8 @@ void wrmsr(uint32_t reg, uint64_t data)
 #endif
 }
 
-void handle_sigtrap(int signo) {
+static void
+handle_sigtrap(int signo) {
     (void)signo;
 #ifndef _WIN32
     uint64_t from = rdmsr(MSR_IA32_LASTBRANCHFROMIP);
@@ -86,13 +88,13 @@ void handle_sigtrap(int signo) {
 #endif
 }
 
-uint32_t set_eflags_tf(uint32_t tf);
-
-void trace_lbr_begin(void) {
+void
+trace_lbr_enable(void) {
 #ifndef _WIN32
     struct sigaction action;
     action.sa_handler = &handle_sigtrap;
     action.sa_flags = 0;
+    coverage = 1;
     sigaction(SIGTRAP, &action, NULL);
 
     wrmsr(MSR_IA32_DEBUGCTL, MSR_IA32_DEBUGCTL_LBR + MSR_IA32_DEBUGCTL_BTF);
@@ -106,7 +108,8 @@ void trace_lbr_begin(void) {
 #endif
 }
 
-void trace_lbr_end(void) {
+void
+trace_lbr_disable(void) {
 #ifndef _WIN32
     wrmsr(MSR_IA32_DEBUGCTL, 0);
     close(msrfd);
@@ -115,10 +118,12 @@ void trace_lbr_end(void) {
 #endif
 }
 
-uint32_t trace_lbr_pause(void) {
-    return set_eflags_tf(0u);
+void
+trace_lbr_on(void) {
+    set_eflags_tf(coverage);
 }
 
-void trace_lbr_resume(uint32_t value) {
-    set_eflags_tf(value);
+void
+trace_lbr_off(void) {
+    set_eflags_tf(0u);
 }

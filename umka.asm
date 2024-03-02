@@ -638,7 +638,6 @@ proc set_eflags_tf c uses ebx esi edi ebp, tf
         rol    eax, 8
         push   eax
         popfd
-        mov    eax, edx
         ret
 endp
 

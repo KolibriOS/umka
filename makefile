@@ -28,7 +28,8 @@ else
 endif
 
 CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -g -O0 -DNDEBUG -masm=intel \
-        -D_POSIX_C_SOURCE=200809L -I$(HOST) -Ideps -I. -fno-pie -D_POSIX
+        -D_POSIX_C_SOURCE=200809L -I$(HOST) -Ideps -I. -fno-pie -D_POSIX \
+        -fno-common
 CFLAGS_32=$(CFLAGS) -m32 -D_FILE_OFFSET_BITS=64 -D__USE_TIME_BITS64
 LDFLAGS=-no-pie
 LDFLAGS_32=$(LDFLAGS) -m32
