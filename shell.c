@@ -831,6 +831,8 @@ disk_list_partitions(struct shell_ctx *ctx, disk_t *d) {
             fsname = "exfat";
         } else if (p->fs_user_functions == ntfs_user_functions) {
             fsname = "ntfs";
+        } else if (p->fs_user_functions == iso9660_user_functions) {
+            fsname = "iso9660";
         } else {
             fsname = "???";
         }
@@ -4430,7 +4432,7 @@ run_test(struct shell_ctx *ctx) {
 
     pthread_mutex_lock(&ctx->cmd_mutex);
     int is_tty = isatty(fileno(stdin));
-    char **argv = (char**)calloc(sizeof(char*), (MAX_COMMAND_ARGS + 1));
+    char **argv = (char**)calloc(MAX_COMMAND_ARGS + 1, sizeof(char*));
     ic_set_default_completer(completer, NULL);
     ic_set_default_highlighter(highlighter, NULL);
     ic_enable_auto_tab(1);

@@ -1,0 +1,62 @@
+umka_boot
+disk_add ../../img/iso9660_s2k_dir_all.qcow2 hd0 -c 524288
+
+ls70 /hd0/1/dir_ls_a
+ls70 /hd0/1/dir_ls_b
+ls70 /hd0/1/dir_ls_c
+ls70 /hd0/1/dir_ls_d
+ls70 /hd0/1/dir_ls_e
+ls70 /hd0/1/dir_ls_f
+ls70 /hd0/1/dir_ls_g
+
+ls70 /hd0/1/dir_ls_g -f 0 -c 1
+ls70 /hd0/1/dir_ls_g -f 1 -c 1
+ls70 /hd0/1/dir_ls_g -f 2 -c 1
+ls70 /hd0/1/dir_ls_g -f 3 -c 1
+ls70 /hd0/1/dir_ls_g -f 4 -c 1
+ls70 /hd0/1/dir_ls_g -f 46651 -c 10
+ls70 /hd0/1/dir_ls_g -f 46658 -c 10
+ls70 /hd0/1/dir_ls_g -f 46659 -c 10
+ls70 /hd0/1/dir_ls_g -f 46660 -c 10
+ls70 /hd0/1/dir_ls_g -f 46661 -c 10
+ls70 /hd0/1/dir_ls_g -f 46662 -c 10
+ls70 /hd0/1/dir_ls_g -f 0 -c 0
+ls70 /hd0/1/dir_ls_g -f 1 -c 0
+ls70 /hd0/1/dir_ls_g -f 2 -c 0
+ls70 /hd0/1/dir_ls_g -f 3 -c 0
+ls70 /hd0/1/dir_ls_g -f 4 -c 0
+ls70 /hd0/1/dir_ls_g -f 0 -c 1
+ls70 /hd0/1/dir_ls_g -f 1 -c 1
+ls70 /hd0/1/dir_ls_g -f 2 -c 1
+ls70 /hd0/1/dir_ls_g -f 3 -c 1
+ls70 /hd0/1/dir_ls_g -f 4 -c 1
+ls70 /hd0/1/dir_ls_g -f 0 -c 2
+ls70 /hd0/1/dir_ls_g -f 1 -c 2
+ls70 /hd0/1/dir_ls_g -f 2 -c 2
+ls70 /hd0/1/dir_ls_g -f 3 -c 2
+ls70 /hd0/1/dir_ls_g -f 4 -c 2
+ls70 /hd0/1/dir_ls_g -f 0 -c 3
+ls70 /hd0/1/dir_ls_g -f 1 -c 3
+ls70 /hd0/1/dir_ls_g -f 2 -c 3
+ls70 /hd0/1/dir_ls_g -f 3 -c 3
+ls70 /hd0/1/dir_ls_g -f 4 -c 3
+ls70 /hd0/1/dir_ls_g -f 0 -c 4
+ls70 /hd0/1/dir_ls_g -f 1 -c 4
+ls70 /hd0/1/dir_ls_g -f 2 -c 4
+ls70 /hd0/1/dir_ls_g -f 3 -c 4
+ls70 /hd0/1/dir_ls_g -f 4 -c 4
+
+stat70 /hd0/1/dir_stat_a
+ls70 /hd0/1/dir_stat_a
+stat70 /hd0/1/dir_stat_b
+ls70 /hd0/1/dir_stat_a
+stat70 /hd0/1/dir_stat_c
+ls70 /hd0/1/dir_stat_a
+stat70 /hd0/1/dir_stat_d
+ls70 /hd0/1/dir_stat_a
+stat70 /hd0/1/dir_stat_e
+ls70 /hd0/1/dir_stat_a
+stat70 /hd0/1/dir_stat_f
+stat70 /hd0/1/dir_stat_g
+
+disk_del hd0

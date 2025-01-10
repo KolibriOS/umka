@@ -124,6 +124,7 @@ pubsym ext_user_functions
 pubsym fat_user_functions
 pubsym exFAT_user_functions, 'exfat_user_functions'
 pubsym ntfs_user_functions
+pubsym iso9660_user_functions
 
 pubsym i40, no_mangle
 
@@ -230,8 +231,6 @@ macro sti {
 
 iretd equ retd
 iret equ ret
-
-lang fix en
 
 macro int n {
   if n eq 0x40

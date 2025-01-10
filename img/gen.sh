@@ -1030,6 +1030,52 @@ fat16_s05k.qcow2 () {
     rm $img_raw
 }
 
+iso9660_s2k_dir_all.qcow2 () {
+    local img=$FUNCNAME
+    local img_raw=$(basename $img .qcow2).raw
+
+    sudo chown $USER $TEMP_DIR -R
+
+    mkdir $TEMP_DIR/dir_ls_a
+
+    mkdir $TEMP_DIR/dir_ls_b
+    $MKDIRRANGE $TEMP_DIR/dir_ls_b 0 3  0 2
+
+    mkdir $TEMP_DIR/dir_ls_c
+    $MKDIRRANGE $TEMP_DIR/dir_ls_c 0 5  201 43
+
+    mkdir $TEMP_DIR/dir_ls_d
+    $MKDIRRANGE $TEMP_DIR/dir_ls_d 0 50  201 43
+
+    mkdir $TEMP_DIR/dir_ls_e
+    $MKDIRRANGE $TEMP_DIR/dir_ls_e 0 1000  201 43
+
+    mkdir $TEMP_DIR/dir_ls_f
+    $MKDIRRANGE $TEMP_DIR/dir_ls_f 0 5000  231 13
+
+    mkdir $TEMP_DIR/dir_ls_g
+    $MKDIRRANGE $TEMP_DIR/dir_ls_g 0 46656  231 13
+
+    mkdir $TEMP_DIR/dir_stat_a
+
+    mkdir $TEMP_DIR/dir_stat_b
+    $MKDOUBLEDIRS $TEMP_DIR/dir_stat_b d 3
+
+    mkdir $TEMP_DIR/dir_stat_c
+    $MKDOUBLEDIRS $TEMP_DIR/dir_stat_c d 100
+
+    mkdir $TEMP_DIR/dir_stat_d
+    $MKDOUBLEDIRS $TEMP_DIR/dir_stat_d d 5000
+
+    mkdir $TEMP_DIR/dir_stat_e
+    $MKDOUBLEDIRS $TEMP_DIR/dir_stat_e d 3861
+
+    mkisofs -J -R -v -T -V 'KolibriOS' $TEMP_DIR > $img_raw
+    rm $TEMP_DIR/* -rf
+    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    rm $img_raw
+}
+
 images=(gpt_large.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
         kolibri.raw jfs.qcow2 xfs_lookup_v4.qcow2 xfs_lookup_v5.qcow2
         xfs_nrext64.qcow2 xfs_bigtime.qcow2 xfs_borg_bit.qcow2
@@ -1041,7 +1087,7 @@ images=(gpt_large.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
         xfs_v5_files_s05k_b4k_n8k.qcow2 fat32_test0.raw
         exfat_s05k_c16k_b16k.qcow2 exfat_s05k_c8k_b8k.qcow2
         xfs_samehash_s05k.raw ext2_s05k.qcow2 ext4_s05k.qcow2 fat12_s05k.qcow2
-        fat16_s05k.qcow2)
+        fat16_s05k.qcow2 iso9660_s2k_dir_all.qcow2)
 
 TEMP_DIR=$(mktemp -d)
 LOOP_DEV=$(losetup --find)

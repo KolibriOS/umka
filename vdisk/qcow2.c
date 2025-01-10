@@ -222,6 +222,8 @@ vdisk_init_qcow2(const char *fname, const struct umka_io *io) {
     d->vdisk.sect_size = 512;
     if (strstr(fname, "s4096") != NULL || strstr(fname, "s4k") != NULL) {
         d->vdisk.sect_size = 4096;
+    } else if (strstr(fname, "s2048") != NULL || strstr(fname, "s2k") != NULL) {
+        d->vdisk.sect_size = 2048;
     }
 
     struct qcow2_header header;

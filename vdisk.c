@@ -45,10 +45,13 @@ vdisk_init(const char *fname, const int adjust_cache_size,
            const size_t cache_size, const void *io) {
     size_t fname_len = strlen(fname);
     size_t dot_raw_len = strlen(RAW_SUFFIX);
+    size_t dot_iso_len = strlen(ISO_SUFFIX);
     size_t dot_qcow2_len = strlen(QCOW2_SUFFIX);
     struct vdisk *disk;
-    if (fname_len > dot_raw_len
-        && !strcmp(fname + fname_len - dot_raw_len, RAW_SUFFIX)) {
+    if ((fname_len > dot_raw_len
+         && !strcmp(fname + fname_len - dot_raw_len, RAW_SUFFIX))
+        || (fname_len > dot_iso_len
+            && !strcmp(fname + fname_len - dot_iso_len, ISO_SUFFIX))) {
         disk = (struct vdisk*)vdisk_init_raw(fname, io);
     } else if (fname_len > dot_qcow2_len
                && !strcmp(fname + fname_len - dot_qcow2_len, QCOW2_SUFFIX)) {

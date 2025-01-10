@@ -51,3 +51,4 @@ apps/loader
 apps/asciivju
 apps/justawindow
 runtests
+cov_t*.*

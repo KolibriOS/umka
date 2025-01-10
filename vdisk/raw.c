@@ -65,6 +65,8 @@ vdisk_init_raw(const char *fname, const struct umka_io *io) {
     size_t sect_size = 512;
     if (strstr(fname, "s4096") != NULL || strstr(fname, "s4k") != NULL) {
         sect_size = 4096;
+    } else if (strstr(fname, "s2048") != NULL || strstr(fname, "s2k") != NULL) {
+        sect_size = 2048;
     }
     struct vdisk_raw *disk = (struct vdisk_raw*)malloc(sizeof(struct vdisk_raw));
     *disk = (struct vdisk_raw){

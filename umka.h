@@ -265,6 +265,7 @@ typedef struct {
     uint32_t flags;
     uint32_t sector_size;
     uint64_t capacity;  // in sectors
+    uint32_t last_session_sector;
 } diskmediainfo_t;
 
 typedef struct {
@@ -297,6 +298,7 @@ typedef struct {
     STDCALL int (*flush)(void *userdata);
     STDCALL unsigned int (*adjust_cache_size)(void *userdata,
                                               size_t suggested_size);
+    STDCALL int (*loadtray)(void *userdata, int flags);
 } diskfunc_t;
 
 struct disk_t {
@@ -603,6 +605,7 @@ extern uint8_t ext_user_functions[];
 extern uint8_t fat_user_functions[];
 extern uint8_t exfat_user_functions[];
 extern uint8_t ntfs_user_functions[];
+extern uint8_t iso9660_user_functions[];
 
 extern char kos_ramdisk[RAMDISK_MAX_LEN];
 

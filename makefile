@@ -3,7 +3,7 @@ ifndef KOLIBRIOS
 endif
 
 FASM_EXE ?= fasm
-FASM_FLAGS=-dUEFI=1 -dextended_primary_loader=1 -dUMKA=1 -dHOST=$(HOST) -m 2000000
+FASM_FLAGS=-dUEFI=1 -dextended_primary_loader=1 -dUMKA=1 -dHOST=$(HOST) -m 2000000 -dlang=en_US
 
 HOST ?= linux
 CC ?= gcc

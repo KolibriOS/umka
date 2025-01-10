@@ -15,6 +15,7 @@
 #include "umkaio.h"
 
 #define RAW_SUFFIX ".raw"
+#define ISO_SUFFIX ".iso"
 
 struct vdisk*
 vdisk_init_raw(const char *fname, const struct umka_io *io);
