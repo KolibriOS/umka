@@ -154,6 +154,17 @@ hw_int(int signo) {
     umka_sti();
 }
 
+void (*copy_display)(void *);
+
+static void
+update_display(SDL_Surface *window_surface, SDL_Window *window) {
+    SDL_LockSurface(window_surface);
+    copy_display(window_surface->pixels);
+    SDL_UnlockSurface(window_surface);
+    SDL_UpdateWindowSurface(window);
+    return;
+}
+
 static void *
 umka_display(void *arg) {
     (void)arg;
@@ -164,8 +175,8 @@ umka_display(void *arg) {
     }
 
     char title[64];
-    sprintf(title, "umka0 %ux%u %ubpp", kos_display.width, kos_display.height,
-            kos_display.bits_per_pixel);
+    sprintf(title, "umka %ux%u %ubpp, press Ctrl-Alt-g to (un)grab input",
+            kos_display.width, kos_display.height, kos_display.bits_per_pixel);
     SDL_Window *window = SDL_CreateWindow(title,
                                           SDL_WINDOWPOS_UNDEFINED,
                                           SDL_WINDOWPOS_UNDEFINED,
@@ -187,8 +198,6 @@ umka_display(void *arg) {
         return NULL;
     }
 
-    void (*copy_display)(void *) = NULL;
-
     switch (window_surface->format->format) {
     case SDL_PIXELFORMAT_RGB888:
         copy_display = copy_display_to_rgb888;
@@ -199,12 +208,109 @@ umka_display(void *arg) {
         break;
     }
 
+    bool input_grabbed = false;
+
+    SDL_Event event;
     while (1) {
-        SDL_LockSurface(window_surface);
-        copy_display(window_surface->pixels);
-        SDL_UnlockSurface(window_surface);
-        SDL_UpdateWindowSurface(window);
-        sleep(1);
+        struct umka_cmd *cmd;
+        struct cmd_set_mouse_data_arg *c;
+        uint32_t btn_state;
+        update_display(window_surface, window);
+        if (SDL_WaitEventTimeout(&event, 1000 /* ms */)) {
+            switch (event.type) {
+            case SDL_QUIT:
+                break;
+            case SDL_WINDOWEVENT:
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+            case SDL_MOUSEBUTTONUP:
+                if (!input_grabbed) {
+                    break;
+                }
+                cmd = shell_get_cmd(os->shell);
+                cmd->type = UMKA_CMD_SET_MOUSE_DATA;
+                c = &cmd->set_mouse_data.arg;
+                c->btn_state = event.button.state;
+                c->xmoving = 0;
+                c->ymoving = 0;
+                c->vscroll = 0;
+                c->hscroll = 0;
+                shell_run_cmd(os->shell);
+                shell_clear_cmd(cmd);
+                break;
+            case SDL_MOUSEMOTION:
+                if (!input_grabbed) {
+                    break;
+                }
+                cmd = shell_get_cmd(os->shell);
+                cmd->type = UMKA_CMD_SET_MOUSE_DATA;
+                c = &cmd->set_mouse_data.arg;
+                c->btn_state = 0;
+                c->xmoving = event.motion.xrel;
+                c->ymoving = -event.motion.yrel;
+                c->vscroll = 0;
+                c->hscroll = 0;
+                shell_run_cmd(os->shell);
+                shell_clear_cmd(cmd);
+                break;
+            case SDL_MOUSEWHEEL:
+                if (!input_grabbed) {
+                    break;
+                }
+                btn_state = SDL_GetMouseState(NULL, NULL);
+                cmd = shell_get_cmd(os->shell);
+                cmd->type = UMKA_CMD_SET_MOUSE_DATA;
+                c = &cmd->set_mouse_data.arg;
+                c->btn_state = 0;
+                if ((btn_state & SDL_BUTTON_LMASK)) {
+                    c->btn_state |= 0x01;
+                }
+                /*
+                if ((btn_state & SDL_BUTTON_RMASK)) {
+                    c->btn_state |= 0x02;
+                }
+                if ((btn_state & SDL_BUTTON_MMASK)) {
+                    c->btn_state |= 0x04;
+                }
+                */
+                c->xmoving = 0;
+                c->ymoving = 0;
+                c->vscroll = event.wheel.y;
+                c->hscroll = event.wheel.x;
+                shell_run_cmd(os->shell);
+                shell_clear_cmd(cmd);
+                break;
+            case SDL_KEYDOWN:
+                if ((event.key.keysym.scancode == SDL_SCANCODE_G)
+                    && (event.key.keysym.mod & KMOD_CTRL)
+                    && (event.key.keysym.mod & KMOD_ALT)) {
+                    input_grabbed = !input_grabbed;
+                    SDL_SetWindowMouseGrab(window, input_grabbed);
+                    SDL_SetWindowKeyboardGrab(window, input_grabbed);
+                    SDL_SetRelativeMouseMode(input_grabbed);
+                }
+                if (!input_grabbed) {
+                    break;
+                }
+                break;
+            case SDL_KEYUP:
+                if (!input_grabbed) {
+                    break;
+                }
+                break;
+            case SDL_TEXTINPUT:
+                if (!input_grabbed) {
+                    break;
+                }
+                break;
+            default:
+                fprintf(stderr, "[sdl] unknown event type: 0x%x\n", event.type);
+                update_display(window_surface, window);
+            }
+        } else {
+            update_display(window_surface, window);
+        }
+//        sleep(1);
     }
     return NULL;
 }

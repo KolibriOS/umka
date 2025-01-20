@@ -1,9 +1,10 @@
+make mkfs.* use config files (-c for mkfs.xfs)
+export and initialize mouse_delay and mouse_speed_factor (test and cover func mouse_acceleration)
 lsstat to decrease tests size
-separate dirs for each image and test
+separate dirs for each image
+include umka_os to tests
+tests with writing to block devices (read-only base image + discardable image for writing)
 library loader
-custom test runner
-make mkfs.xfs use config file via -c option
-writing tests
-compare with reference XFS implementation
-stressing via ref impl
+validate against the reference XFS implementation
+stressing via ref impl (how?)
 multithreaded: kofu one.t two.t

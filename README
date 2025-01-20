@@ -103,6 +103,11 @@ Testing
 Troubleshooting
 ---------------
 
+# Build
+
+    Install toolchain for the 32-bit target, e.g. gcc-multilib, lib32-glibc,
+    32-bit and develop packages of libfuse and libsdl2, fasm.
+
 # umka_os
 
 To create tap devices.

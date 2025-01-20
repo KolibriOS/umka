@@ -84,7 +84,7 @@ umka_os: umka_os.o umka.o shell.o deps/lodepng/lodepng.o vdisk.o vdisk/raw.o \
          vnet/file.o vnet/null.o trace.o trace_lbr.o $(HOST)/pci.o \
          $(HOST)/thread.o umkaio.o umkart.o deps/isocline/src/isocline.o \
          deps/optparse/optparse.o
-	$(CC) $(LDFLAGS_32) `sdl2-config --libs` $^ -o $@ -T umka.ld
+	$(CC) $(LDFLAGS_32) $^ `sdl2-config --libs` -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
                       $(HOST)/thread.o umkart.o

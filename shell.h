@@ -59,7 +59,125 @@ shell_close(struct shell_ctx *shell);
 void *
 run_test(struct shell_ctx *ctx);
 
+enum {
+    UMKA_CMD_NONE,
+    UMKA_CMD_SET_MOUSE_DATA,
+    UMKA_CMD_WAIT_FOR_IDLE,
+    UMKA_CMD_WAIT_FOR_OS_IDLE,
+    UMKA_CMD_WAIT_FOR_WINDOW,
+    UMKA_CMD_SYS_CSLEEP,
+    UMKA_CMD_SYS_PROCESS_INFO,
+    UMKA_CMD_SYS_GET_MOUSE_POS_SCREEN,
+    UMKA_CMD_SYS_LFN,
+};
+
+struct cmd_set_mouse_data_arg {
+    uint32_t btn_state;
+    int32_t xmoving;
+    int32_t ymoving;
+    int32_t vscroll;
+    int32_t hscroll;
+};
+
+struct cmd_set_mouse_data_ret {
+    char stub;
+};
+
+struct cmd_set_mouse_data {
+    struct cmd_set_mouse_data_arg arg;
+    struct cmd_set_mouse_data_ret ret;
+};
+
+struct cmd_sys_lfn_arg {
+    f70or80_t f70or80;
+    f7080s1arg_t *bufptr;
+    f7080ret_t *r;
+};
+
+struct cmd_sys_lfn_ret {
+    f7080ret_t status;
+};
+
+struct cmd_sys_lfn {
+    struct cmd_sys_lfn_arg arg;
+    struct cmd_sys_lfn_ret ret;
+};
+
+struct cmd_sys_process_info_arg {
+    int32_t pid;
+    void *param;
+};
+
+struct cmd_sys_process_info_ret {
+    char stub;
+};
+
+struct cmd_sys_process_info {
+    struct cmd_sys_process_info_arg arg;
+    struct cmd_sys_process_info_ret ret;
+};
+
+struct cmd_sys_get_mouse_pos_screen_arg {
+    char stub;
+};
+
+struct cmd_sys_get_mouse_pos_screen_ret {
+    struct point16s pos;
+};
+
+struct cmd_sys_get_mouse_pos_screen {
+    struct cmd_sys_get_mouse_pos_screen_arg arg;
+    struct cmd_sys_get_mouse_pos_screen_ret ret;
+};
+
+struct cmd_sys_csleep_arg {
+    uint32_t csec;
+};
+
+struct cmd_sys_csleep_ret {
+    char stub;
+};
+
+struct cmd_sys_csleep {
+    struct cmd_sys_csleep_arg arg;
+    struct cmd_sys_csleep_ret ret;
+};
+
+struct cmd_wait_for_window_arg {
+    char *wnd_title;
+};
+
+struct cmd_wait_for_window_ret {
+    char stub;
+};
+
+struct cmd_wait_for_window {
+    struct cmd_wait_for_window_arg arg;
+    struct cmd_wait_for_window_ret ret;
+};
+
+struct umka_cmd {
+    atomic_int status;
+    uint32_t type;
+    union {
+        // internal funcs
+        struct cmd_set_mouse_data set_mouse_data;
+        struct cmd_wait_for_window wait_for_window;
+        // syscalls
+        struct cmd_sys_csleep sys_csleep;
+        struct cmd_sys_process_info sys_process_info;
+        struct cmd_sys_lfn sys_lfn;
+        struct cmd_sys_get_mouse_pos_screen sys_get_mouse_pos_screen;
+    };
+};
+
+struct umka_cmd *
+shell_get_cmd(struct shell_ctx *shell);
+
 void
-umka_run_cmd_sync(struct shell_ctx *ctx);
+shell_run_cmd(struct shell_ctx *ctx);
+
+void
+shell_clear_cmd(struct umka_cmd *cmd);
 
 #endif  // SHELL_H_INCLUDED
