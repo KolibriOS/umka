@@ -30,7 +30,13 @@ gpt_large.qcow2 () {
     local img=$FUNCNAME
     qemu-img create -f qcow2 -o $QCOW2_OPTS,cluster_size=2097152 $img 2E > /dev/null
     sudo qemu-nbd -c $NBD_DEV $img
-
+    sleep 1
+    # This is weird but the sleep above prevents the following error of the
+    # sgdisk below. A better understanding and fix is needed.
+    # Problem reading disk in BasicMBRData::ReadMBRData()!
+    # Warning! Read error 22; strange behavior now likely!
+    # Caution! Secondary header was placed beyond the disk's limits! Moving the
+    # header, but other problems may occur!
     $SGDISK --clear --new=0:0:+1023MiB --new=0:0:+1023GiB --new=0:0:+1023TiB \
         --new=0:0:+1023PiB $NBD_DEV > /dev/null
 
@@ -427,6 +433,7 @@ xfs_v4_xattr.qcow2 () {
 }
 
 xfs_v4_btrees_l2.qcow2 () {
+    echo "[*] This can take about ten minutes"
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
@@ -719,7 +726,7 @@ fat32_test0.raw () {
     sudo mount -o codepage=866,iocharset=utf8,umask=111,dmask=000 $p1 $TEMP_DIR
 
     $RANDDIR $TEMP_DIR 1000 8 255 65536
-    $DIRTOTEST $TEMP_DIR $img hd0 > "../test/045/run.us"
+    $DIRTOTEST $TEMP_DIR $img hd0 > "../test/t045/run.us"
 
 #    tree $TEMP_DIR
 #    du -sh $TEMP_DIR
@@ -841,6 +848,7 @@ exfat_s05k_c8k_b8k.qcow2 () {
 }
 
 xfs_samehash_s05k.raw () {
+    echo "[*] This can take about one hour"
     local img=$FUNCNAME
 #    local img_raw=$(basename $img .qcow2).raw
     local img_raw=$img
@@ -888,7 +896,7 @@ ext2_s05k.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_EXT2 $EXT_MKFS_OPTS -N 1200000 $p1
-    debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1 > /dev/null
+    debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
     sudo mount $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
@@ -918,6 +926,7 @@ ext2_s05k.qcow2 () {
 }
 
 ext4_s05k.qcow2 () {
+    echo "[*] This can take about ten minutes"
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
@@ -927,7 +936,7 @@ ext4_s05k.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_EXT4 $EXT_MKFS_OPTS -N 1200000 $p1
-    debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1 > /dev/null
+    debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
     sudo mount $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
@@ -1031,6 +1040,7 @@ fat16_s05k.qcow2 () {
 }
 
 iso9660_s2k_dir_all.qcow2 () {
+    echo "[*] This can take about thirty minutes"
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
@@ -1070,7 +1080,7 @@ iso9660_s2k_dir_all.qcow2 () {
     mkdir $TEMP_DIR/dir_stat_e
     $MKDOUBLEDIRS $TEMP_DIR/dir_stat_e d 3861
 
-    mkisofs -J -R -v -T -V 'KolibriOS' $TEMP_DIR > $img_raw
+    mkisofs -J -R -T -V 'KolibriOS' -input-charset 'UTF-8' -quiet $TEMP_DIR > $img_raw
     rm $TEMP_DIR/* -rf
     qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
     rm $img_raw

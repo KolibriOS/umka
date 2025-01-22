@@ -420,11 +420,16 @@ cmd_send_scancode(struct shell_ctx *ctx, int argc, char **argv) {
     argc -= 1;
     argv += 1;
 
+    struct umka_cmd *cmd = shell_get_cmd(ctx);
+    cmd->type = UMKA_CMD_SEND_SCANCODE;
+    struct cmd_send_scancode_arg *c = &cmd->send_scancode.arg;
     while (argc) {
         char *endptr;
         size_t code = strtoul(argv[0], &endptr, 0);
         if (*endptr == '\0') {
-            umka_set_keyboard_data(code);
+            c->scancode = code;
+            shell_run_cmd(ctx);
+            shell_clear_cmd(cmd);
             argc--;
             argv++;
         } else {
@@ -4240,6 +4245,13 @@ shell_run_cmd_sync(struct shell_ctx *ctx) {
         COVERAGE_ON();
         kos_set_mouse_data(c->btn_state, c->xmoving, c->ymoving, c->vscroll,
                            c->hscroll);
+        COVERAGE_OFF();
+        break;
+        }
+    case UMKA_CMD_SEND_SCANCODE: {
+        struct cmd_send_scancode_arg *c = &cmd->send_scancode.arg;
+        COVERAGE_ON();
+        umka_set_keyboard_data(c->scancode);
         COVERAGE_OFF();
         break;
         }

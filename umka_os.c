@@ -212,9 +212,6 @@ umka_display(void *arg) {
 
     SDL_Event event;
     while (1) {
-        struct umka_cmd *cmd;
-        struct cmd_set_mouse_data_arg *c;
-        uint32_t btn_state;
         update_display(window_surface, window);
         if (SDL_WaitEventTimeout(&event, 1000 /* ms */)) {
             switch (event.type) {
@@ -223,13 +220,13 @@ umka_display(void *arg) {
             case SDL_WINDOWEVENT:
                 break;
             case SDL_MOUSEBUTTONDOWN:
-            case SDL_MOUSEBUTTONUP:
+            case SDL_MOUSEBUTTONUP: {
                 if (!input_grabbed) {
                     break;
                 }
-                cmd = shell_get_cmd(os->shell);
+                struct umka_cmd *cmd = shell_get_cmd(os->shell);
                 cmd->type = UMKA_CMD_SET_MOUSE_DATA;
-                c = &cmd->set_mouse_data.arg;
+                struct cmd_set_mouse_data_arg *c = &cmd->set_mouse_data.arg;
                 c->btn_state = event.button.state;
                 c->xmoving = 0;
                 c->ymoving = 0;
@@ -238,13 +235,14 @@ umka_display(void *arg) {
                 shell_run_cmd(os->shell);
                 shell_clear_cmd(cmd);
                 break;
-            case SDL_MOUSEMOTION:
+            }
+            case SDL_MOUSEMOTION: {
                 if (!input_grabbed) {
                     break;
                 }
-                cmd = shell_get_cmd(os->shell);
+                struct umka_cmd *cmd = shell_get_cmd(os->shell);
                 cmd->type = UMKA_CMD_SET_MOUSE_DATA;
-                c = &cmd->set_mouse_data.arg;
+                struct cmd_set_mouse_data_arg *c = &cmd->set_mouse_data.arg;
                 c->btn_state = 0;
                 c->xmoving = event.motion.xrel;
                 c->ymoving = -event.motion.yrel;
@@ -253,14 +251,15 @@ umka_display(void *arg) {
                 shell_run_cmd(os->shell);
                 shell_clear_cmd(cmd);
                 break;
-            case SDL_MOUSEWHEEL:
+            }
+            case SDL_MOUSEWHEEL: {
                 if (!input_grabbed) {
                     break;
                 }
-                btn_state = SDL_GetMouseState(NULL, NULL);
-                cmd = shell_get_cmd(os->shell);
+                uint32_t btn_state = SDL_GetMouseState(NULL, NULL);
+                struct umka_cmd *cmd = shell_get_cmd(os->shell);
                 cmd->type = UMKA_CMD_SET_MOUSE_DATA;
-                c = &cmd->set_mouse_data.arg;
+                struct cmd_set_mouse_data_arg *c = &cmd->set_mouse_data.arg;
                 c->btn_state = 0;
                 if ((btn_state & SDL_BUTTON_LMASK)) {
                     c->btn_state |= 0x01;
@@ -280,7 +279,8 @@ umka_display(void *arg) {
                 shell_run_cmd(os->shell);
                 shell_clear_cmd(cmd);
                 break;
-            case SDL_KEYDOWN:
+            }
+            case SDL_KEYDOWN: {
                 if ((event.key.keysym.scancode == SDL_SCANCODE_G)
                     && (event.key.keysym.mod & KMOD_CTRL)
                     && (event.key.keysym.mod & KMOD_ALT)) {
@@ -292,7 +292,13 @@ umka_display(void *arg) {
                 if (!input_grabbed) {
                     break;
                 }
+                struct umka_cmd *cmd = shell_get_cmd(os->shell);
+                cmd->type = UMKA_CMD_SEND_SCANCODE;
+                struct cmd_send_scancode_arg *c = &cmd->send_scancode.arg;
+                shell_run_cmd(os->shell);
+                shell_clear_cmd(cmd);
                 break;
+            }
             case SDL_KEYUP:
                 if (!input_grabbed) {
                     break;

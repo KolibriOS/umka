@@ -69,6 +69,7 @@ enum {
     UMKA_CMD_SYS_PROCESS_INFO,
     UMKA_CMD_SYS_GET_MOUSE_POS_SCREEN,
     UMKA_CMD_SYS_LFN,
+    UMKA_CMD_SEND_SCANCODE,
 };
 
 struct cmd_set_mouse_data_arg {
@@ -156,12 +157,26 @@ struct cmd_wait_for_window {
     struct cmd_wait_for_window_ret ret;
 };
 
+struct cmd_send_scancode_arg {
+    int scancode;
+};
+
+struct cmd_send_scancode_ret {
+    char stub;
+};
+
+struct cmd_send_scancode {
+    struct cmd_send_scancode_arg arg;
+    struct cmd_send_scancode_ret ret;
+};
+
 struct umka_cmd {
     atomic_int status;
     uint32_t type;
     union {
         // internal funcs
         struct cmd_set_mouse_data set_mouse_data;
+        struct cmd_send_scancode send_scancode;
         struct cmd_wait_for_window wait_for_window;
         // syscalls
         struct cmd_sys_csleep sys_csleep;
