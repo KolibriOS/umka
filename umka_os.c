@@ -4,20 +4,18 @@
     UMKa - User-Mode KolibriOS developer tools
     umka_os - kind of KolibriOS anykernel
 
-    Copyright (C) 2018-2023  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2018-2025  Ivan Baravy <dunkaist@gmail.com>
 */
 
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#define __USE_GNU
 #include <signal.h>
 #include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#define __USE_MISC
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -134,13 +132,13 @@ handle_i40(int signo, siginfo_t *info, void *context) {
     (void)signo;
     (void)info;
     ucontext_t *ctx = context;
-    void *ip = (void*)ctx->uc_mcontext.__gregs[REG_EIP];
-    int eax = ctx->uc_mcontext.__gregs[REG_EAX];
+    void *ip = (void*)ctx->uc_mcontext.gregs[REG_EIP];
+    int eax = ctx->uc_mcontext.gregs[REG_EAX];
     if (*(uint16_t*)ip == 0x40cd) {
-        ctx->uc_mcontext.__gregs[REG_EIP] += 2; // skip int 0x40
+        ctx->uc_mcontext.gregs[REG_EIP] += 2; // skip int 0x40
     }
     fprintf(os->fboardlog, "i40: %i %p\n", eax, ip);
-    umka_i40((pushad_t*)(ctx->uc_mcontext.__gregs + REG_EDI));
+    umka_i40((pushad_t*)(ctx->uc_mcontext.gregs + REG_EDI));
 }
 
 static void
@@ -295,6 +293,7 @@ umka_display(void *arg) {
                 struct umka_cmd *cmd = shell_get_cmd(os->shell);
                 cmd->type = UMKA_CMD_SEND_SCANCODE;
                 struct cmd_send_scancode_arg *c = &cmd->send_scancode.arg;
+                c->scancode = event.key.keysym.scancode;
                 shell_run_cmd(os->shell);
                 shell_clear_cmd(cmd);
                 break;
