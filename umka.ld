@@ -35,6 +35,18 @@ SECTIONS
 }
 INSERT AFTER .data;
 
+/*
+SECTIONS
+{
+  .dlls BLOCK(0x1000) : AT(0x70000000)
+  {
+    *(.dlls)
+  }
+
+}
+INSERT AFTER .data;
+*/
+
 SECTIONS
 {
   .bss.aligned BLOCK(0x100000) :

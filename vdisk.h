@@ -14,7 +14,7 @@
 #include "umka.h"
 
 struct vdisk {
-    diskfunc_t diskfunc;
+    struct diskfunc diskfunc;
     uint32_t sect_size;
     uint64_t sect_cnt;
     unsigned cache_size;

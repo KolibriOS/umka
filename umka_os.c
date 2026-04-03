@@ -26,6 +26,7 @@
 #include "shell.h"
 #include "trace.h"
 #include "vnet.h"
+#include "vkbd.h"
 #include "isocline/include/isocline.h"
 #include "optparse/optparse.h"
 
@@ -37,11 +38,13 @@
 struct umka_os_ctx {
     struct umka_ctx *umka;
     struct umka_io *io;
+    struct monitor_ctx *monitor;
     struct shell_ctx *shell;
     FILE *fboardlog;
 };
 
 struct umka_os_ctx *os;
+struct vkbd *vkbd;
 
 char history_filename[PATH_MAX];
 
@@ -58,8 +61,9 @@ umka_os_init(FILE *fstartup, FILE *fboardlog) {
     ctx->fboardlog = fboardlog;
     ctx->umka = umka_init(UMKA_RUNNING_NOT_YET);
     ctx->io = io_init(&ctx->umka->running);
+    ctx->monitor = monitor_init(&ctx->umka->running);
     ctx->shell = shell_init(SHELL_LOG_NONREPRODUCIBLE, history_filename,
-                            ctx->umka, ctx->io, fstartup);
+                            ctx->umka, ctx->io, ctx->monitor, fstartup);
     return ctx;
 }
 
@@ -86,8 +90,8 @@ static void
 dump_procs(void) {
     for (int i = 0; i < KOS_NR_SCHED_QUEUES; i++) {
         fprintf(stderr, "[os] sched queue #%i:", i);
-        appdata_t *p_begin = kos_scheduler_current[i];
-        appdata_t *p = p_begin;
+        struct appdata *p_begin = kos_scheduler_current[i];
+        struct appdata *p = p_begin;
         do {
             fprintf(stderr, " %p", (void*)p);
             p = p->in_schedule.next;
@@ -95,7 +99,7 @@ dump_procs(void) {
         putchar('\n');
     }
     for (size_t i = 0; i < 256; i++) {
-        appdata_t *app = kos_slot_base + i;
+        struct appdata *app = kos_slot_base + i;
         if (app->state != KOS_TSTATE_FREE && app->app_name[0]) {
             printf("slot %2.2d: %s\n", i, app->app_name);
         }
@@ -163,6 +167,61 @@ update_display(SDL_Surface *window_surface, SDL_Window *window) {
     return;
 }
 
+static void
+convert_scancode_hid_to_ps2(int hid, int is_release, uint8_t *ps2) {
+    switch (hid) {
+    case SDL_SCANCODE_RIGHT:
+        *ps2 = 0xe0;
+        *++ps2 = 0x4d;
+        break;
+    case SDL_SCANCODE_LEFT:
+        *ps2 = 0xe0;
+        *++ps2 = 0x4b;
+        break;
+    case SDL_SCANCODE_DOWN:
+        *ps2 = 0xe0;
+        *++ps2 = 0x50;
+        break;
+    case SDL_SCANCODE_UP:
+        *ps2 = 0xe0;
+        *++ps2 = 0x48;
+        break;
+    case SDL_SCANCODE_TAB:
+        *ps2 = 0x0f;
+        break;
+    case SDL_SCANCODE_SPACE:
+        *ps2 = 0x39;
+        break;
+    default:
+        fprintf(stderr, "[sdl] ignore hid scancode: %i 0x%x\n", hid, hid);
+        break;
+    }
+    if (is_release) {
+        *ps2 |= 0x80;
+    }
+}
+
+static uint32_t
+mouse_btn_state_sdl_to_umka(uint32_t sdl_btn_state) {
+    uint32_t btn_state = 0;
+    if ((sdl_btn_state & SDL_BUTTON_LMASK)) {
+        btn_state |= 0x01;
+    }
+    if ((sdl_btn_state & SDL_BUTTON_RMASK)) {
+        btn_state |= 0x02;
+    }
+    if ((sdl_btn_state & SDL_BUTTON_MMASK)) {
+        btn_state |= 0x04;
+    }
+    return btn_state;
+}
+
+static void
+grab_sdl_window(SDL_Window *window, bool grab) {
+    SDL_SetWindowMouseGrab(window, grab);
+    SDL_SetWindowKeyboardGrab(window, grab);
+    SDL_SetRelativeMouseMode(grab);
+}
 static void *
 umka_display(void *arg) {
     (void)arg;
@@ -218,64 +277,42 @@ umka_display(void *arg) {
             case SDL_WINDOWEVENT:
                 break;
             case SDL_MOUSEBUTTONDOWN:
+                if (!input_grabbed) {
+                    int x, y;
+                    SDL_GetMouseState(&x, &y);
+                    monitor_cmd_sys_set_mouse_pos_screen(os->monitor, x, y);
+                    input_grabbed = true;
+                    grab_sdl_window(window, true);
+                }
+                [[fallthrough]];
             case SDL_MOUSEBUTTONUP: {
                 if (!input_grabbed) {
                     break;
                 }
-                struct umka_cmd *cmd = shell_get_cmd(os->shell);
-                cmd->type = UMKA_CMD_SET_MOUSE_DATA;
-                struct cmd_set_mouse_data_arg *c = &cmd->set_mouse_data.arg;
-                c->btn_state = event.button.state;
-                c->xmoving = 0;
-                c->ymoving = 0;
-                c->vscroll = 0;
-                c->hscroll = 0;
-                shell_run_cmd(os->shell);
-                shell_clear_cmd(cmd);
+                uint32_t btn_state =
+                    mouse_btn_state_sdl_to_umka(SDL_GetMouseState(NULL, NULL));
+                monitor_cmd_mouse_move(os->monitor, btn_state, 0, 0, 0, 0);
                 break;
             }
             case SDL_MOUSEMOTION: {
                 if (!input_grabbed) {
                     break;
                 }
-                struct umka_cmd *cmd = shell_get_cmd(os->shell);
-                cmd->type = UMKA_CMD_SET_MOUSE_DATA;
-                struct cmd_set_mouse_data_arg *c = &cmd->set_mouse_data.arg;
-                c->btn_state = 0;
-                c->xmoving = event.motion.xrel;
-                c->ymoving = -event.motion.yrel;
-                c->vscroll = 0;
-                c->hscroll = 0;
-                shell_run_cmd(os->shell);
-                shell_clear_cmd(cmd);
+                uint32_t btn_state =
+                    mouse_btn_state_sdl_to_umka(SDL_GetMouseState(NULL, NULL));
+                monitor_cmd_mouse_move(os->monitor, btn_state,
+                                       event.motion.xrel, -event.motion.yrel,
+                                       event.wheel.y, event.wheel.x);
                 break;
             }
             case SDL_MOUSEWHEEL: {
                 if (!input_grabbed) {
                     break;
                 }
-                uint32_t btn_state = SDL_GetMouseState(NULL, NULL);
-                struct umka_cmd *cmd = shell_get_cmd(os->shell);
-                cmd->type = UMKA_CMD_SET_MOUSE_DATA;
-                struct cmd_set_mouse_data_arg *c = &cmd->set_mouse_data.arg;
-                c->btn_state = 0;
-                if ((btn_state & SDL_BUTTON_LMASK)) {
-                    c->btn_state |= 0x01;
-                }
-                /*
-                if ((btn_state & SDL_BUTTON_RMASK)) {
-                    c->btn_state |= 0x02;
-                }
-                if ((btn_state & SDL_BUTTON_MMASK)) {
-                    c->btn_state |= 0x04;
-                }
-                */
-                c->xmoving = 0;
-                c->ymoving = 0;
-                c->vscroll = event.wheel.y;
-                c->hscroll = event.wheel.x;
-                shell_run_cmd(os->shell);
-                shell_clear_cmd(cmd);
+                uint32_t btn_state =
+                    mouse_btn_state_sdl_to_umka(SDL_GetMouseState(NULL, NULL));
+                monitor_cmd_mouse_move(os->monitor, btn_state, 0, 0,
+                                       event.wheel.y, event.wheel.x);
                 break;
             }
             case SDL_KEYDOWN: {
@@ -283,19 +320,19 @@ umka_display(void *arg) {
                     && (event.key.keysym.mod & KMOD_CTRL)
                     && (event.key.keysym.mod & KMOD_ALT)) {
                     input_grabbed = !input_grabbed;
-                    SDL_SetWindowMouseGrab(window, input_grabbed);
-                    SDL_SetWindowKeyboardGrab(window, input_grabbed);
-                    SDL_SetRelativeMouseMode(input_grabbed);
+                    grab_sdl_window(window, input_grabbed);
                 }
+/*
                 if (!input_grabbed) {
                     break;
                 }
-                struct umka_cmd *cmd = shell_get_cmd(os->shell);
-                cmd->type = UMKA_CMD_SEND_SCANCODE;
-                struct cmd_send_scancode_arg *c = &cmd->send_scancode.arg;
-                c->scancode = event.key.keysym.scancode;
-                shell_run_cmd(os->shell);
-                shell_clear_cmd(cmd);
+*/
+                uint8_t scancodes[16];
+                memset(scancodes, 0, 16);
+                convert_scancode_hid_to_ps2(event.key.keysym.scancode, false, scancodes);
+                monitor_cmd_send_scancodes(os->monitor, scancodes);
+                convert_scancode_hid_to_ps2(event.key.keysym.scancode, true, scancodes);
+                monitor_cmd_send_scancodes(os->monitor, scancodes);
                 break;
             }
             case SDL_KEYUP:
@@ -309,7 +346,9 @@ umka_display(void *arg) {
                 }
                 break;
             default:
-                fprintf(stderr, "[sdl] unknown event type: 0x%x\n", event.type);
+                if (!(event.type & SDL_WINDOWEVENT)) { // filter out SDL3 window events
+                    fprintf(stderr, "[sdl] unknown event type: 0x%x\n", event.type);
+                }
                 update_display(window_surface, window);
             }
         } else {
@@ -321,7 +360,7 @@ umka_display(void *arg) {
 }
 
 static void *
-umka_monitor(void *arg) {
+umka_shell(void *arg) {
     struct shell_ctx *sh = arg;
     run_test(sh);
     exit(0);
@@ -483,6 +522,8 @@ main(int argc, char *argv[]) {
 
 //    load_app("/rd/1/loader");
 
+    vkbd = vkbd_init();
+
     struct vnet *vnet = vnet_init(VNET_DEVTYPE_TAP, &os->umka->running);
     if (vnet) {
         kos_net_add_device(&vnet->eth.net);
@@ -499,7 +540,7 @@ main(int argc, char *argv[]) {
     }
 
     // network setup should be done from the userspace app, e.g. via zeroconf
-    f76ret_t r76;
+    struct f76ret r76;
     r76 = umka_sys_net_ipv4_set_subnet(1, inet_addr("255.255.255.0"));
     if (r76.eax == (uint32_t)-1) {
         fprintf(stderr, "[!] set subnet error\n");
@@ -530,11 +571,17 @@ main(int argc, char *argv[]) {
     load_app_host("../apps/loader", UMKA_LDR_BASE);
 //    load_app_host("../apps/justawindow", KOS_APP_BASE);
     load_app_host("../apps/asciivju", KOS_APP_BASE);
+//    load_app_host("../apps/eyes", KOS_APP_BASE);
+//    load_app_host("../apps/board", KOS_APP_BASE);
+//    load_app_host("../apps/calc", KOS_APP_BASE);
+//    load_app_host("../apps/unvwater", KOS_APP_BASE);
+//    load_app_host("../apps/clicks", KOS_APP_BASE);
+//    load_app_host("../apps/testcon", KOS_APP_BASE);
 
     dump_procs();
 
     pthread_t thread_monitor;
-    pthread_create(&thread_monitor, NULL, umka_monitor, os->shell);
+    pthread_create(&thread_monitor, NULL, umka_shell, os->shell);
 
     if (show_display) {
         pthread_t thread_display;

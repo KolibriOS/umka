@@ -48,7 +48,7 @@ umka_fuse_close(struct umka_fuse_ctx *ctx) {
 }
 
 static void
-bdfe_to_stat(bdfe_t *kf, struct stat *st) {
+bdfe_to_stat(struct bdfe *kf, struct stat *st) {
 //    if (kf->attr & KF_FOLDER) {
     if (st) {
         st->st_mode = S_IFDIR | 0755;
@@ -80,17 +80,17 @@ fs_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi) {
     (void) fi;
     int res = 0;
 
-    bdfe_t file;
-    f7080s5arg_t fX0 = {.sf = 5,
-                        .flags = 0,
-                        .buf = &file,
-                        .u = {.f80 = {.path_encoding = UTF8,
-                                      .path = path
-                                     }
-                             }
-                       };
-    f7080ret_t r;
-    umka_sys_lfn(&fX0, &r, F80);
+    struct bdfe file;
+    struct f7080s5arg fX0 = {.sf = 5,
+                             .flags = 0,
+                             .buf = &file,
+                             .u = {.f80 = {.path_encoding = UTF8,
+                                           .path = path
+                                          }
+                                  }
+                            };
+    struct f7080ret r;
+    umka_sys_lfn(&fX0, &r, F80);    // monitor?
 
     bdfe_to_stat(&file, stbuf);
 //   res = -ENOENT;
@@ -104,24 +104,24 @@ fs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset,
     (void) fi;
     (void) flags;
 
-    f7080s1info_t *dir = (f7080s1info_t*)malloc(sizeof(f7080s1info_t) +
+    struct f7080s1info *dir = (struct f7080s1info*)malloc(sizeof(struct f7080s1info) +
                          BDFE_LEN_UNICODE * DIRENTS_TO_READ);
-    f7080s1arg_t fX0 = {.sf = 1,
-                        .offset = 0,
-                        .encoding = UTF8,
-                        .size = DIRENTS_TO_READ,
-                        .buf = dir,
-                        .u = {.f80 = {.path_encoding = UTF8,
-                                      .path = path
-                                     }
-                             }
-                       };
-    f7080ret_t r;
+    struct f7080s1arg fX0 = {.sf = 1,
+                             .offset = 0,
+                             .encoding = UTF8,
+                             .size = DIRENTS_TO_READ,
+                             .buf = dir,
+                             .u = {.f80 = {.path_encoding = UTF8,
+                                           .path = path
+                                          }
+                                  }
+                            };
+    struct f7080ret r;
     umka_sys_lfn(&fX0, &r, F80);
-    bdfe_t *bdfe = dir->bdfes;
+    struct bdfe *bdfe = dir->bdfes;
     for (size_t i = 0; i < dir->cnt; i++) {
         filler(buf, bdfe->name, NULL, 0, 0);
-        bdfe = (bdfe_t*)((uintptr_t)bdfe + BDFE_LEN_UNICODE);
+        bdfe = (struct bdfe*)((uintptr_t)bdfe + BDFE_LEN_UNICODE);
     }
     free(dir);
     return 0;
@@ -144,10 +144,10 @@ fs_read(const char *path, char *buf, size_t size, off_t offset,
           struct fuse_file_info *fi) {
     (void) fi;
 
-    f7080s0arg_t fX0 = {.sf = 0, .offset = offset, .count = size, .buf = buf,
-                        .u = {.f80 = {.path_encoding = UTF8, .path = path}}};
-    f7080ret_t r;
-    umka_sys_lfn(&fX0, &r, F80);
+    struct f7080s0arg fX0 = {.sf = 0, .offset = offset, .count = size, .buf = buf,
+                             .u = {.f80 = {.path_encoding = UTF8, .path = path}}};
+    struct f7080ret r;
+    umka_sys_lfn(&fX0, &r, F80);    // monitor?
     return size;
 }
 
@@ -171,7 +171,7 @@ main(int argc, char *argv[]) {
     umka_boot();
 
     struct vdisk *umka_disk = vdisk_init(argv[2], 1, 0u, ctx->io);
-    disk_t *disk = disk_add(&umka_disk->diskfunc, "hd0", umka_disk, 0);
+    struct disk *disk = disk_add(&umka_disk->diskfunc, "hd0", umka_disk, 0);
     disk_media_changed(disk, 1);
     return fuse_main(argc-1, argv, &umka_oper, ctx);
 }

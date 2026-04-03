@@ -3,7 +3,7 @@ ifndef KOLIBRIOS
 endif
 
 FASM_EXE ?= fasm
-FASM_FLAGS=-dUEFI=1 -dextended_primary_loader=1 -dUMKA=1 -dHOST=$(HOST) -m 2000000 -dlang=en_US
+FASM_FLAGS=-dextended_primary_loader=1 -dHOST=$(HOST) -m 2000000 -dlang=en_US
 
 HOST ?= linux
 CC ?= gcc
@@ -27,7 +27,7 @@ else
         $(error your compiler is not supported)
 endif
 
-CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c11 -g -O0 -DNDEBUG -masm=intel \
+CFLAGS=$(WARNINGS) $(NOWARNINGS) -std=c23 -g -O0 -DNDEBUG -masm=intel \
         -D_POSIX_C_SOURCE=200809L -I$(HOST) -Ideps -I. -fno-pie -D_POSIX \
         -fno-common
 CFLAGS_32=$(CFLAGS) -m32 -D_FILE_OFFSET_BITS=64 -D__USE_TIME_BITS64
@@ -67,11 +67,11 @@ endif
 test: umka_shell
 	@cd test && make clean all && cd ../
 
-umka_shell: umka_shell.o umka.o shell.o trace.o trace_lbr.o vdisk.o \
-            vdisk/raw.o vdisk/qcow2.o deps/em_inflate/em_inflate.o vnet.o \
-            $(HOST)/vnet/tap.o vnet/file.o vnet/null.o deps/lodepng/lodepng.o \
-            $(HOST)/pci.o $(HOST)/thread.o umkaio.o umkart.o \
-            deps/optparse/optparse.o deps/isocline/src/isocline.o
+umka_shell: umka_shell.o umka.o monitor.o shell.o trace.o trace_lbr.o vkbd.o \
+            vdisk.o vdisk/raw.o vdisk/qcow2.o deps/em_inflate/em_inflate.o \
+            vnet.o $(HOST)/vnet/tap.o vnet/file.o vnet/null.o \
+            deps/lodepng/lodepng.o $(HOST)/pci.o $(HOST)/thread.o umkaio.o \
+            umkart.o deps/optparse/optparse.o deps/isocline/src/isocline.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ -T umka.ld $(LIBS)
 
 umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
@@ -79,11 +79,11 @@ umka_fuse: umka_fuse.o umka.o trace.o trace_lbr.o vdisk.o vdisk/raw.o \
            $(HOST)/thread.o umkaio.o
 	$(CC) $(LDFLAGS_32) $^ -o $@ `pkg-config fuse3 --libs` -T umka.ld
 
-umka_os: umka_os.o umka.o shell.o deps/lodepng/lodepng.o vdisk.o vdisk/raw.o \
-         vdisk/qcow2.o deps/em_inflate/em_inflate.o vnet.o $(HOST)/vnet/tap.o \
-         vnet/file.o vnet/null.o trace.o trace_lbr.o $(HOST)/pci.o \
-         $(HOST)/thread.o umkaio.o umkart.o deps/isocline/src/isocline.o \
-         deps/optparse/optparse.o
+umka_os: umka_os.o umka.o monitor.o shell.o deps/lodepng/lodepng.o vkbd.o \
+         vdisk.o vdisk/raw.o vdisk/qcow2.o deps/em_inflate/em_inflate.o vnet.o \
+         $(HOST)/vnet/tap.o vnet/file.o vnet/null.o trace.o trace_lbr.o \
+         $(HOST)/pci.o $(HOST)/thread.o umkaio.o umkart.o \
+         deps/isocline/src/isocline.o deps/optparse/optparse.o
 	$(CC) $(LDFLAGS_32) $^ `sdl2-config --libs` -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
@@ -93,7 +93,10 @@ umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
 umka.o umka.fas: umka.asm
 	$(FASM) $< umka.o -s umka.fas
 
-shell.o: shell.c deps/lodepng/lodepng.h
+monitor.o: monitor.c monitor.h umka.h
+	$(CC) $(CFLAGS_32) -c $<
+
+shell.o: shell.c shell.h monitor.h umka.h deps/lodepng/lodepng.h
 	$(CC) $(CFLAGS_32) -c $<
 
 umkaio.o: umkaio.c umkaio.h
@@ -159,6 +162,9 @@ vdisk/qcow2.o: vdisk/qcow2.c vdisk/qcow2.h
 deps/em_inflate/em_inflate.o: deps/em_inflate/em_inflate.c deps/em_inflate/em_inflate.h
 	$(CC) $(CFLAGS_32) -c $< -o $@ -Wno-sign-compare -Wno-unused-parameter \
                 -Wno-switch-enum -Wno-unused-function
+
+vkbd.o: vkbd.c vkbd.h
+	$(CC) $(CFLAGS_32) -c $<
 
 vnet.o: vnet.c vnet.h
 	$(CC) $(CFLAGS_32) -c $<

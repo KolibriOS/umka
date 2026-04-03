@@ -20,7 +20,7 @@
 #include "vdisk/qcow2.h"
 
 STDCALL int
-vdisk_querymedia(void *userdata, diskmediainfo_t *minfo) {
+vdisk_querymedia(void *userdata, struct diskmediainfo *minfo) {
     COVERAGE_OFF();
     struct vdisk *disk = userdata;
     minfo->flags = 0u;

@@ -58,6 +58,7 @@ font smoothing: 0 - off
   1:   1
 /> dump_appdata 2
 app_name: OS
+mem_used: 0
 except_mask: 0
 dbg_state: 0
 cur_dir: 

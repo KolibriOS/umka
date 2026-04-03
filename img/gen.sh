@@ -92,7 +92,8 @@ kolibri.raw () {
     mcopy -moi $img ../spray.cur ::SPRAY.CUR
     mcopy -moi $img ../apps/board_cycle ::LOADER
     mmd -i $img ::LIB
-#    mcopy -moi $img ../network.obj ::LIB/NETWORK.OBJ
+    mcopy -moi $img ../apps/network.obj ::LIB/NETWORK.OBJ
+    mcopy -moi $img ../apps/console.obj ::LIB/CONSOLE.OBJ
 }
 
 jfs.qcow2 () {

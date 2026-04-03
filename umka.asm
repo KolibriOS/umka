@@ -114,6 +114,12 @@ pubsym sys_getkey, 'kos_get_key'
 pubsym syslang, 'kos_syslang'
 pubsym keyboard, 'kos_keyboard'
 
+; There is no actual srv_list, only its .fd and .bk fields
+srv_list = srv.fd - SRV.fd
+pubsym srv_list
+pubsym dll_list
+pubsym shmem_list
+
 pubsym disk_add, 16
 pubsym disk_del, 4
 pubsym disk_list
@@ -241,7 +247,7 @@ macro int n {
 }
 
 section '.app' executable writable align 64
-rb 64*1024
+rb 1024*1024
 
 section '.text' executable align 64
 
@@ -291,6 +297,8 @@ ends
 
 NUM_EXCEPTIONS = 32
 
+CDBlockSize = 2048
+
 macro tss pew {}
 include 'const.inc'
 purge tss
@@ -323,6 +331,9 @@ common
         stdcall target, args
   end if
 }
+
+MIN_DEFAULT_DLL_ADDR = umka_dlls_from
+MAX_DEFAULT_DLL_ADDR = umka_dlls_to
 
 include 'system.inc'
 include 'fdo.inc'
@@ -674,6 +685,7 @@ proc umka_init c uses ebx esi edi ebp, _running
         mov     [eax+umka_ctx.booted], 0
         mov     ecx, [_running]
         mov     [eax+umka_ctx.running], ecx
+        mov     [dll_cur_addr], umka_dlls_from
         ret
 endp
 
@@ -1144,10 +1156,17 @@ pubsym coverage_table
 
 ; bt for boot; otherwide fasm complains with 'name too long' for MS COFF
 section '.data.bt' writeable align 0x1000
+;virtual at MIN_DEFAULT_DLL_ADDR
+umka_dlls_from:
+umka_dlls rb 256*1024*1024
+umka_dlls_to:
+;end virtual
+
 BOOT boot_data
 virtual at BOOT
 BOOT_LO boot_data
 end virtual
+
 
 
 ; fasm doesn't align on 65536, but ld script does
@@ -1195,8 +1214,10 @@ align 4
 bios32_entry    dd ?
 tmp_page_tabs   dd ?
 
+align 0x1000
 page_tabs:
 rb 256*1024*1024
+
 v86_irqhooks rd IRQ_RESERVED*2
 cache_ide0  IDE_CACHE
 cache_ide1  IDE_CACHE
@@ -1274,4 +1295,19 @@ forward
         db x
   end if
 }
+
+;macro cmp target, source {
+;  if src eq MAX_DEFAULT_DLL_ADDR-MIN_DEFAULT_DLL_ADDR2
+;        cmp     ebx, 0x10000000
+;  else
+;        cmp     target, source
+;  end if
+;}
+MIN_DEFAULT_DLL_ADDR equ pew_MIN_DEFAULT_DLL_ADDR
+MAX_DEFAULT_DLL_ADDR equ pew_MAX_DEFAULT_DLL_ADDR
 include 'data32.inc'
+restore MIN_DEFAULT_DLL_ADDR
+restore MAX_DEFAULT_DLL_ADDR
+;purge cmp
+MIN_DEFAULT_DLL_ADDR = umka_dlls_from
+MAX_DEFAULT_DLL_ADDR = umka_dlls_to

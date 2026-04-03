@@ -110,12 +110,12 @@ total = 7
 status = 6 end_of_file, count = 7
 total = 7
 ----f .
-----f ..
-----f d
-----f 48@f'
-----f f'f'f'
-----f f'i�=�f'
-----f 48@3
+----- 
+----- 
+----- 
+----- 
+----- 
+----- 
 /> ls70 /hd0/1/❦❦❦/ -e utf8
 status = 5 file_not_found
 /> ls70 /hd0/1/❦❦❦/ -e utf16
@@ -167,12 +167,12 @@ total = 7
 status = 6 end_of_file, count = 7
 total = 7
 ----f .
-----f ..
-----f d
-----f 48@f'
-----f f'f'f'
-----f f'i�=�f'
-----f 48@3
+r-s-f 
+--s-f 
+-hs-f 
+rhs-f 
+--slf 
+---lf 
 /> ls80 /hd0/1/❦❦❦/ -e utf8
 status = 6 end_of_file, count = 3
 total = 3

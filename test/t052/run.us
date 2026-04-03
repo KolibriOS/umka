@@ -1,0 +1,12 @@
+umka_boot
+ramdisk_init ../../img/kolibri.raw
+set_skin /sys/DEFAULT.SKN
+dump_services
+dump_shmem
+dump_dlls
+load_dll /sys/lib/console.obj
+dump_dlls
+dump_appdata 2
+load_dll /sys/lib/network.obj
+dump_dlls
+dump_appdata 2

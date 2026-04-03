@@ -141,19 +141,19 @@ struct mouse_state_events {
     struct mouse_events ev;
 };
 
-typedef struct {
+struct rect {
     uint32_t left, top, right, bottom;
-} rect_t;
+};
 
-typedef struct {
+struct box {
     uint32_t left, top, width, height;
-} box_t;
+};
 
-typedef struct {
+struct dbg_regs {
     uint32_t dr0, dr1, dr2, dr3, dr7;
-} dbg_regs_t;
+};
 
-typedef struct {
+struct __attribute__((packed)) process_information {
     uint32_t cpu_usage;
     uint16_t window_stack_position;
     uint16_t window_stack_value;
@@ -162,19 +162,19 @@ typedef struct {
     uint32_t memory_start;
     uint32_t used_memory;
     uint32_t pid;
-    box_t box;
+    struct box box;
     uint16_t slot_state;
     uint16_t pad2;
-    box_t client_box;
+    struct box client_box;
     uint8_t wnd_state;
     uint8_t pad3[1024-71];
-} __attribute__((packed)) process_information_t;
+};
 
-static_assert(sizeof(process_information_t) == 0x400,
+static_assert(sizeof(struct process_information) == 0x400,
               "must be 0x400 bytes long");
 
-typedef struct wdata {
-    box_t box;
+struct __attribute__((packed)) wdata {
+    struct box box;
     uint32_t cl_workarea;
     uint32_t cl_titlebar;
     uint32_t cl_frames;
@@ -182,25 +182,25 @@ typedef struct wdata {
     uint8_t fl_wstate;
     uint8_t fl_wdrawn;
     uint8_t fl_redraw;
-    box_t clientbox;
+    struct box clientbox;
     uint8_t *shape;
     uint32_t shape_scale;
     char *caption;
     uint8_t caption_encoding;
     uint8_t pad0[3];
-    box_t saved_box;
+    struct box saved_box;
     void *cursor;
     void *temp_cursor;
     uint32_t draw_bgr_x;
     uint32_t draw_bgr_y;
-    rect_t draw_data;
+    struct rect draw_data;
     struct appdata *thread;
     uint8_t pad1[12];
-} __attribute__((packed)) wdata_t;
+};
 
 static_assert(sizeof(struct wdata) == 0x80, "must be 0x80 bytes long");
 
-typedef struct {
+struct system_colors {
     uint32_t frame;
     uint32_t grab;
     uint32_t work_3d_dark;
@@ -211,20 +211,20 @@ typedef struct {
     uint32_t work_button_text;
     uint32_t work_text;
     uint32_t work_graph;
-} system_colors_t;
+};
 
-typedef enum {
+enum fs_enc {
     DEFAULT_ENCODING,
     CP866,
     UTF16,
     UTF8,
     INVALID_ENCODING,
-} fs_enc_t;
+};
 
-typedef enum {
+enum f70or80 {
     F70 = 70,
     F80 = 80,
-} f70or80_t;
+};
 
 enum {
     KOS_ERROR_SUCCESS,
@@ -242,55 +242,54 @@ enum {
     KOS_ERROR_OUT_OF_MEMORY,
 };
 
-typedef struct lhead lhead_t;
-
 struct lhead {
     void *next;
     void *prev;
 };
 
-typedef struct {
-    lhead_t  wait_list;
+struct mutex {
+    struct lhead wait_list;
     uint32_t count;
-} mutex_t;
+};
+
+struct rwsem {
+    struct lhead wait_list;
+    uint32_t count;
+};
 
 struct board_get_ret {
     uint32_t value;
     uint32_t status;
 };
 
-typedef mutex_t rwsem_t;
-
-typedef struct {
+struct diskmediainfo {
     uint32_t flags;
     uint32_t sector_size;
     uint64_t capacity;  // in sectors
     uint32_t last_session_sector;
-} diskmediainfo_t;
+};
 
-typedef struct {
+struct disk_cache {
     uintptr_t   pointer;
     uint32_t    data_size;
     uintptr_t   data;
     uint32_t    sad_size;
     uint32_t    search_start;
     uint32_t    sector_size_log;
-} disk_cache_t;
+};
 
-typedef struct {
+struct partition {
     uint64_t first_sector;
     uint64_t length;    // in sectors
     void *disk;
     void *fs_user_functions;
-} partition_t;
+};
 
-typedef struct disk_t disk_t;
-
-typedef struct {
+struct diskfunc {
     uint32_t  strucsize;
     STDCALL void (*close)(void *userdata);
     STDCALL void (*closemedia)(void *userdata);
-    STDCALL int (*querymedia)(void *userdata, diskmediainfo_t *info);
+    STDCALL int (*querymedia)(void *userdata, struct diskmediainfo *info);
     STDCALL int (*read)(void *userdata, void *buffer, off_t startsector,
                         size_t *numsectors);
     STDCALL int (*write)(void *userdata, void *buffer, off_t startsector,
@@ -299,31 +298,33 @@ typedef struct {
     STDCALL unsigned int (*adjust_cache_size)(void *userdata,
                                               size_t suggested_size);
     STDCALL int (*loadtray)(void *userdata, int flags);
-} diskfunc_t;
+};
 
-struct disk_t {
-    disk_t *next;
-    disk_t *prev;
-    diskfunc_t *functions;
+struct disk;
+
+struct disk {
+    struct disk *next;
+    struct disk *prev;
+    struct diskfunc *functions;
     const char *name;
     void *userdata;
     uint32_t driver_flags;
     uint32_t ref_count;
-    mutex_t media_lock;
+    struct mutex media_lock;
     uint8_t media_inserted;
     uint8_t media_used;
     uint16_t padding;
     uint32_t media_ref_count;
-    diskmediainfo_t media_info;
+    struct diskmediainfo media_info;
     uint32_t num_partitions;
-    partition_t **partitions;
+    struct partition **partitions;
     uint32_t cache_size;
-    mutex_t cache_lock;
-    disk_cache_t sys_cache;
-    disk_cache_t app_cache;
+    struct mutex cache_lock;
+    struct disk_cache sys_cache;
+    struct disk_cache app_cache;
 };
 
-typedef struct {
+struct bdfe {
     uint32_t attr;
     uint32_t enc;
     uint32_t ctime;
@@ -334,14 +335,14 @@ typedef struct {
     uint32_t mdate;
     uint64_t size;
     char name[0x777];  // how to handle this properly? FIXME
-} bdfe_t;
+};
 
-typedef struct {
+struct f7080ret {
     int32_t status;
     uint32_t count;
-} f7080ret_t;
+};
 
-typedef struct {
+struct __attribute__((packed)) f7080s0arg {
     uint32_t sf;
     uint64_t offset;
     uint32_t count;
@@ -356,9 +357,9 @@ typedef struct {
             const char *path;
         } f80;
     } u;
-} __attribute__((packed)) f7080s0arg_t;
+};
 
-typedef struct {
+struct __attribute__((packed)) f7080s1arg {
     uint32_t sf;
     uint32_t offset;
     uint32_t encoding;
@@ -374,17 +375,17 @@ typedef struct {
             const char *path;
         } f80;
     } u;
-} __attribute__((packed)) f7080s1arg_t;
+};
 
-typedef struct {
+struct f7080s1info {
     uint32_t version;
     uint32_t cnt;
     uint32_t total_cnt;
     uint32_t zeroed[5];
-    bdfe_t bdfes[];
-} f7080s1info_t;
+    struct bdfe bdfes[];
+};
 
-typedef struct {
+struct __attribute__((packed)) f7080s5arg {
     uint32_t sf;
     uint32_t reserved1;
     uint32_t flags;
@@ -400,9 +401,9 @@ typedef struct {
             const char *path;
         } f80;
     } u;
-} __attribute__((packed)) f7080s5arg_t;
+};
 
-typedef struct {
+struct __attribute__((packed)) f7080s7arg {
     uint32_t sf;
     uint32_t flags;
     char *params;
@@ -418,7 +419,14 @@ typedef struct {
             const char *path;
         } f80;
     } u;
-} __attribute__((packed)) f7080s7arg_t;
+};
+
+union f7080arg {
+    struct f7080s0arg s0;
+    struct f7080s1arg s1;
+    struct f7080s5arg s5;
+    struct f7080s7arg s7;
+};
 
 #define KF_READONLY 0x01
 #define KF_HIDDEN   0x02
@@ -585,14 +593,14 @@ i40(void);
 time_t
 kos_time_to_epoch(uint32_t *time);
 
-STDCALL disk_t *
-disk_add(diskfunc_t *disk, const char *name, void *userdata, uint32_t flags);
+STDCALL struct disk *
+disk_add(struct diskfunc *disk, const char *name, void *userdata, uint32_t flags);
 
 STDCALL void *
-disk_media_changed(disk_t *disk, int inserted);
+disk_media_changed(struct disk *disk, int inserted);
 
 STDCALL void
-disk_del(disk_t *disk);
+disk_del(struct disk *disk);
 
 void
 hash_oneshot(void *ctx, void *data, size_t len);
@@ -609,7 +617,7 @@ extern uint8_t iso9660_user_functions[];
 
 extern char kos_ramdisk[RAMDISK_MAX_LEN];
 
-disk_t *
+struct disk *
 kos_ramdisk_init(void);
 
 STDCALL void
@@ -719,15 +727,15 @@ kos_pci_walk_tree(struct pci_dev *node,
                   STDCALL void* (*clbk)(struct pci_dev *node, void *arg),
                   void *arg);
 
-typedef struct {
+struct f75ret {
     uint32_t value;
     uint32_t errorcode;
-} f75ret_t;
+};
 
-typedef struct {
+struct f76ret {
     uint32_t eax;
     uint32_t ebx;
-} f76ret_t;
+};
 
 static inline void
 umka_stack_init(void) {
@@ -756,7 +764,7 @@ STDCALL void
 kos_window_set_screen(ssize_t left, ssize_t top, ssize_t right, ssize_t bottom,
                       ssize_t proc);
 
-typedef struct {
+struct __attribute__((packed)) display {
     int32_t x;
     int32_t y;
     size_t width;
@@ -766,7 +774,7 @@ typedef struct {
     void *current_lfb;
     size_t lfb_pitch;
 
-    rwsem_t win_map_lock;
+    struct rwsem win_map_lock;
     uint8_t *win_map;
     size_t win_map_pitch;
     size_t win_map_size;
@@ -801,19 +809,19 @@ typedef struct {
     void *get_rect;
     void *get_image;
     void *get_line;
-} __attribute__((packed)) display_t;
+};
 
-extern display_t kos_display;
+extern struct display kos_display;
 
-typedef struct {
+struct e820entry {
     uint64_t addr;
     uint64_t size;
     uint32_t type;
-} e820entry_t;
+};
 
 #define MAX_MEMMAP_BLOCKS 32
 
-typedef struct {
+struct __attribute__((packed)) boot_data {
     uint8_t bpp;    // bits per pixel
     uint16_t pitch; // scanline length
     uint8_t pad1[5];
@@ -850,14 +858,14 @@ typedef struct {
     uint8_t bios_hd_cnt;    // number of BIOS hard disks
     uint8_t bios_hd[0x80];  // BIOS hard disks
     size_t memmap_block_cnt;    // available physical memory map: number of blocks
-    e820entry_t memmap_blocks[MAX_MEMMAP_BLOCKS];
+    struct e820entry memmap_blocks[MAX_MEMMAP_BLOCKS];
     uint8_t acpi_usage;
-} __attribute__((packed)) boot_data_t;
+};
 
 extern uint8_t kos_msg_board_data[];
 extern uint32_t kos_msg_board_count;
 
-extern boot_data_t kos_boot;
+extern struct boot_data kos_boot;
 
 void
 umka_cli(void);
@@ -879,36 +887,103 @@ extern struct coverage_branch coverage_table[];
 extern uint8_t coverage_begin[];
 extern uint8_t coverage_end[];
 
-typedef struct appobj_t appobj_t;
+struct appobj;
 
-struct appobj_t {
+struct appobj {
     uint32_t magic;
     void *destroy;  // internal destructor
-    appobj_t *fd;   // next object in list
-    appobj_t *bk;   // prev object in list
+    struct appobj *fd;  // next object in list
+    struct appobj *bk;  // prev object in list
     uint32_t pid;   // owner id
 };
 
-typedef struct {
+struct event {
     uint32_t magic;
     void *destroy;  // internal destructor
-    appobj_t *fd;   // next object in list
-    appobj_t *bk;   // prev object in list
+    struct appobj *fd;  // next object in list
+    struct appobj *bk;  // prev object in list
     uint32_t pid;   // owner id
     uint32_t id;    // event uid
     uint32_t state; // internal flags
     uint32_t code;
     uint32_t pad[5];
-} event_t;
+};
 
-typedef struct {
-    lhead_t list;
-    lhead_t thr_list;
-    mutex_t heap_lock;
+struct smem;
+
+struct smem {
+    struct smem *bk;    // +0
+    struct smem *fd;    // +4
+    void *base;         // +8
+    size_t size;        // +12
+    uint32_t access;    // +16
+    size_t refcount;    // +20
+    char name[32];      // +24
+};
+
+struct srv {
+    char srv_name[16];  // +0 ASCIIZ string
+    uint32_t magic;     // +16 'SRV '
+    size_t size;        // +20 size of structure SRV
+    struct srv *fd;     // +24 next SRV descriptor
+    struct srv *bk;     // +28 prev SRV descriptor
+    void *base;         // +32 service base address
+    void *entry;        // +36 service START function
+    void *srv_proc;     // +40 user mode service handler
+    void *srv_proc_ex;  // +44 kernel mode service handler
+};
+
+struct pcidev;
+
+struct pcidev {
+    struct pcidev *bk;  // +0
+    struct pcidev *fd;  // +4
+    uint32_t vendor_device_id;  // +8
+    uint32_t class; // +12
+    uint8_t devfn;  // +16
+    uint8_t bus;    // +17
+    uint8_t pad[2]; // +18
+    struct srv *owner;  // +20 pointer to SRV or 0
+};
+
+struct dlldescr;
+
+struct dlldescr {
+    struct dlldescr *bk;    // +0
+    struct dlldescr *fd;    // +4
+    void    *data;  // +8
+    size_t  size;   // +12
+    uint64_t timestamp; // +16
+    uint32_t refcount; // +24
+    void    *defaultbase;   // +28
+    void    *coff_hdr;  // +32
+    void    *symbols_ptr;   // +36
+    uint32_t symbols_num;   // +40
+    void    *symbols_lim;   // +44
+    void    *exports;   // +48  export table
+    char    name[260];
+};
+
+struct hdll;
+
+struct hdll {
+    struct hdll *fd;    // +0
+    struct hdll *bk;    // +4
+    uint32_t pid;   // +8   owner id
+    void    *base;  // +12  mapped base
+    size_t  size;   // +16  mapped size
+    uint32_t refcount;  // +20  reference counter for this process and this lib
+    struct dlldescr *parent;    // +24 dlldescr
+};
+
+struct proc {
+    struct lhead list;
+    struct lhead thr_list;
+    struct mutex heap_lock;
     void *heap_base;
     void *heap_top;
     uint32_t mem_used;
-    void *dlls_list_ptr;
+    struct hdll *dlls_list_ptr;
     void *pdt_0_phys;
     void *pdt_1_phys;
     void *io_map_0;
@@ -919,25 +994,25 @@ typedef struct {
     void *ht_next;
     void *htab[(1024-18*4)/4];
     void *pdt_0[1024];
-} proc_t;
+};
 
-static_assert(sizeof(proc_t) == 0x1400, "must be 0x1400 bytes long");
+static_assert(sizeof(struct proc) == 0x1400, "must be 0x1400 bytes long");
 
-typedef struct appdata {
+struct appdata {
     char app_name[11];
     uint8_t pad1[5];
 
-    lhead_t list;                  // +16
-    proc_t *process;               // +24
+    struct lhead list;             // +16
+    struct proc *process;          // +24
     void *fpu_state;               // +28
     void *exc_handler;             // +32
     uint32_t except_mask;          // +36
     void *pl0_stack;               // +40
     uint32_t pad2;                 // +44
-    event_t *fd_ev;                // +48
-    event_t *bk_ev;                // +52
-    appobj_t *fd_obj;              // +56
-    appobj_t *bk_obj;              // +60
+    struct event *fd_ev;           // +48
+    struct event *bk_ev;           // +52
+    struct appobj *fd_obj;         // +56
+    struct appobj *bk_obj;         // +60
     void *saved_esp;               // +64
     uint32_t io_map[2];            // +68
     uint32_t dbg_state;            // +76
@@ -969,26 +1044,26 @@ typedef struct appdata {
     uint8_t pad9[3];               // +181
     char *exec_params;             // +184
     void *dbg_event_mem;           // +188
-    dbg_regs_t dbg_regs;           // +192
+    struct dbg_regs dbg_regs;      // +192
     uint32_t pad10;                // +212
     uint32_t pad11[4];             // +216
     uint32_t priority;             // +232
-    lhead_t in_schedule;           // +236
+    struct lhead in_schedule;      // +236
     uint32_t counter_add;          // +244
     uint32_t cpu_usage;            // +248
     uint32_t pad12;                // +252
-} appdata_t;
+};
 
 static_assert(sizeof(struct appdata) == 256, "must be 0x100 bytes long");
 
 extern uint8_t kos_redraw_background;
 extern size_t kos_task_count;
-extern wdata_t kos_window_data[];
-extern appdata_t kos_slot_base[];
+extern struct wdata kos_window_data[];
+extern struct appdata kos_slot_base[];
 extern uint32_t kos_current_process;
-extern appdata_t *kos_current_slot;
+extern struct appdata *kos_current_slot;
 extern uint32_t kos_current_slot_idx;
-extern void umka_do_change_task(appdata_t *new);
+extern void umka_do_change_task(struct appdata *new);
 extern void scheduler_add_thread(void);
 extern void find_next_task(void);
 extern uint8_t kos_lfb_base[];
@@ -1002,7 +1077,10 @@ extern uint32_t kos_acpi_usage;
 extern uint32_t kos_acpi_node_alloc_cnt;
 extern uint32_t kos_acpi_node_free_cnt;
 extern uint32_t kos_acpi_count_nodes(void *ctx) STDCALL;
-extern disk_t disk_list;
+extern struct srv srv_list;
+extern struct dlldescr dll_list;
+extern struct smem shmem_list;
+extern struct disk disk_list;
 extern uint8_t kos_key_count;
 extern uint8_t kos_key_buff[120*2 + 2*2];
 extern uint8_t kos_keyboard_mode;
@@ -1010,7 +1088,7 @@ extern uint32_t kos_syslang;
 extern uint32_t kos_keyboard;
 
 static inline void
-umka_scheduler_add_thread(appdata_t *thread, int32_t priority) {
+umka_scheduler_add_thread(struct appdata *thread, int32_t priority) {
     __asm__ __inline__ __volatile__ (
         "call   do_change_thread"
         :
@@ -1027,7 +1105,7 @@ umka_scheduler_add_thread(appdata_t *thread, int32_t priority) {
 #define SCHEDULE_ANY_PRIORITY 0
 #define SCHEDULE_HIGHER_PRIORITY 1
 
-extern appdata_t *kos_scheduler_current[KOS_NR_SCHED_QUEUES];
+extern struct appdata *kos_scheduler_current[KOS_NR_SCHED_QUEUES];
 
 void
 i40_asm(uint32_t eax,
@@ -1176,7 +1254,7 @@ umka_new_sys_threads(uint32_t flags, void (*entry)(void *), void *stack_top,
                      void *arg, const char *app_name) {
     kos_thread_t entry_noparam = (kos_thread_t)entry;
     size_t tid = kos_new_sys_threads(flags, entry_noparam, stack_top);
-    appdata_t *t = kos_slot_base + tid;
+    struct appdata *t = kos_slot_base + tid;
     strncpy(t->app_name, app_name, 11);
     *(void**)((char*)t->saved_esp0-12) = arg;   // param for the thread
     // -12 here because in UMKa, unlike real hardware, we don't switch between
@@ -1743,7 +1821,7 @@ umka_sys_get_skin_height(void) {
 }
 
 static inline void
-umka_sys_get_screen_area(rect_t *wa) {
+umka_sys_get_screen_area(struct rect *wa) {
     uint32_t eax, ebx;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1759,7 +1837,7 @@ umka_sys_get_screen_area(rect_t *wa) {
 }
 
 static inline void
-umka_sys_set_screen_area(rect_t *wa) {
+umka_sys_set_screen_area(struct rect *wa) {
     uint32_t ecx, edx;
     ecx = (wa->left << 16) + wa->right;
     edx = (wa->top << 16) + wa->bottom;
@@ -1774,7 +1852,7 @@ umka_sys_set_screen_area(rect_t *wa) {
 }
 
 static inline void
-umka_sys_get_skin_margins(rect_t *wa) {
+umka_sys_get_skin_margins(struct rect *wa) {
     uint32_t eax, ebx;
     __asm__ __inline__ __volatile__ (
         "call   i40"
@@ -1972,7 +2050,7 @@ kos_sys_misc_load_file(const char *fname) {
 }
 
 static inline void
-umka_sys_lfn(void *f7080sXarg, f7080ret_t *r, f70or80_t f70or80) {
+umka_sys_lfn(void *f7080sXarg, struct f7080ret *r, enum f70or80 f70or80) {
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r->status),
@@ -2140,9 +2218,9 @@ umka_sys_net_get_link_status(uint8_t dev_num) {
     return status;
 }
 
-static inline f75ret_t
+static inline struct f75ret
 umka_sys_net_open_socket(uint32_t domain, uint32_t type, uint32_t protocol) {
-    f75ret_t r;
+    struct f75ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.value),
@@ -2156,9 +2234,9 @@ umka_sys_net_open_socket(uint32_t domain, uint32_t type, uint32_t protocol) {
     return r;
 }
 
-static inline f75ret_t
+static inline struct f75ret
 umka_sys_net_close_socket(uint32_t fd) {
-    f75ret_t r;
+    struct f75ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.value),
@@ -2170,9 +2248,9 @@ umka_sys_net_close_socket(uint32_t fd) {
     return r;
 }
 
-static inline f75ret_t
+static inline struct f75ret
 umka_sys_net_bind(uint32_t fd, void *sockaddr, size_t sockaddr_len) {
-    f75ret_t r;
+    struct f75ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.value),
@@ -2186,9 +2264,9 @@ umka_sys_net_bind(uint32_t fd, void *sockaddr, size_t sockaddr_len) {
     return r;
 }
 
-static inline f75ret_t
+static inline struct f75ret
 umka_sys_net_listen(uint32_t fd, uint32_t backlog) {
-    f75ret_t r;
+    struct f75ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.value),
@@ -2201,9 +2279,9 @@ umka_sys_net_listen(uint32_t fd, uint32_t backlog) {
     return r;
 }
 
-static inline f75ret_t
+static inline struct f75ret
 umka_sys_net_connect(uint32_t fd, void *sockaddr, size_t sockaddr_len) {
-    f75ret_t r;
+    struct f75ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.value),
@@ -2217,9 +2295,9 @@ umka_sys_net_connect(uint32_t fd, void *sockaddr, size_t sockaddr_len) {
     return r;
 }
 
-static inline f75ret_t
+static inline struct f75ret
 umka_sys_net_accept(uint32_t fd, void *sockaddr, size_t sockaddr_len) {
-    f75ret_t r;
+    struct f75ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.value),
@@ -2233,9 +2311,9 @@ umka_sys_net_accept(uint32_t fd, void *sockaddr, size_t sockaddr_len) {
     return r;
 }
 
-static inline f75ret_t
+static inline struct f75ret
 umka_sys_net_send(uint32_t fd, void *buf, size_t buf_len, uint32_t flags) {
-    f75ret_t r;
+    struct f75ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.value),
@@ -2250,9 +2328,9 @@ umka_sys_net_send(uint32_t fd, void *buf, size_t buf_len, uint32_t flags) {
     return r;
 }
 
-static inline f75ret_t
+static inline struct f75ret
 umka_sys_net_receive(uint32_t fd, void *buf, size_t buf_len, uint32_t flags) {
-    f75ret_t r;
+    struct f75ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.value),
@@ -2267,9 +2345,9 @@ umka_sys_net_receive(uint32_t fd, void *buf, size_t buf_len, uint32_t flags) {
     return r;
 }
 
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_eth_read_mac(uint32_t dev_num) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),
@@ -2283,9 +2361,9 @@ umka_sys_net_eth_read_mac(uint32_t dev_num) {
 // Function 76, Protocol 1 - IPv4, Subfunction 0, Read # Packets sent =
 // Function 76, Protocol 1 - IPv4, Subfunction 1, Read # Packets rcvd =
 
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_ipv4_get_addr(uint32_t dev_num) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),
@@ -2296,9 +2374,9 @@ umka_sys_net_ipv4_get_addr(uint32_t dev_num) {
     return r;
 }
 
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_ipv4_set_addr(uint32_t dev_num, uint32_t addr) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),
@@ -2310,9 +2388,9 @@ umka_sys_net_ipv4_set_addr(uint32_t dev_num, uint32_t addr) {
     return r;
 }
 
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_ipv4_get_dns(uint32_t dev_num) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),
@@ -2323,9 +2401,9 @@ umka_sys_net_ipv4_get_dns(uint32_t dev_num) {
     return r;
 }
 
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_ipv4_set_dns(uint32_t dev_num, uint32_t dns) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),
@@ -2337,9 +2415,9 @@ umka_sys_net_ipv4_set_dns(uint32_t dev_num, uint32_t dns) {
     return r;
 }
 
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_ipv4_get_subnet(uint32_t dev_num) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),
@@ -2350,9 +2428,9 @@ umka_sys_net_ipv4_get_subnet(uint32_t dev_num) {
     return r;
 }
 
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_ipv4_set_subnet(uint32_t dev_num, uint32_t subnet) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),
@@ -2364,9 +2442,9 @@ umka_sys_net_ipv4_set_subnet(uint32_t dev_num, uint32_t subnet) {
     return r;
 }
 
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_ipv4_get_gw(uint32_t dev_num) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),
@@ -2377,9 +2455,9 @@ umka_sys_net_ipv4_get_gw(uint32_t dev_num) {
     return r;
 }
 
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_ipv4_set_gw(uint32_t dev_num, uint32_t gw) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),
@@ -2399,9 +2477,9 @@ umka_sys_net_ipv4_set_gw(uint32_t dev_num, uint32_t gw) {
 // Function 76, Protocol 4 - TCP, Subfunction 1, Read # Packets rcvd ==
 // Function 76, Protocol 5 - ARP, Subfunction 0, Read # Packets sent ==
 // Function 76, Protocol 5 - ARP, Subfunction 1, Read # Packets rcvd ==
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_arp_get_count(uint32_t dev_num) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),
@@ -2412,9 +2490,9 @@ umka_sys_net_arp_get_count(uint32_t dev_num) {
     return r;
 }
 
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_arp_get_entry(uint32_t dev_num, uint32_t arp_num, void *buf) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),
@@ -2427,9 +2505,9 @@ umka_sys_net_arp_get_entry(uint32_t dev_num, uint32_t arp_num, void *buf) {
     return r;
 }
 
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_arp_add_entry(uint32_t dev_num, void *buf) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),
@@ -2441,9 +2519,9 @@ umka_sys_net_arp_add_entry(uint32_t dev_num, void *buf) {
     return r;
 }
 
-static inline f76ret_t
+static inline struct f76ret
 umka_sys_net_arp_del_entry(uint32_t dev_num, int32_t arp_num) {
-    f76ret_t r;
+    struct f76ret r;
     __asm__ __inline__ __volatile__ (
         "call   i40"
         : "=a"(r.eax),

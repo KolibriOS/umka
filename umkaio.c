@@ -165,7 +165,7 @@ io_init(atomic_int *running) {
     struct umka_io *io = malloc(sizeof(struct umka_io));
     io->running = running;
     if (running) {
-        pthread_create(&io->iot, NULL, thread_io, NULL);
+        pthread_create(&io->iot, NULL, thread_io, NULL);    // can this be merged to monitor?
     }
     return io;
 }

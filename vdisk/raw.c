@@ -70,7 +70,7 @@ vdisk_init_raw(const char *fname, const struct umka_io *io) {
     }
     struct vdisk_raw *disk = (struct vdisk_raw*)malloc(sizeof(struct vdisk_raw));
     *disk = (struct vdisk_raw){
-            .vdisk = {.diskfunc = {.strucsize = sizeof(diskfunc_t),
+            .vdisk = {.diskfunc = {.strucsize = sizeof(struct diskfunc),
                                    .close = vdisk_raw_close,
                                    .read = vdisk_raw_read,
                                    .write = vdisk_raw_write,

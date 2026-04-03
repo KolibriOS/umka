@@ -26,6 +26,7 @@
 struct umka_shell_ctx {
     struct umka_ctx *umka;
     struct umka_io *io;
+    struct monitor_ctx *monitor;
     struct shell_ctx *shell;
 };
 
@@ -36,8 +37,9 @@ umka_shell_init(int reproducible, FILE *fin) {
     struct umka_shell_ctx *ctx = malloc(sizeof(struct umka_shell_ctx));
     ctx->umka = umka_init(UMKA_RUNNING_NEVER);
     ctx->io = io_init(&ctx->umka->running);
+    ctx->monitor = monitor_init(&ctx->umka->running);
     ctx->shell = shell_init(reproducible, history_filename, ctx->umka, ctx->io,
-                            fin);
+                            ctx->monitor, fin);
     return ctx;
 }
 

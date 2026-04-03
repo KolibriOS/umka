@@ -206,7 +206,7 @@ vdisk_init_qcow2(const char *fname, const struct umka_io *io) {
         return NULL;
     }
 
-    d->vdisk.diskfunc = (diskfunc_t) {.strucsize = sizeof(diskfunc_t),
+    d->vdisk.diskfunc = (struct diskfunc) {.strucsize = sizeof(struct diskfunc),
                                       .close = vdisk_qcow2_close,
                                       .read = vdisk_qcow2_read,
                                       .write = vdisk_qcow2_write,
