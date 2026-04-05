@@ -1,0 +1,32 @@
+umka_boot
+disk_add ../../img/ext2_symlinks.qcow2 hd0 -c 0
+stat70 /hd0/1/t70/pure_frel_40
+stat70 /hd0/1/t70/pure_srel_40
+stat70 /hd0/1/t70/pure_fabs_40
+stat70 /hd0/1/t70/pure_sabs_40
+stat70 /hd0/1/t70/hop1_frel
+stat70 /hd0/1/t70/hop2_fabs
+stat70 /hd0/1/t70/hop4_frel
+stat70 /hd0/1/t70/hop17_srel
+stat70 /hd0/1/t70/hop33_srel
+stat70 /hd0/1/t70/hop40_frel
+stat70 /hd0/1/t70/hop41_srel
+stat70 /hd0/1/t70/rel_loop_a
+stat70 /hd0/1/t70/abs_loop_a
+stat70 /hd0/1/t70/d_pure_frel_40
+stat70 /hd0/1/t70/d_pure_frel_40/file.txt
+stat70 /hd0/1/t70/d_pure_srel_40
+stat70 /hd0/1/t70/d_pure_srel_40/file.txt
+stat70 /hd0/1/t70/d_pure_fabs_40
+stat70 /hd0/1/t70/d_pure_fabs_40/file.txt
+stat70 /hd0/1/t70/d_pure_sabs_40
+stat70 /hd0/1/t70/d_pure_sabs_40/file.txt
+stat70 /hd0/1/t70/d_hop40_frel
+stat70 /hd0/1/t70/d_hop40_frel/file.txt
+stat70 /hd0/1/t70/d_hop41_srel
+stat70 /hd0/1/t70/d_hop41_srel/file.txt
+stat70 /hd0/1/t70/d_rel_loop_a
+stat70 /hd0/1/t70/d_rel_loop_a/file.txt
+stat70 /hd0/1/t70/d_abs_loop_a
+stat70 /hd0/1/t70/d_abs_loop_a/file.txt
+disk_del hd0

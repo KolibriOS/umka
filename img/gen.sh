@@ -928,6 +928,155 @@ ext2_s05k.qcow2 () {
     rm $img_raw
 }
 
+ext2_symlinks.qcow2 () {
+    local img=$FUNCNAME
+    local img_raw=$(basename $img .qcow2).raw
+
+    fallocate -l 15MiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    local LOOP_DEV=$(sudo losetup --find --show -P $img_raw)
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXT2 -b 1024 $EXT_MKFS_OPTS $p1
+
+    sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1 > /dev/null 2>&1
+
+    sudo mount $p1 $TEMP_DIR
+    sudo chown $USER $TEMP_DIR -R
+
+    local SLOW_PAD=$(printf './%.0s' {1..40})
+    local HUGE_PAD=$(printf 'x%.0s' {1..1000})
+
+# --- TEST 69: BASIC VALID LINKS AND LOOPS ---
+    mkdir -p $TEMP_DIR/targets/t69/subdir/deep
+    mkdir $TEMP_DIR/t69
+    echo "target69" > $TEMP_DIR/targets/t69/target_fast.txt
+    echo "target69" > $TEMP_DIR/targets/t69/target_slow.txt
+    echo "insidedir69" > $TEMP_DIR/targets/t69/subdir/file.txt
+    echo "deepfile69" > $TEMP_DIR/targets/t69/subdir/deep/file.txt
+
+    # File symlink chains (fast/slow x abs/rel)
+    ln -s ../targets/t69/target_fast.txt $TEMP_DIR/t69/f_rel_target
+    ln -s f_rel_target $TEMP_DIR/t69/f_rel_entry
+    ln -s /targets/t69/target_fast.txt $TEMP_DIR/t69/f_abs_target
+    ln -s /t69/f_abs_target $TEMP_DIR/t69/f_abs_entry
+    ln -s ../targets/t69/${SLOW_PAD}target_slow.txt $TEMP_DIR/t69/s_rel_target
+    ln -s ${SLOW_PAD}s_rel_target $TEMP_DIR/t69/s_rel_entry
+    ln -s /targets/t69/${SLOW_PAD}target_slow.txt $TEMP_DIR/t69/s_abs_target
+    ln -s /t69/${SLOW_PAD}s_abs_target $TEMP_DIR/t69/s_abs_entry
+
+    # Mixed file chain (fast->slow->abs->rel)
+    ln -s ../targets/t69/target_fast.txt $TEMP_DIR/t69/mix_f_rel
+    ln -s /t69/mix_f_rel $TEMP_DIR/t69/mix_f_abs
+    ln -s ${SLOW_PAD}mix_f_abs $TEMP_DIR/t69/mix_s_rel
+    ln -s /t69/${SLOW_PAD}mix_s_rel $TEMP_DIR/t69/mix_s_abs_entry
+
+    # Dir symlink chains (fast/slow x abs/rel)
+    ln -s ../targets/t69/subdir $TEMP_DIR/t69/d_frel_target
+    ln -s d_frel_target $TEMP_DIR/t69/d_frel_entry
+    ln -s /targets/t69/subdir $TEMP_DIR/t69/d_fabs_target
+    ln -s /t69/d_fabs_target $TEMP_DIR/t69/d_fabs_entry
+    ln -s ../targets/t69/${SLOW_PAD}subdir $TEMP_DIR/t69/d_srel_target
+    ln -s ${SLOW_PAD}d_srel_target $TEMP_DIR/t69/d_srel_entry
+    ln -s /targets/t69/${SLOW_PAD}subdir $TEMP_DIR/t69/d_sabs_target
+    ln -s /t69/${SLOW_PAD}d_sabs_target $TEMP_DIR/t69/d_sabs_entry
+
+    # Mixed dir chain
+    ln -s ../targets/t69/subdir $TEMP_DIR/t69/d_mix_frel
+    ln -s /t69/d_mix_frel $TEMP_DIR/t69/d_mix_fabs
+    ln -s ${SLOW_PAD}d_mix_fabs $TEMP_DIR/t69/d_mix_srel
+    ln -s /t69/${SLOW_PAD}d_mix_srel $TEMP_DIR/t69/d_mix_sabs_entry
+
+# --- TEST 70: NESTED NETWORKS ---
+    mkdir -p $TEMP_DIR/targets/t70/subdir
+    mkdir $TEMP_DIR/t70
+    echo "target70" > $TEMP_DIR/targets/t70/target.txt
+    echo "target70dir" > $TEMP_DIR/targets/t70/subdir/file.txt
+
+    # Pure nested file chains (40 deep)
+    ln -s ../targets/t70/target.txt $TEMP_DIR/t70/pure_frel_1
+    for i in {2..40}; do ln -s pure_frel_$((i-1)) $TEMP_DIR/t70/pure_frel_$i; done
+    ln -s ../targets/t70/${SLOW_PAD}target.txt $TEMP_DIR/t70/pure_srel_1
+    for i in {2..40}; do ln -s ${SLOW_PAD}pure_srel_$((i-1)) $TEMP_DIR/t70/pure_srel_$i; done
+    ln -s /targets/t70/target.txt $TEMP_DIR/t70/pure_fabs_1
+    for i in {2..40}; do ln -s /t70/pure_fabs_$((i-1)) $TEMP_DIR/t70/pure_fabs_$i; done
+    ln -s /targets/t70/${SLOW_PAD}target.txt $TEMP_DIR/t70/pure_sabs_1
+    for i in {2..40}; do ln -s /t70/${SLOW_PAD}pure_sabs_$((i-1)) $TEMP_DIR/t70/pure_sabs_$i; done
+
+    # Mixed nested file chain (42 deep)
+    ln -s ../targets/t70/target.txt $TEMP_DIR/t70/hop1_frel
+    prev_name="hop1_frel"
+    for i in {2..42}; do
+        type=$((i % 4))
+        if [ $type -eq 0 ]; then name="hop${i}_frel"; ln -s ${prev_name} $TEMP_DIR/t70/${name}
+        elif [ $type -eq 1 ]; then name="hop${i}_srel"; ln -s ${SLOW_PAD}${prev_name} $TEMP_DIR/t70/${name}
+        elif [ $type -eq 2 ]; then name="hop${i}_fabs"; ln -s /t70/${prev_name} $TEMP_DIR/t70/${name}
+        else name="hop${i}_sabs"; ln -s /t70/${SLOW_PAD}${prev_name} $TEMP_DIR/t70/${name}
+        fi
+        prev_name=$name
+    done
+
+    # File symlink loops
+    ln -s rel_loop_b $TEMP_DIR/t70/rel_loop_a
+    ln -s rel_loop_a $TEMP_DIR/t70/rel_loop_b
+    ln -s /t70/abs_loop_b $TEMP_DIR/t70/abs_loop_a
+    ln -s /t70/abs_loop_a $TEMP_DIR/t70/abs_loop_b
+
+    # Pure nested dir chains (40 deep)
+    ln -s ../targets/t70/subdir $TEMP_DIR/t70/d_pure_frel_1
+    for i in {2..40}; do ln -s d_pure_frel_$((i-1)) $TEMP_DIR/t70/d_pure_frel_$i; done
+    ln -s ../targets/t70/${SLOW_PAD}subdir $TEMP_DIR/t70/d_pure_srel_1
+    for i in {2..40}; do ln -s ${SLOW_PAD}d_pure_srel_$((i-1)) $TEMP_DIR/t70/d_pure_srel_$i; done
+    ln -s /targets/t70/subdir $TEMP_DIR/t70/d_pure_fabs_1
+    for i in {2..40}; do ln -s /t70/d_pure_fabs_$((i-1)) $TEMP_DIR/t70/d_pure_fabs_$i; done
+    ln -s /targets/t70/${SLOW_PAD}subdir $TEMP_DIR/t70/d_pure_sabs_1
+    for i in {2..40}; do ln -s /t70/${SLOW_PAD}d_pure_sabs_$((i-1)) $TEMP_DIR/t70/d_pure_sabs_$i; done
+
+    # Mixed nested dir chain (42 deep)
+    ln -s ../targets/t70/subdir $TEMP_DIR/t70/d_hop1_frel
+    prev_name="d_hop1_frel"
+    for i in {2..42}; do
+        type=$((i % 4))
+        if [ $type -eq 0 ]; then name="d_hop${i}_frel"; ln -s ${prev_name} $TEMP_DIR/t70/${name}
+        elif [ $type -eq 1 ]; then name="d_hop${i}_srel"; ln -s ${SLOW_PAD}${prev_name} $TEMP_DIR/t70/${name}
+        elif [ $type -eq 2 ]; then name="d_hop${i}_fabs"; ln -s /t70/${prev_name} $TEMP_DIR/t70/${name}
+        else name="d_hop${i}_sabs"; ln -s /t70/${SLOW_PAD}${prev_name} $TEMP_DIR/t70/${name}
+        fi
+        prev_name=$name
+    done
+
+    # Dir symlink loops
+    ln -s d_rel_loop_b $TEMP_DIR/t70/d_rel_loop_a
+    ln -s d_rel_loop_a $TEMP_DIR/t70/d_rel_loop_b
+    ln -s /t70/d_abs_loop_b $TEMP_DIR/t70/d_abs_loop_a
+    ln -s /t70/d_abs_loop_a $TEMP_DIR/t70/d_abs_loop_b
+
+# --- TEST 71: INVALID LINKS ---
+    mkdir $TEMP_DIR/t71
+
+    # Invalid file symlinks
+    ln -s does_not_exist $TEMP_DIR/t71/f_rel_inv
+    ln -s /does_not_exist $TEMP_DIR/t71/f_abs_inv
+    ln -s ${SLOW_PAD}does_not_exist $TEMP_DIR/t71/s_rel_inv
+    ln -s /${SLOW_PAD}does_not_exist $TEMP_DIR/t71/s_abs_inv
+    ln -s f_rel_inv $TEMP_DIR/t71/nested_inv
+    ln -s ${HUGE_PAD}missing $TEMP_DIR/t71/huge_inv
+
+    # Invalid dir symlinks
+    ln -s no_such_dir $TEMP_DIR/t71/d_frel_inv
+    ln -s /no_such_dir $TEMP_DIR/t71/d_fabs_inv
+    ln -s ${SLOW_PAD}no_such_dir $TEMP_DIR/t71/d_srel_inv
+    ln -s /${SLOW_PAD}no_such_dir $TEMP_DIR/t71/d_sabs_inv
+    ln -s d_frel_inv $TEMP_DIR/t71/d_nested_inv
+    ln -s ${HUGE_PAD}no_such_dir $TEMP_DIR/t71/d_huge_inv
+#
+    sudo umount $TEMP_DIR
+    sudo losetup -d $LOOP_DEV
+
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
+    rm $img_raw
+}
+
 ext4_s05k.qcow2 () {
     echo "[*] This may take about fifteen minutes"
     local img=$FUNCNAME
@@ -1099,9 +1248,9 @@ ext2_extra_isize.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_EXT2 -b 1024 -I 256 -O extra_isize $EXT_MKFS_OPTS $p1
-    
+
     sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1 > /dev/null 2>&1
-    
+
     sudo mount $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 
@@ -1138,7 +1287,7 @@ ext2_extra_isize.qcow2 () {
 
     sudo debugfs -w -R "set_inode_field file_ctime_crtime ctime 20200101000000" $p1 > /dev/null 2>&1
     sudo debugfs -w -R "set_inode_field file_ctime_crtime crtime 20100101000000" $p1 > /dev/null 2>&1
-    
+
     sudo losetup -d $LOOP_DEV
 
     qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
@@ -1156,7 +1305,8 @@ images=(gpt_large.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
         xfs_v5_files_s05k_b4k_n8k.qcow2 fat32_test0.raw
         exfat_s05k_c16k_b16k.qcow2 exfat_s05k_c8k_b8k.qcow2
         xfs_samehash_s05k.raw ext2_s05k.qcow2 ext4_s05k.qcow2 fat12_s05k.qcow2
-        fat16_s05k.qcow2 iso9660_s2k_dir_all.qcow2 ext2_extra_isize.qcow2)
+        fat16_s05k.qcow2 iso9660_s2k_dir_all.qcow2 ext2_extra_isize.qcow2
+        ext2_symlinks.qcow2)
 
 TEMP_DIR=$(mktemp -d)
 LOOP_DEV=$(losetup --find)

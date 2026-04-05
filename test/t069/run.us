@@ -1,0 +1,19 @@
+umka_boot
+disk_add ../../img/ext2_symlinks.qcow2 hd0 -c 0
+stat70 /hd0/1/t69/f_rel_entry
+stat70 /hd0/1/t69/f_abs_entry
+stat70 /hd0/1/t69/s_rel_entry
+stat70 /hd0/1/t69/s_abs_entry
+stat70 /hd0/1/t69/mix_s_abs_entry
+stat70 /hd0/1/t69/d_frel_entry
+stat70 /hd0/1/t69/d_frel_entry/file.txt
+stat70 /hd0/1/t69/d_fabs_entry
+stat70 /hd0/1/t69/d_fabs_entry/file.txt
+stat70 /hd0/1/t69/d_srel_entry
+stat70 /hd0/1/t69/d_srel_entry/file.txt
+stat70 /hd0/1/t69/d_sabs_entry
+stat70 /hd0/1/t69/d_sabs_entry/file.txt
+stat70 /hd0/1/t69/d_mix_sabs_entry
+stat70 /hd0/1/t69/d_mix_sabs_entry/file.txt
+stat70 /hd0/1/t69/d_frel_target/deep/file.txt
+disk_del hd0

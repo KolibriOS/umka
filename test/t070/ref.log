@@ -1,0 +1,98 @@
+/> umka_boot
+/> disk_add ../../img/ext2_symlinks.qcow2 hd0 -c 0
+/hd0: sector_size=512, capacity=30720 (15 MiB), num_partitions=1
+/hd0/1: fs=ext, start=2048 (1 MiB), length=26624 (13 MiB)
+/> stat70 /hd0/1/t70/pure_frel_40
+status = 0 success
+attr: -----
+size: 9
+/> stat70 /hd0/1/t70/pure_srel_40
+status = 0 success
+attr: -----
+size: 9
+/> stat70 /hd0/1/t70/pure_fabs_40
+status = 0 success
+attr: -----
+size: 9
+/> stat70 /hd0/1/t70/pure_sabs_40
+status = 0 success
+attr: -----
+size: 9
+/> stat70 /hd0/1/t70/hop1_frel
+status = 0 success
+attr: -----
+size: 9
+/> stat70 /hd0/1/t70/hop2_fabs
+status = 0 success
+attr: -----
+size: 9
+/> stat70 /hd0/1/t70/hop4_frel
+status = 0 success
+attr: -----
+size: 9
+/> stat70 /hd0/1/t70/hop17_srel
+status = 0 success
+attr: -----
+size: 9
+/> stat70 /hd0/1/t70/hop33_srel
+status = 0 success
+attr: -----
+size: 9
+/> stat70 /hd0/1/t70/hop40_frel
+status = 0 success
+attr: -----
+size: 9
+/> stat70 /hd0/1/t70/hop41_srel
+status = 40 unknown
+/> stat70 /hd0/1/t70/rel_loop_a
+status = 40 unknown
+/> stat70 /hd0/1/t70/abs_loop_a
+status = 40 unknown
+/> stat70 /hd0/1/t70/d_pure_frel_40
+status = 0 success
+attr: ----f
+/> stat70 /hd0/1/t70/d_pure_frel_40/file.txt
+status = 0 success
+attr: -----
+size: 12
+/> stat70 /hd0/1/t70/d_pure_srel_40
+status = 0 success
+attr: ----f
+/> stat70 /hd0/1/t70/d_pure_srel_40/file.txt
+status = 0 success
+attr: -----
+size: 12
+/> stat70 /hd0/1/t70/d_pure_fabs_40
+status = 0 success
+attr: ----f
+/> stat70 /hd0/1/t70/d_pure_fabs_40/file.txt
+status = 0 success
+attr: -----
+size: 12
+/> stat70 /hd0/1/t70/d_pure_sabs_40
+status = 0 success
+attr: ----f
+/> stat70 /hd0/1/t70/d_pure_sabs_40/file.txt
+status = 0 success
+attr: -----
+size: 12
+/> stat70 /hd0/1/t70/d_hop40_frel
+status = 0 success
+attr: ----f
+/> stat70 /hd0/1/t70/d_hop40_frel/file.txt
+status = 0 success
+attr: -----
+size: 12
+/> stat70 /hd0/1/t70/d_hop41_srel
+status = 40 unknown
+/> stat70 /hd0/1/t70/d_hop41_srel/file.txt
+status = 40 unknown
+/> stat70 /hd0/1/t70/d_rel_loop_a
+status = 40 unknown
+/> stat70 /hd0/1/t70/d_rel_loop_a/file.txt
+status = 40 unknown
+/> stat70 /hd0/1/t70/d_abs_loop_a
+status = 40 unknown
+/> stat70 /hd0/1/t70/d_abs_loop_a/file.txt
+status = 40 unknown
+/> disk_del hd0
