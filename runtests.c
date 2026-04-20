@@ -110,7 +110,7 @@ parse_tags(struct tag **tags, char *str) {
 
 static bool
 match_tags(const struct tag *user, const struct tag *test) {
-    if (!user) {
+    if (!user || !test) {
         return true;
     }
     for (const struct tag *ut = user; ut; ut = ut->next) {
@@ -242,13 +242,11 @@ get_test_timeout(const char *testname) {
 static struct tag *
 get_test_tags(const char *testname) {
     sprintf(tagsfname, "%s/%s", testname, TAGS_FILENAME);
-    FILE *f = fopen(tagsfname, "rb");
-    if (!f) {
-        fprintf(stderr, "[!] Can't open %s\n: %s\n", TAGS_FILENAME,
-                strerror(errno));
-        return 0;
-    }
     char str[TAGS_STR_MAX_LEN];
+    FILE *f = fopen(tagsfname, "rb");
+    if (!f) {   // it's okay to not have a tags.txt file
+        return NULL;
+    }
     fread(str, 1, TAGS_STR_MAX_LEN, f);
     fclose(f);
     struct tag *test_tags;
