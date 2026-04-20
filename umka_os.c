@@ -7,6 +7,7 @@
     Copyright (C) 2018-2025  Ivan Baravy <dunkaist@gmail.com>
 */
 
+#define _GNU_SOURCE
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -20,7 +21,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #include "umka.h"
 #include "umkart.h"
 #include "shell.h"
@@ -167,38 +168,82 @@ update_display(SDL_Surface *window_surface, SDL_Window *window) {
     return;
 }
 
+struct {
+    SDL_Scancode sdl_code;
+    bool ps2_ext;
+    uint8_t ps2_code;
+} hid_to_ps2set1[] = {
+                      {SDL_SCANCODE_COMMA,     false, 0x33},
+                      {SDL_SCANCODE_PERIOD,    false, 0x34},
+                      {SDL_SCANCODE_SLASH,     false, 0x35},
+                      {SDL_SCANCODE_CAPSLOCK,  false, 0x3a},
+                      {SDL_SCANCODE_HOME,       true, 0x47},
+                      {SDL_SCANCODE_PAGEUP,     true, 0x49},
+                      {SDL_SCANCODE_DELETE,     true, 0x53},
+                      {SDL_SCANCODE_END,        true, 0x4f},
+                      {SDL_SCANCODE_PAGEDOWN,   true, 0x51},
+                      {SDL_SCANCODE_RIGHT,      true, 0x4d},
+                      {SDL_SCANCODE_LEFT,       true, 0x4b},
+                      {SDL_SCANCODE_DOWN,       true, 0x50},
+                      {SDL_SCANCODE_UP,         true, 0x48},
+                      {SDL_SCANCODE_A,         false, 0x1e},
+                      {SDL_SCANCODE_B,         false, 0x30},
+                      {SDL_SCANCODE_C,         false, 0x2e},
+                      {SDL_SCANCODE_D,         false, 0x20},
+                      {SDL_SCANCODE_E,         false, 0x12},
+                      {SDL_SCANCODE_F,         false, 0x21},
+                      {SDL_SCANCODE_G,         false, 0x22},
+                      {SDL_SCANCODE_H,         false, 0x23},
+                      {SDL_SCANCODE_I,         false, 0x17},
+                      {SDL_SCANCODE_J,         false, 0x24},
+                      {SDL_SCANCODE_K,         false, 0x25},
+                      {SDL_SCANCODE_L,         false, 0x26},
+                      {SDL_SCANCODE_M,         false, 0x32},
+                      {SDL_SCANCODE_N,         false, 0x31},
+                      {SDL_SCANCODE_O,         false, 0x18},
+                      {SDL_SCANCODE_P,         false, 0x19},
+                      {SDL_SCANCODE_Q,         false, 0x10},
+                      {SDL_SCANCODE_R,         false, 0x13},
+                      {SDL_SCANCODE_S,         false, 0x1f},
+                      {SDL_SCANCODE_T,         false, 0x14},
+                      {SDL_SCANCODE_U,         false, 0x16},
+                      {SDL_SCANCODE_V,         false, 0x2f},
+                      {SDL_SCANCODE_W,         false, 0x11},
+                      {SDL_SCANCODE_X,         false, 0x2d},
+                      {SDL_SCANCODE_Y,         false, 0x15},
+                      {SDL_SCANCODE_Z,         false, 0x2c},
+                      {SDL_SCANCODE_1,         false, 0x02},
+                      {SDL_SCANCODE_2,         false, 0x03},
+                      {SDL_SCANCODE_3,         false, 0x04},
+                      {SDL_SCANCODE_4,         false, 0x05},
+                      {SDL_SCANCODE_5,         false, 0x06},
+                      {SDL_SCANCODE_6,         false, 0x07},
+                      {SDL_SCANCODE_7,         false, 0x08},
+                      {SDL_SCANCODE_8,         false, 0x09},
+                      {SDL_SCANCODE_9,         false, 0x0a},
+                      {SDL_SCANCODE_0,         false, 0x0b},
+                      {SDL_SCANCODE_RETURN,    false, 0x1c},
+                      {SDL_SCANCODE_ESCAPE,    false, 0x01},
+                      {SDL_SCANCODE_BACKSPACE, false, 0x0e},
+                      {SDL_SCANCODE_TAB,       false, 0x0f},
+                      {SDL_SCANCODE_SPACE,     false, 0x39},
+                     };
+
 static void
-convert_scancode_hid_to_ps2(int hid, int is_release, uint8_t *ps2) {
-    switch (hid) {
-    case SDL_SCANCODE_RIGHT:
-        *ps2 = 0xe0;
-        *++ps2 = 0x4d;
-        break;
-    case SDL_SCANCODE_LEFT:
-        *ps2 = 0xe0;
-        *++ps2 = 0x4b;
-        break;
-    case SDL_SCANCODE_DOWN:
-        *ps2 = 0xe0;
-        *++ps2 = 0x50;
-        break;
-    case SDL_SCANCODE_UP:
-        *ps2 = 0xe0;
-        *++ps2 = 0x48;
-        break;
-    case SDL_SCANCODE_TAB:
-        *ps2 = 0x0f;
-        break;
-    case SDL_SCANCODE_SPACE:
-        *ps2 = 0x39;
-        break;
-    default:
-        fprintf(stderr, "[sdl] ignore hid scancode: %i 0x%x\n", hid, hid);
-        break;
+convert_scancode_hid_to_ps2(SDL_Scancode sdl_code, int is_release, uint8_t *ps2) {
+    for (size_t i = 0; i < sizeof(hid_to_ps2set1) / sizeof(*hid_to_ps2set1); i++) {
+        if (sdl_code == hid_to_ps2set1[i].sdl_code) {
+            if (hid_to_ps2set1[i].ps2_ext) {
+                *ps2++ = 0xe0;
+            }
+            *ps2 = hid_to_ps2set1[i].ps2_code;
+            if (is_release) {
+                *ps2 |= 0x80;
+            }
+            return;
+        }
     }
-    if (is_release) {
-        *ps2 |= 0x80;
-    }
+//    fprintf(stderr, "[sdl] unknown hid scancode: %i 0x%x\n", hid, hid);
 }
 
 static uint32_t
@@ -220,14 +265,15 @@ static void
 grab_sdl_window(SDL_Window *window, bool grab) {
     SDL_SetWindowMouseGrab(window, grab);
     SDL_SetWindowKeyboardGrab(window, grab);
-    SDL_SetRelativeMouseMode(grab);
+    SDL_SetWindowRelativeMouseMode(window, grab);
 }
+
 static void *
 umka_display(void *arg) {
     (void)arg;
-    if(SDL_Init(SDL_INIT_VIDEO) < 0)
+    if(!SDL_Init(SDL_INIT_VIDEO))
     {
-        fprintf(stderr, "Failed to initialize the SDL2 library\n");
+        fprintf(stderr, "Failed to initialize SDL library\n");
         return NULL;
     }
 
@@ -235,8 +281,6 @@ umka_display(void *arg) {
     sprintf(title, "umka %ux%u %ubpp, press Ctrl-Alt-g to (un)grab input",
             kos_display.width, kos_display.height, kos_display.bits_per_pixel);
     SDL_Window *window = SDL_CreateWindow(title,
-                                          SDL_WINDOWPOS_UNDEFINED,
-                                          SDL_WINDOWPOS_UNDEFINED,
                                           kos_display.width,
                                           kos_display.height,
                                           0);
@@ -255,14 +299,11 @@ umka_display(void *arg) {
         return NULL;
     }
 
-    switch (window_surface->format->format) {
-    case SDL_PIXELFORMAT_RGB888:
-        copy_display = copy_display_to_rgb888;
-        break;
-    default:
+    if (window_surface->format == SDL_PIXELFORMAT_XRGB8888) {
+        copy_display = copy_display_to_xrgb8888;
+    } else {
         printf("unknown SDL_PIXELFORMAT_* value: 0x%8.8x\n",
-               window_surface->format->format);
-        break;
+               window_surface->format);
     }
 
     bool input_grabbed = false;
@@ -272,20 +313,22 @@ umka_display(void *arg) {
         update_display(window_surface, window);
         if (SDL_WaitEventTimeout(&event, 1000 /* ms */)) {
             switch (event.type) {
-            case SDL_QUIT:
+            case SDL_EVENT_QUIT:
                 break;
-            case SDL_WINDOWEVENT:
+            case SDL_EVENT_WINDOW_SHOWN:
+            case SDL_EVENT_WINDOW_HIDDEN:
                 break;
-            case SDL_MOUSEBUTTONDOWN:
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
                 if (!input_grabbed) {
-                    int x, y;
-                    SDL_GetMouseState(&x, &y);
+                    float fx, fy;
+                    SDL_GetMouseState(&fx, &fy);
+                    int x = (int)fx, y = (int)fy;
                     monitor_cmd_sys_set_mouse_pos_screen(os->monitor, x, y);
                     input_grabbed = true;
                     grab_sdl_window(window, true);
                 }
                 [[fallthrough]];
-            case SDL_MOUSEBUTTONUP: {
+            case SDL_EVENT_MOUSE_BUTTON_UP: {
                 if (!input_grabbed) {
                     break;
                 }
@@ -294,7 +337,7 @@ umka_display(void *arg) {
                 monitor_cmd_mouse_move(os->monitor, btn_state, 0, 0, 0, 0);
                 break;
             }
-            case SDL_MOUSEMOTION: {
+            case SDL_EVENT_MOUSE_MOTION: {
                 if (!input_grabbed) {
                     break;
                 }
@@ -305,7 +348,7 @@ umka_display(void *arg) {
                                        event.wheel.y, event.wheel.x);
                 break;
             }
-            case SDL_MOUSEWHEEL: {
+            case SDL_EVENT_MOUSE_WHEEL: {
                 if (!input_grabbed) {
                     break;
                 }
@@ -315,10 +358,10 @@ umka_display(void *arg) {
                                        event.wheel.y, event.wheel.x);
                 break;
             }
-            case SDL_KEYDOWN: {
-                if ((event.key.keysym.scancode == SDL_SCANCODE_G)
-                    && (event.key.keysym.mod & KMOD_CTRL)
-                    && (event.key.keysym.mod & KMOD_ALT)) {
+            case SDL_EVENT_KEY_DOWN: {
+                if ((event.key.scancode == SDL_SCANCODE_G)
+                    && (event.key.mod & SDL_KMOD_CTRL)
+                    && (event.key.mod & SDL_KMOD_ALT)) {
                     input_grabbed = !input_grabbed;
                     grab_sdl_window(window, input_grabbed);
                 }
@@ -329,26 +372,31 @@ umka_display(void *arg) {
 */
                 uint8_t scancodes[16];
                 memset(scancodes, 0, 16);
-                convert_scancode_hid_to_ps2(event.key.keysym.scancode, false, scancodes);
+                convert_scancode_hid_to_ps2(event.key.scancode, false, scancodes);
                 monitor_cmd_send_scancodes(os->monitor, scancodes);
-                convert_scancode_hid_to_ps2(event.key.keysym.scancode, true, scancodes);
+                convert_scancode_hid_to_ps2(event.key.scancode, true, scancodes);
                 monitor_cmd_send_scancodes(os->monitor, scancodes);
                 break;
             }
-            case SDL_KEYUP:
+            case SDL_EVENT_KEY_UP:
                 if (!input_grabbed) {
                     break;
                 }
                 break;
-            case SDL_TEXTINPUT:
+            case SDL_EVENT_TEXT_INPUT:
                 if (!input_grabbed) {
                     break;
                 }
+                break;
+            case SDL_EVENT_WINDOW_EXPOSED:
+            case SDL_EVENT_WINDOW_FOCUS_GAINED:
+            case SDL_EVENT_WINDOW_FOCUS_LOST:
+            case SDL_EVENT_WINDOW_MOUSE_ENTER:
+            case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+            case SDL_EVENT_CLIPBOARD_UPDATE:    // TODO: pass through clipboard
                 break;
             default:
-                if (!(event.type & SDL_WINDOWEVENT)) { // filter out SDL3 window events
-                    fprintf(stderr, "[sdl] unknown event type: 0x%x\n", event.type);
-                }
+//                fprintf(stderr, "[sdl] unknown event type: 0x%x\n", event.type);
                 update_display(window_surface, window);
             }
         } else {
@@ -383,7 +431,8 @@ int
 main(int argc, char *argv[]) {
     (void)argc;
     const char *usage = "umka_os [-i <infile>] [-o <outfile>]"
-                        " [-b <boardlog>] [-s <startupfile>] [-c covfile]\n";
+                        " [-s <startupfile>] [-b <boardlog>] [-d(isplay)]"
+                        " [-c covfile]\n";
 
     int coverage = 0;
     int show_display = 0;
@@ -570,7 +619,8 @@ main(int argc, char *argv[]) {
     thread_start(1, umka_thread_board, UMKA_DEFAULT_THREAD_STACK_SIZE);
     load_app_host("../apps/loader", UMKA_LDR_BASE);
 //    load_app_host("../apps/justawindow", KOS_APP_BASE);
-    load_app_host("../apps/asciivju", KOS_APP_BASE);
+//    load_app_host("../apps/asciivju", KOS_APP_BASE);
+    load_app_host("../apps/charsets", KOS_APP_BASE);
 //    load_app_host("../apps/eyes", KOS_APP_BASE);
 //    load_app_host("../apps/board", KOS_APP_BASE);
 //    load_app_host("../apps/calc", KOS_APP_BASE);

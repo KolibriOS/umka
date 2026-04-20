@@ -2455,7 +2455,7 @@ cmd_scrot(struct shell_ctx *ctx, int argc, char **argv) {
     uint32_t *lfb32 = (uint32_t*)kos_lfb_base;
 
     lfb32 = malloc(4*kos_display.width*kos_display.height);
-    copy_display_to_rgb888(lfb32);
+    copy_display_to_xrgb8888(lfb32);
 
     uint8_t *from = (uint8_t*)lfb32;
     for (size_t y = 0; y < kos_display.height; y++) {

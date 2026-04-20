@@ -54,7 +54,7 @@ dump_devices_dat(const char *filename) {
 }
 
 static void
-copy_display_bpp16_to_rgb888(void *to) {
+copy_display_bpp16_to_xrgb8888(void *to) {
     for (size_t y = 0; y < kos_display.height; y++) {
         for (size_t x = 0; x < kos_display.width; x++) {
             uint32_t p = ((uint16_t*)kos_lfb_base)[y*kos_display.width+x];
@@ -65,7 +65,7 @@ copy_display_bpp16_to_rgb888(void *to) {
 }
 
 static void
-copy_display_bpp24_to_rgb888(void *to) {
+copy_display_bpp24_to_xrgb8888(void *to) {
     uint8_t *from = kos_lfb_base;
     for (size_t y = 0; y < kos_display.height; y++) {
         for (size_t x = 0; x < kos_display.width; x++) {
@@ -79,21 +79,21 @@ copy_display_bpp24_to_rgb888(void *to) {
 }
 
 static void
-copy_display_bpp32_to_rgb888(void *to) {
+copy_display_bpp32_to_xrgb8888(void *to) {
     memcpy(to, kos_lfb_base, kos_display.width*kos_display.height*4);
 }
 
 void
-copy_display_to_rgb888(void *to) {
+copy_display_to_xrgb8888(void *to) {
     switch (kos_display.bits_per_pixel) {
     case 16:
-        copy_display_bpp16_to_rgb888(to);
+        copy_display_bpp16_to_xrgb8888(to);
         break;
     case 24:
-        copy_display_bpp24_to_rgb888(to);
+        copy_display_bpp24_to_xrgb8888(to);
         break;
     case 32:
-        copy_display_bpp32_to_rgb888(to);
+        copy_display_bpp32_to_xrgb8888(to);
         break;
     default:
         fprintf(stderr, "[!] unsupported bit depth: %d\n",

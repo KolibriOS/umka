@@ -84,7 +84,7 @@ umka_os: umka_os.o umka.o monitor.o shell.o deps/lodepng/lodepng.o vkbd.o \
          $(HOST)/vnet/tap.o vnet/file.o vnet/null.o trace.o trace_lbr.o \
          $(HOST)/pci.o $(HOST)/thread.o umkaio.o umkart.o \
          deps/isocline/src/isocline.o deps/optparse/optparse.o
-	$(CC) $(LDFLAGS_32) $^ `sdl2-config --libs` -o $@ -T umka.ld
+	$(CC) $(LDFLAGS_32) $^ `pkg-config sdl3 --libs` -o $@ -T umka.ld
 
 umka_gen_devices_dat: umka_gen_devices_dat.o umka.o $(HOST)/pci.o \
                       $(HOST)/thread.o umkart.o
@@ -185,7 +185,7 @@ umka_fuse.o: umka_fuse.c umka.h
 	$(CC) $(CFLAGS_32) `pkg-config fuse3 --cflags` -c $<
 
 umka_os.o: umka_os.c umka.h
-	$(CC) $(CFLAGS_32) `sdl2-config --cflags` -c $<
+	$(CC) $(CFLAGS_32) `pkg-config sdl3 --cflags` -c $<
 
 umka_gen_devices_dat.o: umka_gen_devices_dat.c umka.h
 	$(CC) $(CFLAGS_32) -c $<

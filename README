@@ -65,7 +65,7 @@ Linux:
 
 $ KOLIBRIOS=/path/to/kolibrios HOST=linux CC=gcc make
 
-/path/to/kolibrios is where you checked out 'svn co svn://kolibrios.org'.
+/path/to/kolibrios is where you cloned the main KolibriOS repository.
 
 Windows:
 
@@ -85,7 +85,8 @@ Testing
 
 # Run all the tests
 
-    $ HOST=linux make -B
+    $ cd test
+    $ ../runtests
 
 # Copy ACPI tables and PCI configs
 
@@ -106,7 +107,7 @@ Troubleshooting
 # Build
 
     Install toolchain for the 32-bit target, e.g. gcc-multilib, lib32-glibc,
-    32-bit and develop packages of libfuse and libsdl2, fasm.
+    32-bit and develop packages of libfuse3 and libsdl3, fasm.
 
 # umka_os
 
@@ -154,5 +155,5 @@ Links & Acknowledgements
 [8] qemu-nbd by Anthony Liguori and others
     https://www.qemu.org/docs/master/tools/qemu-nbd.html
 
-[9] Simple DirectMedia Layer library aka SDL2
+[9] Simple DirectMedia Layer library aka SDL
     https://libsdl.org

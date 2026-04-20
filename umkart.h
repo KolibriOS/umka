@@ -19,6 +19,6 @@ void
 dump_devices_dat(const char *filename);
 
 void
-copy_display_to_rgb888(void *to);
+copy_display_to_xrgb8888(void *to);
 
 #endif  // UMKART_H_INCLUDED
