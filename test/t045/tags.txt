@@ -1,2 +1,2 @@
-syscall: f70
-fs: fat fat32
+syscall:f70
+fs:fat,fat32

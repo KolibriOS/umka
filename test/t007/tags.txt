@@ -1,2 +1,2 @@
-syscall: f70
-fs: xfs lookup
+syscall:f70
+fs:xfs,lookup

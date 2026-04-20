@@ -26,12 +26,14 @@
 #endif
 
 #define CMPFILE_BUF_LEN 0x100000
+#define TAGS_FILENAME "tags.txt"
 #define TIMEOUT_FILENAME "timeout.txt"
+#define TAGS_STR_MAX_LEN 1024
 #define TIMEOUT_STR_MAX_LEN 16
-#define ACTION_RUN 0
 
 _Thread_local char bufa[CMPFILE_BUF_LEN];
 _Thread_local char bufb[CMPFILE_BUF_LEN];
+_Thread_local char tagsfname[PATH_MAX];
 _Thread_local char timeoutfname[PATH_MAX];
 _Thread_local char reffname[PATH_MAX];
 _Thread_local char outfname[PATH_MAX];
@@ -39,6 +41,87 @@ _Thread_local char outfname[PATH_MAX];
 int coverage = 0;
 int no_timeout = 0;
 int silent_success = 1;
+
+enum tag_mode {
+    TAG_ENABLED,
+    TAG_DISABLED,
+};
+
+struct tag;
+struct tag {
+    struct tag *next;
+    const char *name;
+    enum tag_mode mode;
+};
+
+struct tag *user_tags = NULL;
+
+/*
+static void
+dump_tags(const struct tag *tags) {
+    printf("dumping tags\n");
+    for (const struct tag *t = tags; t; t = t->next) {
+        printf("tag: %s (%i)\n", t->name, t->mode);
+    }
+}
+*/
+
+static void
+add_tag(struct tag **root, struct tag *t) {
+    t->next = *root;
+    *root = t;
+}
+
+static struct tag *
+parse_tag(const char *prefix, const char *s) {
+    char name[32];
+    struct tag *t = malloc(sizeof(struct tag));
+    if (s[0] == '-') {
+        t->mode = TAG_DISABLED;
+        s += 1;
+    } else {
+        t->mode = TAG_ENABLED;
+    }
+    if (prefix) {
+        sprintf(name, "%s_%s", prefix, s);
+    } else {
+        sprintf(name, "%s", s);
+    }
+    t->name = strdup(name);
+    return t;
+}
+
+static void
+parse_tags(struct tag **tags, char *str) {
+    for (char *asave = str, *as; (as = strtok_r(asave, " \n\r\t", &asave));) {
+        char *colon = strchr(as, ':');
+        if (!colon) {
+            for (char *csave = as, *cs; (cs = strtok_r(csave, ",", &csave));) {
+                add_tag(tags, parse_tag(NULL, cs));
+            }
+        } else {
+            *colon = '\0';
+            for (char *csave = colon+1, *cs; (cs = strtok_r(csave, ",", &csave));) {
+                add_tag(tags, parse_tag(as, cs));
+            }
+        }
+    }
+}
+
+static bool
+match_tags(const struct tag *user, const struct tag *test) {
+    if (!user) {
+        return true;
+    }
+    for (const struct tag *ut = user; ut; ut = ut->next) {
+        for (const struct tag *tt = test; tt; tt = tt->next) {
+            if ((ut->mode == TAG_ENABLED) && !strcmp(ut->name, tt->name)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 static int
 is_valid_test(const char *name) {
@@ -156,6 +239,24 @@ get_test_timeout(const char *testname) {
     return min*60 + sec;
 }
 
+static struct tag *
+get_test_tags(const char *testname) {
+    sprintf(tagsfname, "%s/%s", testname, TAGS_FILENAME);
+    FILE *f = fopen(tagsfname, "rb");
+    if (!f) {
+        fprintf(stderr, "[!] Can't open %s\n: %s\n", TAGS_FILENAME,
+                strerror(errno));
+        return 0;
+    }
+    char str[TAGS_STR_MAX_LEN];
+    fread(str, 1, TAGS_STR_MAX_LEN, f);
+    fclose(f);
+    struct tag *test_tags;
+    parse_tags(&test_tags, str);
+//    dump_tags(test_tags);
+    return test_tags;
+}
+
 #ifndef _WIN32
 
 #include <sys/wait.h>
@@ -268,6 +369,10 @@ thread_run_test(void *arg) {
         if (!is_valid_test(testname)) {
             continue;
         }
+        struct tag *test_tags = get_test_tags(testname);
+        if (!match_tags(user_tags, test_tags)) {
+            continue;
+        }
         fprintf(stderr, "running test %s\n", testname);
         if (run_test(testname) || check_test_artefacts(testname)) {
             fprintf(stderr, "[!] test %s failed\n", testname);
@@ -281,16 +386,31 @@ thread_run_test(void *arg) {
 int
 main(int argc, char *argv[]) {
     (void)argc;
-//    int action = ACTION_RUN;
+    const char *usage = \
+        "usage: runtests [-c] [-f] [-h] [-j] [-s]\n"
+        "  -c               collect coverage\n"
+        "  -f               run without timeouts (forever)\n"
+        "  -h               show this help\n"
+        "  -j<n>            run <n> threads in parallel\n"
+        "  -s               repost each successful test\n"
+        "  -t               run only specific tests\n";
+
     size_t nthreads = 1;
     struct optparse opts;
     optparse_init(&opts, argv);
     int opt;
 
-    while ((opt = optparse(&opts, "cj:st")) != -1) {
+    while ((opt = optparse(&opts, "cfhj:st:")) != -1) {
         switch (opt) {
         case 'c':
             coverage = 1;
+            break;
+        case 'f':
+            no_timeout = 1;
+            break;
+        case 'h':
+            fputs(usage, stderr);
+            exit(EXIT_SUCCESS);
             break;
         case 'j':
             nthreads = strtoul(opts.optarg, NULL, 0);
@@ -299,14 +419,14 @@ main(int argc, char *argv[]) {
             silent_success = 0;
             break;
         case 't':
-            no_timeout = 1;
+            parse_tags(&user_tags, opts.optarg);
+//            dump_tags(user_tags);
             break;
         default:
-            fprintf(stderr, "[!] Unknown option: '%c'\n", opt);
-            exit(1);
+            fprintf(stderr, "[!] %s: %s\n", argv[0], opts.errmsg);
+            exit(EXIT_FAILURE);
         }
     }
-
 
     DIR *cwd = opendir(".");
     pthread_t *threads = malloc(sizeof(pthread_t)*nthreads);

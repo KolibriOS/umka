@@ -1,2 +1,2 @@
-fs: xfs lookup
-xfs: v5
+fs:xfs,lookup
+xfs:v5

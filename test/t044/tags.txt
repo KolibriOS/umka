@@ -1,2 +1,2 @@
-syscall: f01
-draw: winmap
+syscall:f01
+draw:winmap

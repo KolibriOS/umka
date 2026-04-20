@@ -1,1 +1,1 @@
-syscall: f68 f68s27
+syscall:f68,f68s27

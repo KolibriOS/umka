@@ -1,2 +1,2 @@
-fs: xfs
-xfs: bigtime
+fs:xfs
+xfs:bigtime
