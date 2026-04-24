@@ -247,9 +247,10 @@ get_test_tags(const char *testname) {
     if (!f) {   // it's okay to not have a tags.txt file
         return NULL;
     }
-    fread(str, 1, TAGS_STR_MAX_LEN, f);
+    size_t nread = fread(str, 1, TAGS_STR_MAX_LEN - 1, f);
+    str[nread] = '\0';
     fclose(f);
-    struct tag *test_tags;
+    struct tag *test_tags = NULL;
     parse_tags(&test_tags, str);
 //    dump_tags(test_tags);
     return test_tags;
