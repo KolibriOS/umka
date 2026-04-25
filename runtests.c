@@ -72,10 +72,13 @@ add_tag(struct tag **root, struct tag *t) {
     *root = t;
 }
 
-static struct tag *
-parse_tag(const char *prefix, const char *s) {
+static void
+parse_add_tag(struct tag **tags, const char *prefix, const char *s) {
     char name[32];
     struct tag *t = malloc(sizeof(struct tag));
+    if (!t) {
+        return;
+    }
     if (s[0] == '-') {
         t->mode = TAG_DISABLED;
         s += 1;
@@ -88,7 +91,8 @@ parse_tag(const char *prefix, const char *s) {
         sprintf(name, "%s", s);
     }
     t->name = strdup(name);
-    return t;
+    add_tag(tags, t);
+    return;
 }
 
 static void
@@ -97,12 +101,13 @@ parse_tags(struct tag **tags, char *str) {
         char *colon = strchr(as, ':');
         if (!colon) {
             for (char *csave = as, *cs; (cs = strtok_r(csave, ",", &csave));) {
-                add_tag(tags, parse_tag(NULL, cs));
+                parse_add_tag(tags, NULL, cs);
             }
         } else {
             *colon = '\0';
+            parse_add_tag(tags, NULL, as);
             for (char *csave = colon+1, *cs; (cs = strtok_r(csave, ",", &csave));) {
-                add_tag(tags, parse_tag(as, cs));
+                parse_add_tag(tags, as, cs);
             }
         }
     }
@@ -207,6 +212,7 @@ check_test_artefacts(const char *testname) {
 struct test_wait_arg {
     int pid;
     pthread_cond_t *cond;
+    pthread_mutex_t *mutex;
 };
 
 static time_t
@@ -264,8 +270,10 @@ static void *
 thread_wait(void *arg) {
     struct test_wait_arg *wa = arg;
     int status;
+    pthread_mutex_lock(wa->mutex);
     waitpid(wa->pid, &status, 0);
     pthread_cond_signal(wa->cond);
+    pthread_mutex_unlock(wa->mutex);
     return (void *)(intptr_t)status;
 }
 
@@ -293,7 +301,7 @@ run_test(const void *arg) {
         return (void *)-1;
     }
     pthread_t t;
-    struct test_wait_arg wa = {.pid = child, .cond = &cond};
+    struct test_wait_arg wa = {.pid = child, .cond = &cond, .mutex = &mutex};
     pthread_create(&t, NULL, thread_wait, &wa);
     time_t tout = get_test_timeout(test_name);
     struct timespec ts;
@@ -429,6 +437,9 @@ main(int argc, char *argv[]) {
 
     DIR *cwd = opendir(".");
     pthread_t *threads = malloc(sizeof(pthread_t)*nthreads);
+    if (!threads) {
+        return 1;
+    }
     for (size_t i = 0; i < nthreads; i++) {
         pthread_create(threads + i, NULL, thread_run_test, cwd);
     }
