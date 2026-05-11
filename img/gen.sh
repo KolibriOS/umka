@@ -252,18 +252,18 @@ xfs_bigtime.qcow2 () {
     mkdir $TEMP_DIR/dird
     mkdir $TEMP_DIR/dire
     mkdir $TEMP_DIR/dirf
-    touch -a -t 200504031122.33 $TEMP_DIR/dira
-    touch -m -t 200504031122.44 $TEMP_DIR/dira
-    touch -a -t 199504031122.33 $TEMP_DIR/dirb
-    touch -m -t 203504031122.44 $TEMP_DIR/dirb
-    touch -a -t 197504031122.33 $TEMP_DIR/dirc
-    touch -m -t 207504031122.44 $TEMP_DIR/dirc
-    touch -a -t 192504031122.33 $TEMP_DIR/dird
-    touch -m -t 210504031122.44 $TEMP_DIR/dird
-    touch -a -t 190004031122.33 $TEMP_DIR/dire
-    touch -m -t 220504031122.44 $TEMP_DIR/dire
-    touch -a -t 180004031122.33 $TEMP_DIR/dirf
-    touch -m -t 220504031122.44 $TEMP_DIR/dirf
+    TZ=UTC touch -a -t 200504031122.33 $TEMP_DIR/dira
+    TZ=UTC touch -m -t 200504031122.44 $TEMP_DIR/dira
+    TZ=UTC touch -a -t 199504031122.33 $TEMP_DIR/dirb
+    TZ=UTC touch -m -t 203504031122.44 $TEMP_DIR/dirb
+    TZ=UTC touch -a -t 197504031122.33 $TEMP_DIR/dirc
+    TZ=UTC touch -m -t 207504031122.44 $TEMP_DIR/dirc
+    TZ=UTC touch -a -t 192504031122.33 $TEMP_DIR/dird
+    TZ=UTC touch -m -t 210504031122.44 $TEMP_DIR/dird
+    TZ=UTC touch -a -t 190004031122.33 $TEMP_DIR/dire
+    TZ=UTC touch -m -t 220504031122.44 $TEMP_DIR/dire
+    TZ=UTC touch -a -t 180004031122.33 $TEMP_DIR/dirf
+    TZ=UTC touch -m -t 220504031122.44 $TEMP_DIR/dirf
 #
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
@@ -1087,6 +1087,62 @@ iso9660_s2k_dir_all.qcow2 () {
     rm $img_raw
 }
 
+ext2_extra_isize.qcow2 () {
+    local img=$FUNCNAME
+    local img_raw=$(basename $img .qcow2).raw
+
+    fallocate -l 15MiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    local LOOP_DEV=$(sudo losetup --find --show -P $img_raw)
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXT2 -b 1024 -I 256 -O extra_isize $EXT_MKFS_OPTS $p1
+    
+    sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1 > /dev/null 2>&1
+    
+    sudo mount $p1 $TEMP_DIR
+    sudo chown $USER $TEMP_DIR -R
+
+    mkdir $TEMP_DIR/dira
+    touch $TEMP_DIR/file_1985
+    TZ=UTC touch -a -t 198512312359.59 $TEMP_DIR/file_1985
+    TZ=UTC touch -m -t 198512312359.59 $TEMP_DIR/file_1985
+
+    touch $TEMP_DIR/file_2015
+    TZ=UTC touch -a -t 201512312359.59 $TEMP_DIR/file_2015
+    TZ=UTC touch -m -t 201512312359.59 $TEMP_DIR/file_2015
+
+    touch $TEMP_DIR/file_2045
+    TZ=UTC touch -a -t 204512312359.59 $TEMP_DIR/file_2045
+    TZ=UTC touch -m -t 204512312359.59 $TEMP_DIR/file_2045
+
+    touch $TEMP_DIR/file_2085
+    TZ=UTC touch -a -t 208512312359.59 $TEMP_DIR/file_2085
+    TZ=UTC touch -m -t 208512312359.59 $TEMP_DIR/file_2085
+
+    touch $TEMP_DIR/file_2110
+    TZ=UTC touch -a -t 211012312359.59 $TEMP_DIR/file_2110
+    TZ=UTC touch -m -t 211012312359.59 $TEMP_DIR/file_2110
+
+    touch $TEMP_DIR/file_2200
+    TZ=UTC touch -a -t 220012312359.59 $TEMP_DIR/file_2200
+    TZ=UTC touch -m -t 220012312359.59 $TEMP_DIR/file_2200
+
+    touch $TEMP_DIR/file_ctime_crtime
+    TZ=UTC touch -a -t 202401011200.00 $TEMP_DIR/file_ctime_crtime
+    TZ=UTC touch -m -t 202401011200.00 $TEMP_DIR/file_ctime_crtime
+
+    sudo umount $TEMP_DIR
+
+    sudo debugfs -w -R "set_inode_field file_ctime_crtime ctime 20200101000000" $p1 > /dev/null 2>&1
+    sudo debugfs -w -R "set_inode_field file_ctime_crtime crtime 20100101000000" $p1 > /dev/null 2>&1
+    
+    sudo losetup -d $LOOP_DEV
+
+    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    rm $img_raw
+}
+
 images=(gpt_large.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
         kolibri.raw jfs.qcow2 xfs_lookup_v4.qcow2 xfs_lookup_v5.qcow2
         xfs_nrext64.qcow2 xfs_bigtime.qcow2 xfs_borg_bit.qcow2
@@ -1098,7 +1154,7 @@ images=(gpt_large.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
         xfs_v5_files_s05k_b4k_n8k.qcow2 fat32_test0.raw
         exfat_s05k_c16k_b16k.qcow2 exfat_s05k_c8k_b8k.qcow2
         xfs_samehash_s05k.raw ext2_s05k.qcow2 ext4_s05k.qcow2 fat12_s05k.qcow2
-        fat16_s05k.qcow2 iso9660_s2k_dir_all.qcow2)
+        fat16_s05k.qcow2 iso9660_s2k_dir_all.qcow2 ext2_extra_isize.qcow2)
 
 TEMP_DIR=$(mktemp -d)
 LOOP_DEV=$(losetup --find)

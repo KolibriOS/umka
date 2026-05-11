@@ -2750,6 +2750,8 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80) {
 
     time_t time;
     struct tm *t;
+    const char *tz = getenv("TZ");
+    setenv("TZ", "UTC", 1);
     if (!ctx->reproducible || force_atime) {
         time = kos_time_to_epoch(&file.atime);
         t = localtime(&time);
@@ -2771,6 +2773,8 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80) {
                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
                t->tm_hour, t->tm_min, t->tm_sec);
     }
+    
+    if (tz) setenv("TZ", tz, 1); else unsetenv("TZ");
     return;
 }
 
