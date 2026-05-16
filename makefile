@@ -3,7 +3,7 @@ ifndef KOLIBRIOS
 endif
 
 FASM_EXE ?= fasm
-FASM_FLAGS=-dextended_primary_loader=1 -dHOST=$(HOST) -m 2000000 -dlang=en_US
+FASM_FLAGS=-dextended_primary_loader=1 -dHOST=$(HOST) -m 1000000 -dlang=en_US
 
 HOST ?= linux
 CC ?= gcc
@@ -106,7 +106,7 @@ $(HOST)/thread.o: $(HOST)/thread.c
 	$(CC) $(CFLAGS_32) -c $< -o $@
 
 $(HOST)/pci.o: $(HOST)/pci.c
-	$(CC) $(CFLAGS_32) -std=gnu11 -c $< -o $@
+	$(CC) $(CFLAGS_32) -c $< -o $@
 
 deps/lodepng/lodepng.o: deps/lodepng/lodepng.c deps/lodepng/lodepng.h
 	$(CC) $(CFLAGS_32) -c $< -o $@ -DLODEPNG_NO_COMPILE_DECODER \

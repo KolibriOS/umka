@@ -1,0 +1,3 @@
+syscall:f70,f70s1,f70s9
+fs:fat,rw,mkdir,rm
+blkdev:s05k

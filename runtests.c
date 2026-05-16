@@ -135,7 +135,7 @@ is_valid_test(const char *name) {
         return 0;
     }
     for (size_t i = 1; i < 4 && name[i]; i++) {
-        if (name[1] < '0' || name[1] > '9') {
+        if (name[i] < '0' || name[i] > '9') {
             return 0;
         }
     }

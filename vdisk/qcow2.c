@@ -4,7 +4,7 @@
     UMKa - User-Mode KolibriOS developer tools
     vdisk - virtual disk, qcow2 format
 
-    Copyright (C) 2023  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2023,2025-2026  Ivan Baravy <dunkaist@gmail.com>
 */
 
 #include <errno.h>
@@ -16,12 +16,18 @@
 #include "umkaio.h"
 #include "em_inflate/em_inflate.h"
 
-#define L1_MAX_LEN (32u*1024u*1024u)
-#define L1_MAX_ENTRIES (L1_MAX_LEN / sizeof(uint64_t))
+#define QCOW2_DIRTY_SUFFIX ".dirty"
+
+struct qcow2_file {
+    char *fname;
+    int fd;
+    uint64_t *l1;
+};
 
 struct vdisk_qcow2 {
     struct vdisk vdisk;
-    int fd;
+    struct qcow2_file base;
+    struct qcow2_file dirty;
     size_t cluster_bits;
     size_t cluster_size;
     uint8_t *cluster;
@@ -30,20 +36,15 @@ struct vdisk_qcow2 {
     uint64_t l2_entry_cmp_x;
     uint64_t l2_entry_cmp_offset_mask;
     uint64_t l2_entry_cmp_sect_cnt_mask;
-    size_t header_length;
-    size_t refcount_order;
-    size_t refcount_table_clusters;
-    off_t refcount_table_offset;
     size_t l1_size;
     uint64_t sector_idx_mask;
-    uint64_t *l1;
     uint64_t prev_cluster_index;
 };
 
 #define QCOW2_MAGIC "QFI\xfb"
 
 struct qcow2_header {
-    char magic[4];
+    [[gnu::nonstring]] char magic[4];
     uint32_t version;
     uint64_t back_file_offset;
     uint32_t back_file_size;
@@ -74,6 +75,20 @@ struct qcow2_header {
 #define L2_ENTRY_FORMAT 0x4000000000000000ULL
 #define L2_ENTRY_STATUS 0x8000000000000000ULL
 
+#define BSWAP32(x) ( (((uint32_t)(x) & 0x000000ffu) << 24) \
+                    + (((uint32_t)(x) & 0x0000ff00u) << 8) \
+                    + (((uint32_t)(x) & 0x00ff0000u) >> 8) \
+                    + (((uint32_t)(x) & 0xff000000u) >> 24))
+
+#define BSWAP64(x) ( (((uint64_t)(x) & 0x00000000000000ffull) << 56) \
+                    + (((uint64_t)(x) & 0x000000000000ff00ull) << 40) \
+                    + (((uint64_t)(x) & 0x0000000000ff0000ull) << 24) \
+                    + (((uint64_t)(x) & 0x00000000ff000000ull) << 8) \
+                    + (((uint64_t)(x) & 0x000000ff00000000ull) >> 8) \
+                    + (((uint64_t)(x) & 0x0000ff0000000000ull) >> 24) \
+                    + (((uint64_t)(x) & 0x00ff000000000000ull) >> 40) \
+                    + (((uint64_t)(x) & 0xff00000000000000ull) >> 56))
+
 static inline uint32_t
 be32(void *p) {
     uint8_t *x = p;
@@ -90,110 +105,247 @@ be64(void *p) {
            + ((uint64_t)x[1] << 48) + ((uint64_t)x[0] << 56);
 }
 
-static void
-qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
+static int
+qcow2_read_guest_cluster(struct vdisk_qcow2 *d, struct qcow2_file *qf,
+                         uint64_t cluster_index) {
     uint64_t cluster_offset;
     size_t l2_entries = d->cluster_size / sizeof(uint64_t);
-    uint64_t offset = sector * d->vdisk.sect_size;
-    uint64_t cluster_index = offset / d->cluster_size;
     uint64_t l1_index = (cluster_index) / l2_entries;
     uint64_t l2_index = (cluster_index) % l2_entries;
-    uint64_t l1_entry = d->l1[l1_index];
+    uint64_t l1_entry = qf->l1[l1_index];    // TODO: move all l2 to mem
     uint64_t l2_entry;
-
-    if (cluster_index == d->prev_cluster_index) {
-        memcpy(buf,
-               d->cluster + (sector & d->sector_idx_mask) * d->vdisk.sect_size,
-               d->vdisk.sect_size);
-        return;
-    }
-    d->prev_cluster_index = cluster_index;
 
     uint64_t l2_table_offset = l1_entry & L1_ENTRY_OFFSET_MASK;
     if (!l2_table_offset) {
-        memset(buf, 0, d->vdisk.sect_size);
-        return;
+        return 0;
     }
-    lseek(d->fd, l2_table_offset + l2_index*sizeof(l2_entry), SEEK_SET);
-    if (!io_read(d->fd, &l2_entry, sizeof(l2_entry), d->vdisk.io)) {
+    lseek(qf->fd, l2_table_offset + l2_index*sizeof(l2_entry), SEEK_SET);
+    if (!io_read(qf->fd, &l2_entry, sizeof(l2_entry), d->vdisk.io)) {
         fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                 strerror(errno));
-        return;
+        return -1;
     }
     l2_entry = be64(&l2_entry);
     if ((l2_entry & L2_ENTRY_FORMAT) == CLUSTER_FORMAT_STANDARD) {
-        if (l2_entry & L2_ENTRY_STD_ZEROED) {
-            printf("[vdisk.qcow2] cluster 0x%" PRIx64 " is zeroed\n",
-                   cluster_index);
-            memset(buf, 0, d->vdisk.sect_size);
-            return;
-        }
         cluster_offset = l2_entry & L2_ENTRY_STD_OFFSET;
-        lseek(d->fd, cluster_offset, SEEK_SET);
-        if (!io_read(d->fd, d->cluster, d->cluster_size, d->vdisk.io)) {
+        if (!cluster_offset) {
+            return 0;
+        }
+        lseek(qf->fd, cluster_offset, SEEK_SET);
+        if (!io_read(qf->fd, d->cluster, d->cluster_size, d->vdisk.io)) {
             fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                     strerror(errno));
-            return;
+            return -1;
         }
     } else {
+        // compressed
         off_t cmp_offset = d->l2_entry_cmp_offset_mask & l2_entry;
         printf("cmp_offset: 0x%" PRIx64 "\n", cmp_offset);
-        lseek(d->fd, cmp_offset, SEEK_SET);
+        lseek(qf->fd, cmp_offset, SEEK_SET);
         size_t additional_sectors = (l2_entry & d->l2_entry_cmp_sect_cnt_mask)
                                     >> d->l2_entry_cmp_x;
         size_t cmp_size = 512 - (cmp_offset & 511) + additional_sectors*512;
-        if (!io_read(d->fd, d->cmp_cluster, d->cluster_size, d->vdisk.io)) {
+        if (!io_read(qf->fd, d->cmp_cluster, d->cluster_size, d->vdisk.io)) {
             fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                     strerror(errno));
-            return;
+            return -1;
         }
         unsigned long dest_size = d->cluster_size;
         em_inflate(d->cluster, dest_size, d->cmp_cluster, cmp_size);
     }
-    memcpy(buf,
-           d->cluster + (sector & d->sector_idx_mask) * d->vdisk.sect_size,
-           d->vdisk.sect_size);
+    return 1;
 }
 
-STDCALL void
+static int
+qcow2_read_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
+    uint64_t offset = sector * d->vdisk.sect_size;
+    uint64_t cluster_index = offset / d->cluster_size;
+
+    int status = 0;
+    if (d->dirty.fd) {
+        status = qcow2_read_guest_cluster(d, &d->dirty, cluster_index);
+    }
+    if (!status) {
+        status = qcow2_read_guest_cluster(d, &d->base, cluster_index);
+    }
+    if (status < 0) {
+        fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
+                strerror(errno));
+        return KOS_ERROR_DEVICE;
+    }
+    if (!status) {
+        memset(buf, 0, d->vdisk.sect_size);
+    } else {
+        memcpy(buf,
+               d->cluster + (sector & d->sector_idx_mask) * d->vdisk.sect_size,
+               d->vdisk.sect_size);
+    }
+    return KOS_ERROR_SUCCESS;
+}
+
+static int
+qcow2_write_guest_cluster(struct vdisk_qcow2 *d, struct qcow2_file *qf,
+                          uint64_t cluster_index) {
+    uint64_t cluster_offset;
+    size_t l2_entries = d->cluster_size / sizeof(uint64_t);
+    uint64_t l1_index = (cluster_index) / l2_entries;
+    uint64_t l2_index = (cluster_index) % l2_entries;
+    uint64_t l1_entry = qf->l1[l1_index];
+    uint64_t l2_entry;
+
+    d->prev_cluster_index = ~(uint64_t)0;
+
+    uint64_t l2_table_offset = l1_entry & L1_ENTRY_OFFSET_MASK;
+    if (!l2_table_offset) {
+        l2_table_offset = lseek(qf->fd, 0u, SEEK_END);
+        qf->l1[l1_index] = l2_table_offset;
+        uint8_t *zero_cluster = calloc(1, d->cluster_size);
+        write(qf->fd, zero_cluster, d->cluster_size);
+        free(zero_cluster);
+    }
+    lseek(qf->fd, l2_table_offset + l2_index*sizeof(l2_entry), SEEK_SET);
+    if (!io_read(qf->fd, &l2_entry, sizeof(l2_entry), d->vdisk.io)) {
+        fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
+                strerror(errno));
+        return -1;
+    }
+    l2_entry = be64(&l2_entry);
+    cluster_offset = l2_entry & L2_ENTRY_STD_OFFSET;
+    if (!cluster_offset) {
+        cluster_offset = lseek(qf->fd, 0u, SEEK_END);
+        uint64_t cluster_offset_be = BSWAP64(cluster_offset + L2_ENTRY_STATUS);
+        lseek(qf->fd, l2_table_offset + l2_index*sizeof(l2_entry), SEEK_SET);
+        write(qf->fd, &cluster_offset_be, sizeof(uint64_t));
+    }
+    lseek(qf->fd, cluster_offset, SEEK_SET);
+    if (!io_write(qf->fd, d->cluster, d->cluster_size, d->vdisk.io)) {
+        fprintf(stderr, "[vdisk.qcow2] can't write to image file: %s\n",
+                strerror(errno));
+        return -1;
+    }
+    return 1;
+}
+
+static int
+qcow2_write_guest_sector(struct vdisk_qcow2 *d, uint64_t sector, uint8_t *buf) {
+    uint64_t offset = sector * d->vdisk.sect_size;
+    uint64_t cluster_index = offset / d->cluster_size;
+
+    d->prev_cluster_index = ~(uint64_t)0;   // TODO: rename to cached_cluster_idx
+
+    int status = 0;
+    status = qcow2_read_guest_cluster(d, &d->dirty, cluster_index);
+    if (!status) {
+        status = qcow2_read_guest_cluster(d, &d->base, cluster_index);
+    }
+    if (!status) {
+        memset(d->cluster, 0, d->cluster_size);
+    }
+    memcpy(d->cluster + (sector & d->sector_idx_mask) * d->vdisk.sect_size,
+           buf, d->vdisk.sect_size);
+    status = qcow2_write_guest_cluster(d, &d->dirty, cluster_index);
+    return 1;
+}
+
+[[gnu::stdcall]]
+void
 vdisk_qcow2_close(void *userdata) {
     COVERAGE_OFF();
     struct vdisk_qcow2 *d = userdata;
-    if (d->fd) {
-        close(d->fd);
+    if (d->base.fname) {
+        free(d->base.fname);
+        if (d->base.fd) {
+            close(d->base.fd);
+        }
+    }
+    if (d->dirty.fname) {
+        if (d->dirty.fd) {
+            lseek(d->dirty.fd, d->l1_table_offset, SEEK_SET);
+            for (uint64_t *x = d->dirty.l1; x < d->dirty.l1 + d->l1_size; x++) {
+                *x = be64(x);
+            }
+            write(d->dirty.fd, d->dirty.l1, d->l1_size * sizeof(uint64_t));
+            close(d->dirty.fd);
+        }
+        unlink(d->dirty.fname);
+        free(d->dirty.fname);
     }
     free(d->cluster);
     free(d->cmp_cluster);
-    free(d->l1);
+    free(d->base.l1);
+    free(d->dirty.l1);
     free(d);
     COVERAGE_ON();
 }
 
-STDCALL int
+[[gnu::stdcall]]
+int
 vdisk_qcow2_read(void *userdata, void *buffer, off_t startsector,
                  size_t *numsectors) {
     COVERAGE_OFF();
     struct vdisk_qcow2 *d = userdata;
+    int status = KOS_ERROR_SUCCESS;
     for (size_t i = 0; i < *numsectors; i++) {
-        qcow2_read_guest_sector(d, startsector + i, buffer);
+        status = qcow2_read_guest_sector(d, startsector + i, buffer);
+        if (status < 0) {
+            fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
+                    strerror(errno));
+            break;
+        }
         buffer = (uint8_t*)buffer + d->vdisk.sect_size;
     }
     COVERAGE_ON();
-    return KOS_ERROR_SUCCESS;
+    return status;
 }
 
-STDCALL int
+// TODO: change to io_*
+static int
+qcow2_init_dirty_file(struct vdisk_qcow2 *d) {
+    int fd;
+    if ((fd = open(d->dirty.fname, O_RDWR | O_BINARY | O_CREAT | O_TRUNC,
+                   S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1) {
+        fprintf(stderr, "[vdisk.qcow2] can't open file '%s': %s\n",
+                d->dirty.fname, strerror(errno));
+    }
+    struct qcow2_header h = {.magic = QCOW2_MAGIC,
+                             .version = BSWAP32(3u),
+                             .back_file_offset = 0u,
+                             .back_file_size = 0u,
+                             .cluster_bits = BSWAP32(d->cluster_bits),
+                             .size = BSWAP64(d->vdisk.sect_cnt
+                                             * d->vdisk.sect_size),
+                             .crypt_method = 0u,
+                             .l1_size = BSWAP32(d->l1_size),
+                             .l1_table_offset = BSWAP64(d->l1_table_offset),
+                            };
+    write(fd, &h, sizeof(h));
+    d->dirty.l1 = calloc(d->l1_size, sizeof(uint64_t));
+    off_t aligned = d->l1_table_offset + d->l1_size * sizeof(uint64_t);
+    aligned += 1u << d->cluster_bits;
+    aligned &= ~( (1u << d->cluster_bits) - 1);
+    ftruncate(fd, aligned);
+    return fd;
+}
+
+[[gnu::stdcall]]
+int
 vdisk_qcow2_write(void *userdata, void *buffer, off_t startsector,
                   size_t *numsectors) {
     COVERAGE_OFF();
     struct vdisk_qcow2 *d = userdata;
-    (void)d;
-    (void)buffer;
-    (void)startsector;
-    (void)numsectors;
-    fprintf(stderr, "[vdisk.qcow2] writing is not implemented");
+    if (!d->dirty.fd) {
+        d->dirty.fd = qcow2_init_dirty_file(d);
+    }
+    for (size_t i = 0; i < *numsectors; i++) {
+        int status = qcow2_write_guest_sector(d, startsector + i, buffer);
+        if (status < 0) {
+            fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
+                    strerror(errno));
+        }
+        buffer = (uint8_t*)buffer + d->vdisk.sect_size;
+    }
     COVERAGE_ON();
-    return KOS_ERROR_UNSUPPORTED_FS;
+    return KOS_ERROR_SUCCESS;
 }
 
 struct vdisk*
@@ -206,6 +358,16 @@ vdisk_init_qcow2(const char *fname, const struct umka_io *io) {
         return NULL;
     }
 
+    d->base.fname = strdup(fname);
+    d->dirty.fname = malloc(512);
+    const char *fbasename = strrchr(fname, '/');
+    if (!fbasename) {
+        fbasename = fname;
+    } else {
+        fbasename++;
+    }
+    sprintf(d->dirty.fname, "%s" QCOW2_DIRTY_SUFFIX, fbasename);
+
     d->vdisk.diskfunc = (struct diskfunc) {.strucsize = sizeof(struct diskfunc),
                                       .close = vdisk_qcow2_close,
                                       .read = vdisk_qcow2_read,
@@ -213,21 +375,23 @@ vdisk_init_qcow2(const char *fname, const struct umka_io *io) {
                                      };
     d->vdisk.io = io;
     d->prev_cluster_index = ~(uint64_t)0;
-    if ((d->fd = open(fname, O_RDONLY | O_BINARY)) == -1) {
-        fprintf(stderr, "[vdisk.qcow2] can't open file '%s': %s\n", fname,
-                strerror(errno));
+    if ((d->base.fd = open(d->base.fname, O_RDONLY | O_BINARY)) == -1) {
+        fprintf(stderr, "[vdisk.qcow2] can't open file '%s': %s\n",
+                d->base.fname, strerror(errno));
         vdisk_qcow2_close(d);
         return NULL;
     }
     d->vdisk.sect_size = 512;
-    if (strstr(fname, "s4096") != NULL || strstr(fname, "s4k") != NULL) {
+    if ((strstr(d->base.fname, "s4096") != NULL)
+        || (strstr(d->base.fname, "s4k") != NULL)) {
         d->vdisk.sect_size = 4096;
-    } else if (strstr(fname, "s2048") != NULL || strstr(fname, "s2k") != NULL) {
+    } else if ((strstr(d->base.fname, "s2048") != NULL)
+               || (strstr(d->base.fname, "s2k") != NULL)) {
         d->vdisk.sect_size = 2048;
     }
 
     struct qcow2_header header;
-    if (!io_read(d->fd, &header, sizeof(struct qcow2_header), d->vdisk.io)) {
+    if (!io_read(d->base.fd, &header, sizeof(struct qcow2_header), d->vdisk.io)) {
         fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                 strerror(errno));
         vdisk_qcow2_close(d);
@@ -276,8 +440,6 @@ vdisk_init_qcow2(const char *fname, const struct umka_io *io) {
 
     d->l1_size = be32(&header.l1_size);
     d->l1_table_offset = be64(&header.l1_table_offset);
-    d->refcount_table_offset = be64(&header.refcount_table_offset);
-    d->refcount_table_clusters = be32(&header.refcount_table_clusters);
 
     uint64_t incompatible_features = be64(&header.incompatible_features);
     if (incompatible_features) {
@@ -287,15 +449,6 @@ vdisk_init_qcow2(const char *fname, const struct umka_io *io) {
         return NULL;
     }
 
-    d->refcount_order = be32(&header.refcount_order);
-    if (d->refcount_order < 4 || d->refcount_order > 6) {
-        fprintf(stderr, "[vdisk.qcow2] bad refcount_order value: %u\n",
-                d->refcount_order);
-        vdisk_qcow2_close(d);
-        return NULL;
-    }
-
-    d->header_length = be32(&header.header_length);
     d->cluster = (uint8_t*)malloc(d->cluster_size);
     if (!d->cluster) {
         fprintf(stderr, "[vdisk.qcow2] can't allocate memory: %s\n",
@@ -312,23 +465,23 @@ vdisk_init_qcow2(const char *fname, const struct umka_io *io) {
         return NULL;
     }
 
-    d->l1 = (uint64_t*)malloc(d->l1_size * sizeof(uint64_t));
-    if (!d->l1) {
+    d->base.l1 = (uint64_t*)malloc(d->l1_size * sizeof(uint64_t));
+    if (!d->base.l1) {
         fprintf(stderr, "[vdisk.qcow2] can't allocate memory: %s\n",
                 strerror(errno));
         vdisk_qcow2_close(d);
         return NULL;
     }
 
-    lseek(d->fd, d->l1_table_offset, SEEK_SET);
-    if (!io_read(d->fd, d->l1, d->l1_size * sizeof(uint64_t), d->vdisk.io)) {
+    lseek(d->base.fd, d->l1_table_offset, SEEK_SET);
+    if (!io_read(d->base.fd, d->base.l1, d->l1_size * sizeof(uint64_t), d->vdisk.io)) {
         fprintf(stderr, "[vdisk.qcow2] can't read from image file: %s\n",
                 strerror(errno));
         vdisk_qcow2_close(d);
         return NULL;
     }
 
-    for (uint64_t *x = d->l1; x < d->l1 + d->l1_size; x++) {
+    for (uint64_t *x = d->base.l1; x < d->base.l1 + d->l1_size; x++) {
         *x = be64(x);
     }
 

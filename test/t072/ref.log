@@ -3,13 +3,25 @@
 /hd0: sector_size=512, capacity=30720 (15 MiB), num_partitions=1
 /hd0/1: fs=ext, start=2048 (1 MiB), length=26624 (13 MiB)
 /> ls70 /hd0/1/
-status = 0 success, count = 11
+status = 6 end_of_file, count = 11
+total = 11
+-h--f .
+-h--f ..
+----f lost+found
+----f dira
+----- file_1985
+----- file_2015
+----- file_2045
+----- file_2085
+----- file_2110
+----- file_2200
+----- file_ctime_crtime
 /> stat70 /hd0/1/file_1985 -am
 status = 0 success
 attr: -----
 size: 0
-atime: 2001.01.01 00:00:00
-mtime: 2001.01.01 00:00:00
+atime: 2122.02.07 06:28:15
+mtime: 2122.02.07 06:28:15
 /> stat70 /hd0/1/file_2015 -am
 status = 0 success
 attr: -----
@@ -38,13 +50,13 @@ mtime: 2110.12.31 23:59:59
 status = 0 success
 attr: -----
 size: 0
-atime: 2137.02.07 06:28:15
-mtime: 2137.02.07 06:28:15
+atime: 2064.11.23 17:31:43
+mtime: 2064.11.23 17:31:43
 /> stat70 /hd0/1/file_ctime_crtime -amc
 status = 0 success
 attr: -----
 size: 0
 atime: 2024.01.01 12:00:00
 mtime: 2024.01.01 12:00:00
-ctime: 2010.01.01 00:00:00
+ctime: 2020.01.01 00:00:00
 /> disk_del hd0

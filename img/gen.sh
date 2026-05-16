@@ -23,12 +23,13 @@ FAT_MOUNT_OPTS="umask=111,dmask=000"
 MKFS_EXFAT="sudo mkfs.exfat"
 
 QCOW2_OPTS="compat=v3,compression_type=zlib,encryption=off,extended_l2=off,preallocation=off"
+QEMU_IMG_CONVERT_OPTS="-m 4 -f raw -O qcow2 -o $QCOW2_OPTS"
 NBD_DEV=/dev/nbd0   # FIXME
 SGDISK="sgdisk --align-end --disk-guid=abcdefff-0123-4554-3210-ffeeddccbbaa"
 
 gpt_large.qcow2 () {
     local img=$FUNCNAME
-    qemu-img create -f qcow2 -o $QCOW2_OPTS,cluster_size=2097152 $img 2E > /dev/null
+    qemu-img create -f qcow2 -o $QCOW2_OPTS,cluster_size=2M $img 2E > /dev/null
     sudo qemu-nbd -c $NBD_DEV $img
     sleep 1
     # This is weird but the sleep above prevents the following error of the
@@ -57,7 +58,7 @@ gpt_partitions_s05k.qcow2 () {
         --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB --new=0:0:+1MiB \
         --new=0:0:+1MiB $img_raw > /dev/null
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -78,7 +79,7 @@ gpt_partitions_s4k.qcow2 () {
 
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -109,7 +110,7 @@ jfs.qcow2 () {
 
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -150,7 +151,7 @@ xfs_lookup_v4.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -191,7 +192,7 @@ xfs_lookup_v5.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -229,7 +230,7 @@ xfs_nrext64.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -268,7 +269,8 @@ xfs_bigtime.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
+
     rm $img_raw
 }
 
@@ -285,7 +287,7 @@ xfs_borg_bit.qcow2 () {
 
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -314,7 +316,7 @@ xfs_short_dir_i8.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -355,7 +357,7 @@ xfs_v4_ftype0_s05k_b2k_n8k.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -396,7 +398,7 @@ xfs_v4_ftype1_s05k_b2k_n8k.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -411,7 +413,7 @@ xfs_v4_xattr.qcow2 () {
 
     $MKFS_XFS $XFS_MKFS_OPTS -m crc=0,finobt=0,rmapbt=0,reflink=0 \
         -d sectsize=512 -n ftype=0 $p1
-    sudo mount $XFS_MOUNT_OPTS $p1  $TEMP_DIR -o attr2
+    sudo mount $XFS_MOUNT_OPTS $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
     mkdir $TEMP_DIR/sf
@@ -429,12 +431,12 @@ xfs_v4_xattr.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
 xfs_v4_btrees_l2.qcow2 () {
-    echo "[*] This can take about ten minutes"
+    echo "[*] This may take about ten minutes"
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
@@ -461,7 +463,7 @@ xfs_v4_btrees_l2.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -506,7 +508,7 @@ xfs_v4_files_s05k_b4k_n8k.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -549,7 +551,7 @@ xfs_v4_ftype0_s4k_b4k_n8k.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -597,7 +599,7 @@ xfs_v4_ftype0_s05k_b2k_n8k_xattr.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -631,7 +633,7 @@ xfs_v4_unicode.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -672,7 +674,7 @@ xfs_v5_ftype1_s05k_b2k_n8k.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -711,7 +713,7 @@ xfs_v5_files_s05k_b4k_n8k.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -761,7 +763,7 @@ exfat_s05k_c16k_b16k.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -844,12 +846,12 @@ exfat_s05k_c8k_b8k.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
 xfs_samehash_s05k.raw () {
-    echo "[*] This can take about one hour"
+    echo "[*] This may take about one hour"
     local img=$FUNCNAME
 #    local img_raw=$(basename $img .qcow2).raw
     local img_raw=$img
@@ -884,7 +886,7 @@ xfs_samehash_s05k.raw () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-#    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+#    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
 }
 
 ext2_s05k.qcow2 () {
@@ -897,7 +899,7 @@ ext2_s05k.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_EXT2 $EXT_MKFS_OPTS -N 1200000 $p1
-    debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
+    sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
     sudo mount $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
@@ -922,12 +924,12 @@ ext2_s05k.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
 ext4_s05k.qcow2 () {
-    echo "[*] This can take about ten minutes"
+    echo "[*] This may take about fifteen minutes"
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
@@ -937,7 +939,7 @@ ext4_s05k.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_EXT4 $EXT_MKFS_OPTS -N 1200000 $p1
-    debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
+    sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
     sudo mount $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 #
@@ -965,7 +967,7 @@ ext4_s05k.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -999,7 +1001,7 @@ fat12_s05k.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -1036,12 +1038,12 @@ fat16_s05k.qcow2 () {
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
 iso9660_s2k_dir_all.qcow2 () {
-    echo "[*] This can take about thirty minutes"
+    echo "[*] This may take about thirty minutes"
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
@@ -1083,7 +1085,7 @@ iso9660_s2k_dir_all.qcow2 () {
 
     mkisofs -J -R -T -V 'KolibriOS' -input-charset 'UTF-8' -quiet $TEMP_DIR > $img_raw
     rm $TEMP_DIR/* -rf
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
@@ -1139,7 +1141,7 @@ ext2_extra_isize.qcow2 () {
     
     sudo losetup -d $LOOP_DEV
 
-    qemu-img convert -m 2 -O qcow2 -o $QCOW2_OPTS $img_raw $img
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 

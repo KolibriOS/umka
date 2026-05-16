@@ -1,0 +1,14 @@
+umka_boot
+disk_add ../../img/fat16_s05k.qcow2 hd0 -c 0
+ls70 /hd0/1/dir_a
+write70 /hd0/1/dir_a/one.txt 3 -h 00112233
+stat70 /hd0/1/dir_a/one.txt
+read70 /hd0/1/dir_a/one.txt 0 100 -b
+create70 /hd0/1/dir_a/one.txt -h 00112233
+stat70 /hd0/1/dir_a/one.txt
+read70 /hd0/1/dir_a/one.txt 0 100 -b
+write70 /hd0/1/dir_a/one.txt 3 -h 00112233
+stat70 /hd0/1/dir_a/one.txt
+read70 /hd0/1/dir_a/one.txt 0 100 -b
+ls70 /hd0/1/dir_a
+disk_del hd0

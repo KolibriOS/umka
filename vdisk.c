@@ -19,7 +19,8 @@
 #include "vdisk/raw.h"
 #include "vdisk/qcow2.h"
 
-STDCALL int
+[[gnu::stdcall]]
+int
 vdisk_querymedia(void *userdata, struct diskmediainfo *minfo) {
     COVERAGE_OFF();
     struct vdisk *disk = userdata;
@@ -30,7 +31,8 @@ vdisk_querymedia(void *userdata, struct diskmediainfo *minfo) {
     return KOS_ERROR_SUCCESS;
 }
 
-STDCALL size_t
+[[gnu::stdcall]]
+size_t
 vdisk_adjust_cache_size(void *userdata, size_t suggested_size) {
     struct vdisk *disk = userdata;
     if (disk->adjust_cache_size) {

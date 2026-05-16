@@ -153,6 +153,7 @@ io_async_read(int fd, void *buf, size_t count, void *arg) {
 
 ssize_t
 io_async_write(int fd, const void *buf, size_t count, void *arg) {
+    fprintf(stderr, "### io_async_write not implemented!\n");
     (void)fd;
     (void)buf;
     (void)count;

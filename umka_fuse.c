@@ -58,9 +58,9 @@ bdfe_to_stat(struct bdfe *kf, struct stat *st) {
         st->st_nlink = 1;
         st->st_size = kf->size;
     }
-    st->st_atime = kos_time_to_epoch(&(kf->atime));
-    st->st_mtime = kos_time_to_epoch(&(kf->mtime));
-    st->st_ctime = kos_time_to_epoch(&(kf->ctime));
+    st->st_atime = kos_bdfe_time_to_epoch(&(kf->a_datetime));
+    st->st_ctime = kos_bdfe_time_to_epoch(&(kf->c_datetime));
+    st->st_mtime = kos_bdfe_time_to_epoch(&(kf->m_datetime));
 }
 
 static void *
@@ -83,7 +83,7 @@ fs_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi) {
     struct bdfe file;
     struct f7080s5arg fX0 = {.sf = 5,
                              .flags = 0,
-                             .buf = &file,
+                             .info = &file,
                              .u = {.f80 = {.path_encoding = UTF8,
                                            .path = path
                                           }

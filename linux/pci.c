@@ -16,14 +16,16 @@
 #include <unistd.h>
 #include <limits.h>
 #include "pci.h"
+#include "umka.h"
 
-char pci_path[PATH_MAX] = ".";
+char pci_path[UMKA_PATH_MAX] = ".";
 
-__attribute__((stdcall)) uint32_t pci_read(uint32_t bus, uint32_t dev,
-                                           uint32_t fun, uint32_t offset,
-                                           size_t len) {
-    char path_colon[PATH_MAX*2];
-    char path_underscore[PATH_MAX*2];
+[[gnu::stdcall]]
+uint32_t pci_read(uint32_t bus, uint32_t dev,
+                  uint32_t fun, uint32_t offset,
+                  size_t len) {
+    char path_colon[UMKA_PATH_MAX*2];
+    char path_underscore[UMKA_PATH_MAX*2];
     uint32_t value = 0;
     sprintf(path_colon, "%s/%4.4x:%2.2x:%2.2x.%u/config", pci_path, 0, bus, dev,
             fun);

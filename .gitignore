@@ -52,3 +52,4 @@ apps/asciivju
 apps/justawindow
 runtests
 cov_t*.*
+*.dirty

@@ -138,7 +138,8 @@ pubsym coverage_begin
 pubsym coverage_end
 
 pubsym sha3_256_oneshot, 'hash_oneshot'
-pubsym kos_time_to_epoch
+pubsym kos_bdfe_time_to_epoch
+pubsym kos_epoch_to_bdfe_time
 pubsym umka_init, 'umka_init'
 pubsym umka_close, 'umka_close'
 pubsym umka_boot
@@ -556,7 +557,15 @@ include 'blkdev/rd.inc'         ; ramdisk driver
 include 'blkdev/disk.inc'
 include 'blkdev/disk_cache.inc'
 
+macro call target {
+  if target eq fsReadCMOS
+        call    _fsReadCMOS
+  else
+        call    target
+  end if
+}
 include 'fs/fs_lfn.inc'
+purge call
 
 include 'network/stack.inc'
 
@@ -575,12 +584,20 @@ proc sha3_256_oneshot c uses ebx esi edi ebp, _ctx, _data, _len
         ret
 endp
 
-proc kos_time_to_epoch c uses ebx esi edi ebp, _time
+proc kos_bdfe_time_to_epoch c uses ebx esi edi ebp, _time
         mov     esi, [_time]
         call    fsCalculateTime
         xor     edx, edx
         add     eax, UNIXTIME_TO_KOS_OFFSET
         adc     edx, 0
+        ret
+endp
+
+proc kos_epoch_to_bdfe_time c uses ebx esi edi ebp, _epoch_lo, _time
+        mov     eax, [_epoch_lo]
+        sub     eax, UNIXTIME_TO_KOS_OFFSET
+        mov     edi, [_time]
+        call    fsTime2bdfe
         ret
 endp
 
@@ -940,6 +957,20 @@ proc _pci_read_reg uses ebx esi edi
         movzx   edx, ah
         push    edx     ; bus
         call    pci_read
+        ret
+endp
+
+static_cmos db 0x33, 0, 0x22, 0, 0x11, 0, 0, 3, 4, 5
+
+proc _fsReadCMOS
+        push    ecx
+        movzx   ecx, al
+        mov     al, [static_cmos + ecx]
+        pop     ecx
+        xor     ah, ah
+        shl     ax, 4
+        shr     al, 4
+        aad
         ret
 endp
 

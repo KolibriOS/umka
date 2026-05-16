@@ -25,7 +25,8 @@ struct devices_dat_entry {
     uint32_t pad2;
 };
 
-static STDCALL void*
+[[gnu::stdcall]]
+static void*
 dump_devices_dat_iter(struct pci_dev *node, void *arg) {
     FILE *f = arg;
     if (node->gsi) {

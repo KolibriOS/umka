@@ -20,7 +20,8 @@ struct vdisk_raw {
     int fd;
 };
 
-STDCALL void
+[[gnu::stdcall]]
+void
 vdisk_raw_close(void *userdata) {
     COVERAGE_OFF();
     struct vdisk_raw *disk = userdata;
@@ -29,7 +30,8 @@ vdisk_raw_close(void *userdata) {
     COVERAGE_ON();
 }
 
-STDCALL int
+[[gnu::stdcall]]
+int
 vdisk_raw_read(void *userdata, void *buffer, off_t startsector,
                size_t *numsectors) {
     COVERAGE_OFF();
@@ -41,7 +43,8 @@ vdisk_raw_read(void *userdata, void *buffer, off_t startsector,
     return KOS_ERROR_SUCCESS;
 }
 
-STDCALL int
+[[gnu::stdcall]]
+int
 vdisk_raw_write(void *userdata, void *buffer, off_t startsector,
                 size_t *numsectors) {
     COVERAGE_OFF();

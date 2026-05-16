@@ -152,6 +152,37 @@ parse_uint64(struct shell_ctx *ctx, const char *str, uint64_t *res) {
     }
 }
 
+// change to int?
+static uint8_t
+parse_nibble(const char c) {
+    if ((c >= '0') && (c <= '9')) return c - '0';
+    if ((c >= 'A') && (c <= 'F')) return c - 'A' + 10;
+    if ((c >= 'a') && (c <= 'f')) return c - 'a' + 10;
+    return 0xffu;
+}
+
+static uint8_t *
+parse_hex_string(struct shell_ctx *ctx, const char *s, size_t *blen) {
+    size_t slen = strlen(s);
+    if (slen & 1) {
+        fprintf(ctx->fout, "the length of a hex string must be even\n");
+        return NULL;
+    }
+    *blen = slen/2;
+    uint8_t *b = malloc(*blen);
+    for (const char *c = s; *c; c++) {
+        if ((*c >= '0') && (*c <= '9')) continue;
+        if ((*c >= 'A') && (*c <= 'F')) continue;
+        if ((*c >= 'a') && (*c <= 'f')) continue;
+        fprintf(ctx->fout, "bad hex character: %c\n", *c);
+        return NULL;
+    }
+    for (size_t i = 0; i < *blen; i++) {
+        b[i] = (parse_nibble(s[2*i]) << 4) + parse_nibble(s[2*i+1]);
+    }
+    return b;
+}
+
 static struct shell_var *
 shell_var_get(struct shell_ctx *ctx, const char *name) {
     for (struct shell_var *var = ctx->var; var; var = var->next) {
@@ -301,7 +332,7 @@ print_hash(struct shell_ctx *ctx, uint8_t *x, size_t len) {
     fprintf(ctx->fout, "\n");
 }
 
-void *host_load_file(const char *fname) {
+void *host_load_file(const char *fname, size_t *len) {
     FILE *f = fopen(fname, "rb");
     if (!f) {
         return NULL;
@@ -312,6 +343,9 @@ void *host_load_file(const char *fname) {
     void *fdata = malloc(fsize);
     fread(fdata, 1, fsize, f);
     fclose(f);
+    if (len) {
+        *len = fsize;
+    }
     return fdata;
 }
 
@@ -665,7 +699,7 @@ cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: disk_add <file> <name> [option]...\n"
         "  <file>           absolute or relative path\n"
         "  <name>           disk name, e.g. hd0 or rd\n"
-        "  -c cache size    size of disk cache in bytes\n";
+        "  -c cache_size    size of disk cache in bytes\n";
     if (argc < 3) {
         fputs(usage, ctx->fout);
         return;
@@ -1211,7 +1245,7 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
             switch (*ctx->opts.optarg++) {
             case '=':
                 xabs = 1;
-                __attribute__ ((fallthrough));
+                [[fallthrough]];
             case '+':
                 xmoving = strtol(ctx->opts.optarg, NULL, 0);
                 break;
@@ -1227,7 +1261,7 @@ cmd_mouse_move(struct shell_ctx *ctx, int argc, char **argv) {
             switch (*ctx->opts.optarg++) {
             case '=':
                 yabs = 1;
-                __attribute__ ((fallthrough));
+                [[fallthrough]];
             case '+':
                 ymoving = strtol(ctx->opts.optarg, NULL, 0);
                 break;
@@ -2091,7 +2125,7 @@ cmd_load_cursor_from_mem(struct shell_ctx *ctx, int argc, char **argv) {
     }
     int show_pointers = 0;
     const char *fname = argv[1];
-    void *fdata = host_load_file(fname);
+    void *fdata = host_load_file(fname, NULL);
     if (!fdata) {
         fprintf(ctx->fout, "[umka] Can't load file: %s\n", fname);
         return;
@@ -2538,18 +2572,30 @@ ls_all(struct shell_ctx *ctx, struct f7080s1arg *fX0, enum f70or80 f70or80) {
     while (true) {
         struct f7080ret r = monitor_cmd_sys_lfn(ctx->monitor, f70or80,
                                                 (union f7080arg*)fX0);
-        print_f70_status(ctx, &r, 1);
-        assert((r.status == ERROR_SUCCESS && r.count == fX0->size)
-              || (r.status == ERROR_END_OF_FILE && r.count < fX0->size));
         struct f7080s1info *dir = fX0->buf;
         fX0->offset += dir->cnt;
-        int ok = (r.count <= fX0->size);
-        ok &= (dir->cnt == r.count);
-        ok &= (r.status == KOS_ERROR_SUCCESS && r.count == fX0->size)
-              || (r.status == KOS_ERROR_END_OF_FILE && r.count < fX0->size);
-        assert(ok);
-        if (!ok)
+        print_f70_status(ctx, &r, 1);
+        if (r.status == KOS_ERROR_SUCCESS) {
+            if (r.count != fX0->size) {
+                fprintf(ctx->fout, "eax == 0 but ebx != files to read\n");
+                break;
+            }
+            if (dir->cnt != r.count) {
+                fprintf(ctx->fout, "ebx != files read\n");
+                break;
+            }
+        } else if (r.status == KOS_ERROR_END_OF_FILE) {
+            if (r.count >= fX0->size) {
+                fprintf(ctx->fout, "eax == 6 but ebx >= files to read\n");
+                break;
+            }
+            if (dir->cnt != r.count) {
+                fprintf(ctx->fout, "ebx != files read\n");
+                break;
+            }
+        } else {
             break;
+        }
         fprintf(ctx->fout, "total = %"PRIi32"\n", dir->total_cnt);
         struct bdfe *bdfe = dir->bdfes;
         for (size_t i = 0; i < dir->cnt; i++) {
@@ -2695,6 +2741,58 @@ cmd_ls80(struct shell_ctx *ctx, int argc, char **argv) {
 }
 
 static void
+cmd_mkdir(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80) {
+    const char *usage = \
+        "usage: mkdir <path>\n"
+        "  path             path/to/file\n";
+    if (argc != 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    optparse_init(&ctx->opts, argv);
+    struct f7080s9arg fX0 = {.sf = 9};
+    if (f70or80 == F70) {
+        fX0.u.f70.zero = 0;
+        fX0.u.f70.path = optparse_arg(&ctx->opts);
+    } else {
+        fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
+        fX0.u.f80.path = optparse_arg(&ctx->opts);
+    }
+    struct f7080ret r = monitor_cmd_sys_lfn(ctx->monitor, f70or80,
+                                            (union f7080arg*)&fX0);
+    print_f70_status(ctx, &r, 0);
+    if (r.status != KOS_ERROR_SUCCESS)
+        return;
+}
+
+static void
+cmd_mkdir70(struct shell_ctx *ctx, int argc, char **argv) {
+    cmd_mkdir(ctx, argc, argv, F70);
+}
+
+static void
+cmd_mkdir80(struct shell_ctx *ctx, int argc, char **argv) {
+    cmd_mkdir(ctx, argc, argv, F80);
+}
+
+const char *tz;
+
+static void
+tz_to_utc() {
+    tz = getenv("TZ");
+    setenv("TZ", "UTC", 1);
+}
+
+static void
+tz_from_utc() {
+    if (tz) {
+        setenv("TZ", tz, 1);
+    } else {
+        unsetenv("TZ");
+    }
+}
+
+static void
 cmd_stat(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80) {
     const char *usage = \
         "usage: stat <file> [-c] [-m] [-a]\n"
@@ -2710,7 +2808,7 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80) {
     bool force_ctime = false, force_mtime = false, force_atime = false;
     struct f7080s5arg fX0 = {.sf = 5, .flags = 0};
     struct bdfe file;
-    fX0.buf = &file;
+    fX0.info = &file;
     if (f70or80 == F70) {
         fX0.u.f70.zero = 0;
         fX0.u.f70.path = optparse_arg(&ctx->opts);
@@ -2731,16 +2829,16 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80) {
     }
 
     int opt;
-    while ((opt = optparse(&ctx->opts, "cma")) != -1) {
+    while ((opt = optparse(&ctx->opts, "acm")) != -1) {
         switch (opt) {
+        case 'a':
+            force_atime = true;
+            break;
         case 'c':
             force_ctime = true;
             break;
         case 'm':
             force_mtime = true;
-            break;
-        case 'a':
-            force_atime = true;
             break;
         default:
             fputs(usage, ctx->fout);
@@ -2750,31 +2848,30 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80) {
 
     time_t time;
     struct tm *t;
-    const char *tz = getenv("TZ");
-    setenv("TZ", "UTC", 1);
+    tz_to_utc();
     if (!ctx->reproducible || force_atime) {
-        time = kos_time_to_epoch(&file.atime);
+        time = kos_bdfe_time_to_epoch(&file.a_datetime);
         t = localtime(&time);
         fprintf(ctx->fout, "atime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
                t->tm_hour, t->tm_min, t->tm_sec);
     }
     if (!ctx->reproducible || force_mtime) {
-        time = kos_time_to_epoch(&file.mtime);
+        time = kos_bdfe_time_to_epoch(&file.m_datetime);
         t = localtime(&time);
         fprintf(ctx->fout, "mtime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
                t->tm_hour, t->tm_min, t->tm_sec);
     }
     if (!ctx->reproducible || force_ctime) {
-        time = kos_time_to_epoch(&file.ctime);
+        time = kos_bdfe_time_to_epoch(&file.c_datetime);
         t = localtime(&time);
         fprintf(ctx->fout, "ctime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
                t->tm_hour, t->tm_min, t->tm_sec);
     }
+    tz_from_utc();
     
-    if (tz) setenv("TZ", tz, 1); else unsetenv("TZ");
     return;
 }
 
@@ -2871,6 +2968,423 @@ cmd_read80(struct shell_ctx *ctx, int argc, char **argv) {
         "  -e               encoding\n";
     cmd_read(ctx, argc, argv, F80, usage);
 }
+
+static void
+cmd_create(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80,
+          const char *usage) {
+    (void)ctx;
+    if (argc < 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    int opt;
+    optparse_init(&ctx->opts, argv);
+    struct f7080s2arg fX0 = {.sf = 2};
+    struct f7080ret r;
+    if (f70or80 == F70) {
+        fX0.u.f70.zero = 0;
+        fX0.u.f70.path = optparse_arg(&ctx->opts);
+    } else {
+        fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
+        fX0.u.f80.path = optparse_arg(&ctx->opts);
+    }
+    const char *src_fname = NULL;
+    const char *src_hex = NULL;
+    uint8_t *src_bin = NULL;
+    size_t src_len = 0;
+    size_t fsize = 0;
+    bool length_opt_used = false;
+    while ((opt = optparse(&ctx->opts, "e:f:h:l:")) != -1) {
+        switch (opt) {
+        case 'e':
+            if (f70or80 == F70) {
+                fprintf(ctx->fout, "f70 doesn't accept encoding parameter,"
+                        " use f80\n");
+                return;
+            }
+            fX0.u.f80.path_encoding = parse_encoding(ctx->opts.optarg);
+            if (fX0.u.f80.path_encoding == INVALID_ENCODING) {
+                fprintf(ctx->fout, "can't parse encoding\n");
+                return;
+            }
+            break;
+        case 'f':
+            if (src_fname) {
+                fprintf(ctx->fout, "you can't specify both -f src_file and"
+                        " -h src_hex\n");
+                return;
+            }
+            src_fname = ctx->opts.optarg;
+            src_bin = host_load_file(src_fname, &fsize);
+            if (!length_opt_used) {
+                fX0.size = fsize;
+            }
+            break;
+        case 'h':
+            if (src_fname) {
+                fprintf(ctx->fout, "you can't specify both -f src_file and"
+                        " -h src_hex\n");
+                return;
+            }
+            src_hex = ctx->opts.optarg;
+            src_bin = parse_hex_string(ctx, src_hex, &src_len);
+            if (!length_opt_used) {
+                fX0.size = src_len;
+            }
+            break;
+        case 'l':
+            if (!parse_uint32(ctx, optparse_arg(&ctx->opts), &fX0.size)) {
+                fprintf(ctx->fout, "can't parse offset\n");
+                return;
+            }
+            length_opt_used = true;
+            break;
+        default:
+            fputs(usage, ctx->fout);
+            return;
+        }
+    }
+
+    fX0.buf = src_bin;
+
+    COVERAGE_ON();
+    umka_sys_lfn(&fX0, &r, f70or80);
+    COVERAGE_OFF();
+
+    print_f70_status(ctx, &r, 1);
+
+    free(fX0.buf);
+    return;
+}
+
+static void
+cmd_create70(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: create70 <dst_file> [-l length] [-f src_file]"
+            " [-h src_hex]\n"
+        "  dst_file         path/to/file to write\n"
+        "  -l length        in bytes\n"
+        "  -f src_file      path/to/file to read\n"
+        "  -h src_hex       hex string to read\n";
+
+    cmd_create(ctx, argc, argv, F70, usage);
+}
+
+static void
+cmd_create80(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: create80 <dst_file> [-l length] [-f src_file]"
+            " [-h src_hex] [-e cp866|utf8|utf16]\n"
+        "  dst_file         path/to/file to write\n"
+        "  -l length        in bytes\n"
+        "  -f src_file      path/to/file to read\n"
+        "  -h src_hex       hex string to read\n"
+        "  -e               encoding\n";
+    cmd_create(ctx, argc, argv, F80, usage);
+}
+
+
+static void
+cmd_write(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80,
+          const char *usage) {
+    (void)ctx;
+    if (argc < 3) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    int opt;
+    optparse_init(&ctx->opts, argv);
+    struct f7080s3arg fX0 = {.sf = 3};
+    struct f7080ret r;
+    if (f70or80 == F70) {
+        fX0.u.f70.zero = 0;
+        fX0.u.f70.path = optparse_arg(&ctx->opts);
+    } else {
+        fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
+        fX0.u.f80.path = optparse_arg(&ctx->opts);
+    }
+    if (!parse_uint64(ctx, optparse_arg(&ctx->opts), &fX0.offset)) {
+        fprintf(ctx->fout, "can't parse offset\n");
+        return;
+    }
+    const char *src_fname = NULL;
+    const char *src_hex = NULL;
+    uint8_t *src_bin = NULL;
+    size_t src_len = 0;
+    size_t fsize = 0;
+    bool length_opt_used = false;
+    while ((opt = optparse(&ctx->opts, "e:f:h:l:")) != -1) {
+        switch (opt) {
+        case 'e':
+            if (f70or80 == F70) {
+                fprintf(ctx->fout, "f70 doesn't accept encoding parameter,"
+                        " use f80\n");
+                return;
+            }
+            fX0.u.f80.path_encoding = parse_encoding(ctx->opts.optarg);
+            if (fX0.u.f80.path_encoding == INVALID_ENCODING) {
+                fprintf(ctx->fout, "can't parse encoding\n");
+                return;
+            }
+            break;
+        case 'f':
+            if (src_fname) {
+                fprintf(ctx->fout, "you can't specify both -f src_file and"
+                        " -h src_hex\n");
+                return;
+            }
+            src_fname = ctx->opts.optarg;
+            src_bin = host_load_file(src_fname, &fsize);
+            if (!length_opt_used) {
+                fX0.size = fsize;
+            }
+            break;
+        case 'h':
+            if (src_fname) {
+                fprintf(ctx->fout, "you can't specify both -f src_file and"
+                        " -h src_hex\n");
+                return;
+            }
+            src_hex = ctx->opts.optarg;
+            src_bin = parse_hex_string(ctx, src_hex, &src_len);
+            if (!length_opt_used) {
+                fX0.size = src_len;
+            }
+            break;
+        case 'l':
+            if (!parse_uint32(ctx, optparse_arg(&ctx->opts), &fX0.size)) {
+                fprintf(ctx->fout, "can't parse offset\n");
+                return;
+            }
+            length_opt_used = true;
+            break;
+        default:
+            fputs(usage, ctx->fout);
+            return;
+        }
+    }
+
+    fX0.buf = src_bin;
+
+    COVERAGE_ON();
+    umka_sys_lfn(&fX0, &r, f70or80);
+    COVERAGE_OFF();
+
+    print_f70_status(ctx, &r, 1);
+
+    free(fX0.buf);
+    return;
+}
+
+static void
+cmd_write70(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: write70 <dst_file> <offset> [-l length] [-f src_file]"
+            " [-h src_hex]\n"
+        "  dst_file         path/to/file to write\n"
+        "  offset           in bytes\n"
+        "  -l length        in bytes\n"
+        "  -f src_file      path/to/file to read\n"
+        "  -h src_hex       hex string to read\n";
+
+    cmd_write(ctx, argc, argv, F70, usage);
+}
+
+static void
+cmd_write80(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: write80 <dst_file> <offset> [-l length] [-f src_file]"
+            " [-h src_hex] [-e cp866|utf8|utf16]\n"
+        "  dst_file         path/to/file to write\n"
+        "  offset           in bytes\n"
+        "  -l length        in bytes\n"
+        "  -f src_file      path/to/file to read\n"
+        "  -h src_hex       hex string to read\n"
+        "  -e               encoding\n";
+    cmd_write(ctx, argc, argv, F80, usage);
+}
+
+static bool
+parse_datetime(struct shell_ctx *ctx, const char *s, struct tm *t) {
+    if (sscanf(s, "%4d-%2d-%2d_%2d:%2d:%2d", &t->tm_year, &t->tm_mon,
+               &t->tm_mday, &t->tm_hour, &t->tm_min, &t->tm_sec) != 6) {
+        fprintf(ctx->fout, "bad date or time format\n");
+        return false;
+    }
+    t->tm_year -= 1900;
+    t->tm_mon -= 1;
+    return true;
+}
+
+static void
+cmd_touch(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80,
+          const char *usage) {
+    (void)ctx;
+    if (argc < 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    int opt;
+    optparse_init(&ctx->opts, argv);
+    struct f7080s6arg fX0;
+    struct f7080ret r;
+    if (f70or80 == F70) {
+        fX0.u.f70.zero = 0;
+        fX0.u.f70.path = optparse_arg(&ctx->opts);
+    } else {
+        fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
+        fX0.u.f80.path = optparse_arg(&ctx->opts);
+    }
+
+    struct bdfe info;
+    fX0.info = &info;
+
+    fX0.sf = 5; // first read, then rewrite
+    COVERAGE_ON();
+    umka_sys_lfn(&fX0, &r, f70or80);
+    COVERAGE_OFF();
+
+    print_f70_status(ctx, &r, 0);
+    if (r.status != KOS_ERROR_SUCCESS) {
+        return;
+    }
+
+    struct tm t = {0};
+    while ((opt = optparse(&ctx->opts, "a:c:hHm:nNrRsS")) != -1) {
+        switch (opt) {
+        case 'a':
+            if (!parse_datetime(ctx, ctx->opts.optarg, &t)) {
+                return;
+            }
+            tz_to_utc();
+            kos_epoch_to_bdfe_time(mktime(&t), &info.a_datetime);
+            tz_from_utc();
+            break;
+        case 'c':
+            if (!parse_datetime(ctx, ctx->opts.optarg, &t)) {
+                return;
+            }
+            tz_to_utc();
+            kos_epoch_to_bdfe_time(mktime(&t), &info.c_datetime);
+            tz_from_utc();
+            break;
+        case 'h':
+            fX0.info->attr &= ~BDFE_ATTR_HIDDEN;
+            break;
+        case 'H':
+            fX0.info->attr |= BDFE_ATTR_HIDDEN;
+            break;
+        case 'm':
+            if (!parse_datetime(ctx, ctx->opts.optarg, &t)) {
+                return;
+            }
+            tz_to_utc();
+            kos_epoch_to_bdfe_time(mktime(&t), &info.m_datetime);
+            tz_from_utc();
+            break;
+        case 'n':
+            fX0.info->attr &= ~BDFE_ATTR_NOT_ARCHIVED;
+            break;
+        case 'N':
+            fX0.info->attr |= BDFE_ATTR_NOT_ARCHIVED;
+            break;
+        case 'r':
+            fX0.info->attr &= ~BDFE_ATTR_READ_ONLY;
+            break;
+        case 'R':
+            fX0.info->attr |= BDFE_ATTR_READ_ONLY;
+            break;
+        case 's':
+            fX0.info->attr &= ~BDFE_ATTR_SYSTEM;
+            break;
+        case 'S':
+            fX0.info->attr |= BDFE_ATTR_SYSTEM;
+            break;
+        default:
+            fputs(usage, ctx->fout);
+            return;
+        }
+    }
+
+    fX0.sf = 6;
+    COVERAGE_ON();
+    umka_sys_lfn(&fX0, &r, f70or80);
+    COVERAGE_OFF();
+
+    print_f70_status(ctx, &r, 0);
+    return;
+}
+
+static void
+cmd_touch70(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: touch70 <file> [-a atime] [-c ctime] [-m mtime]"
+        " [-r|-R] [-h|-H] [-s|-S] [-n|-N]\n"
+        "  -a atime         access time string*\n"
+        "  -c ctime         change time string*\n"
+        "  -a mtime         modification time string*\n"
+        "  -r|-R            read-only bit reset/set\n"
+        "  -h|-H            hidden bit reset/set\n"
+        "  -s|-S            system bit reset/set\n"
+        "  -n|-N            not archived bit reset/set\n"
+        "* time format: YYYY-mm-DD_HH:MM:SS\n";
+
+    cmd_touch(ctx, argc, argv, F70, usage);
+}
+
+static void
+cmd_touch80(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: touch80 [-a atime] [-c ctime] [-m mtime]"
+        " [-r|-R] [-h|-H] [-s|-S] [-n|-N] [-e cp866|utf8|utf16]\n"
+        "  -a atime         access time string*\n"
+        "  -c ctime         change time string*\n"
+        "  -a mtime         modification time string*\n"
+        "  -r|-R            read-only bit reset/set\n"
+        "  -h|-H            hidden bit reset/set\n"
+        "  -s|-S            system bit reset/set\n"
+        "  -n|-N            not archived bit reset/set\n"
+        "  -e               encoding\n"
+        "* time format: YYYY-mm-DD_HH:MM:SS\n";
+    cmd_touch(ctx, argc, argv, F80, usage);
+}
+
+
+static void
+cmd_rm(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80) {
+    const char *usage = \
+        "usage: rm <path>\n"
+        "  path             path/to/file\n";
+    if (argc != 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    optparse_init(&ctx->opts, argv);
+    struct f7080s8arg fX0 = {.sf = 8};
+    if (f70or80 == F70) {
+        fX0.u.f70.zero = 0;
+        fX0.u.f70.path = optparse_arg(&ctx->opts);
+    } else {
+        fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
+        fX0.u.f80.path = optparse_arg(&ctx->opts);
+    }
+    struct f7080ret r = monitor_cmd_sys_lfn(ctx->monitor, f70or80,
+                                            (union f7080arg*)&fX0);
+    print_f70_status(ctx, &r, 0);
+    if (r.status != KOS_ERROR_SUCCESS)
+        return;
+}
+
+static void
+cmd_rm70(struct shell_ctx *ctx, int argc, char **argv) {
+    cmd_rm(ctx, argc, argv, F70);
+}
+
+static void
+cmd_rm80(struct shell_ctx *ctx, int argc, char **argv) {
+    cmd_rm(ctx, argc, argv, F80);
+}
+
 
 static void
 cmd_acpi_preload_table(struct shell_ctx *ctx, int argc, char **argv) {
@@ -3949,7 +4463,7 @@ cmd_board_get(struct shell_ctx *ctx, int argc, char **argv) {
         switch (opt) {
         case 'f':
             flush = 1;
-            __attribute__((fallthrough));   // TODO: use [[fallthrough]]; (C23)
+            [[fallthrough]];
         case 'l':
             line = 1;
             break;
@@ -4077,7 +4591,10 @@ func_table_t cmd_cmds[] = {
     { "blit_bitmap",                    cmd_blit_bitmap },
     { "button",                         cmd_button },
     { "cd",                             cmd_cd },
-    { "set",                            cmd_set },
+    { "check_for_event",                cmd_check_for_event },
+    { "create70",                       cmd_create70},
+    { "create80",                       cmd_create80},
+    { "csleep",                         cmd_csleep },
     { "get",                            cmd_get },
     { "get_key",                        cmd_get_key },
     { "disk_add",                       cmd_disk_add },
@@ -4155,6 +4672,9 @@ func_table_t cmd_cmds[] = {
     { "net_ipv4_set_gw",                cmd_net_ipv4_set_gw },
     { "net_ipv4_set_subnet",            cmd_net_ipv4_set_subnet },
     { "net_listen",                     cmd_net_listen },
+    { "new_sys_thread",                 cmd_new_sys_thread },
+    { "mkdir70",                        cmd_mkdir70 },
+    { "mkdir80",                        cmd_mkdir80 },
     { "net_open_socket",                cmd_net_open_socket },
     { "osloop",                         cmd_osloop },
     { "pci_get_path",                   cmd_pci_get_path },
@@ -4166,8 +4686,10 @@ func_table_t cmd_cmds[] = {
     { "ramdisk_init",                   cmd_ramdisk_init },
     { "read70",                         cmd_read70 },
     { "read80",                         cmd_read80 },
+    { "rm70",                           cmd_rm70 },
+    { "rm80",                           cmd_rm80 },
     { "scrot",                          cmd_scrot },
-    { "write_devices_dat",              cmd_write_devices_dat },
+    { "set",                            cmd_set },
     { "set_button_style",               cmd_set_button_style },
     { "set_cursor",                     cmd_set_cursor },
     { "set_cwd",                        cmd_cd },
@@ -4183,18 +4705,20 @@ func_table_t cmd_cmds[] = {
     { "set_system_lang",                cmd_set_system_lang },
     { "set_window_caption",             cmd_set_window_caption },
     { "set_window_colors",              cmd_set_window_colors },
-    { "csleep",                         cmd_csleep },
     { "stat70",                         cmd_stat70 },
     { "stat80",                         cmd_stat80 },
+    { "touch70",                        cmd_touch70 },
+    { "touch80",                        cmd_touch80 },
     { "var",                            cmd_var },
-    { "check_for_event",                cmd_check_for_event },
     { "wait_for_idle",                  cmd_wait_for_idle },
     { "wait_for_os_idle",               cmd_wait_for_os_idle },
     { "wait_for_window",                cmd_wait_for_window },
     { "window_redraw",                  cmd_window_redraw },
+    { "write70",                        cmd_write70},
+    { "write80",                        cmd_write80},
+    { "write_devices_dat",              cmd_write_devices_dat },
     { "write_text",                     cmd_write_text },
     { "switch_to_thread",               cmd_switch_to_thread },
-    { "new_sys_thread",                 cmd_new_sys_thread },
     { NULL,                             NULL },
 };
 

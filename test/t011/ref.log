@@ -110,7 +110,7 @@ total = 7
 status = 6 end_of_file, count = 7
 total = 7
 ----f .
------ 
+----- 
 ----- 
 ----- 
 ----- 
@@ -167,8 +167,8 @@ total = 7
 status = 6 end_of_file, count = 7
 total = 7
 ----f .
-r-s-f 
---s-f 
+r-s-f 
+--s-f 
 -hs-f 
 rhs-f 
 --slf 

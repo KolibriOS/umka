@@ -16,13 +16,15 @@
 #include "umka.h"
 #include "vnet.h"
 
-static STDCALL void
+[[gnu::stdcall]]
+static void
 vnet_unload_null(void) {
     COVERAGE_ON();
     COVERAGE_OFF();
 }
 
-static STDCALL void
+[[gnu::stdcall]]
+static void
 vnet_reset_null(void) {
     COVERAGE_ON();
     COVERAGE_OFF();
@@ -38,7 +40,8 @@ dump_net_buff(net_buff_t *buf) {
 }
 */
 
-static STDCALL int
+[[gnu::stdcall]]
+static int
 vnet_transmit_null(net_buff_t *buf) {
     struct vnet *net;
     __asm__ __inline__ __volatile__ (

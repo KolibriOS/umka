@@ -1,0 +1,29 @@
+umka_boot
+disk_add ../../img/fat16_s05k.qcow2 hd0 -c 0
+ls70 /hd0/1/dir_a
+mkdir70 /hd0/1/dir_a/one
+mkdir70 /hd0/1/dir_a/two
+mkdir70 /hd0/1/dir_a/two/three
+mkdir70 /hd0/1/dir_a/four/five
+ls70 /hd0/1/dir_a
+ls70 /hd0/1/dir_a/one
+ls70 /hd0/1/dir_a/two
+ls70 /hd0/1/dir_a/two/three
+ls70 /hd0/1/dir_a/four
+stat70 /hd0/1/dir_a
+stat70 /hd0/1/dir_a/one
+stat70 /hd0/1/dir_a/two
+stat70 /hd0/1/dir_a/two/three
+stat70 /hd0/1/dir_a/four
+rm70 /hd0/1/dir_a
+rm70 /hd0/1/dir_a/one
+rm70 /hd0/1/dir_a/two
+rm70 /hd0/1/dir_a/two/three
+rm70 /hd0/1/dir_a/two/three
+ls70 /hd0/1/dir_a
+rm70 /hd0/1/dir_a/two
+rm70 /hd0/1/dir_a/four
+rm70 /hd0/1/dir_a
+ls70 /hd0/1/dir_a
+ls70 /hd0/1
+disk_del hd0

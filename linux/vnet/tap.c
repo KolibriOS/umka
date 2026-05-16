@@ -24,19 +24,22 @@
 #define TAP_DEV "/dev/net/tun"
 #define UMKA_TAP_NAME "umka%d"
 
-static STDCALL void
+[[gnu::stdcall]]
+static void
 vnet_unload_tap(void) {
     COVERAGE_ON();
     COVERAGE_OFF();
 }
 
-static STDCALL void
+[[gnu::stdcall]]
+static void
 vnet_reset_tap(void) {
     COVERAGE_ON();
     COVERAGE_OFF();
 }
 
-static STDCALL int
+[[gnu::stdcall]]
+static int
 vnet_transmit_tap(net_buff_t *buf) {
     struct vnet *net;
     __asm__ __inline__ __volatile__ (

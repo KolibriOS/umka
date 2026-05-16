@@ -3,7 +3,7 @@
 
     UMKa - User-Mode KolibriOS developer tools
 
-    Copyright (C) 2017-2023  Ivan Baravy <dunkaist@gmail.com>
+    Copyright (C) 2017-2026  Ivan Baravy <dunkaist@gmail.com>
     Copyright (C) 2021  Magomed Kostoev <mkostoevr@yandex.ru>
 */
 
@@ -29,8 +29,6 @@
 #else
 typedef void siginfo_t;
 #endif
-
-#define STDCALL __attribute__((__stdcall__))
 
 enum {
     UMKA_RUNNING_NEVER,
@@ -153,7 +151,7 @@ struct dbg_regs {
     uint32_t dr0, dr1, dr2, dr3, dr7;
 };
 
-struct __attribute__((packed)) process_information {
+struct [[gnu::packed]] process_information {
     uint32_t cpu_usage;
     uint16_t window_stack_position;
     uint16_t window_stack_value;
@@ -173,7 +171,7 @@ struct __attribute__((packed)) process_information {
 static_assert(sizeof(struct process_information) == 0x400,
               "must be 0x400 bytes long");
 
-struct __attribute__((packed)) wdata {
+struct [[gnu::packed]] wdata {
     struct box box;
     uint32_t cl_workarea;
     uint32_t cl_titlebar;
@@ -214,11 +212,11 @@ struct system_colors {
 };
 
 enum fs_enc {
+    INVALID_ENCODING = -1,
     DEFAULT_ENCODING,
     CP866,
     UTF16,
     UTF8,
-    INVALID_ENCODING,
 };
 
 enum f70or80 {
@@ -287,17 +285,18 @@ struct partition {
 
 struct diskfunc {
     uint32_t  strucsize;
-    STDCALL void (*close)(void *userdata);
-    STDCALL void (*closemedia)(void *userdata);
-    STDCALL int (*querymedia)(void *userdata, struct diskmediainfo *info);
-    STDCALL int (*read)(void *userdata, void *buffer, off_t startsector,
-                        size_t *numsectors);
-    STDCALL int (*write)(void *userdata, void *buffer, off_t startsector,
-                         size_t *numsectors);
-    STDCALL int (*flush)(void *userdata);
-    STDCALL unsigned int (*adjust_cache_size)(void *userdata,
+    [[gnu::stdcall]] void (*close)(void *userdata);
+    [[gnu::stdcall]] void (*closemedia)(void *userdata);
+    [[gnu::stdcall]] int (*querymedia)(void *userdata,
+                                       struct diskmediainfo *info);
+    [[gnu::stdcall]] int (*read)(void *userdata, void *buffer,
+                                 off_t startsector, size_t *numsectors);
+    [[gnu::stdcall]] int (*write)(void *userdata, void *buffer,
+                                  off_t startsector, size_t *numsectors);
+    [[gnu::stdcall]] int (*flush)(void *userdata);
+    [[gnu::stdcall]] unsigned int (*adjust_cache_size)(void *userdata,
                                               size_t suggested_size);
-    STDCALL int (*loadtray)(void *userdata, int flags);
+    [[gnu::stdcall]] int (*loadtray)(void *userdata, int flags);
 };
 
 struct disk;
@@ -324,17 +323,26 @@ struct disk {
     struct disk_cache app_cache;
 };
 
+struct bdfe_datetime {
+    uint32_t time;
+    uint32_t date;
+};
+
+#define BDFE_ATTR_READ_ONLY    0x01
+#define BDFE_ATTR_HIDDEN       0x02
+#define BDFE_ATTR_SYSTEM       0x04
+#define BDFE_ATTR_VOLUME_LABEL 0x08
+#define BDFE_ATTR_DIRECTORY    0x10
+#define BDFE_ATTR_NOT_ARCHIVED 0x20
+
 struct bdfe {
     uint32_t attr;
     uint32_t enc;
-    uint32_t ctime;
-    uint32_t cdate;
-    uint32_t atime;
-    uint32_t adate;
-    uint32_t mtime;
-    uint32_t mdate;
+    struct bdfe_datetime c_datetime;
+    struct bdfe_datetime a_datetime;
+    struct bdfe_datetime m_datetime;
     uint64_t size;
-    char name[0x777];  // how to handle this properly? FIXME
+    char name[0x777];  // how to handle this properly? union? FIXME
 };
 
 struct f7080ret {
@@ -342,16 +350,16 @@ struct f7080ret {
     uint32_t count;
 };
 
-struct __attribute__((packed)) f7080s0arg {
+struct [[gnu::packed]] f7080s0arg {
     uint32_t sf;
     uint64_t offset;
     uint32_t count;
     void *buf;
     union {
-        struct {
+        struct [[gnu::packed]] {
             uint8_t zero;
             const char *path;
-        } __attribute__((packed)) f70;
+        } f70;
         struct {
             uint32_t path_encoding;
             const char *path;
@@ -359,19 +367,54 @@ struct __attribute__((packed)) f7080s0arg {
     } u;
 };
 
-struct __attribute__((packed)) f7080s1arg {
+struct [[gnu::packed]] f7080s1arg {
     uint32_t sf;
     uint32_t offset;
     uint32_t encoding;
     uint32_t size;
     void *buf;
     union {
-        struct {
+        struct [[gnu::packed]] {
             uint8_t zero;
             const char *path;
-        } __attribute__((packed)) f70;
+        } f70;
         struct {
             uint32_t path_encoding;
+            const char *path;
+        } f80;
+    } u;
+};
+
+struct [[gnu::packed]] f7080s2arg {
+    uint32_t sf;
+    uint32_t reserved1;
+    uint32_t reserved2;
+    uint32_t size;
+    void *buf;
+    union {
+        struct [[gnu::packed]] {
+            uint8_t zero;
+            const char *path;
+        } f70;
+        struct {
+            int path_encoding;
+            const char *path;
+        } f80;
+    } u;
+};
+
+struct [[gnu::packed]] f7080s3arg {
+    uint32_t sf;
+    uint64_t offset;
+    uint32_t size;
+    void *buf;
+    union {
+        struct [[gnu::packed]] {
+            uint8_t zero;
+            const char *path;
+        } f70;
+        struct {
+            int path_encoding;
             const char *path;
         } f80;
     } u;
@@ -385,17 +428,17 @@ struct f7080s1info {
     struct bdfe bdfes[];
 };
 
-struct __attribute__((packed)) f7080s5arg {
+struct [[gnu::packed]] f7080s5arg {
     uint32_t sf;
     uint32_t reserved1;
     uint32_t flags;
     uint32_t reserved2;
-    void *buf;
+    struct bdfe *info;
     union {
-        struct {
+        struct [[gnu::packed]] {
             uint8_t zero;
             const char *path;
-        } __attribute__((packed)) f70;
+        } f70;
         struct {
             uint32_t path_encoding;
             const char *path;
@@ -403,17 +446,71 @@ struct __attribute__((packed)) f7080s5arg {
     } u;
 };
 
-struct __attribute__((packed)) f7080s7arg {
+struct [[gnu::packed]] f7080s6arg {
+    uint32_t sf;
+    uint32_t reserved1;
+    uint32_t reserved2;
+    uint32_t reserved3;
+    struct bdfe *info;
+    union {
+        struct [[gnu::packed]] {
+            uint8_t zero;
+            const char *path;
+        } f70;
+        struct {
+            uint32_t path_encoding;
+            const char *path;
+        } f80;
+    } u;
+};
+
+struct [[gnu::packed]] f7080s7arg {
     uint32_t sf;
     uint32_t flags;
     char *params;
     uint32_t reserved1;
     uint32_t reserved2;
     union {
-        struct {
+        struct [[gnu::packed]] {
             uint8_t zero;
             const char *path;
-        } __attribute__((packed)) f70;
+        } f70;
+        struct {
+            uint32_t path_encoding;
+            const char *path;
+        } f80;
+    } u;
+};
+
+struct [[gnu::packed]] f7080s8arg {
+    uint32_t sf;
+    uint32_t reserved1;
+    uint32_t reserved2;
+    uint32_t reserved3;
+    void *reserved4;
+    union {
+        struct [[gnu::packed]] {
+            uint8_t zero;
+            const char *path;
+        } f70;
+        struct {
+            uint32_t path_encoding;
+            const char *path;
+        } f80;
+    } u;
+};
+
+struct [[gnu::packed]] f7080s9arg {
+    uint32_t sf;
+    uint32_t reserved1;
+    uint32_t reserved2;
+    uint32_t reserved3;
+    void *reserved4;
+    union {
+        struct [[gnu::packed]] {
+            uint8_t zero;
+            const char *path;
+        } f70;
         struct {
             uint32_t path_encoding;
             const char *path;
@@ -424,8 +521,12 @@ struct __attribute__((packed)) f7080s7arg {
 union f7080arg {
     struct f7080s0arg s0;
     struct f7080s1arg s1;
+    struct f7080s3arg s3;
     struct f7080s5arg s5;
+    struct f7080s5arg s6;
     struct f7080s7arg s7;
+    struct f7080s8arg s8;
+    struct f7080s9arg s9;
 };
 
 #define KF_READONLY 0x01
@@ -510,9 +611,9 @@ struct net_device {
     char *name;             // ptr to 0 terminated string
 
     // ptrs to driver functions
-    STDCALL void (*unload) (void);
-    STDCALL void (*reset) (void);
-    STDCALL int (*transmit) (net_buff_t *);
+    [[gnu::stdcall]] void (*unload) (void);
+    [[gnu::stdcall]] void (*reset) (void);
+    [[gnu::stdcall]] int (*transmit) (net_buff_t *);
 
     uint32_t link_state;    // link state (0 = no link)
     uint32_t hwacc;         // bitmask stating enabled HW accelerations (offload
@@ -591,15 +692,22 @@ void
 i40(void);
 
 time_t
-kos_time_to_epoch(uint32_t *time);
+kos_bdfe_time_to_epoch(struct bdfe_datetime *time);
 
-STDCALL struct disk *
-disk_add(struct diskfunc *disk, const char *name, void *userdata, uint32_t flags);
+void
+kos_epoch_to_bdfe_time(uint32_t epoch, struct bdfe_datetime *time);
 
-STDCALL void *
+[[gnu::stdcall]]
+struct disk *
+disk_add(struct diskfunc *disk, const char *name, void *userdata,
+         uint32_t flags);
+
+[[gnu::stdcall]]
+void *
 disk_media_changed(struct disk *disk, int inserted);
 
-STDCALL void
+[[gnu::stdcall]]
+void
 disk_del(struct disk *disk);
 
 void
@@ -620,11 +728,13 @@ extern char kos_ramdisk[RAMDISK_MAX_LEN];
 struct disk *
 kos_ramdisk_init(void);
 
-STDCALL void
+[[gnu::stdcall]]
+void
 kos_set_mouse_data(uint32_t btn_state, int32_t xmoving, int32_t ymoving,
                    int32_t vscroll, int32_t hscroll);
 
-STDCALL net_buff_t *
+[[gnu::stdcall]]
+net_buff_t *
 kos_net_buff_alloc(size_t size);
 
 struct idt_entry {
@@ -638,7 +748,8 @@ typedef int (*hw_int_handler_t)(void*);
 
 extern struct idt_entry kos_idts[];
 
-STDCALL void
+[[gnu::stdcall]]
+void
 kos_attach_int_handler(int irq, hw_int_handler_t handler, void *userdata);
 
 void
@@ -686,28 +797,36 @@ extern struct pci_dev *kos_pci_root;
 void
 kos_acpi_aml_init(void);
 
-STDCALL void
+[[gnu::stdcall]]
+void
 kos_aml_attach(acpi_node_t *parent, acpi_node_t *node);
 
-STDCALL void
+[[gnu::stdcall]]
+void
 kos_acpi_fill_pci_irqs(void *ctx);
 
-STDCALL amlctx_t*
+[[gnu::stdcall]]
+amlctx_t*
 kos_acpi_aml_new_thread(void);
 
-STDCALL acpi_node_t*
+[[gnu::stdcall]]
+acpi_node_t*
 kos_aml_alloc_node(int32_t type);
 
-STDCALL acpi_node_t*
+[[gnu::stdcall]]
+acpi_node_t*
 kos_aml_constructor_integer(void);
 
-STDCALL acpi_node_t*
+[[gnu::stdcall]]
+acpi_node_t*
 kos_aml_constructor_package(size_t el_cnt);
 
-STDCALL acpi_node_t*
+[[gnu::stdcall]]
+acpi_node_t*
 kos_acpi_lookup_node(acpi_node_t *root, char *name);
 
-STDCALL void
+[[gnu::stdcall]]
+void
 kos_acpi_print_tree(void *ctx);
 
 #define MAX_PCI_DEVICES 256
@@ -718,13 +837,17 @@ extern void *kos_acpi_dev_next;
 
 void kos_eth_input(void *buf);
 
-STDCALL void*
+[[gnu::stdcall]]
+void*
 kos_kernel_alloc(size_t len);
 
-STDCALL void
+[[gnu::stdcall]]
+void
 kos_pci_walk_tree(struct pci_dev *node,
-                  STDCALL void* (*test)(struct pci_dev *node, void *arg),
-                  STDCALL void* (*clbk)(struct pci_dev *node, void *arg),
+                  [[gnu::stdcall]] void* (*test)(struct pci_dev *node,
+                                                 void *arg),
+                  [[gnu::stdcall]] void* (*clbk)(struct pci_dev *node,
+                                                 void *arg),
                   void *arg);
 
 struct f75ret {
@@ -760,11 +883,12 @@ kos_net_add_device(struct net_device *dev) {
     return dev_num;
 }
 
-STDCALL void
+[[gnu::stdcall]]
+void
 kos_window_set_screen(ssize_t left, ssize_t top, ssize_t right, ssize_t bottom,
                       ssize_t proc);
 
-struct __attribute__((packed)) display {
+struct [[gnu::packed]] display {
     int32_t x;
     int32_t y;
     size_t width;
@@ -821,7 +945,7 @@ struct e820entry {
 
 #define MAX_MEMMAP_BLOCKS 32
 
-struct __attribute__((packed)) boot_data {
+struct [[gnu::packed]] boot_data {
     uint8_t bpp;    // bits per pixel
     uint16_t pitch; // scanline length
     uint8_t pad1[5];
@@ -1076,7 +1200,7 @@ extern void *acpi_ctx;
 extern uint32_t kos_acpi_usage;
 extern uint32_t kos_acpi_node_alloc_cnt;
 extern uint32_t kos_acpi_node_free_cnt;
-extern uint32_t kos_acpi_count_nodes(void *ctx) STDCALL;
+extern uint32_t kos_acpi_count_nodes(void *ctx) [[gnu::stdcall]];
 extern struct srv srv_list;
 extern struct dlldescr dll_list;
 extern struct smem shmem_list;

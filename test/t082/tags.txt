@@ -1,0 +1,3 @@
+syscall:f70,f70s2,f70s3
+fs:fat,fat16,rw,create,write
+blkdev:s05k
