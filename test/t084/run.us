@@ -1,0 +1,7 @@
+umka_boot
+disk_add ../../img/ext2_s05k.qcow2 hd0 -c 0
+touch70 /hd0/1/dir_a -H -R -S -a 2001-02-03_04:05:06 -c 2005-06-07_08:09:10 -m 2009-10-11_12:13:14
+stat70 /hd0/1/dir_a -acm
+touch70 /hd0/1/dir_a -s -c 2025-12-31_23:59:59
+stat70 /hd0/1/dir_a -acm
+disk_del hd0
