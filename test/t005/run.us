@@ -5,3 +5,4 @@ cd /hd0
 pwd
 cd 1
 pwd
+disk_del hd0

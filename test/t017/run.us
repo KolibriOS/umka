@@ -95,3 +95,5 @@ read70 /hd0/1/4GiB_plus 0x120004001 0x6000 -h
 read70 /hd0/1/4GiB_plus 0x11fffefff 0x6000 -h
 read70 /hd0/1/4GiB_plus 0x11ffff000 0x6000 -h
 read70 /hd0/1/4GiB_plus 0x11ffff001 0x6000 -h
+
+disk_del hd0

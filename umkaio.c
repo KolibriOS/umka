@@ -139,7 +139,7 @@ io_async_read(int fd, void *buf, size_t count, void *arg) {
     cmd->read.arg.buf = buf;
     cmd->read.arg.count = count;
     atomic_store_explicit(&cmd->status, IOT_CMD_STATUS_READY, memory_order_release);
-    
+
     pthread_cond_signal(&cmd->iot_cond);
     kos_wait_events(io_async_complete_wait_test, NULL);
 

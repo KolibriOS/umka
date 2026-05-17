@@ -562,7 +562,7 @@ cmd_i40(struct shell_ctx *ctx, int argc, char **argv) {
         fputs(usage, ctx->fout);
         return;
     }
-    pushad_t regs = {0, 0, 0, 0, 0, 0, 0, 0};
+    pushad_t regs = {};
     if (argv[1]) regs.eax = strtoul(argv[1], NULL, 0);
     if (argv[2]) regs.ebx = strtoul(argv[2], NULL, 0);
     if (argv[3]) regs.ecx = strtoul(argv[3], NULL, 0);
@@ -2530,7 +2530,7 @@ cmd_cd(struct shell_ctx *ctx, int argc, char **argv) {
 
 static void
 ls_range(struct shell_ctx *sh, struct f7080s1arg *fX0, enum f70or80 f70or80) {
-    size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 :
+    size_t bdfe_len = (fX0->encoding <= CP866) ? BDFE_LEN_CP866 :
                                                  BDFE_LEN_UNICODE;
     uint32_t requested = fX0->size;
     if (fX0->size > MAX_DIRENTS_TO_READ) {
@@ -2567,7 +2567,7 @@ ls_range(struct shell_ctx *sh, struct f7080s1arg *fX0, enum f70or80 f70or80) {
 
 static void
 ls_all(struct shell_ctx *ctx, struct f7080s1arg *fX0, enum f70or80 f70or80) {
-    size_t bdfe_len = (fX0->encoding == CP866) ? BDFE_LEN_CP866 :
+    size_t bdfe_len = (fX0->encoding <= CP866) ? BDFE_LEN_CP866 :
                                                  BDFE_LEN_UNICODE;
     while (true) {
         struct f7080ret r = monitor_cmd_sys_lfn(ctx->monitor, f70or80,
@@ -2775,23 +2775,6 @@ cmd_mkdir80(struct shell_ctx *ctx, int argc, char **argv) {
     cmd_mkdir(ctx, argc, argv, F80);
 }
 
-const char *tz;
-
-static void
-tz_to_utc() {
-    tz = getenv("TZ");
-    setenv("TZ", "UTC", 1);
-}
-
-static void
-tz_from_utc() {
-    if (tz) {
-        setenv("TZ", tz, 1);
-    } else {
-        unsetenv("TZ");
-    }
-}
-
 static void
 cmd_stat(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80) {
     const char *usage = \
@@ -2848,30 +2831,28 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80) {
 
     time_t time;
     struct tm *t;
-    tz_to_utc();
     if (!ctx->reproducible || force_atime) {
         time = kos_bdfe_time_to_epoch(&file.a_datetime);
-        t = localtime(&time);
+        t = gmtime(&time);
         fprintf(ctx->fout, "atime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
                t->tm_hour, t->tm_min, t->tm_sec);
     }
     if (!ctx->reproducible || force_mtime) {
         time = kos_bdfe_time_to_epoch(&file.m_datetime);
-        t = localtime(&time);
+        t = gmtime(&time);
         fprintf(ctx->fout, "mtime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
                t->tm_hour, t->tm_min, t->tm_sec);
     }
     if (!ctx->reproducible || force_ctime) {
         time = kos_bdfe_time_to_epoch(&file.c_datetime);
-        t = localtime(&time);
+        t = gmtime(&time);
         fprintf(ctx->fout, "ctime: %4.4i.%2.2i.%2.2i %2.2i:%2.2i:%2.2i\n",
                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
                t->tm_hour, t->tm_min, t->tm_sec);
     }
-    tz_from_utc();
-    
+
     return;
 }
 
@@ -3249,24 +3230,20 @@ cmd_touch(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80,
         return;
     }
 
-    struct tm t = {0};
+    struct tm t = {};
     while ((opt = optparse(&ctx->opts, "a:c:hHm:nNrRsS")) != -1) {
         switch (opt) {
         case 'a':
             if (!parse_datetime(ctx, ctx->opts.optarg, &t)) {
                 return;
             }
-            tz_to_utc();
-            kos_epoch_to_bdfe_time(mktime(&t), &info.a_datetime);
-            tz_from_utc();
+            kos_epoch_to_bdfe_time(timegm(&t), &info.a_datetime);
             break;
         case 'c':
             if (!parse_datetime(ctx, ctx->opts.optarg, &t)) {
                 return;
             }
-            tz_to_utc();
-            kos_epoch_to_bdfe_time(mktime(&t), &info.c_datetime);
-            tz_from_utc();
+            kos_epoch_to_bdfe_time(timegm(&t), &info.c_datetime);
             break;
         case 'h':
             fX0.info->attr &= ~BDFE_ATTR_HIDDEN;
@@ -3278,9 +3255,7 @@ cmd_touch(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80,
             if (!parse_datetime(ctx, ctx->opts.optarg, &t)) {
                 return;
             }
-            tz_to_utc();
-            kos_epoch_to_bdfe_time(mktime(&t), &info.m_datetime);
-            tz_from_utc();
+            kos_epoch_to_bdfe_time(timegm(&t), &info.m_datetime);
             break;
         case 'n':
             fX0.info->attr &= ~BDFE_ATTR_NOT_ARCHIVED;
@@ -4761,7 +4736,7 @@ run_test(struct shell_ctx *ctx) {
         dup2(fileno(ctx->fin), STDIN_FILENO);
         fclose(ctx->fin);
     }
-    ic_init_custom_malloc(NULL, NULL, NULL);
+    ic_init_custom_alloc(NULL, NULL, NULL);
 //    ic_style_def("ic-prompt","ansi-default");
     ic_enable_color(0);
     ic_set_prompt_marker(NULL, NULL);

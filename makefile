@@ -10,14 +10,14 @@ CC ?= gcc
 WARNINGS_COMMON=-Wall -Wextra \
          -Wnull-dereference -Wshadow -Wformat=2 -Wswitch -Wswitch-enum \
          -Wpedantic -Wstrict-prototypes -Wunused -Wformat-nonliteral \
-         #-Wconversion -Wsign-conversion
-NOWARNINGS_COMMON=-Wno-address-of-packed-member
+         #-Wconversion -Wsign-conversion -Wtrailing-whitespace=any
+NOWARNINGS_COMMON=-Wno-address-of-packed-member -Wno-missing-format-attribute
 
-CFLAGS_ISOCLINE_COMMON=-D__MINGW_USE_VC2005_COMPAT
+CFLAGS_ISOCLINE_COMMON=-D__MINGW_USE_VC2005_COMPAT -Wno-shadow -Wno-unused-function -Wno-format-nonliteral
 ifeq (,$(findstring gcc,$(CC)))
         WARNINGS=$(WARNINGS_COMMON)
-        NOWARNINGS=$(NOWARNINGS_COMMON) -Wno-missing-prototype-for-cc
-        CFLAGS_ISOCLINE=$(CFLAGS_ISOCLINE_COMMON) -Wno-format-nonliteral
+        NOWARNINGS=$(NOWARNINGS_COMMON)
+        CFLAGS_ISOCLINE=$(CFLAGS_ISOCLINE_COMMON)
 else ifeq (,$(findstring clang,$(CC)))
         WARNINGS=$(WARNINGS_COMMON) -Wduplicated-cond -Wduplicated-branches \
                  -Wrestrict -Wlogical-op -Wjump-misses-init
@@ -114,8 +114,7 @@ deps/lodepng/lodepng.o: deps/lodepng/lodepng.c deps/lodepng/lodepng.h
 
 deps/isocline/src/isocline.o: deps/isocline/src/isocline.c \
         deps/isocline/include/isocline.h
-	$(CC) $(CFLAGS_32) $(CFLAGS_ISOCLINE) -c $< -o $@ -Wno-shadow \
-                -Wno-unused-function
+	$(CC) $(CFLAGS_32) $(CFLAGS_ISOCLINE) -c $< -o $@
 
 deps/optparse/optparse.o: deps/optparse/optparse.c deps/optparse/optparse.h
 	$(CC) $(CFLAGS_32) -c $< -o $@

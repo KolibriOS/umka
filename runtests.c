@@ -320,7 +320,7 @@ run_test(const void *arg) {
     }
     pthread_join(t, &result);
     pthread_mutex_unlock(&mutex);
-    
+
     return result;
 }
 #else

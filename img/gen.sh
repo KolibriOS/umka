@@ -10,15 +10,16 @@ MKDIRRANGE=../tools/mkdirrange
 MKFS_XFS="sudo mkfs.xfs"
 XFS_MIN_DISK_SIZE="302MiB"
 XFS_MKFS_OPTS="-q -i maxpct=0"
-XFS_MOUNT_OPTS="-t xfs"
+XFS_MOUNT_OPTS="-t xfs -o lazytime"
 
 MKFS_EXT2="sudo mkfs.ext2"
 MKFS_EXT4="sudo mkfs.ext4"
 EXT_HASH_SEED="01234567-abcd-abcd-abcd-001122334455"
 EXT_MKFS_OPTS="-q"
+EXT_MOUNT_OPTS="-t ext4 -o lazytime"
 
 MKFS_FAT="sudo mkfs.fat"
-FAT_MOUNT_OPTS="umask=111,dmask=000"
+FAT_MOUNT_OPTS="-t vfat -o lazytime,umask=111,dmask=000"
 
 MKFS_EXFAT="sudo mkfs.exfat"
 
@@ -921,6 +922,17 @@ ext2_s05k.qcow2 () {
     mkdir $TEMP_DIR/dir_f
     $MKDIRRANGE $TEMP_DIR/dir_f 0 64998  0 1
 #
+    $MKFILEPATTERN $TEMP_DIR/no_hole 0 65536
+#
+    $MKFILEPATTERN $TEMP_DIR/hole_begin 0 65536
+    fallocate -p -o 0 -l 16KiB $TEMP_DIR/hole_begin
+#
+    $MKFILEPATTERN $TEMP_DIR/hole_middle 0 65536
+    fallocate -p -o 32KiB -l 16KiB $TEMP_DIR/hole_middle
+#
+    $MKFILEPATTERN $TEMP_DIR/hole_end 0 65536
+    fallocate -p -o 48KiB -l 16KiB $TEMP_DIR/hole_end
+#
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
@@ -1113,6 +1125,17 @@ ext4_s05k.qcow2 () {
     mkdir $TEMP_DIR/dir_g
     $MKDIRRANGE $TEMP_DIR/dir_g 0 1000000  0 1
 #
+    $MKFILEPATTERN $TEMP_DIR/no_hole 0 65536
+#
+    $MKFILEPATTERN $TEMP_DIR/hole_begin 0 65536
+    fallocate -p -o 0 -l 16KiB $TEMP_DIR/hole_begin
+#
+    $MKFILEPATTERN $TEMP_DIR/hole_middle 0 65536
+    fallocate -p -o 32KiB -l 16KiB $TEMP_DIR/hole_middle
+#
+    $MKFILEPATTERN $TEMP_DIR/hole_end 0 65536
+    fallocate -p -o 48KiB -l 16KiB $TEMP_DIR/hole_end
+#
     sudo umount $TEMP_DIR
     sudo losetup -d $LOOP_DEV
 
@@ -1130,7 +1153,7 @@ fat12_s05k.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_FAT -F 12 $p1 > /dev/null
-    sudo mount -o $FAT_MOUNT_OPTS $p1 $TEMP_DIR
+    sudo mount $FAT_MOUNT_OPTS $p1 $TEMP_DIR
 #
     mkdir $TEMP_DIR/dir_a
     $MKDIRRANGE $TEMP_DIR/dir_a 0 3  0 1
@@ -1164,7 +1187,7 @@ fat16_s05k.qcow2 () {
     local p1="$LOOP_DEV"p1
 
     $MKFS_FAT -F 16 $p1 > /dev/null
-    sudo mount -o $FAT_MOUNT_OPTS $p1 $TEMP_DIR
+    sudo mount $FAT_MOUNT_OPTS $p1 $TEMP_DIR
 #
     mkdir $TEMP_DIR/dir_a
     $MKDIRRANGE $TEMP_DIR/dir_a 0 3  0 1

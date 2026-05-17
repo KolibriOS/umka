@@ -211,3 +211,5 @@ status = 6 end_of_file, count = 0
 /> read70 /hd0/1/btree_l1_no_hole 0x80000 11 -b
 status = 0 success, count = 11
 0000080004000800080008
+/> 
+/> disk_del hd0

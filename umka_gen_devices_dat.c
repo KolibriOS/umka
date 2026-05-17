@@ -179,7 +179,7 @@ main (int argc, char *argv[]) {
                 perror("Can't open file");
             }
         }
-        
+
         size_t len = fread(acpi_path, 1, PATH_MAX, f);
         acpi_path[len-1] = '\0';
         fclose(f);

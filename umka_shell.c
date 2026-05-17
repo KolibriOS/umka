@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <inttypes.h>
 #include <limits.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -72,6 +73,7 @@ main(int argc, char **argv) {
     const char *infile = NULL, *outfile = NULL;
     FILE *fin = stdin;
     FILE *fout = stdout;
+    setlocale(LC_ALL, "");
     build_history_filename();
 /*
     kos_boot.memmap_block_cnt = 3;

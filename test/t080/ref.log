@@ -94,8 +94,8 @@ total = 5
 ----f d0000000001_
 ----f d0000000002_
 /> ls70 /hd0/1
-status = 6 end_of_file, count = 9
-total = 9
+status = 6 end_of_file, count = 13
+total = 13
 -h--f .
 -h--f ..
 ----f lost+found
@@ -105,4 +105,8 @@ total = 9
 ----f dir_d
 ----f dir_e
 ----f dir_f
+----- no_hole
+----- hole_begin
+----- hole_middle
+----- hole_end
 /> disk_del hd0

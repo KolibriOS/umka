@@ -1200,7 +1200,7 @@ extern void *acpi_ctx;
 extern uint32_t kos_acpi_usage;
 extern uint32_t kos_acpi_node_alloc_cnt;
 extern uint32_t kos_acpi_node_free_cnt;
-extern uint32_t kos_acpi_count_nodes(void *ctx) [[gnu::stdcall]];
+ [[gnu::stdcall]] extern uint32_t kos_acpi_count_nodes(void *ctx);
 extern struct srv srv_list;
 extern struct dlldescr dll_list;
 extern struct smem shmem_list;

@@ -10,3 +10,5 @@ dump_appdata 2
 load_dll /sys/lib/network.obj
 dump_dlls
 dump_appdata 2
+
+disk_del rd

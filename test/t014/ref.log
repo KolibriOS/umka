@@ -274,3 +274,5 @@ status = 6 end_of_file, count = 0
 /> read70 /hd0/1/hole_end 0x10001 11 -b
 status = 6 end_of_file, count = 0
 
+/> 
+/> disk_del hd0

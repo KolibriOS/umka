@@ -251,3 +251,5 @@ status = 0 success, count = 24576
 /> read70 /hd0/1/4GiB_plus 0x11ffff001 0x6000 -h
 status = 0 success, count = 24576
 22a8dca8c78a49cdde0cd804f032e8fdf19a8609b8ad79ac128468a798601315
+/> 
+/> disk_del hd0
