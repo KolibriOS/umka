@@ -946,12 +946,12 @@ ext2_symlinks.qcow2 () {
 
     fallocate -l 15MiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
-    local LOOP_DEV=$(sudo losetup --find --show -P $img_raw)
+    sudo losetup -P $LOOP_DEV $img_raw
     local p1="$LOOP_DEV"p1
 
     $MKFS_EXT2 -b 1024 $EXT_MKFS_OPTS $p1
 
-    sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1 > /dev/null 2>&1
+    sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
 
     sudo mount $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
@@ -1267,12 +1267,12 @@ ext2_extra_isize.qcow2 () {
 
     fallocate -l 15MiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
-    local LOOP_DEV=$(sudo losetup --find --show -P $img_raw)
+    sudo losetup -P $LOOP_DEV $img_raw
     local p1="$LOOP_DEV"p1
 
     $MKFS_EXT2 -b 1024 -I 256 -O extra_isize $EXT_MKFS_OPTS $p1
 
-    sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1 > /dev/null 2>&1
+    sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
 
     sudo mount $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
@@ -1308,8 +1308,34 @@ ext2_extra_isize.qcow2 () {
 
     sudo umount $TEMP_DIR
 
-    sudo debugfs -w -R "set_inode_field file_ctime_crtime ctime 20200101000000" $p1 > /dev/null 2>&1
-    sudo debugfs -w -R "set_inode_field file_ctime_crtime crtime 20100101000000" $p1 > /dev/null 2>&1
+    sudo debugfs -w -R "set_inode_field file_ctime_crtime ctime 20200101000000" $p1
+    sudo debugfs -w -R "set_inode_field file_ctime_crtime crtime 20100101000000" $p1
+
+    sudo losetup -d $LOOP_DEV
+
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
+    rm $img_raw
+}
+
+ext2_rev0.qcow2 () {
+    local img=$FUNCNAME
+    local img_raw=$(basename $img .qcow2).raw
+
+    fallocate -l 18MiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXT2 -E revision=0 $EXT_MKFS_OPTS $p1
+
+    sudo debugfs -w -R "set_super_value feature_compat 0" $p1
+    sudo debugfs -w -R "set_super_value feature_incompat 0" $p1
+    sudo debugfs -w -R "set_super_value feature_ro_compat 0" $p1
+    sudo debugfs -w -R "set_super_value first_ino 0" $p1
+    sudo debugfs -w -R "set_super_value inode_size 0" $p1
+
+    # Zero out all modern extensions after the UUID (offset 120 to 1024)
+    sudo dd if=/dev/zero of=$p1 bs=1 seek=$((1024 + 120)) count=$((1024 - 120)) conv=notrunc
 
     sudo losetup -d $LOOP_DEV
 
@@ -1329,7 +1355,7 @@ images=(gpt_large.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
         exfat_s05k_c16k_b16k.qcow2 exfat_s05k_c8k_b8k.qcow2
         xfs_samehash_s05k.raw ext2_s05k.qcow2 ext4_s05k.qcow2 fat12_s05k.qcow2
         fat16_s05k.qcow2 iso9660_s2k_dir_all.qcow2 ext2_extra_isize.qcow2
-        ext2_symlinks.qcow2)
+        ext2_symlinks.qcow2 ext2_rev0.qcow2)
 
 TEMP_DIR=$(mktemp -d)
 LOOP_DEV=$(losetup --find)

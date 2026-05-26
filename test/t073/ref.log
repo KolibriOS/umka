@@ -1,0 +1,11 @@
+/> umka_boot
+/> disk_add ../../img/ext2_rev0.qcow2 hd0 -c 0
+/hd0: sector_size=512, capacity=36864 (18 MiB), num_partitions=1
+/hd0/1: fs=ext, start=2048 (1 MiB), length=32768 (16 MiB)
+/> ls70 /hd0/1/
+status = 6 end_of_file, count = 3
+total = 3
+-h--f .
+-h--f ..
+----f lost+found
+/> disk_del hd0
