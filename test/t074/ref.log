@@ -1,0 +1,72 @@
+/> umka_boot
+/> 
+/> #test ext2_extra_isze which has extra_isize
+/> disk_add ../../img/ext2_extra_isize.qcow2 hd0 -c 0
+/hd0: sector_size=512, capacity=30720 (15 MiB), num_partitions=1
+/hd0/1: fs=ext, start=2048 (1 MiB), length=26624 (13 MiB)
+/> #test ext2_s05k which doesn't have extra_isize
+/> disk_add ../../img/ext2_s05k.qcow2 hd1 -c 0
+/hd1: sector_size=512, capacity=10485760 (5 GiB), num_partitions=1
+/hd1/1: fs=ext, start=2048 (1 MiB), length=10481664 (5118 MiB)
+/> 
+/> stat70 /hd1/1/dir_a -amc
+status = 0 success
+attr: ----f
+atime: 2026.06.06 17:55:45
+mtime: 2026.06.06 17:55:45
+ctime: 2026.06.06 17:55:45
+/> mkdir70 /hd1/1/dir_a/new_fallback_dir
+status = 0 success
+/> stat70 /hd1/1/dir_a -amc
+status = 0 success
+attr: ----f
+atime: 2026.06.06 17:55:45
+mtime: 2005.04.03 11:22:33
+ctime: 2005.04.03 11:22:33
+/> rm70 /hd1/1/dir_a/new_fallback_dir
+status = 0 success
+/> 
+/> stat70 /hd0/1/file_2085 -amc
+status = 0 success
+attr: -----
+size: 0
+atime: 2085.12.31 23:59:59
+mtime: 2085.12.31 23:59:59
+ctime: 2005.06.13 00:00:00
+/> touch70 /hd0/1/file_2085 -a 2129-01-01_00:00:00 -c 2129-01-01_00:00:00 -m 2129-01-01_00:00:00
+status = 0 success
+status = 0 success
+/> stat70 /hd0/1/file_2085 -amc
+status = 0 success
+attr: -----
+size: 0
+atime: 2129.01.01 00:00:00
+mtime: 2129.01.01 00:00:00
+ctime: 2005.06.13 00:00:00
+/> touch70 /hd0/1/file_2085 -a 2085-12-31_23:59:59 -c 2026-05-25_09:21:17 -m 2085-12-31_23:59:59
+status = 0 success
+status = 0 success
+/> 
+/> mkdir70 /hd0/1/dira/new_edge_case_dir
+status = 0 success
+/> stat70 /hd0/1/dira/new_edge_case_dir -amc
+status = 0 success
+attr: ----f
+atime: 2005.04.03 11:22:33
+mtime: 2005.04.03 11:22:33
+ctime: 2005.04.03 11:22:33
+/> mkdir70 /hd0/1/dira/new_edge_case_dir/sub_dir
+status = 0 success
+/> stat70 /hd0/1/dira/new_edge_case_dir -amc  
+status = 0 success
+attr: ----f
+atime: 2005.04.03 11:22:33
+mtime: 2005.04.03 11:22:33
+ctime: 2005.04.03 11:22:33
+/> rm70 /hd0/1/dira/new_edge_case_dir/sub_dir
+status = 0 success
+/> rm70 /hd0/1/dira/new_edge_case_dir
+status = 0 success
+/> 
+/> disk_del hd1
+/> disk_del hd0

@@ -16,6 +16,7 @@ MKFS_EXT2="sudo mkfs.ext2"
 MKFS_EXT4="sudo mkfs.ext4"
 EXT_HASH_SEED="01234567-abcd-abcd-abcd-001122334455"
 EXT_MKFS_OPTS="-q"
+KOS_SUPPORTED="-O none,filetype,sparse_super,large_file"
 EXT_MOUNT_OPTS="-t ext4 -o lazytime"
 
 MKFS_FAT="sudo mkfs.fat"
@@ -1308,6 +1309,7 @@ ext2_extra_isize.qcow2 () {
 
     sudo umount $TEMP_DIR
 
+    sudo debugfs -w -R "set_inode_field file_2085 crtime 20050613000000" $p1
     sudo debugfs -w -R "set_inode_field file_ctime_crtime ctime 20200101000000" $p1
     sudo debugfs -w -R "set_inode_field file_ctime_crtime crtime 20100101000000" $p1
 
@@ -1358,7 +1360,7 @@ images=(gpt_large.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
         ext2_symlinks.qcow2 ext2_rev0.qcow2)
 
 TEMP_DIR=$(mktemp -d)
-LOOP_DEV=$(losetup --find)
+LOOP_DEV=$(sudo losetup --find)
 
 for image in ${images[*]}; do
     if [ -f "$image" ]; then

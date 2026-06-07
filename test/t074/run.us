@@ -1,0 +1,26 @@
+umka_boot
+
+#test with extra_isize
+disk_add ../../img/ext2_extra_isize.qcow2 hd0 -c 0
+#test without extra_isize
+disk_add ../../img/ext2_s05k.qcow2 hd1 -c 0
+
+stat70 /hd1/1/dir_a -amc
+mkdir70 /hd1/1/dir_a/new_fallback_dir
+stat70 /hd1/1/dir_a -amc
+rm70 /hd1/1/dir_a/new_fallback_dir
+
+stat70 /hd0/1/file_2085 -amc
+touch70 /hd0/1/file_2085 -a 2129-01-01_00:00:00 -c 2129-01-01_00:00:00 -m 2129-01-01_00:00:00
+stat70 /hd0/1/file_2085 -amc
+touch70 /hd0/1/file_2085 -a 2085-12-31_23:59:59 -c 2026-05-25_09:21:17 -m 2085-12-31_23:59:59
+
+mkdir70 /hd0/1/dira/new_edge_case_dir
+stat70 /hd0/1/dira/new_edge_case_dir -amc
+mkdir70 /hd0/1/dira/new_edge_case_dir/sub_dir
+stat70 /hd0/1/dira/new_edge_case_dir -amc  
+rm70 /hd0/1/dira/new_edge_case_dir/sub_dir
+rm70 /hd0/1/dira/new_edge_case_dir
+
+disk_del hd1
+disk_del hd0
