@@ -1,0 +1,9 @@
+umka_boot
+disk_add ../../img/ext2_s05k.qcow2 hd0 -c 0
+mkdir70 /hd0/1/dir_a/new_dir
+create70 /hd0/1/dir_a/new_dir/new_file.txt -h 48656c6c6f
+stat70 /hd0/1/dir_a/new_dir/new_file.txt
+read70 /hd0/1/dir_a/new_dir/new_file.txt 0 5 -b
+rm70 /hd0/1/dir_a/new_dir/new_file.txt
+rm70 /hd0/1/dir_a/new_dir
+disk_del hd0
