@@ -6,5 +6,4 @@ ls70 /hd0/1/dir_c
 ls70 /hd0/1/dir_d
 ls70 /hd0/1/dir_e
 ls70 /hd0/1/dir_f
-ls70 /hd0/1/dir_g
 disk_del hd0

@@ -1,0 +1,9 @@
+umka_boot
+disk_add ../../img/ext4_64bit_s05k.qcow2 hd0 -c 524288
+ls70 /hd0/1/dir_a
+ls70 /hd0/1/dir_b
+ls70 /hd0/1/dir_c
+read70 /hd0/1/no_hole 0 256 -b
+read70 /hd0/1/no_hole 0xfff 16 -b
+read70 /hd0/1/no_hole 0xffff 16 -b
+disk_del hd0
