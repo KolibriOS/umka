@@ -198,7 +198,8 @@ status = 6 end_of_file, count = 0
 status = 0 success, count = 0
 
 /> read70 /hd0/1/hole_end 0x10001 0 -b
-status = 32774 unknown
+status = 6 end_of_file, count = 0
+
 /> # one-byte length
 /> read70 /hd0/1/hole_end 0xbffe 1 -b
 status = 0 success, count = 1
@@ -219,9 +220,11 @@ status = 6 end_of_file, count = 0
 status = 6 end_of_file, count = 0
 
 /> read70 /hd0/1/hole_end 0x10000 1 -b
-status = 32774 unknown
+status = 6 end_of_file, count = 0
+
 /> read70 /hd0/1/hole_end 0x10001 1 -b
-status = 32774 unknown
+status = 6 end_of_file, count = 0
+
 /> # fixed-size block, different begin/end positions
 /> read70 /hd0/1/hole_end 0xbff4 11 -b
 status = 0 success, count = 11
@@ -266,8 +269,10 @@ status = 6 end_of_file, count = 0
 status = 6 end_of_file, count = 0
 
 /> read70 /hd0/1/hole_end 0x10000 11 -b
-status = 32774 unknown
+status = 6 end_of_file, count = 0
+
 /> read70 /hd0/1/hole_end 0x10001 11 -b
-status = 32774 unknown
+status = 6 end_of_file, count = 0
+
 /> 
 /> disk_del hd0
