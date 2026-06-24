@@ -1,0 +1,20 @@
+/> umka_boot
+/> disk_add ../../img/ext2_s05k.qcow2 hd0 -c 0
+/hd0: sector_size=512, capacity=10485760 (5 GiB), num_partitions=1
+/hd0/1: fs=ext, start=2048 (1 MiB), length=10481664 (5118 MiB)
+/> mkdir70 /hd0/1/dir_a/new_dir
+status = 0 success
+/> create70 /hd0/1/dir_a/new_dir/new_file.txt -h 48656c6c6f
+status = 0 success, count = 5
+/> stat70 /hd0/1/dir_a/new_dir/new_file.txt
+status = 0 success
+attr: -----
+size: 5
+/> read70 /hd0/1/dir_a/new_dir/new_file.txt 0 5 -b
+status = 0 success, count = 5
+48656c6c6f
+/> rm70 /hd0/1/dir_a/new_dir/new_file.txt
+status = 0 success
+/> rm70 /hd0/1/dir_a/new_dir
+status = 0 success
+/> disk_del hd0
