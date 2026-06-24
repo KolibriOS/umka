@@ -1,0 +1,2 @@
+syscall:write70,read70
+fs:ext,ext2,file

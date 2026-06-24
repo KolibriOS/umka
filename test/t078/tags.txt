@@ -1,0 +1,2 @@
+syscall:mkdir70,create70,ls70,cd
+fs:ext,ext2
