@@ -146,5 +146,6 @@ e0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
 status = 0 success, count = 16
 0f001002100410061008100a100c100e
 /> read70 /hd0/1/no_hole 0xffff 16 -b
-status = 32774 unknown
+status = 6 end_of_file, count = 1
+ff
 /> disk_del hd0
