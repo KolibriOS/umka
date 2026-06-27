@@ -1,0 +1,266 @@
+/> umka_boot
+/> disk_add ../../img/ext2_unicode.qcow2 hd0 -c 524288
+/hd0: sector_size=512, capacity=65536 (32 MiB), num_partitions=1
+/hd0/1: fs=ext, start=2048 (1 MiB), length=61440 (30 MiB)
+/> 
+/> stat80 /hd0/1/dir0
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/dir0/
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/дир❦
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/дир❦/
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/дир❦/дир11
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/дир❦/дир11/
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/❦❦❦
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/❦❦❦/
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/❦❦❦/д❦р22
+status = 0 success
+attr: ----f
+/> stat80 /hd0/1/дир3
+status = 0 success
+attr: ----f
+/> 
+/> stat80 /hd0/1/dir0/file00
+status = 0 success
+attr: -----
+size: 12
+/> stat80 /hd0/1/dir0/file00/
+status = 0 success
+attr: -----
+size: 12
+/> stat80 /hd0/1/❦❦❦/д❦р22/❦❦
+status = 0 success
+attr: -----
+size: 22
+/> stat80 /hd0/1/❦❦❦/д❦р22/❦❦/
+status = 0 success
+attr: -----
+size: 22
+/> stat80 /hd0/1/❦❦❦/д❦р22/💗💗
+status = 0 success
+attr: -----
+size: 23
+/> stat80 /hd0/1/дир3/файл33
+status = 0 success
+attr: -----
+size: 26
+/> stat80 /hd0/1/дир3/файл33/
+status = 0 success
+attr: -----
+size: 26
+/> 
+/> read80 /hd0/1/dir0/file00 0 100 -b
+status = 6 end_of_file, count = 12
+68656c6c6f5f776f726c640a
+/> read80 /hd0/1/dir0/file00/ 0 100 -b
+status = 6 end_of_file, count = 12
+68656c6c6f5f776f726c640a
+/> read80 /hd0/1/❦❦❦/д❦р22/❦❦ 0 100 -b
+status = 6 end_of_file, count = 22
+d0bfd180d0b8d0b2d0b5d182e29da6d0bcd0b8d1800a
+/> read80 /hd0/1/дир3/файл33 0 100 -b
+status = 6 end_of_file, count = 26
+d0bfd180d0b8d0b2d0b5d182e29da6f09f9297d0bcd0b8d1800a
+/> 
+/> ls70 /hd0/1/ -e utf8
+status = 6 end_of_file, count = 8
+total = 8
+-h--f .
+-h--f ..
+----f lost+found
+----f dir0
+----f дир❦
+----f ❦❦❦
+----f ❦👩❦
+----f дир3
+/> ls70 /hd0/1/ -e utf16
+status = 6 end_of_file, count = 8
+total = 8
+-h--f .
+-h--f .
+----f l
+----f d
+----f 48@f'
+----f f'f'f'
+----f f'i�=�f'
+----f 48@3
+/> ls70 /hd0/1/ -e cp866
+status = 6 end_of_file, count = 8
+total = 8
+-h--f .
+-h--f ..
+----f lost+found
+----f dir0
+----f ���_
+----f ___
+----f ___
+----f ���3
+/> ls70 /hd0/1/ -e default
+status = 6 end_of_file, count = 8
+total = 8
+-h--f .
+-h--f ..
+----f lost+found
+----f dir0
+----f ���_
+----f ___
+----f ___
+----f ���3
+/> ls70 /hd0/1/❦❦❦/ -e utf8
+status = 5 file_not_found
+/> ls70 /hd0/1/❦❦❦/ -e utf16
+status = 5 file_not_found
+/> ls70 /hd0/1/❦❦❦/ -e cp866
+status = 5 file_not_found
+/> ls70 /hd0/1/❦❦❦/ -e default
+status = 5 file_not_found
+/> ls70 /hd0/1/дир3/ -e utf8
+status = 5 file_not_found
+/> ls70 /hd0/1/дир3/ -e utf16
+status = 5 file_not_found
+/> ls70 /hd0/1/дир3/ -e cp866
+status = 5 file_not_found
+/> ls70 /hd0/1/дир3/ -e default
+status = 5 file_not_found
+/> 
+/> ls80 /hd0/1/ -e utf8
+status = 6 end_of_file, count = 8
+total = 8
+-h--f .
+-h--f ..
+----f lost+found
+----f dir0
+----f дир❦
+----f ❦❦❦
+----f ❦👩❦
+----f дир3
+/> ls80 /hd0/1/ -e utf16
+status = 6 end_of_file, count = 8
+total = 8
+-h--f .
+-h--f .
+----f l
+----f d
+----f 48@f'
+----f f'f'f'
+----f f'i�=�f'
+----f 48@3
+/> ls80 /hd0/1/ -e cp866
+status = 6 end_of_file, count = 8
+total = 8
+-h--f .
+-h--f ..
+----f lost+found
+----f dir0
+----f ���_
+----f ___
+----f ___
+----f ���3
+/> ls80 /hd0/1/ -e default
+status = 6 end_of_file, count = 8
+total = 8
+-h--f .
+-h--f ..
+----f lost+found
+----f dir0
+----f ���_
+----f ___
+----f ___
+----f ���3
+/> ls80 /hd0/1/❦❦❦/ -e utf8
+status = 6 end_of_file, count = 3
+total = 3
+-h--f .
+-h--f ..
+----f д❦р22
+/> ls80 /hd0/1/❦❦❦/ -e utf16
+status = 6 end_of_file, count = 3
+total = 3
+-h--f .
+-h--f .
+----f 4f'@2
+/> ls80 /hd0/1/❦❦❦/ -e cp866
+status = 6 end_of_file, count = 3
+total = 3
+-h--f .
+-h--f ..
+----f �_�22
+/> ls80 /hd0/1/❦❦❦/ -e default
+status = 6 end_of_file, count = 3
+total = 3
+-h--f .
+-h--f ..
+----f �_�22
+/> ls80 /hd0/1/дир3/ -e utf8
+status = 6 end_of_file, count = 3
+total = 3
+-h--f .
+-h--f ..
+----- файл33
+/> ls80 /hd0/1/дир3/ -e utf16
+status = 6 end_of_file, count = 3
+total = 3
+-h--f .
+-h--f .
+----- D09;3
+/> ls80 /hd0/1/дир3/ -e cp866
+status = 6 end_of_file, count = 3
+total = 3
+-h--f .
+-h--f ..
+----- 䠩�33
+/> ls80 /hd0/1/дир3/ -e default
+status = 6 end_of_file, count = 3
+total = 3
+-h--f .
+-h--f ..
+----- 䠩�33
+/> 
+/> ls80 /hd0/1/❦👩❦/ -e utf8
+status = 6 end_of_file, count = 5
+total = 5
+-h--f .
+-h--f ..
+----f 👩❦❦
+----f ❦👩❦
+----f ❦❦👩
+/> ls80 /hd0/1/❦👩❦/ -e utf16
+status = 6 end_of_file, count = 5
+total = 5
+-h--f .
+-h--f .
+----f i�=�f'f'
+----f f'i�=�f'
+----f f'f'i�=�
+/> ls80 /hd0/1/❦👩❦/ -e cp866
+status = 6 end_of_file, count = 5
+total = 5
+-h--f .
+-h--f ..
+----f ___
+----f ___
+----f ___
+/> ls80 /hd0/1/❦👩❦/ -e default
+status = 6 end_of_file, count = 5
+total = 5
+-h--f .
+-h--f ..
+----f ___
+----f ___
+----f ___
+/> 
+/> disk_del hd0
