@@ -639,6 +639,41 @@ xfs_v4_unicode.qcow2 () {
     rm $img_raw
 }
 
+ext2_unicode.qcow2 () {
+    local img=$FUNCNAME
+    local img_raw=$(basename $img .qcow2).raw
+
+    fallocate -l 32MiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXT2 $EXT_MKFS_OPTS $KOS_SUPPORTED \
+        -E hash_seed=$EXT_HASH_SEED $p1
+    sudo mount $EXT_MOUNT_OPTS $p1 $TEMP_DIR
+    sudo chown $USER $TEMP_DIR -R
+#
+    mkdir -p $TEMP_DIR/dir0
+    mkdir -p $TEMP_DIR/дир❦/дир11
+    mkdir -p $TEMP_DIR/❦❦❦/д❦р22
+    mkdir -p $TEMP_DIR/❦👩❦/
+    mkdir -p $TEMP_DIR/❦👩❦/👩❦❦/
+    mkdir -p $TEMP_DIR/❦👩❦/❦👩❦/
+    mkdir -p $TEMP_DIR/❦👩❦/❦❦👩/
+    mkdir $TEMP_DIR/дир3/
+#
+    echo hello_world > $TEMP_DIR/dir0/file00
+    echo привет❦мир > $TEMP_DIR/❦❦❦/д❦р22/❦❦
+    echo привет💗мир > $TEMP_DIR/❦❦❦/д❦р22/💗💗
+    echo привет❦💗мир > $TEMP_DIR/дир3/файл33
+#
+    sudo umount $TEMP_DIR
+    sudo losetup -d $LOOP_DEV
+
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
+    rm $img_raw
+}
+
 xfs_v5_ftype1_s05k_b2k_n8k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
@@ -1393,7 +1428,7 @@ images=(gpt_large.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
         exfat_s05k_c16k_b16k.qcow2 exfat_s05k_c8k_b8k.qcow2
         xfs_samehash_s05k.raw ext2_s05k.qcow2 ext4_s05k.qcow2 fat12_s05k.qcow2
         fat16_s05k.qcow2 iso9660_s2k_dir_all.qcow2 ext2_extra_isize.qcow2
-        ext2_symlinks.qcow2 ext2_rev0.qcow2 ext4_csum.qcow2)
+        ext2_symlinks.qcow2 ext2_rev0.qcow2 ext4_csum.qcow2 ext2_unicode.qcow2)
 
 TEMP_DIR=$(mktemp -d)
 LOOP_DEV=$(sudo losetup --find)
