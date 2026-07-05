@@ -312,7 +312,7 @@ shell_var_add_ptr(struct shell_ctx *ctx, void *value) {
 }
 
 static void
-print_bytes(struct shell_ctx *ctx, uint8_t *x, size_t len) {
+print_bytes(struct shell_ctx *ctx, const uint8_t *x, size_t len) {
     for (size_t i = 0; i < len; i++) {
         if (i % PRINT_BYTES_PER_LINE == 0 && i != 0) {
             fprintf(ctx->fout, "\n");
@@ -323,7 +323,7 @@ print_bytes(struct shell_ctx *ctx, uint8_t *x, size_t len) {
 }
 
 static void
-print_hash(struct shell_ctx *ctx, uint8_t *x, size_t len) {
+print_hash(struct shell_ctx *ctx, const uint8_t *x, size_t len) {
     hash_context hash;
     hash_oneshot(&hash, x, len);
     for (size_t i = 0; i < HASH_SIZE; i++) {
@@ -2856,6 +2856,164 @@ cmd_stat(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80) {
     return;
 }
 
+static struct disk *
+lookup_disk(const struct disk *root, const char *path) {
+    if (*path++ != '/') {
+        return NULL;
+    }
+    for (struct disk *d = root->next; d != root; d = d->next) {
+        size_t len = strlen(d->name);
+        if (!strncmp(path, d->name, len)
+           && ((path[len] == '/') || (path[len] == '\0'))) {
+            return d;
+        }
+    }
+    return NULL;
+}
+
+static struct partition *
+lookup_partition(const struct disk *d, const char *path) {
+    size_t part_num = strtoul(path, NULL, 0);
+    if (!part_num || part_num > d->num_partitions) {
+        return NULL;
+    } else {
+        return d->partitions[part_num - 1];
+    }
+}
+
+static uint8_t *
+read_disk_partition(struct shell_ctx *ctx, const struct disk *d, off_t offset,
+                    size_t count) {
+    size_t first_sector = offset / d->media_info.sector_size;
+    size_t last_sector = (offset + count - 1) / d->media_info.sector_size;
+    size_t count_sectors = last_sector - first_sector + 1;
+    uint8_t *buf = (uint8_t*)malloc(count_sectors * d->media_info.sector_size);
+
+    int status = d->functions->read(d->userdata, buf, first_sector, &count_sectors);
+
+    fprintf(ctx->fout, "status = %d\n", status);
+    return buf;
+}
+
+static void
+cmd_read_disk(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: read_disk <path> <offset> <length> [-b] [-h]\n"
+        "  path             /disk\n"
+        "  offset           in bytes\n"
+        "  length           in bytes\n"
+        "  -b               dump bytes in hex\n"
+        "  -h               print hash of data read\n";
+    (void)ctx;
+    if (argc < 3) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    bool dump_bytes = false, dump_hash = false;
+    int opt = 1;
+    const char *path = argv[opt++];
+    uint64_t offset;
+    if ((opt >= argc) || !parse_uint64(ctx, argv[opt++], &offset))
+        return;
+    uint32_t count;
+    if ((opt >= argc) || !parse_uint32(ctx, argv[opt++], &count))
+        return;
+    for (; opt < argc; opt++) {
+        if (!strcmp(argv[opt], "-b")) {
+            dump_bytes = true;
+        } else if (!strcmp(argv[opt], "-h")) {
+            dump_hash = true;
+        } else {
+            fprintf(ctx->fout, "invalid option: '%s'\n", argv[opt]);
+            return;
+        }
+    }
+
+    struct disk *d = lookup_disk(&disk_list, path);
+    if (!d) {
+        fprintf(ctx->fout, "can't find disk: '%s'\n", path);
+        return;
+    }
+
+    uint8_t *buf = read_disk_partition(ctx, d, offset, count);
+
+    if (buf) {
+        if (dump_bytes)
+            print_bytes(ctx, buf + (offset % d->media_info.sector_size), count);
+        if (dump_hash)
+            print_hash(ctx, buf + (offset % d->media_info.sector_size), count);
+        free(buf);
+    }
+
+    return;
+}
+
+static void
+cmd_read_partition(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: read_partition <path> <offset> <length> [-b] [-h]\n"
+        "  path             /disk/partition\n"
+        "  offset           in bytes\n"
+        "  length           in bytes\n"
+        "  -b               dump bytes in hex\n"
+        "  -h               print hash of data read\n";
+    (void)ctx;
+    if (argc < 3) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    bool dump_bytes = false, dump_hash = false;
+    int opt = 1;
+    const char *path = argv[opt++];
+    uint64_t offset;
+    if ((opt >= argc) || !parse_uint64(ctx, argv[opt++], &offset))
+        return;
+    uint32_t count;
+    if ((opt >= argc) || !parse_uint32(ctx, argv[opt++], &count))
+        return;
+    for (; opt < argc; opt++) {
+        if (!strcmp(argv[opt], "-b")) {
+            dump_bytes = true;
+        } else if (!strcmp(argv[opt], "-h")) {
+            dump_hash = true;
+        } else {
+            fprintf(ctx->fout, "invalid option: '%s'\n", argv[opt]);
+            return;
+        }
+    }
+
+    struct disk *d = lookup_disk(&disk_list, path);
+    if (!d) {
+        fprintf(ctx->fout, "can't find disk: '%s'\n", path);
+        return;
+    }
+
+    const char *part = strchr(path + 1, '/');
+    if (!part++) {
+        return;
+    }
+
+    struct partition *p = lookup_partition(d, part);
+    if (!p) {
+        fprintf(ctx->fout, "can't find partition: '%s'\n", path);
+        return;
+    }
+
+    offset += p->first_sector * d->media_info.sector_size;
+
+    uint8_t *buf = read_disk_partition(ctx, d, offset, count);
+
+    if (buf) {
+        if (dump_bytes)
+            print_bytes(ctx, buf + (offset % d->media_info.sector_size), count);
+        if (dump_hash)
+            print_hash(ctx, buf + (offset % d->media_info.sector_size), count);
+        free(buf);
+    }
+
+    return;
+}
+
 static void
 cmd_stat70(struct shell_ctx *ctx, int argc, char **argv) {
     cmd_stat(ctx, argc, argv, F70);
@@ -2878,12 +3036,13 @@ cmd_read(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80,
     struct f7080ret r;
     bool dump_bytes = false, dump_hash = false;
     int opt = 1;
+    const char *path = argv[opt++];
     if (f70or80 == F70) {
         fX0.u.f70.zero = 0;
-        fX0.u.f70.path = argv[opt++];
+        fX0.u.f70.path = path;
     } else {
         fX0.u.f80.path_encoding = DEFAULT_PATH_ENCODING;
-        fX0.u.f80.path = argv[opt++];
+        fX0.u.f80.path = path;
     }
     if ((opt >= argc) || !parse_uint64(ctx, argv[opt++], &fX0.offset))
         return;
@@ -4659,6 +4818,8 @@ func_table_t cmd_cmds[] = {
     { "put_image_palette",              cmd_put_image_palette },
     { "pwd",                            cmd_pwd },
     { "ramdisk_init",                   cmd_ramdisk_init },
+    { "read_disk",                      cmd_read_disk },
+    { "read_partition",                 cmd_read_partition },
     { "read70",                         cmd_read70 },
     { "read80",                         cmd_read80 },
     { "rm70",                           cmd_rm70 },
