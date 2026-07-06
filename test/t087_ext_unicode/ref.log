@@ -96,7 +96,7 @@ total = 8
 ----f d
 ----f 48@f'
 ----f f'f'f'
-----f f'iØ=Üf'
+----f f'=ØiÜf'
 ----f 48@3
 /> ls70 /hd0/1/ -e cp866
 status = 6 end_of_file, count = 8
@@ -157,7 +157,7 @@ total = 8
 ----f d
 ----f 48@f'
 ----f f'f'f'
-----f f'iØ=Üf'
+----f f'=ØiÜf'
 ----f 48@3
 /> ls80 /hd0/1/ -e cp866
 status = 6 end_of_file, count = 8
@@ -243,9 +243,9 @@ status = 6 end_of_file, count = 5
 total = 5
 -h--f .
 -h--f .
-----f iØ=Üf'f'
-----f f'iØ=Üf'
-----f f'f'iØ=Ü
+----f =ØiÜf'f'
+----f f'=ØiÜf'
+----f f'f'=ØiÜ
 /> ls80 /hd0/1/â¦ğŸ‘©â¦/ -e cp866
 status = 6 end_of_file, count = 5
 total = 5
