@@ -1,0 +1,35 @@
+/> umka_boot
+/> disk_add ../../img/ext2_symlinks.qcow2 hd0 -c 0
+/hd0: sector_size=512, capacity=30720 (15 MiB), num_partitions=1
+/hd0/1: fs=ext, start=2048 (1 MiB), length=26624 (13 MiB)
+/> readlink70 /hd0/1/t69/f_rel_entry
+status = 0 success, count = 12
+Target: f_rel_target
+/> readlink70 /hd0/1/t69/f_abs_entry
+status = 0 success, count = 17
+Target: /t69/f_abs_target
+/> readlink70 /hd0/1/t69/s_rel_entry
+status = 0 success, count = 92
+Target: ././././././././././././././././././././././././././././././././././././././././s_rel_target
+/> readlink70 /hd0/1/t69/s_abs_entry
+status = 0 success, count = 97
+Target: /t69/././././././././././././././././././././././././././././././././././././././././s_abs_target
+/> readlink70 /hd0/1/t69/mix_s_abs_entry
+status = 0 success, count = 94
+Target: /t69/././././././././././././././././././././././././././././././././././././././././mix_s_rel
+/> readlink70 /hd0/1/t69/d_frel_entry
+status = 0 success, count = 13
+Target: d_frel_target
+/> readlink70 /hd0/1/t69/d_fabs_entry
+status = 0 success, count = 18
+Target: /t69/d_fabs_target
+/> readlink70 /hd0/1/t69/d_srel_entry
+status = 0 success, count = 93
+Target: ././././././././././././././././././././././././././././././././././././././././d_srel_target
+/> readlink70 /hd0/1/t69/d_sabs_entry
+status = 0 success, count = 98
+Target: /t69/././././././././././././././././././././././././././././././././././././././././d_sabs_target
+/> readlink70 /hd0/1/t69/d_mix_sabs_entry
+status = 0 success, count = 95
+Target: /t69/././././././././././././././././././././././././././././././././././././././././d_mix_srel
+/> disk_del hd0

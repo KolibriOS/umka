@@ -1,0 +1,281 @@
+/> umka_boot
+/> disk_add ../../img/ext2_symlinks.qcow2 hd0 -c 0
+/hd0: sector_size=512, capacity=30720 (15 MiB), num_partitions=1
+/hd0/1: fs=ext, start=2048 (1 MiB), length=26624 (13 MiB)
+/> symlink70 /t69/d_frel_entry/file.txt /hd0/1/t88_fast_abs_file
+status = 0 success
+/> ls70 /hd0/1/
+status = 6 end_of_file, count = 8
+total = 8
+-h--f .
+-h--f ..
+----f lost+found
+----f targets
+----f t69
+----f t70
+----f t71
+----- t88_fast_abs_file
+/> stat70 /hd0/1/t88_fast_abs_file
+status = 0 success
+attr: -----
+size: 12
+/> symlink70 /t69 /hd0/1/t88_fast_abs_dir
+status = 0 success
+/> ls70 /hd0/1/
+status = 6 end_of_file, count = 9
+total = 9
+-h--f .
+-h--f ..
+----f lost+found
+----f targets
+----f t69
+----f t70
+----f t71
+----- t88_fast_abs_file
+----- t88_fast_abs_dir
+/> stat70 /hd0/1/t88_fast_abs_dir
+status = 0 success
+attr: ----f
+/> ls70 /hd0/1/t88_fast_abs_dir
+status = 6 end_of_file, count = 26
+total = 26
+-h--f .
+-h--f ..
+----- f_rel_target
+----- f_rel_entry
+----- f_abs_target
+----- f_abs_entry
+----- s_rel_target
+----- s_rel_entry
+----- s_abs_target
+----- s_abs_entry
+----- mix_f_rel
+----- mix_f_abs
+----- mix_s_rel
+----- mix_s_abs_entry
+----- d_frel_target
+----- d_frel_entry
+----- d_fabs_target
+----- d_fabs_entry
+----- d_srel_target
+----- d_srel_entry
+----- d_sabs_target
+----- d_sabs_entry
+----- d_mix_frel
+----- d_mix_fabs
+----- d_mix_srel
+----- d_mix_sabs_entry
+/> symlink70 t69/d_frel_entry/file.txt /hd0/1/t88_fast_rel_file
+status = 0 success
+/> ls70 /hd0/1/
+status = 6 end_of_file, count = 10
+total = 10
+-h--f .
+-h--f ..
+----f lost+found
+----f targets
+----f t69
+----f t70
+----f t71
+----- t88_fast_abs_file
+----- t88_fast_abs_dir
+----- t88_fast_rel_file
+/> stat70 /hd0/1/t88_fast_rel_file
+status = 0 success
+attr: -----
+size: 12
+/> symlink70 t69 /hd0/1/t88_fast_rel_dir
+status = 0 success
+/> ls70 /hd0/1/
+status = 6 end_of_file, count = 11
+total = 11
+-h--f .
+-h--f ..
+----f lost+found
+----f targets
+----f t69
+----f t70
+----f t71
+----- t88_fast_abs_file
+----- t88_fast_abs_dir
+----- t88_fast_rel_file
+----- t88_fast_rel_dir
+/> stat70 /hd0/1/t88_fast_rel_dir
+status = 0 success
+attr: ----f
+/> ls70 /hd0/1/t88_fast_rel_dir
+status = 6 end_of_file, count = 26
+total = 26
+-h--f .
+-h--f ..
+----- f_rel_target
+----- f_rel_entry
+----- f_abs_target
+----- f_abs_entry
+----- s_rel_target
+----- s_rel_entry
+----- s_abs_target
+----- s_abs_entry
+----- mix_f_rel
+----- mix_f_abs
+----- mix_s_rel
+----- mix_s_abs_entry
+----- d_frel_target
+----- d_frel_entry
+----- d_fabs_target
+----- d_fabs_entry
+----- d_srel_target
+----- d_srel_entry
+----- d_sabs_target
+----- d_sabs_entry
+----- d_mix_frel
+----- d_mix_fabs
+----- d_mix_srel
+----- d_mix_sabs_entry
+/> symlink70 /t69/../t69/../t69/../t69/../t69/../t69/d_frel_entry/file.txt /hd0/1/t88_slow_abs_file
+status = 0 success
+/> ls70 /hd0/1/
+status = 6 end_of_file, count = 12
+total = 12
+-h--f .
+-h--f ..
+----f lost+found
+----f targets
+----f t69
+----f t70
+----f t71
+----- t88_fast_abs_file
+----- t88_fast_abs_dir
+----- t88_fast_rel_file
+----- t88_fast_rel_dir
+----- t88_slow_abs_file
+/> stat70 /hd0/1/t88_slow_abs_file
+status = 0 success
+attr: -----
+size: 12
+/> symlink70 /t69/../t69/../t69/../t69/../t69/../t69/../t69/../t69/../t69/../t69 /hd0/1/t88_slow_abs_dir
+status = 0 success
+/> ls70 /hd0/1/
+status = 6 end_of_file, count = 13
+total = 13
+-h--f .
+-h--f ..
+----f lost+found
+----f targets
+----f t69
+----f t70
+----f t71
+----- t88_fast_abs_file
+----- t88_fast_abs_dir
+----- t88_fast_rel_file
+----- t88_fast_rel_dir
+----- t88_slow_abs_file
+----- t88_slow_abs_dir
+/> stat70 /hd0/1/t88_slow_abs_dir
+status = 0 success
+attr: ----f
+/> ls70 /hd0/1/t88_slow_abs_dir
+status = 6 end_of_file, count = 26
+total = 26
+-h--f .
+-h--f ..
+----- f_rel_target
+----- f_rel_entry
+----- f_abs_target
+----- f_abs_entry
+----- s_rel_target
+----- s_rel_entry
+----- s_abs_target
+----- s_abs_entry
+----- mix_f_rel
+----- mix_f_abs
+----- mix_s_rel
+----- mix_s_abs_entry
+----- d_frel_target
+----- d_frel_entry
+----- d_fabs_target
+----- d_fabs_entry
+----- d_srel_target
+----- d_srel_entry
+----- d_sabs_target
+----- d_sabs_entry
+----- d_mix_frel
+----- d_mix_fabs
+----- d_mix_srel
+----- d_mix_sabs_entry
+/> symlink70 t69/../t69/../t69/../t69/../t69/../t69/../t69/d_frel_entry/file.txt /hd0/1/t88_slow_rel_file
+status = 0 success
+/> ls70 /hd0/1/
+status = 6 end_of_file, count = 14
+total = 14
+-h--f .
+-h--f ..
+----f lost+found
+----f targets
+----f t69
+----f t70
+----f t71
+----- t88_fast_abs_file
+----- t88_fast_abs_dir
+----- t88_fast_rel_file
+----- t88_fast_rel_dir
+----- t88_slow_abs_file
+----- t88_slow_abs_dir
+----- t88_slow_rel_file
+/> stat70 /hd0/1/t88_slow_rel_file
+status = 0 success
+attr: -----
+size: 12
+/> symlink70 t69/../t69/../t69/../t69/../t69/../t69/../t69/../t69/../t69/../t69 /hd0/1/t88_slow_rel_dir
+status = 0 success
+/> ls70 /hd0/1/
+status = 6 end_of_file, count = 15
+total = 15
+-h--f .
+-h--f ..
+----f lost+found
+----f targets
+----f t69
+----f t70
+----f t71
+----- t88_fast_abs_file
+----- t88_fast_abs_dir
+----- t88_fast_rel_file
+----- t88_fast_rel_dir
+----- t88_slow_abs_file
+----- t88_slow_abs_dir
+----- t88_slow_rel_file
+----- t88_slow_rel_dir
+/> stat70 /hd0/1/t88_slow_rel_dir
+status = 0 success
+attr: ----f
+/> ls70 /hd0/1/t88_slow_rel_dir
+status = 6 end_of_file, count = 26
+total = 26
+-h--f .
+-h--f ..
+----- f_rel_target
+----- f_rel_entry
+----- f_abs_target
+----- f_abs_entry
+----- s_rel_target
+----- s_rel_entry
+----- s_abs_target
+----- s_abs_entry
+----- mix_f_rel
+----- mix_f_abs
+----- mix_s_rel
+----- mix_s_abs_entry
+----- d_frel_target
+----- d_frel_entry
+----- d_fabs_target
+----- d_fabs_entry
+----- d_srel_target
+----- d_srel_entry
+----- d_sabs_target
+----- d_sabs_entry
+----- d_mix_frel
+----- d_mix_fabs
+----- d_mix_srel
+----- d_mix_sabs_entry
+/> disk_del hd0

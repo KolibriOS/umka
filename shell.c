@@ -2766,6 +2766,72 @@ cmd_mkdir(struct shell_ctx *ctx, int argc, char **argv, enum f70or80 f70or80) {
 }
 
 static void
+cmd_symlink70(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: symlink70 <target> <link>\n"
+        "  target           string the symlink points to\n"
+        "  link             path of the symlink to create\n";
+    if (argc != 3) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    struct __attribute__((packed)) {
+        uint32_t sf;
+        uint32_t flags;
+        uint32_t reserved1;
+        uint32_t reserved2;
+        const char *target;
+        uint8_t zero;
+        const char *link;
+    } fX0;
+    fX0.sf        = 11;
+    fX0.flags     = 0;
+    fX0.reserved1 = 0;
+    fX0.reserved2 = 0;
+    fX0.target    = argv[1];
+    fX0.zero      = 0;
+    fX0.link      = argv[2];
+    struct f7080ret r = monitor_cmd_sys_lfn(ctx->monitor, F70,
+                                            (union f7080arg*)&fX0);
+    print_f70_status(ctx, &r, 0);
+}
+
+static void
+cmd_readlink70(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage = \
+        "usage: readlink70 <link>\n"
+        "  link             path of the symlink to read\n";
+    if (argc != 2) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    char target_buf[1024];
+    memset(target_buf, 0, sizeof(target_buf));
+    struct __attribute__((packed)) {
+        uint32_t sf;
+        uint32_t flags;
+        uint32_t reserved1;
+        uint32_t buf_size;
+        char *target_buf;
+        uint8_t zero;
+        const char *link;
+    } fX0;
+    fX0.sf        = 12;
+    fX0.flags     = 0;
+    fX0.reserved1 = 0;
+    fX0.buf_size  = sizeof(target_buf) - 1;
+    fX0.target_buf = target_buf;
+    fX0.zero      = 0;
+    fX0.link      = argv[1];
+    struct f7080ret r = monitor_cmd_sys_lfn(ctx->monitor, F70,
+                                            (union f7080arg*)&fX0);
+    print_f70_status(ctx, &r, 1);
+    if (r.status == 0) {
+        fprintf(ctx->fout, "Target: %s\n", target_buf);
+    }
+}
+
+static void
 cmd_mkdir70(struct shell_ctx *ctx, int argc, char **argv) {
     cmd_mkdir(ctx, argc, argv, F70);
 }
@@ -4807,6 +4873,8 @@ func_table_t cmd_cmds[] = {
     { "net_ipv4_set_subnet",            cmd_net_ipv4_set_subnet },
     { "net_listen",                     cmd_net_listen },
     { "new_sys_thread",                 cmd_new_sys_thread },
+    { "symlink70",                      cmd_symlink70 },
+    { "readlink70",                     cmd_readlink70 },
     { "mkdir70",                        cmd_mkdir70 },
     { "mkdir80",                        cmd_mkdir80 },
     { "net_open_socket",                cmd_net_open_socket },

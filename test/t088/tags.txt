@@ -1,0 +1,2 @@
+syscall:symlink70
+fs:ext,ext2,symlink

@@ -1,0 +1,31 @@
+umka_boot
+disk_add ../../img/ext2_symlinks.qcow2 hd0 -c 0
+symlink70 /t69/d_frel_entry/file.txt /hd0/1/t88_fast_abs_file
+ls70 /hd0/1/
+stat70 /hd0/1/t88_fast_abs_file
+symlink70 /t69 /hd0/1/t88_fast_abs_dir
+ls70 /hd0/1/
+stat70 /hd0/1/t88_fast_abs_dir
+ls70 /hd0/1/t88_fast_abs_dir
+symlink70 t69/d_frel_entry/file.txt /hd0/1/t88_fast_rel_file
+ls70 /hd0/1/
+stat70 /hd0/1/t88_fast_rel_file
+symlink70 t69 /hd0/1/t88_fast_rel_dir
+ls70 /hd0/1/
+stat70 /hd0/1/t88_fast_rel_dir
+ls70 /hd0/1/t88_fast_rel_dir
+symlink70 /t69/../t69/../t69/../t69/../t69/../t69/d_frel_entry/file.txt /hd0/1/t88_slow_abs_file
+ls70 /hd0/1/
+stat70 /hd0/1/t88_slow_abs_file
+symlink70 /t69/../t69/../t69/../t69/../t69/../t69/../t69/../t69/../t69/../t69 /hd0/1/t88_slow_abs_dir
+ls70 /hd0/1/
+stat70 /hd0/1/t88_slow_abs_dir
+ls70 /hd0/1/t88_slow_abs_dir
+symlink70 t69/../t69/../t69/../t69/../t69/../t69/../t69/d_frel_entry/file.txt /hd0/1/t88_slow_rel_file
+ls70 /hd0/1/
+stat70 /hd0/1/t88_slow_rel_file
+symlink70 t69/../t69/../t69/../t69/../t69/../t69/../t69/../t69/../t69/../t69 /hd0/1/t88_slow_rel_dir
+ls70 /hd0/1/
+stat70 /hd0/1/t88_slow_rel_dir
+ls70 /hd0/1/t88_slow_rel_dir
+disk_del hd0
