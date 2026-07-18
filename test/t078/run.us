@@ -1,0 +1,7 @@
+umka_boot
+disk_add ../../img/ext2_s05k.qcow2 hd0 -c 0
+mkdir70 /hd0/1/dir_a/nested_dir
+cd /hd0/1/dir_a/nested_dir
+create70 relative_file.txt -h 48656c6c6f
+ls70 /hd0/1/dir_a/nested_dir
+disk_del hd0

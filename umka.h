@@ -711,7 +711,7 @@ void
 disk_del(struct disk *disk);
 
 void
-hash_oneshot(void *ctx, void *data, size_t len);
+hash_oneshot(void *ctx, const void *data, size_t len);
 
 extern atomic_int idle_scheduled;
 extern atomic_int os_scheduled;

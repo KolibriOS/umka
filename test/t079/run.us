@@ -1,0 +1,5 @@
+umka_boot
+disk_add ../../img/ext2_s05k.qcow2 hd0 -c 524288
+write70 /hd0/1/no_hole 3 -h 0011223344
+read70 /hd0/1/no_hole 0 10 -b
+disk_del hd0
