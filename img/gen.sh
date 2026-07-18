@@ -1345,6 +1345,42 @@ ext2_rev0.qcow2 () {
     rm $img_raw
 }
 
+ext4_csum.qcow2 () {
+    local img=$FUNCNAME
+    local img_raw=$(basename $img .qcow2).raw
+
+    fallocate -l 64MiB $img_raw
+    $SGDISK --clear \
+        --new=1:2048:+12MiB \
+        --new=2:0:+12MiB \
+        --new=3:0:+12MiB \
+        --new=4:0:+12MiB $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+    local p2="$LOOP_DEV"p2
+    local p3="$LOOP_DEV"p3
+    local p4="$LOOP_DEV"p4
+
+    # P1: metadata_csum enabled, valid checksum (KOS_SUPPORTED + metadata_csum)
+    $MKFS_EXT4 $EXT_MKFS_OPTS $KOS_SUPPORTED,metadata_csum,^metadata_csum_seed $p1
+
+    # P2: metadata_csum enabled, invalid checksum
+    $MKFS_EXT4 $EXT_MKFS_OPTS $KOS_SUPPORTED,metadata_csum,^metadata_csum_seed $p2
+    echo -ne "\xAA\xBB\xCC\xDD" | sudo dd of=$p2 bs=1 seek=2044 conv=notrunc >/dev/null 2>&1
+
+    # P3: metadata_csum + metadata_csum_seed enabled, valid checksum
+    $MKFS_EXT4 $EXT_MKFS_OPTS $KOS_SUPPORTED,metadata_csum,metadata_csum_seed $p3
+
+    # P4: metadata_csum + metadata_csum_seed enabled, invalid checksum
+    $MKFS_EXT4 $EXT_MKFS_OPTS $KOS_SUPPORTED,metadata_csum,metadata_csum_seed $p4
+    echo -ne "\xAA\xBB\xCC\xDD" | sudo dd of=$p4 bs=1 seek=2044 conv=notrunc >/dev/null 2>&1
+
+    sudo losetup -d $LOOP_DEV
+
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
+    rm $img_raw
+}
+
 images=(gpt_large.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
         kolibri.raw jfs.qcow2 xfs_lookup_v4.qcow2 xfs_lookup_v5.qcow2
         xfs_nrext64.qcow2 xfs_bigtime.qcow2 xfs_borg_bit.qcow2
@@ -1357,7 +1393,7 @@ images=(gpt_large.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
         exfat_s05k_c16k_b16k.qcow2 exfat_s05k_c8k_b8k.qcow2
         xfs_samehash_s05k.raw ext2_s05k.qcow2 ext4_s05k.qcow2 fat12_s05k.qcow2
         fat16_s05k.qcow2 iso9660_s2k_dir_all.qcow2 ext2_extra_isize.qcow2
-        ext2_symlinks.qcow2 ext2_rev0.qcow2)
+        ext2_symlinks.qcow2 ext2_rev0.qcow2 ext4_csum.qcow2)
 
 TEMP_DIR=$(mktemp -d)
 LOOP_DEV=$(sudo losetup --find)

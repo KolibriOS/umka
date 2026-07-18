@@ -1,0 +1,24 @@
+/> umka_boot
+/> disk_add ../../img/ext4_csum.qcow2 hd0 -c 524288
+/hd0: sector_size=512, capacity=131072 (64 MiB), num_partitions=4
+/hd0/1: fs=ext, start=2048 (1 MiB), length=24576 (12 MiB)
+/hd0/2: fs=???, start=26624 (13 MiB), length=24576 (12 MiB)
+/hd0/3: fs=ext, start=51200 (25 MiB), length=24576 (12 MiB)
+/hd0/4: fs=???, start=75776 (37 MiB), length=24576 (12 MiB)
+/> ls70 /hd0/1/
+status = 6 end_of_file, count = 3
+total = 3
+-h--f .
+-h--f ..
+----f lost+found
+/> ls70 /hd0/2/
+status = 3 unknown_fs
+/> ls70 /hd0/3/
+status = 6 end_of_file, count = 3
+total = 3
+-h--f .
+-h--f ..
+----f lost+found
+/> ls70 /hd0/4/
+status = 3 unknown_fs
+/> disk_del hd0
