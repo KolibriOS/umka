@@ -1,0 +1,3 @@
+syscall:f70,f70s0
+fs:ext,write,create,file,flex_bg
+blkdev:s05k

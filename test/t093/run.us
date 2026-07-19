@@ -1,0 +1,5 @@
+umka_boot
+disk_add ../../img/ext4_flex_bg_frag.qcow2 hd0 -c 131072
+write70 /hd0/1/test_dir/target.bin 58000000 -h 00
+write70 /hd0/1/test_dir/target.bin 69000000 -h 00
+disk_del hd0

@@ -1,0 +1,2 @@
+syscall:f70s3
+fs:ext,ext4,rw,create,write

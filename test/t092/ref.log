@@ -1,0 +1,95 @@
+/> umka_boot
+/> disk_add ../../img/ext4_flex_bg.qcow2 hd0 -c 524288
+/hd0: sector_size=512, capacity=524288 (256 MiB), num_partitions=1
+/hd0/1: fs=ext, start=2048 (1 MiB), length=520192 (254 MiB)
+/> 
+/> ls70 /hd0/1
+status = 6 end_of_file, count = 6
+total = 6
+-h--f .
+-h--f ..
+----f lost+found
+----- read_test.txt
+----- write_test.txt
+----f full_dir
+/> stat70 /hd0/1/read_test.txt
+status = 0 success
+attr: -----
+size: 32
+/> read70 /hd0/1/read_test.txt 0 31 -b
+status = 0 success, count = 31
+5468697320697320612072656164207465737420666f7220666c65785f6267
+/> 
+/> rm70 /hd0/1/read_test.txt
+status = 0 success
+/> ls70 /hd0/1
+status = 6 end_of_file, count = 5
+total = 5
+-h--f .
+-h--f ..
+----f lost+found
+----- write_test.txt
+----f full_dir
+/> 
+/> mkdir70 /hd0/1/new_dir
+status = 0 success
+/> ls70 /hd0/1/new_dir
+status = 6 end_of_file, count = 2
+total = 2
+-h--f .
+-h--f ..
+/> create70 /hd0/1/new_dir/new_file.txt -h 68656c6c6f
+status = 0 success, count = 5
+/> stat70 /hd0/1/new_dir/new_file.txt
+status = 0 success
+attr: -----
+size: 5
+/> read70 /hd0/1/new_dir/new_file.txt 0 5 -b
+status = 0 success, count = 5
+68656c6c6f
+/> 
+/> ls70 /hd0/1/full_dir
+status = 6 end_of_file, count = 3
+total = 3
+-h--f .
+-h--f ..
+----- huge_file
+/> mkdir70 /hd0/1/full_dir/spill_dir
+status = 0 success
+/> ls70 /hd0/1/full_dir/spill_dir
+status = 6 end_of_file, count = 2
+total = 2
+-h--f .
+-h--f ..
+/> create70 /hd0/1/full_dir/spill_dir/spill_file.txt -h 7370696c6c6f766572
+status = 0 success, count = 9
+/> stat70 /hd0/1/full_dir/spill_dir/spill_file.txt
+status = 0 success
+attr: -----
+size: 9
+/> read70 /hd0/1/full_dir/spill_dir/spill_file.txt 0 9 -b
+status = 0 success, count = 9
+7370696c6c6f766572
+/> 
+/> rm70 /hd0/1/full_dir/spill_dir/spill_file.txt
+status = 0 success
+/> rm70 /hd0/1/full_dir/spill_dir
+status = 0 success
+/> 
+/> disk_del hd0
+/> 
+/> disk_add ../../img/ext4_flex_bg_coverage.qcow2 hd1 -c 131072
+/hd1: sector_size=512, capacity=131072 (64 MiB), num_partitions=1
+/hd1/1: fs=ext, start=2048 (1 MiB), length=126976 (62 MiB)
+/> write70 /hd1/1/dir1/f1.txt 0 -h 1234
+status = 0 success, count = 2
+/> write70 /hd1/1/dir3/f3.txt 0 -h 1234
+status = 0 success, count = 2
+/> disk_del hd1
+/> 
+/> disk_add ../../img/ext4_flex_bg_full.qcow2 hd2 -c 32768
+/hd2: sector_size=512, capacity=32768 (16 MiB), num_partitions=1
+/hd2/1: fs=ext, start=2048 (1 MiB), length=28672 (14 MiB)
+/> create70 /hd2/1/fail.txt -h 1234
+status = 8 disk_full
+/> disk_del hd2

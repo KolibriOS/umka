@@ -1,0 +1,36 @@
+umka_boot
+disk_add ../../img/ext4_flex_bg.qcow2 hd0 -c 524288
+
+ls70 /hd0/1
+stat70 /hd0/1/read_test.txt
+read70 /hd0/1/read_test.txt 0 31 -b
+
+rm70 /hd0/1/read_test.txt
+ls70 /hd0/1
+
+mkdir70 /hd0/1/new_dir
+ls70 /hd0/1/new_dir
+create70 /hd0/1/new_dir/new_file.txt -h 68656c6c6f
+stat70 /hd0/1/new_dir/new_file.txt
+read70 /hd0/1/new_dir/new_file.txt 0 5 -b
+
+ls70 /hd0/1/full_dir
+mkdir70 /hd0/1/full_dir/spill_dir
+ls70 /hd0/1/full_dir/spill_dir
+create70 /hd0/1/full_dir/spill_dir/spill_file.txt -h 7370696c6c6f766572
+stat70 /hd0/1/full_dir/spill_dir/spill_file.txt
+read70 /hd0/1/full_dir/spill_dir/spill_file.txt 0 9 -b
+
+rm70 /hd0/1/full_dir/spill_dir/spill_file.txt
+rm70 /hd0/1/full_dir/spill_dir
+
+disk_del hd0
+
+disk_add ../../img/ext4_flex_bg_coverage.qcow2 hd1 -c 131072
+write70 /hd1/1/dir1/f1.txt 0 -h 1234
+write70 /hd1/1/dir3/f3.txt 0 -h 1234
+disk_del hd1
+
+disk_add ../../img/ext4_flex_bg_full.qcow2 hd2 -c 32768
+create70 /hd2/1/fail.txt -h 1234
+disk_del hd2

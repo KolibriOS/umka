@@ -775,6 +775,74 @@ fat32_test0.raw () {
     sudo losetup -d $LOOP_DEV
 }
 
+ext4_flex_bg_coverage.qcow2 () {
+    local img=$FUNCNAME
+    local img_raw=$(basename $img .qcow2).raw
+
+    fallocate -l 64MiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXT4 $EXT_MKFS_OPTS -m 0 -b 1024 -g 8192 -G 2 -O none,filetype,sparse_super,large_file,flex_bg $p1
+    sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
+    sudo mount -o sync $p1 $TEMP_DIR
+    sudo chown $USER $TEMP_DIR -R
+
+    mkdir $TEMP_DIR/dir0
+    dd if=/dev/zero of=$TEMP_DIR/dir0/fill0 bs=1M count=16 2>/dev/null || true
+    
+    mkdir $TEMP_DIR/dir1
+    touch $TEMP_DIR/dir1/f1.txt
+    dd if=/dev/zero of=$TEMP_DIR/dir1/fill1 bs=1M count=16 2>/dev/null || true
+
+    mkdir $TEMP_DIR/dir2
+    touch $TEMP_DIR/dir2/f2.txt
+    dd if=/dev/zero of=$TEMP_DIR/dir2/fill2 bs=1M count=16 2>/dev/null || true
+
+    mkdir $TEMP_DIR/dir3
+    touch $TEMP_DIR/dir3/f3.txt
+    dd if=/dev/zero of=$TEMP_DIR/dir3/fill3 bs=1M count=16 2>/dev/null || true
+
+    cat /dev/zero > $TEMP_DIR/fill_end 2>/dev/null || true
+    for i in {1..10}; do
+        dd if=/dev/zero of=$TEMP_DIR/fill_$i bs=1K 2>/dev/null || true
+    done
+    rm $TEMP_DIR/dir2/fill2
+
+    sudo umount $TEMP_DIR
+    sudo losetup -d $LOOP_DEV
+
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
+    rm $img_raw
+}
+
+ext4_flex_bg_full.qcow2 () {
+    local img=$FUNCNAME
+    local img_raw=$(basename $img .qcow2).raw
+
+    fallocate -l 16MiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXT4 $EXT_MKFS_OPTS -m 0 -b 1024 -O none,filetype,sparse_super,large_file,flex_bg $p1
+    sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
+    sudo mount -o sync $p1 $TEMP_DIR
+    sudo chown $USER $TEMP_DIR -R
+
+    cat /dev/zero > $TEMP_DIR/fill 2>/dev/null || true
+    for i in {1..10}; do
+        dd if=/dev/zero of=$TEMP_DIR/fill_$i bs=1K 2>/dev/null || true
+    done
+
+    sudo umount $TEMP_DIR
+    sudo losetup -d $LOOP_DEV
+
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
+    rm $img_raw
+}
+
 exfat_s05k_c16k_b16k.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
@@ -1310,7 +1378,7 @@ ext2_extra_isize.qcow2 () {
 
     sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
 
-    sudo mount $p1 $TEMP_DIR
+    sudo mount -o sync $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
 
     mkdir $TEMP_DIR/dira
@@ -1380,6 +1448,27 @@ ext2_rev0.qcow2 () {
     rm $img_raw
 }
 
+ext4_flex_bg.qcow2 () {
+    local img=$FUNCNAME
+    local img_raw=$(basename $img .qcow2).raw
+
+    fallocate -l 256MiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXT4 $EXT_MKFS_OPTS -b 1024 -O none,filetype,sparse_super,large_file,flex_bg $p1
+    sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
+    sudo mount -o sync $p1 $TEMP_DIR
+    sudo chown $USER $TEMP_DIR -R
+
+    echo "This is a read test for flex_bg" > $TEMP_DIR/read_test.txt
+    echo "This will be overwritten" > $TEMP_DIR/write_test.txt
+
+    mkdir $TEMP_DIR/full_dir
+    dd if=/dev/zero of=$TEMP_DIR/full_dir/huge_file bs=1M count=130
+
+    sudo umount $TEMP_DIR
 ext4_csum.qcow2 () {
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
@@ -1416,7 +1505,52 @@ ext4_csum.qcow2 () {
     rm $img_raw
 }
 
-images=(gpt_large.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
+
+ext4_flex_bg_frag.qcow2 () {
+    local img=$FUNCNAME
+    local img_raw=$(basename $img .qcow2).raw
+
+    fallocate -l 64MiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXT4 -F -q -I 256 -b 1024 -O none,filetype,sparse_super,large_file,flex_bg -g 1024 -G 8 $p1
+    
+    cat <<EOF > "$TEMP_DIR/debugfs_cmds.txt"
+mkdir /test_dir
+mkdir /dummy_dir
+EOF
+
+    local temp_dummy="$TEMP_DIR/dummy_temp.txt"
+    echo "X" > "$temp_dummy"
+
+    for i in {1..4864}; do
+        echo "write $temp_dummy /dummy_dir/dummy$i" >> "$TEMP_DIR/debugfs_cmds.txt"
+    done
+
+    local temp_txt="$TEMP_DIR/existing_temp.txt"
+    echo "A" > "$temp_txt"
+    echo "write $temp_txt /test_dir/target.bin" >> "$TEMP_DIR/debugfs_cmds.txt"
+
+    sudo debugfs -w -f "$TEMP_DIR/debugfs_cmds.txt" $p1 >/dev/null 2>&1
+
+    for i in {1..4864}; do
+        echo "rm /dummy_dir/dummy$i" >> "$TEMP_DIR/debugfs_rm_cmds.txt"
+    done
+    sudo debugfs -w -f "$TEMP_DIR/debugfs_rm_cmds.txt" $p1 >/dev/null 2>&1
+
+    rm "$TEMP_DIR/debugfs_cmds.txt"
+    rm "$TEMP_DIR/dummy_temp.txt"
+    rm "$TEMP_DIR/existing_temp.txt"
+    rm "$TEMP_DIR/debugfs_rm_cmds.txt"
+
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
+    rm $img_raw
+}
+
+images=(gpt_large.qcow2 ext4_flex_bg_frag.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
+
         kolibri.raw jfs.qcow2 xfs_lookup_v4.qcow2 xfs_lookup_v5.qcow2
         xfs_nrext64.qcow2 xfs_bigtime.qcow2 xfs_borg_bit.qcow2
         xfs_short_dir_i8.qcow2 xfs_v4_ftype0_s05k_b2k_n8k.qcow2
@@ -1428,7 +1562,8 @@ images=(gpt_large.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
         exfat_s05k_c16k_b16k.qcow2 exfat_s05k_c8k_b8k.qcow2
         xfs_samehash_s05k.raw ext2_s05k.qcow2 ext4_s05k.qcow2 fat12_s05k.qcow2
         fat16_s05k.qcow2 iso9660_s2k_dir_all.qcow2 ext2_extra_isize.qcow2
-        ext2_symlinks.qcow2 ext2_rev0.qcow2 ext4_csum.qcow2 ext2_unicode.qcow2)
+        ext2_symlinks.qcow2 ext2_rev0.qcow2 ext4_csum.qcow2 ext2_unicode.qcow2 ext4_flex_bg.qcow2
+        ext4_flex_bg_coverage.qcow2 ext4_flex_bg_full.qcow2)
 
 TEMP_DIR=$(mktemp -d)
 LOOP_DEV=$(sudo losetup --find)

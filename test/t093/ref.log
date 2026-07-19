@@ -1,0 +1,9 @@
+/> umka_boot
+/> disk_add ../../img/ext4_flex_bg_frag.qcow2 hd0 -c 131072
+/hd0: sector_size=512, capacity=131072 (64 MiB), num_partitions=1
+/hd0/1: fs=ext, start=2048 (1 MiB), length=126976 (62 MiB)
+/> write70 /hd0/1/test_dir/target.bin 58000000 -h 00
+status = 0 success, count = 1
+/> write70 /hd0/1/test_dir/target.bin 69000000 -h 00
+status = 8 disk_full
+/> disk_del hd0
