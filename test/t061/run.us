@@ -1,9 +1,15 @@
 umka_boot
 disk_add ../../img/ext4_s05k.qcow2 hd0 -c 524288
 ls70 /hd0/1/dir_a
+create70 /hd0/1/dir_a/newfile -h 0011
 ls70 /hd0/1/dir_b
+create70 /hd0/1/dir_b/newfile -h 0011
 ls70 /hd0/1/dir_c
+create70 /hd0/1/dir_c/newfile -h 0011
 ls70 /hd0/1/dir_d
+create70 /hd0/1/dir_d/newfile -h 0011
 ls70 /hd0/1/dir_e
+create70 /hd0/1/dir_e/newfile -h 0011
 ls70 /hd0/1/dir_f
+create70 /hd0/1/dir_f/newfile -h 0011
 disk_del hd0

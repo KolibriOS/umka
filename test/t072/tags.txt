@@ -1,2 +1,3 @@
 syscall:f70
 fs:ext,ext2
+ext:extra_isize

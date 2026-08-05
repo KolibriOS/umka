@@ -1194,16 +1194,15 @@ ext2_symlinks.qcow2 () {
 }
 
 ext4_s05k.qcow2 () {
-    echo "[*] This may take about fifteen minutes"
     local img=$FUNCNAME
     local img_raw=$(basename $img .qcow2).raw
 
-    fallocate -l 5GiB $img_raw
+    fallocate -l 1GiB $img_raw
     $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
     sudo losetup -P $LOOP_DEV $img_raw
     local p1="$LOOP_DEV"p1
 
-    $MKFS_EXT4 $EXT_MKFS_OPTS -N 1200000 $p1
+    $MKFS_EXT4 $EXT_MKFS_OPTS -N 200000 $p1
     sudo debugfs -w -R "set_super_value hash_seed $EXT_HASH_SEED" $p1
     sudo mount $p1 $TEMP_DIR
     sudo chown $USER $TEMP_DIR -R
@@ -1224,10 +1223,7 @@ ext4_s05k.qcow2 () {
     $MKDIRRANGE $TEMP_DIR/dir_e 0 10000  0 1
 #
     mkdir $TEMP_DIR/dir_f
-    $MKDIRRANGE $TEMP_DIR/dir_f 0 100000  0 1
-#
-    mkdir $TEMP_DIR/dir_g
-    $MKDIRRANGE $TEMP_DIR/dir_g 0 1000000  0 1
+    $MKDIRRANGE $TEMP_DIR/dir_f 0 70000  0 1
 #
     $MKFILEPATTERN $TEMP_DIR/no_hole 0 65536
 #
@@ -1504,7 +1500,64 @@ ext4_csum.qcow2 () {
     qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
+ext4_extents.qcow2 () {
+    local img=$FUNCNAME
+    local img_raw=$(basename $img .qcow2).raw
 
+    fallocate -l 50MiB $img_raw
+    $SGDISK --clear --new=0:0:0 $img_raw > /dev/null
+    sudo losetup -P $LOOP_DEV $img_raw
+    local p1="$LOOP_DEV"p1
+
+    $MKFS_EXT4 $EXT_MKFS_OPTS -N 4000 -I 256 -b 1024 $p1
+#
+    local temp_40k="$TEMP_DIR/temp_40k.txt"
+    rm -f "$temp_40k"
+    for i in {1..10}; do
+        yes "This is block \$i of the heavily fragmented text file. " | head -c 4096 >> "$temp_40k"
+    done
+
+    local temp_12m="$TEMP_DIR/temp_12m.txt"
+    rm -f "$temp_12m"
+    yes "This is block \$i of the heavily fragmented text file. " | head -c 12000000 > "$temp_12m"
+
+    local cmds_file="$TEMP_DIR/debugfs_cmds.txt"
+    cat <<EOF > "$cmds_file"
+mkdir /test_dir
+write $temp_40k /test_dir/file_overflow.txt
+punch /test_dir/file_overflow.txt 1 1
+punch /test_dir/file_overflow.txt 3 3
+punch /test_dir/file_overflow.txt 5 5
+# Create depth 1
+write $temp_40k /test_dir/file_height_0.txt
+punch /test_dir/file_height_0.txt 1 1
+punch /test_dir/file_height_0.txt 3 3
+punch /test_dir/file_height_0.txt 5 5
+punch /test_dir/file_height_0.txt 7 7
+punch /test_dir/file_height_0.txt 9 9
+# Create depth 1
+write $temp_40k /test_dir/file_height_1.txt
+punch /test_dir/file_height_1.txt 1 1
+punch /test_dir/file_height_1.txt 3 3
+punch /test_dir/file_height_1.txt 5 5
+punch /test_dir/file_height_1.txt 7 7
+punch /test_dir/file_height_1.txt 9 9
+# Create depth 2
+write $temp_12m /test_dir/file_height_2.txt
+EOF
+    for i in $(seq 1 2 200); do
+        echo "punch /test_dir/file_height_2.txt $i $i" >> "$cmds_file"
+    done
+
+    sudo debugfs -w -f "$cmds_file" $p1 >/dev/null 2>&1
+    
+    rm -f "$temp_40k" "$temp_12m" "$cmds_file"
+#
+    sudo losetup -d $LOOP_DEV
+
+    qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
+    rm $img_raw
+}
 
 ext4_flex_bg_frag.qcow2 () {
     local img=$FUNCNAME
@@ -1544,13 +1597,14 @@ EOF
     rm "$TEMP_DIR/dummy_temp.txt"
     rm "$TEMP_DIR/existing_temp.txt"
     rm "$TEMP_DIR/debugfs_rm_cmds.txt"
+    
+    sudo losetup -d $LOOP_DEV
 
     qemu-img convert $QEMU_IMG_CONVERT_OPTS $img_raw $img
     rm $img_raw
 }
 
-images=(gpt_large.qcow2 ext4_flex_bg_frag.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
-
+images=(ext4_extents.qcow2 gpt_large.qcow2 ext4_flex_bg_frag.qcow2 gpt_partitions_s05k.qcow2 gpt_partitions_s4k.qcow2
         kolibri.raw jfs.qcow2 xfs_lookup_v4.qcow2 xfs_lookup_v5.qcow2
         xfs_nrext64.qcow2 xfs_bigtime.qcow2 xfs_borg_bit.qcow2
         xfs_short_dir_i8.qcow2 xfs_v4_ftype0_s05k_b2k_n8k.qcow2

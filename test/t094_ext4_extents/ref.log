@@ -1,0 +1,64 @@
+/> umka_boot
+/> disk_add ../../img/ext4_s05k.qcow2 hd0 -c 0
+/hd0: sector_size=512, capacity=10485760 (5 GiB), num_partitions=1
+/hd0/1: fs=ext, start=2048 (1 MiB), length=10481664 (5118 MiB)
+/> ls70 /hd0/1/
+status = 6 end_of_file, count = 13
+total = 13
+-h--f .
+-h--f ..
+----f lost+found
+----f dir_a
+----f dir_b
+----f dir_c
+----f dir_d
+----f dir_e
+----f dir_f
+----- no_hole
+----- hole_begin
+----- hole_middle
+----- hole_end
+/> read_partition /hd0/1 15556608 160 -b
+status = 0
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+/> write70 /hd0/1/no_hole 65536 -h 00112233
+status = 0 success, count = 4
+/> stat70 /hd0/1/no_hole
+status = 0 success
+attr: -----
+size: 65540
+/> write70 /hd0/1/no_hole 65540 -h 44556677
+status = 0 success, count = 4
+/> stat70 /hd0/1/no_hole
+status = 0 success
+attr: -----
+size: 65544
+/> read70 /hd0/1/no_hole 65536 100 -b
+status = 6 end_of_file, count = 8
+0011223344556677
+/> read_partition /hd0/1 15556608 160 -b
+status = 0
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+/> 
+/> setfileend70 /hd0/1/no_hole 512
+status = 0 success
+/> stat70 /hd0/1/no_hole
+status = 0 success
+attr: -----
+size: 512
+/> setfileend70 /hd0/1/no_hole 0
+status = 0 success
+/> stat70 /hd0/1/no_hole
+status = 0 success
+attr: -----
+size: 0
+/> 
+/> disk_del hd0

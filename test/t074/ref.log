@@ -47,6 +47,16 @@ ctime: 2005.06.13 00:00:00
 status = 0 success
 status = 0 success
 /> 
+/> setfileend70 /hd0/1/file_2085 0
+status = 0 success
+/> stat70 /hd0/1/file_2085 -amc
+status = 0 success
+attr: -----
+size: 0
+atime: 2085.12.31 23:59:59
+mtime: 2005.04.03 11:22:33
+ctime: 2005.06.13 00:00:00
+/> 
 /> mkdir70 /hd0/1/dira/new_edge_case_dir
 status = 0 success
 /> stat70 /hd0/1/dira/new_edge_case_dir -amc

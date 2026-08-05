@@ -1,0 +1,39 @@
+umka_boot
+disk_add ../../img/ext4_extents.qcow2 hd0 -c 0
+stat70 /hd0/1/test_dir/file_overflow.txt
+setfileend70 /hd0/1/test_dir/file_overflow.txt 45056
+stat70 /hd0/1/test_dir/file_height_0.txt
+read_partition /hd0/1 103680 160 -b
+read70 /hd0/1/test_dir/file_height_0.txt 0 100 -b
+write70 /hd0/1/test_dir/file_height_0.txt 100 -h 00112233
+stat70 /hd0/1/test_dir/file_height_1.txt
+setfileend70 /hd0/1/test_dir/file_height_0.txt 45056
+stat70 /hd0/1/test_dir/file_height_1.txt
+setfileend70 /hd0/1/test_dir/file_height_0.txt 248
+stat70 /hd0/1/test_dir/file_height_0.txt
+read_partition /hd0/1 103680 160 -b
+stat70 /hd0/1/test_dir/file_height_1.txt
+read_partition /hd0/1 103936 160 -b
+read70 /hd0/1/test_dir/file_height_1.txt 0 100 -b
+write70 /hd0/1/test_dir/file_height_1.txt 100 -h 00112233
+stat70 /hd0/1/test_dir/file_height_1.txt
+setfileend70 /hd0/1/test_dir/file_height_1.txt 45056
+stat70 /hd0/1/test_dir/file_height_1.txt
+setfileend70 /hd0/1/test_dir/file_height_1.txt 248
+stat70 /hd0/1/test_dir/file_height_1.txt
+read_partition /hd0/1 103936 160 -b
+stat70 /hd0/1/test_dir/file_height_2.txt
+read_partition /hd0/1 104192 160 -b
+read70 /hd0/1/test_dir/file_height_2.txt 0 100 -b
+write70 /hd0/1/test_dir/file_height_2.txt 100 -h 00112233
+stat70 /hd0/1/test_dir/file_height_2.txt
+setfileend70 /hd0/1/test_dir/file_height_2.txt 45056
+stat70 /hd0/1/test_dir/file_height_2.txt
+setfileend70 /hd0/1/test_dir/file_height_2.txt 248
+stat70 /hd0/1/test_dir/file_height_2.txt
+read_partition /hd0/1 104192 160 -b
+setfileend70 /hd0/1/test_dir/file_height_2.txt 51200
+stat70 /hd0/1/test_dir/file_height_2.txt
+setfileend70 /hd0/1/test_dir/file_height_2.txt 0
+stat70 /hd0/1/test_dir/file_height_2.txt
+disk_del hd0

@@ -15,6 +15,9 @@ touch70 /hd0/1/file_2085 -a 2129-01-01_00:00:00 -c 2129-01-01_00:00:00 -m 2129-0
 stat70 /hd0/1/file_2085 -amc
 touch70 /hd0/1/file_2085 -a 2085-12-31_23:59:59 -c 2026-05-25_09:21:17 -m 2085-12-31_23:59:59
 
+setfileend70 /hd0/1/file_2085 0
+stat70 /hd0/1/file_2085 -amc
+
 mkdir70 /hd0/1/dira/new_edge_case_dir
 stat70 /hd0/1/dira/new_edge_case_dir -amc
 mkdir70 /hd0/1/dira/new_edge_case_dir/sub_dir
