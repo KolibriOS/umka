@@ -3421,6 +3421,31 @@ cmd_write80(struct shell_ctx *ctx, int argc, char **argv) {
     cmd_write(ctx, argc, argv, F80, usage);
 }
 
+static void
+cmd_setfileend70(struct shell_ctx *ctx, int argc, char **argv) {
+    const char *usage =
+        "usage: setfileend70 <file> <new_size>\n"
+        "  file             path/to/file\n"
+        "  new_size         new file size in bytes\n";
+    if (argc < 3) {
+        fputs(usage, ctx->fout);
+        return;
+    }
+    optparse_init(&ctx->opts, argv);
+    struct f7080s4arg fX0 = {.sf = 4};
+    fX0.u.f70.zero = 0;
+    fX0.u.f70.path = optparse_arg(&ctx->opts);
+    if (!parse_uint64(ctx, optparse_arg(&ctx->opts), &fX0.new_size)) {
+        fprintf(ctx->fout, "can't parse new_size\n");
+        return;
+    }
+    struct f7080ret r;
+    COVERAGE_ON();
+    umka_sys_lfn(&fX0, &r, F70);
+    COVERAGE_OFF();
+    print_f70_status(ctx, &r, 0);
+}
+
 static bool
 parse_datetime(struct shell_ctx *ctx, const char *s, struct tm *t) {
     if (sscanf(s, "%4d-%2d-%2d_%2d:%2d:%2d", &t->tm_year, &t->tm_mon,
@@ -4931,6 +4956,7 @@ func_table_t cmd_cmds[] = {
     { "window_redraw",                  cmd_window_redraw },
     { "write70",                        cmd_write70},
     { "write80",                        cmd_write80},
+    { "setfileend70",                   cmd_setfileend70 },
     { "write_devices_dat",              cmd_write_devices_dat },
     { "write_text",                     cmd_write_text },
     { "switch_to_thread",               cmd_switch_to_thread },

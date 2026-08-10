@@ -420,6 +420,23 @@ struct [[gnu::packed]] f7080s3arg {
     } u;
 };
 
+struct [[gnu::packed]] f7080s4arg {
+    uint32_t sf;
+    uint64_t new_size;
+    uint32_t reserved1;
+    void    *reserved2;
+    union {
+        struct [[gnu::packed]] {
+            uint8_t zero;
+            const char *path;
+        } f70;
+        struct {
+            int path_encoding;
+            const char *path;
+        } f80;
+    } u;
+};
+
 struct f7080s1info {
     uint32_t version;
     uint32_t cnt;
