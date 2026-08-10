@@ -7,7 +7,7 @@ status = 0 success
 attr: -----
 size: 40960
 /> setfileend70 /hd0/1/test_dir/file_overflow.txt 45056
-status = 2 unsupported_fs
+status = 0 success
 /> stat70 /hd0/1/test_dir/file_height_0.txt
 status = 0 success
 attr: -----
