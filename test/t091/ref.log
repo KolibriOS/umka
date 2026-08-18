@@ -2,20 +2,36 @@
 /> disk_add ../../img/ext2_s05k.qcow2 hd0 -c 524288
 /hd0: sector_size=512, capacity=10485760 (5 GiB), num_partitions=1
 /hd0/1: fs=ext, start=2048 (1 MiB), length=10481664 (5118 MiB)
-/> read_disk /hd0 1024 0 -b
+/> read_disk /hd0 1049600 0 -b
 status = 0
 
-/> read_disk /hd0 1024 1 -b
+/> read_disk /hd0 1049600 1 -b
 status = 0
-af
-/> read_disk /hd0 1024 32 -b
+80
+/> read_disk /hd0 1049600 32 -b
 status = 0
-af3dc60f838472478e793d69d8477de4d67a816958af554ea3a8489b6b77ce41
-/> read_disk /hd0 1025 31 -b
+804f120000fe1300e6ff0000a1ad11001c261100000000000200000002000000
+/> read_disk /hd0 1049601 31 -b
 status = 0
-3dc60f838472478e793d69d8477de4d67a816958af554ea3a8489b6b77ce41
-/> read_disk /hd0 1025 32 -b
+4f120000fe1300e6ff0000a1ad11001c261100000000000200000002000000
+/> read_disk /hd0 1049601 32 -b
 status = 0
-3dc60f838472478e793d69d8477de4d67a816958af554ea3a8489b6b77ce4100
+4f120000fe1300e6ff0000a1ad11001c26110000000000020000000200000000
+/> 
+/> read_partition /hd0/1 1024 0 -b
+status = 0
+
+/> read_partition /hd0/1 1024 1 -b
+status = 0
+80
+/> read_partition /hd0/1 1024 32 -b
+status = 0
+804f120000fe1300e6ff0000a1ad11001c261100000000000200000002000000
+/> read_partition /hd0/1 1025 31 -b
+status = 0
+4f120000fe1300e6ff0000a1ad11001c261100000000000200000002000000
+/> read_partition /hd0/1 1025 32 -b
+status = 0
+4f120000fe1300e6ff0000a1ad11001c26110000000000020000000200000000
 /> 
 /> disk_del hd0

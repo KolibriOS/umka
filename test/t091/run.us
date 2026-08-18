@@ -1,10 +1,10 @@
 umka_boot
 disk_add ../../img/ext2_s05k.qcow2 hd0 -c 524288
-read_disk /hd0 1024 0 -b
-read_disk /hd0 1024 1 -b
-read_disk /hd0 1024 32 -b
-read_disk /hd0 1025 31 -b
-read_disk /hd0 1025 32 -b
+read_disk /hd0 1049600 0 -b
+read_disk /hd0 1049600 1 -b
+read_disk /hd0 1049600 32 -b
+read_disk /hd0 1049601 31 -b
+read_disk /hd0 1049601 32 -b
 
 read_partition /hd0/1 1024 0 -b
 read_partition /hd0/1 1024 1 -b
