@@ -18,6 +18,6 @@
 #define ISO_SUFFIX ".iso"
 
 struct vdisk*
-vdisk_init_raw(const char *fname, const struct umka_io *io);
+vdisk_init_raw(const char *fname, int writable, const struct umka_io *io);
 
 #endif  // VDISK_RAW_H_INCLUDED

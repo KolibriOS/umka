@@ -43,7 +43,7 @@ vdisk_adjust_cache_size(void *userdata, size_t suggested_size) {
 }
 
 struct vdisk*
-vdisk_init(const char *fname, const int adjust_cache_size,
+vdisk_init(const char *fname, int writable, const int adjust_cache_size,
            const size_t cache_size, const void *io) {
     size_t fname_len = strlen(fname);
     size_t dot_raw_len = strlen(RAW_SUFFIX);
@@ -54,7 +54,7 @@ vdisk_init(const char *fname, const int adjust_cache_size,
          && !strcmp(fname + fname_len - dot_raw_len, RAW_SUFFIX))
         || (fname_len > dot_iso_len
             && !strcmp(fname + fname_len - dot_iso_len, ISO_SUFFIX))) {
-        disk = (struct vdisk*)vdisk_init_raw(fname, io);
+        disk = (struct vdisk*)vdisk_init_raw(fname, writable, io);
     } else if (fname_len > dot_qcow2_len
                && !strcmp(fname + fname_len - dot_qcow2_len, QCOW2_SUFFIX)) {
         disk = (struct vdisk*)vdisk_init_qcow2(fname, io);

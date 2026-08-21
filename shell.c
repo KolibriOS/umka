@@ -390,8 +390,13 @@ highlighter(ic_highlight_env_t *henv, const char *input, void *arg) {
 
 static int
 split_args(char *s, char **argv) {
-    int argc = -1;
-    for (; (argv[++argc] = strtok(s, " \t\n\r")) != NULL; s = NULL);
+    int argc = 0;
+    while (*(s += strspn(s, " \t\n\r"))) {
+        if (*s == '"') { argv[argc++] = ++s; s += strcspn(s, "\""); }
+        else           { argv[argc++] =  s;  s += strcspn(s, " \t\n\r"); }
+        if (*s) *s++ = '\0';
+    }
+    argv[argc] = NULL;
     return argc;
 }
 
@@ -699,6 +704,7 @@ cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
         "usage: disk_add <file> <name> [option]...\n"
         "  <file>           absolute or relative path\n"
         "  <name>           disk name, e.g. hd0 or rd\n"
+        "  -w writable      open disk image for writing\n"
         "  -c cache_size    size of disk cache in bytes\n";
     if (argc < 3) {
         fputs(usage, ctx->fout);
@@ -706,12 +712,16 @@ cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
     }
     size_t cache_size = 0;
     int adjust_cache_size = 0;
+    int writable = 0;
     int opt;
     optparse_init(&ctx->opts, argv);
     const char *file_name = optparse_arg(&ctx->opts);
     const char *disk_name = optparse_arg(&ctx->opts);
-    while ((opt = optparse(&ctx->opts, "c:")) != -1) {
+    while ((opt = optparse(&ctx->opts, "wc:")) != -1) {
         switch (opt) {
+        case 'w':
+            writable = 1;
+            break;
         case 'c':
             cache_size = strtoul(ctx->opts.optarg, NULL, 0);
             adjust_cache_size = 1;
@@ -722,7 +732,7 @@ cmd_disk_add(struct shell_ctx *ctx, int argc, char **argv) {
         }
     }
 
-    struct vdisk *umka_disk = vdisk_init(file_name, adjust_cache_size,
+    struct vdisk *umka_disk = vdisk_init(file_name, writable, adjust_cache_size,
                                          cache_size, ctx->io);
     if (umka_disk) {
         COVERAGE_ON();
