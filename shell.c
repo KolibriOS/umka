@@ -444,6 +444,7 @@ cmd_send_scancode(struct shell_ctx *ctx, int argc, char **argv) {
             return;
         }
     }
+    *scancode = 0;
     monitor_cmd_send_scancodes(ctx->monitor, scancodes);
 }
 
